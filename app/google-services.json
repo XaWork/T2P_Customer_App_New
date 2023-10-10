@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1005056058682",
+    "project_id": "test-project-7c79d",
+    "storage_bucket": "test-project-7c79d.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1005056058682:android:d23ddce24b881063c4dc03",
+        "android_client_info": {
+          "package_name": "me.taste2plate.app.customer"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAzVgZrKfBmLKv6A5FiKOV_TB3XD0DTXSY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
