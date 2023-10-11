@@ -1,4 +1,4 @@
-package me.taste2plate.app.customer.ui.theme
+package me.taste2plate.app.customer.presentation.theme
 
 import androidx.compose.ui.graphics.Color
 

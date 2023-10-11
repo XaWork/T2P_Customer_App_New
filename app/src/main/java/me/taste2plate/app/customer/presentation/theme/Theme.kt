@@ -1,4 +1,4 @@
-package me.taste2plate.app.customer.ui.theme
+package me.taste2plate.app.customer.presentation.theme
 
 import android.app.Activity
 import android.os.Build
@@ -87,17 +87,18 @@ private val DarkColors = darkColorScheme(
 fun T2PCustomerAppTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
     // Dynamic color is available on Android 12+
-    dynamicColor: Boolean = true,
+    dynamicColor: Boolean = false,
     content: @Composable () -> Unit
 ) {
-    val colorScheme = when {
+  /*  val colorScheme = when {
         dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
             val context = LocalContext.current
             if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
         }
         darkTheme -> DarkColors
         else -> LightColors
-    }
+    }*/
+    val colorScheme = if(darkTheme) DarkColors else LightColors
     val view = LocalView.current
     if (!view.isInEditMode) {
         SideEffect {
@@ -110,6 +111,7 @@ fun T2PCustomerAppTheme(
     MaterialTheme(
         colorScheme = colorScheme,
         typography = Typography,
-        content = content
+        content = content,
+        shapes = Shapes
     )
 }
