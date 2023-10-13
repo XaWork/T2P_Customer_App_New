@@ -17,13 +17,13 @@ import me.taste2plate.app.customer.presentation.widgets.AppScaffold
 
 @Composable
 fun SplashScreen(
-    onNavigateToSignInScreen: () -> Unit,
+    onNavigateToOnBoardingScreen: () -> Unit,
     onNavigateToHomeScreen: () -> Unit,
 ) {
 
     LaunchedEffect(key1 = true) {
         delay(3000)
-        onNavigateToSignInScreen()
+        onNavigateToOnBoardingScreen()
     }
 
     AppScaffold(

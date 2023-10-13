@@ -3,12 +3,8 @@ package me.taste2plate.app.customer.presentation.screens.auth.signup
 import android.text.Html
 import androidx.compose.foundation.layout.Column
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AccountBox
-import androidx.compose.material.icons.filled.Build
 import androidx.compose.material.icons.outlined.AccountBox
-import androidx.compose.material.icons.outlined.Build
 import androidx.compose.material.icons.outlined.Email
-import androidx.compose.material.icons.outlined.Lock
 import androidx.compose.material.icons.outlined.Phone
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -19,9 +15,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import me.taste2plate.app.customer.presentation.theme.SpaceBetweenViews
 import me.taste2plate.app.customer.presentation.theme.T2PCustomerAppTheme
 import me.taste2plate.app.customer.presentation.utils.emailString
+import me.taste2plate.app.customer.presentation.utils.getOtpString
 import me.taste2plate.app.customer.presentation.utils.mobileNumber
 import me.taste2plate.app.customer.presentation.utils.referralCodeString
-import me.taste2plate.app.customer.presentation.utils.signUpString
 import me.taste2plate.app.customer.presentation.widgets.AppButton
 import me.taste2plate.app.customer.presentation.widgets.AppCheckBox
 import me.taste2plate.app.customer.presentation.widgets.AppScaffold
@@ -31,7 +27,7 @@ import me.taste2plate.app.customer.presentation.widgets.VerticalSpace
 
 @Composable
 fun SignUpScreen(
-    onNavigateToHomeScreen: () -> Unit
+    onNavigateToOTPScreen: () -> Unit
 ) {
     var mobile by remember {
         mutableStateOf("")
@@ -93,9 +89,9 @@ fun SignUpScreen(
             )
             VerticalSpace(space = SpaceBetweenViews)
             AppButton(
-                text = signUpString
+                text = getOtpString
             ) {
-                onNavigateToHomeScreen()
+                onNavigateToOTPScreen()
             }
         }
     }

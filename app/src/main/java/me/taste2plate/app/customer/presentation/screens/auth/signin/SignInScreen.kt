@@ -10,8 +10,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.tooling.preview.Preview
 import me.taste2plate.app.customer.presentation.theme.SpaceBetweenViews
+import me.taste2plate.app.customer.presentation.utils.getOtpString
 import me.taste2plate.app.customer.presentation.utils.mobileNumber
-import me.taste2plate.app.customer.presentation.utils.signInString
 import me.taste2plate.app.customer.presentation.widgets.AppButton
 import me.taste2plate.app.customer.presentation.widgets.AppScaffold
 import me.taste2plate.app.customer.presentation.widgets.AppTextField
@@ -20,7 +20,7 @@ import me.taste2plate.app.customer.presentation.widgets.VerticalSpace
 
 @Composable
 fun SignInScreen(
-    onNavigateToHomeScreen: () -> Unit
+    onNavigateToOTPScreen: () -> Unit
 ) {
     var mobile by remember {
         mutableStateOf("")
@@ -39,9 +39,9 @@ fun SignInScreen(
             )
             VerticalSpace(space = SpaceBetweenViews)
             AppButton(
-                text = signInString
+                text = getOtpString
             ) {
-                onNavigateToHomeScreen()
+                onNavigateToOTPScreen()
             }
         }
     }

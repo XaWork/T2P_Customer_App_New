@@ -1,5 +1,6 @@
 package me.taste2plate.app.customer.presentation.widgets
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.width
@@ -18,6 +19,18 @@ fun DrawableIcon(
     id: Int,
     ) {
     Icon(
+        modifier = modifier,
+        painter = painterResource(id = id),
+        contentDescription = ""
+    )
+}
+
+@Composable
+fun DrawableImage(
+    modifier: Modifier = Modifier,
+    id: Int,
+    ) {
+    Image(
         modifier = modifier,
         painter = painterResource(id = id),
         contentDescription = ""
