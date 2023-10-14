@@ -1,6 +1,7 @@
 package me.taste2plate.app.customer.presentation.screens.auth.signin
 
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Phone
 import androidx.compose.runtime.Composable
@@ -8,7 +9,9 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import me.taste2plate.app.customer.presentation.theme.ScreenPadding
 import me.taste2plate.app.customer.presentation.theme.SpaceBetweenViews
 import me.taste2plate.app.customer.presentation.utils.getOtpString
 import me.taste2plate.app.customer.presentation.utils.mobileNumber
@@ -26,7 +29,9 @@ fun SignInScreen(
         mutableStateOf("")
     }
     AppScaffold {
-        Column {
+        Column(
+            modifier = Modifier.padding(horizontal = ScreenPadding)
+        ) {
             AppTextField(
                 value = mobile,
                 onValueChanged = { mobile = it },

@@ -2,6 +2,7 @@ package me.taste2plate.app.customer.presentation.screens.auth.signup
 
 import android.text.Html
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.AccountBox
 import androidx.compose.material.icons.outlined.Email
@@ -11,7 +12,9 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import me.taste2plate.app.customer.presentation.theme.ScreenPadding
 import me.taste2plate.app.customer.presentation.theme.SpaceBetweenViews
 import me.taste2plate.app.customer.presentation.theme.T2PCustomerAppTheme
 import me.taste2plate.app.customer.presentation.utils.emailString
@@ -42,7 +45,9 @@ fun SignUpScreen(
         mutableStateOf(false)
     }
     AppScaffold {
-        Column {
+        Column(
+            modifier = Modifier.padding(horizontal = ScreenPadding)
+        ) {
             AppTextField(
                 value = emailValue,
                 onValueChanged = { emailValue = it },

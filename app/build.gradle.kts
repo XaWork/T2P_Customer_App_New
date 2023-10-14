@@ -71,6 +71,9 @@ dependencies {
     debugImplementation("androidx.compose.ui:ui-tooling")
     debugImplementation("androidx.compose.ui:ui-test-manifest")
 
+    //UI
+    implementation("me.onebone:toolbar-compose:2.3.5")
+
     //navigation destination
     implementation("androidx.navigation:navigation-compose:$nav_version")
 

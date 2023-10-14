@@ -24,8 +24,7 @@ fun AppScaffold(
     content: @Composable () -> Unit
 ) {
     Scaffold(
-        modifier = modifier
-            .fillMaxSize() ,
+        modifier = modifier,
         topBar = topBar,
         bottomBar = bottomBar,
         floatingActionButton = floatingActionButton,
@@ -33,8 +32,7 @@ fun AppScaffold(
         val paddingValue = it
         Surface(
             modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues),
+                .padding(it),
             color = MaterialTheme.colorScheme.background
         ) {
             content()

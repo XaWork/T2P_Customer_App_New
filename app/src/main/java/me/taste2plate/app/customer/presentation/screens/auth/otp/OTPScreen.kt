@@ -3,6 +3,7 @@ package me.taste2plate.app.customer.presentation.screens.auth.otp
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Lock
@@ -21,6 +22,7 @@ import me.taste2plate.app.customer.R
 import me.taste2plate.app.customer.presentation.screens.auth.signin.SignInScreen
 import me.taste2plate.app.customer.presentation.theme.ExtraHighSpacing
 import me.taste2plate.app.customer.presentation.theme.HighSpacing
+import me.taste2plate.app.customer.presentation.theme.ScreenPadding
 import me.taste2plate.app.customer.presentation.theme.SpaceBetweenViews
 import me.taste2plate.app.customer.presentation.theme.T2PCustomerAppTheme
 import me.taste2plate.app.customer.presentation.utils.otpString
@@ -43,8 +45,10 @@ fun OTPScreen(
     AppScaffold {
         Column(
             verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier.padding(horizontal = ScreenPadding)
         ) {
+            VerticalSpace(space = ExtraHighSpacing)
             DrawableImage(id = R.drawable.logo_new, modifier = Modifier.size(100.dp))
             VerticalSpace(space = HighSpacing)
             Text("Enter OTP", textAlign = TextAlign.Start)

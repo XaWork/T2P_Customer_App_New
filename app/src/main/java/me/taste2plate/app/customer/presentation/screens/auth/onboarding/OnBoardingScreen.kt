@@ -52,7 +52,7 @@ fun OnBoardingScreen(
         ) {
             VerticalSpace(space = ExtraHighSpacing)
             DrawableImage(id = R.drawable.logo_new, modifier = Modifier.size(100.dp))
-            VerticalSpace(space = SpaceBetweenViews)
+            VerticalSpace(space = HighSpacing)
             TabRow(
                 selectedTabIndex = pagerState.currentPage,
                 /*indicator = { tabPositions ->
