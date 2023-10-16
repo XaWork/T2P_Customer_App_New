@@ -73,6 +73,7 @@ dependencies {
 
     //UI
     implementation("me.onebone:toolbar-compose:2.3.5")
+    implementation("io.coil-kt:coil-compose:2.4.0")
 
     //navigation destination
     implementation("androidx.navigation:navigation-compose:$nav_version")

@@ -15,7 +15,7 @@ import me.taste2plate.app.customer.presentation.screens.splash.SplashScreen
 fun Navigation() {
     val navController = rememberNavController()
 
-    NavHost(navController = navController, startDestination = Screens.SplashScreen.route) {
+    NavHost(navController = navController, startDestination = Screens.HomeScreen.route) {
 
         // --------------------------> Splash Screen <------------------------------------
         composable(route = Screens.SplashScreen.route) {

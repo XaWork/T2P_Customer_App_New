@@ -71,3 +71,9 @@ val seed = Color(0xFFDE2228)
 
 val GreyLight = Color(0xFFB5B6BA)
 val GreyDark = Color(0xFF60626C)
+
+val YellowBanner = Color(0xFFfce039)
+val YellowBannerDark = Color(0xFF6c5e00)
+
+val ForestGreen = Color(0xFF176d29)
+val ForestGreenDark = Color(0xFF86d988)

@@ -1,5 +1,6 @@
 package me.taste2plate.app.customer.presentation.screens.home.widgets
 
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.interaction.collectIsDraggedAsState
@@ -16,6 +17,7 @@ import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Card
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
@@ -25,12 +27,18 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.layout.ScaleFactor
+import androidx.compose.ui.layout.lerp
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.yield
 import me.taste2plate.app.customer.R
+import me.taste2plate.app.customer.presentation.theme.ScreenPadding
 import me.taste2plate.app.customer.presentation.widgets.DrawableImage
+import kotlin.math.absoluteValue
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -42,20 +50,56 @@ fun AutoSlidingCarousel(
         R.drawable.home_brand, R.drawable.home_category,
         R.drawable.home_city, R.drawable.home_cuisine
     )
-    val pagerState = rememberPagerState(pageCount = { pages.size })
+    val pagerState = rememberPagerState(pageCount = { pages.size }, initialPageOffsetFraction = 0.4f)
     val isDragged by pagerState.interactionSource.collectIsDraggedAsState()
 
-    LaunchedEffect(pagerState.currentPage) {
-        delay(autoSlideDuration)
-        pagerState.animateScrollToPage((pagerState.currentPage + 1) % pages.size)
+    LaunchedEffect(Unit) {
+        while (true) {
+            yield()
+            delay(autoSlideDuration)
+            pagerState.animateScrollToPage(
+                page = (pagerState.currentPage + 1) % (pagerState.pageCount),
+                animationSpec = tween(600)
+            )
+
+        }
     }
 
     Box(
-        modifier = modifier.fillMaxWidth().height(210.dp),
+        modifier = modifier
+            .fillMaxWidth()
+            .height(200.dp)
+            .padding(ScreenPadding),
     ) {
-        HorizontalPager(state = pagerState) { page ->
-            SingleSliderImage(page)
+        HorizontalPager(
+            beyondBoundsPageCount = pages.size,
+            state = pagerState
+        ) { page ->
+            Card(
+                modifier = Modifier.graphicsLayer {
+                    val pageOffset: Float =
+                        (pagerState.currentPage - page) + pagerState.currentPageOffsetFraction.absoluteValue
+                    lerp(
+                        start = ScaleFactor(0.05F, 0.05F),
+                        stop = ScaleFactor(1F, 1F),
+                        fraction = pageOffset.coerceIn(0f, 1f)
+                    )
+                }
+                    .fillMaxWidth(),
+                shape = RoundedCornerShape(10.dp)
+            ) {
+                DrawableImage(
+                    id = pages[page],
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clip(RoundedCornerShape(10.dp))
+                        .height(200.dp),
+                    contentScale = ContentScale.Crop
+                )
+            }
+
         }
+
         Surface(
             modifier = Modifier
                 .padding(bottom = 8.dp)
@@ -74,13 +118,9 @@ fun AutoSlidingCarousel(
 }
 
 @Composable
-fun SingleSliderImage(index: Int) {
-    val pages = listOf(
-        R.drawable.home_brand, R.drawable.home_category,
-        R.drawable.home_city, R.drawable.home_cuisine
-    )
+fun SingleSliderImage(id: Int) {
     DrawableImage(
-        id = pages[index],
+        id = id,
         modifier = Modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(10.dp))
@@ -108,7 +148,6 @@ fun DotsIndicator(
                 color = if (index == selectedIndex) selectedColor else unSelectedColor,
                 size = dotSize
             )
-
             if (index != totalDots - 1) {
                 Spacer(modifier = Modifier.padding(horizontal = 2.dp))
             }

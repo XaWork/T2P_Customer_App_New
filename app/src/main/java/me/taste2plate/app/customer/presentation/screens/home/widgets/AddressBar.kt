@@ -2,6 +2,7 @@ package me.taste2plate.app.customer.presentation.screens.home.widgets
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -18,6 +19,8 @@ import me.taste2plate.app.customer.presentation.theme.ScreenPadding
 import me.taste2plate.app.customer.presentation.theme.SpaceBetweenViewsAndSubViews
 import me.taste2plate.app.customer.presentation.theme.T2PCustomerAppTheme
 import me.taste2plate.app.customer.presentation.theme.VeryLowSpacing
+import me.taste2plate.app.customer.presentation.theme.YellowBanner
+import me.taste2plate.app.customer.presentation.theme.YellowBannerDark
 import me.taste2plate.app.customer.presentation.widgets.HorizontalSpace
 import me.taste2plate.app.customer.presentation.widgets.MaterialIcon
 
@@ -29,7 +32,7 @@ fun AddressBar(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .background(color = Color.Yellow)
+            .background(color = if(isSystemInDarkTheme()) YellowBannerDark else YellowBanner)
             .padding(
                 horizontal = ScreenPadding,
                 vertical = 2.dp
