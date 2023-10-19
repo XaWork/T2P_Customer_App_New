@@ -6,11 +6,9 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.pager.HorizontalPager
@@ -32,7 +30,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
@@ -46,16 +43,15 @@ import me.taste2plate.app.customer.presentation.theme.ForestGreen
 import me.taste2plate.app.customer.presentation.theme.ForestGreenDark
 import me.taste2plate.app.customer.presentation.theme.LowPadding
 import me.taste2plate.app.customer.presentation.theme.LowRoundedCorners
-import me.taste2plate.app.customer.presentation.theme.MediumRoundedCorners
 import me.taste2plate.app.customer.presentation.theme.ScreenPadding
 import me.taste2plate.app.customer.presentation.theme.SpaceBetweenViews
 import me.taste2plate.app.customer.presentation.theme.SpaceBetweenViewsAndSubViews
 import me.taste2plate.app.customer.presentation.theme.T2PCustomerAppTheme
 import me.taste2plate.app.customer.presentation.utils.rupeeSign
-import me.taste2plate.app.customer.presentation.widgets.CircleIconButton
+import me.taste2plate.app.customer.presentation.widgets.ImageWithWishlistButton
 import me.taste2plate.app.customer.presentation.widgets.InfoWithIcon
 import me.taste2plate.app.customer.presentation.widgets.MaterialIcon
-import me.taste2plate.app.customer.presentation.widgets.NetworkImage
+import me.taste2plate.app.customer.presentation.widgets.RedBorderCard
 import me.taste2plate.app.customer.presentation.widgets.RoundedCornerIconButton
 import me.taste2plate.app.customer.presentation.widgets.VerticalSpace
 import kotlin.math.absoluteValue
@@ -82,7 +78,6 @@ fun MostOrderedItemList() {
         VerticalSpace(space = SpaceBetweenViewsAndSubViews)
         HorizontalPager(
             state = pagerState,
-            modifier = Modifier.padding(horizontal = ScreenPadding)
         ) {
             SingleMostOrderedItem(it, pagerState = pagerState)
         }
@@ -97,124 +92,94 @@ fun SingleMostOrderedItem(
     pagerState: PagerState,
 ) {
     val product = productList[page]
-    Card(
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(
-                start = ScreenPadding,
-                end = ScreenPadding,
-                bottom = ScreenPadding
-            )
-            .graphicsLayer {
-                val pageOffset: Float =
-                    (pagerState.currentPage - page) + pagerState.currentPageOffsetFraction.absoluteValue
-                translationX = pageOffset * size.width
-                // apply an alpha to fade the current page in and the old page out
-                alpha = 1 - pageOffset.absoluteValue
-            },
-        shape = RoundedCornerShape(MediumRoundedCorners),
-        border = BorderStroke(
-            width = 0.5.dp,
-            color = MaterialTheme.colorScheme.primary
-        )
+    RedBorderCard(
+        modifier = modifier.graphicsLayer {
+            val pageOffset: Float =
+                (pagerState.currentPage - page) + pagerState.currentPageOffsetFraction.absoluteValue
+            translationX = pageOffset * size.width
+            alpha = 1 - pageOffset.absoluteValue
+        }
     ) {
-        Box {
-            Box(
-                modifier = Modifier.align(
-                    Alignment.TopEnd
-                )
+        Column {
+            ImageWithWishlistButton(image = product.image)
+
+            VerticalSpace(space = SpaceBetweenViewsAndSubViews)
+
+            Column(
+                modifier = Modifier.padding(ScreenPadding)
             ) {
-                CircleIconButton(
-                    painterResource = R.drawable.heart,
-                ) {}
-            }
-            Column {
-                NetworkImage(
-                    image = product.image,
+                Row(
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .height(150.dp),
-                    contentScale = ContentScale.Crop
+                        .fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        "Flat $rupeeSign${product.flatOff} OFF",
+                        color = MaterialTheme.colorScheme.tertiary
+                    )
+
+                    Row(
+                        modifier = Modifier
+                            .clip(RoundedCornerShape(LowRoundedCorners))
+                            .clip(RoundedCornerShape(LowRoundedCorners))
+                            .background(
+                                color = if (isSystemInDarkTheme()) ForestGreenDark
+                                else ForestGreen
+                            )
+                            .padding(horizontal = LowPadding),
+                        horizontalArrangement = Arrangement.Center,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = product.rating,
+                            color = MaterialTheme.colorScheme.background,
+                            fontSize = 14.sp
+                        )
+
+                        MaterialIcon(
+                            imageVector = Icons.Rounded.Star,
+                            tint = MaterialTheme.colorScheme.background,
+                            modifier = Modifier.size(15.dp)
+                        )
+                    }
+                }
+
+                VerticalSpace(space = SpaceBetweenViews)
+
+                Text(
+                    text = product.name,
+                    style = MaterialTheme.typography.titleMedium
+                )
+
+                Text(
+                    text = product.brand,
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Light
                 )
 
                 VerticalSpace(space = SpaceBetweenViewsAndSubViews)
 
-                Column(
-                    modifier = Modifier.padding(ScreenPadding)
-                ) {
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Text(
-                            "Flat $rupeeSign${product.flatOff} OFF",
-                            color = MaterialTheme.colorScheme.tertiary
-                        )
+                InfoWithIcon(
+                    icon = true,
+                    imageVector = Icons.Outlined.LocationOn,
+                    info = product.address
+                )
 
-                        Row(
-                            modifier = Modifier
-                                .clip(RoundedCornerShape(LowRoundedCorners))
-                                .clip(RoundedCornerShape(LowRoundedCorners))
-                                .background(
-                                    color = if (isSystemInDarkTheme()) ForestGreenDark
-                                    else ForestGreen
-                                )
-                                .padding(horizontal = LowPadding),
-                            horizontalArrangement = Arrangement.Center,
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Text(
-                                text = product.rating,
-                                color = MaterialTheme.colorScheme.background,
-                                fontSize = 14.sp
-                            )
+                VerticalSpace(space = SpaceBetweenViewsAndSubViews)
 
-                            MaterialIcon(
-                                imageVector = Icons.Rounded.Star,
-                                tint = MaterialTheme.colorScheme.background,
-                                modifier = Modifier.size(15.dp)
-                            )
-                        }
-                    }
-
-                    VerticalSpace(space = SpaceBetweenViews)
-
-                    Text(
-                        text = product.name,
-                        style = MaterialTheme.typography.titleMedium
+                InfoWithIcon(
+                    icon = false,
+                    id = R.drawable.delivery_bike,
+                    info = product.delivery,
+                    colorFilter = ColorFilter.tint(
+                        color = MaterialTheme.colorScheme.onSurface
                     )
+                )
 
-                    Text(
-                        text = product.restaurant,
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.Light
-                    )
+                VerticalSpace(space = SpaceBetweenViews)
 
-                    VerticalSpace(space = SpaceBetweenViewsAndSubViews)
-
-                    InfoWithIcon(
-                        icon = true,
-                        imageVector = Icons.Outlined.LocationOn,
-                        info = product.address
-                    )
-
-                    VerticalSpace(space = SpaceBetweenViewsAndSubViews)
-
-                    InfoWithIcon(
-                        icon = false,
-                        id = R.drawable.delivery_bike,
-                        info = product.delivery,
-                        colorFilter = ColorFilter.tint(
-                            color = MaterialTheme.colorScheme.onSurface
-                        )
-                    )
-
-                    VerticalSpace(space = SpaceBetweenViews)
-
-                    MostOrderedPriceCard("250")
-                }
+                MostOrderedPriceCard("250")
             }
         }
     }

@@ -50,7 +50,8 @@ fun AutoSlidingCarousel(
         R.drawable.home_brand, R.drawable.home_category,
         R.drawable.home_city, R.drawable.home_cuisine
     )
-    val pagerState = rememberPagerState(pageCount = { pages.size }, initialPageOffsetFraction = 0.4f)
+    val pagerState =
+        rememberPagerState(pageCount = { pages.size }, initialPageOffsetFraction = 0.4f)
     val isDragged by pagerState.interactionSource.collectIsDraggedAsState()
 
     LaunchedEffect(Unit) {
@@ -68,35 +69,30 @@ fun AutoSlidingCarousel(
     Box(
         modifier = modifier
             .fillMaxWidth()
-            .height(200.dp)
-            .padding(ScreenPadding),
+            .height(200.dp),
     ) {
         HorizontalPager(
             beyondBoundsPageCount = pages.size,
             state = pagerState
         ) { page ->
-            Card(
-                modifier = Modifier.graphicsLayer {
-                    val pageOffset: Float =
-                        (pagerState.currentPage - page) + pagerState.currentPageOffsetFraction.absoluteValue
-                    lerp(
-                        start = ScaleFactor(0.05F, 0.05F),
-                        stop = ScaleFactor(1F, 1F),
-                        fraction = pageOffset.coerceIn(0f, 1f)
-                    )
-                }
-                    .fillMaxWidth(),
-                shape = RoundedCornerShape(10.dp)
-            ) {
-                DrawableImage(
-                    id = pages[page],
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clip(RoundedCornerShape(10.dp))
-                        .height(200.dp),
-                    contentScale = ContentScale.Crop
-                )
-            }
+            SingleTopList(
+                pages[page],
+                modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .clip(RoundedCornerShape(10.dp))
+                    .height(200.dp)
+                    .padding(horizontal = ScreenPadding)
+                    .graphicsLayer {
+                        val pageOffset: Float =
+                            (pagerState.currentPage - page) + pagerState.currentPageOffsetFraction.absoluteValue
+                        lerp(
+                            start = ScaleFactor(0.05F, 0.05F),
+                            stop = ScaleFactor(1F, 1F),
+                            fraction = pageOffset.coerceIn(0f, 1f)
+                        )
+                    },
+            )
 
         }
 

@@ -58,7 +58,8 @@ fun HeadingChipWithLine(
         Text(
             text,
             modifier = Modifier
-                .padding(horizontal = MediumPadding)
+                .padding(horizontal = MediumPadding),
+            color = MaterialTheme.colorScheme.background
         )
         Divider(
             thickness = 2.dp,

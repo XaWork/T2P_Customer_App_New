@@ -22,8 +22,15 @@ val VeryLowSpacing = 5.dp
 val LowPadding = 5.dp
 val MediumPadding = 10.dp
 val HighPadding = 15.dp
+val ExtraHighPadding = 30.dp
 
 // ---------------------> Rounded Corners <--------------------
 val LowRoundedCorners = 5.dp
 val MediumRoundedCorners = 10.dp
 val HighRoundedCorners = 15.dp
+
+// ---------------------> Icon Size <--------------------
+val SmallIcon = 24.dp
+val RegularIcon = 24.dp
+val MediumIcon = 40.dp
+val LargeIcon = 70.dp

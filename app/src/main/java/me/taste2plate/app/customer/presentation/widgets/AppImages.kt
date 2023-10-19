@@ -1,7 +1,9 @@
 package me.taste2plate.app.customer.presentation.widgets
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
@@ -18,6 +20,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
@@ -44,6 +47,7 @@ fun DrawableIcon(
     )
 }
 
+//Image that store in drawable folder whether it is jpg/png
 @Composable
 fun DrawableImage(
     modifier: Modifier = Modifier,
@@ -60,6 +64,8 @@ fun DrawableImage(
     )
 }
 
+
+//Icons for ex : Icons.Default.Lock
 @Composable
 fun MaterialIcon(
     modifier: Modifier = Modifier,
@@ -121,9 +127,11 @@ fun HorizontalSpace(space: Dp) {
 @Composable
 fun CircleIconButton(
     painterResource: Int,
-    onclick: () -> Unit
+    modifier: Modifier = Modifier,
+    onclick: () -> Unit,
 ) {
     Card(
+        modifier = modifier,
         shape = CircleShape,
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.outlineVariant
@@ -184,4 +192,27 @@ fun NetworkImage(
         contentScale = contentScale,
         contentDescription = ""
     )
+}
+
+@Composable
+fun ImageWithWishlistButton(
+    withButton: Boolean = true,
+    image: String
+) {
+    Box {
+        NetworkImage(
+            image = image,
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(200.dp),
+            contentScale = ContentScale.Crop
+        )
+        if (withButton)
+            CircleIconButton(
+                painterResource = R.drawable.heart,
+                modifier = Modifier
+                    .align(Alignment.TopEnd)
+                    .padding(10.dp)
+            ) {}
+    }
 }

@@ -31,7 +31,9 @@ import me.taste2plate.app.customer.presentation.widgets.MaterialIconButton
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun HomeAppBar() {
+fun HomeAppBar(
+    onNavigationIconClick : () -> Unit
+) {
     TopAppBar(
         colors = TopAppBarDefaults.largeTopAppBarColors(
             containerColor = MaterialTheme.colorScheme.primary,
@@ -57,9 +59,11 @@ fun HomeAppBar() {
             }
         },
         navigationIcon = {
-            MaterialIcon(
-                imageVector = Icons.Default.Menu,
-            )
+            MaterialIconButton(
+                imageVector = Icons.Default.Menu
+            ){
+                onNavigationIconClick()
+            }
         },
         actions = {
             DrawableIconButton(
@@ -80,6 +84,6 @@ fun HomeAppBar() {
 @Composable
 fun HomeAppBarPreview() {
     T2PCustomerAppTheme {
-        HomeAppBar()
+        HomeAppBar(){}
     }
 }

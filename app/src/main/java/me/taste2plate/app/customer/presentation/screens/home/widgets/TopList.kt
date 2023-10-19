@@ -43,7 +43,7 @@ fun SingleTopList(image: Int, modifier: Modifier = Modifier) {
         modifier = modifier
             .clip(RoundedCornerShape(10.dp))
             .height(80.dp),
-        contentScale = ContentScale.FillBounds
+        contentScale = ContentScale.Crop
     )
 }
 
