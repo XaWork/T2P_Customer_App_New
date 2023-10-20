@@ -5,7 +5,10 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
@@ -17,7 +20,9 @@ import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import me.taste2plate.app.customer.presentation.screens.countries
 import me.taste2plate.app.customer.presentation.theme.GreyDark
 import me.taste2plate.app.customer.presentation.theme.GreyLight
 
@@ -28,8 +33,10 @@ fun AppTextField(
     modifier: Modifier = Modifier,
     value: String,
     onValueChanged: (String) -> Unit,
-    hint: String,
-    leadingIcon: @Composable () -> Unit = {}
+    hint: String = "",
+    readOnly : Boolean = false,
+    leadingIcon: @Composable (() -> Unit)? = null,
+    trailingIcon: @Composable (() -> Unit)? = null,
 ) {
     OutlinedTextField(
         modifier = modifier
@@ -37,7 +44,13 @@ fun AppTextField(
         value = "",
         onValueChange = { onValueChanged(it) },
         leadingIcon = leadingIcon,
-        label = { Text(text = hint) },
+        trailingIcon = trailingIcon,
+        readOnly = readOnly,
+        label = { Text(
+            text = hint,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis
+        ) },
     )
 }
 
@@ -102,6 +115,50 @@ private fun CharView(
         text = char,
         style = MaterialTheme.typography.headlineSmall,
         textAlign = TextAlign.Center,
-        color = if(isFocused) Color.White else Color.Black
+        color = if (isFocused) Color.White else Color.Black
     )
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun AppDropDown(
+    expanded: Boolean,
+    modifier: Modifier = Modifier,
+    onExpandedChange: () -> Unit,
+    selectedText: String,
+    hint: String ="",
+    onTextChanged: (String) -> Unit
+
+) {
+    ExposedDropdownMenuBox(
+        modifier = modifier,
+        expanded = expanded,
+        onExpandedChange = {
+            onExpandedChange()
+        }
+    ) {
+        AppTextField(
+            modifier = Modifier.menuAnchor(),
+            value = selectedText,
+            onValueChanged = {},
+            readOnly = true,
+            hint = hint,
+            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
+        )
+
+        ExposedDropdownMenu(
+            expanded = expanded,
+            onDismissRequest = { onExpandedChange() }
+        ) {
+            countries.forEach { item ->
+                DropdownMenuItem(
+                    text = { Text(text = item) },
+                    onClick = {
+                        onTextChanged(item)
+                        onExpandedChange()
+                    }
+                )
+            }
+        }
+    }
 }

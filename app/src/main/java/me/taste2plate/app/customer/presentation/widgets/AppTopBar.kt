@@ -17,7 +17,7 @@ import me.taste2plate.app.customer.presentation.theme.T2PCustomerAppTheme
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AppTopBar(
-    title: String = "Title",
+    title: String = "Taste2Plate",
     tasteVisible: Boolean = false,
     onBackClick: () -> Unit
 ) {

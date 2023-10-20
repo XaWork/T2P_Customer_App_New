@@ -65,8 +65,8 @@ fun SingleFeaturedItem(
                 modifier = Modifier.padding(ScreenPadding)
             ) {
                 RatingInfoRow(
-                    "Flat $rupeeSign${product.flatOff} OFF",
-                    product.rating
+                    flatOff = "Flat $rupeeSign${product.flatOff} OFF",
+                    rating = product.rating
                 )
 
                 VerticalSpace(space = SpaceBetweenViews)

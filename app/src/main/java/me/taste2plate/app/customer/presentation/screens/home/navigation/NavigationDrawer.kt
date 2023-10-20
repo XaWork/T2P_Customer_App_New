@@ -49,6 +49,7 @@ import me.taste2plate.app.customer.presentation.widgets.VerticalSpace
 @Composable
 fun NavigationDrawer(
     drawerState: DrawerState,
+    onItemClick : (String) -> Unit,
     content: @Composable () -> Unit
 ) {
     val coroutineScope = rememberCoroutineScope()
@@ -116,6 +117,7 @@ fun NavigationDrawer(
                                 coroutineScope.launch {
                                     drawerState.close()
                                 }
+                                onItemClick(item.id)
                             })
                     }
                 }

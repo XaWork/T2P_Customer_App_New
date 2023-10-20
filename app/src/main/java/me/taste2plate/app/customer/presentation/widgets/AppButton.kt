@@ -27,7 +27,7 @@ fun AppButton(
         modifier = modifier
             .fillMaxWidth(),
         onClick = { onClick() }) {
-        Text(text = text)
+        Text(text = text.uppercase())
     }
 }
 

@@ -39,6 +39,7 @@ import me.taste2plate.app.customer.presentation.utils.rupeeSign
 
 @Composable
 fun InfoWithIcon(
+    modifier: Modifier = Modifier,
     icon: Boolean = false,
     imageVector: ImageVector = Icons.Default.LocationOn,
     id: Int = 0,
@@ -51,6 +52,7 @@ fun InfoWithIcon(
     fontSize: TextUnit = 12.sp
 ) {
     Row(
+        modifier = modifier,
         verticalAlignment = Alignment.CenterVertically
     ) {
         if (icon)
@@ -70,12 +72,13 @@ fun InfoWithIcon(
 
 @Composable
 fun RatingInfoRow(
+    modifier: Modifier = Modifier,
     flatOff: String,
     rating: String,
     showIcon: Boolean = true
 ) {
     Row(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
@@ -110,6 +113,22 @@ fun RatingInfoRow(
                     modifier = Modifier.size(15.dp)
                 )
         }
+    }
+}
+
+@Composable
+fun SpaceBetweenRow(
+    modifier: Modifier = Modifier,
+    item1 : @Composable () -> Unit,
+    item2 : @Composable () -> Unit,
+) {
+    Row(
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = modifier.fillMaxWidth()
+    ) {
+        item1()
+        item2()
     }
 }
 

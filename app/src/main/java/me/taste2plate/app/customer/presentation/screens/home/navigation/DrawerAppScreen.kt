@@ -18,15 +18,18 @@ enum class DrawerAppScreen {
     Orders,
     Profile,
     BulkOrders,
+    Wallet,
     MembershipPlan,
     MyPlan,
     RateApp,
+    ReferAndEarn,
     ShareApp,
     ContactUs,
     LogOut,
 }
 
 data class DrawerItem(
+    val id: String,
     val icon: Int,
     val title: String,
     val selected: Boolean = false
@@ -34,57 +37,68 @@ data class DrawerItem(
 
 val drawerItems = listOf(
     DrawerItem(
+        id = DrawerAppScreen.Home.name,
         icon = R.drawable.ic_store_mall_directory_green_24dp,
         title = homeString,
         selected = true
     ),
 
     DrawerItem(
+        id = DrawerAppScreen.Orders.name,
         icon = R.drawable.ic_local_dining_green_24dp,
         title = ordersString,
     ),
 
     DrawerItem(
+        id = DrawerAppScreen.Profile.name,
         icon = R.drawable.ic_person_pin_green_24dp,
         title = profileString,
     ),
 
     DrawerItem(
+        id = DrawerAppScreen.BulkOrders.name,
         icon = R.drawable.shopping_bag,
         title = bulkOrderString,
     ),
 
     DrawerItem(
+        id = DrawerAppScreen.MembershipPlan.name,
         icon = R.drawable.ic_rank,
         title = membershipPlansString,
     ),
 
     DrawerItem(
+        id = DrawerAppScreen.MyPlan.name,
         icon = R.drawable.food_plan,
         title = myPlanString,
     ),
 
     DrawerItem(
+        id = DrawerAppScreen.Wallet.name,
         icon = R.drawable.wallet,
         title = walletString,
     ),
 
     DrawerItem(
+        id = DrawerAppScreen.RateApp.name,
         icon = R.drawable.ic_thumb_up_green_24dp,
         title = rateAppString,
     ),
 
     DrawerItem(
+        id = DrawerAppScreen.ReferAndEarn.name,
         icon = R.drawable.ic_share_green_24dp,
         title = referAppAndEarnPointsString,
     ),
 
     DrawerItem(
+        id = DrawerAppScreen.ContactUs.name,
         icon = R.drawable.ic_person_pin_green_24dp,
         title = contactUsString,
     ),
 
     DrawerItem(
+        id = DrawerAppScreen.LogOut.name,
         icon = R.drawable.ic_logout,
         title = logOutString,
     ),

@@ -1,10 +1,12 @@
 package me.taste2plate.app.customer.presentation.screens.home
 
 import android.content.res.Configuration
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
@@ -22,6 +24,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
 import me.taste2plate.app.customer.R
+import me.taste2plate.app.customer.presentation.screens.home.navigation.DrawerAppScreen
 import me.taste2plate.app.customer.presentation.screens.home.navigation.NavigationDrawer
 import me.taste2plate.app.customer.presentation.screens.home.widgets.AddressBar
 import me.taste2plate.app.customer.presentation.screens.home.widgets.AutoSlidingCarousel
@@ -44,16 +47,50 @@ import me.taste2plate.app.customer.presentation.widgets.VerticalSpace
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun HomeScreen() {
+fun HomeScreen(
+    onNavigateToOrderScreen: () -> Unit,
+    onNavigateToProfileScreen: () -> Unit,
+    onNavigateToBulkOrdersScreen: () -> Unit,
+    onNavigateToWalletScreen: () -> Unit,
+    onNavigateToMembershipPlanScreen: () -> Unit,
+    onNavigateToMyPlanScreen: () -> Unit,
+    onNavigateContactUsScreen: () -> Unit,
+    onNavigateReferAndEarnScreen: () -> Unit,
+    onNavigateLogoutScreen: () -> Unit,
+) {
     var searchValue by remember {
         mutableStateOf("")
     }
+
+    val scrollState = rememberLazyListState()
+  //  val position by animateFloatAsState(if (scrollUpState.value == true) -150f else 0f, label = "")
 
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
 
     val scope = rememberCoroutineScope()
 
-    NavigationDrawer(drawerState = drawerState) {
+    NavigationDrawer(drawerState = drawerState, onItemClick = { id ->
+        when (id) {
+            DrawerAppScreen.Home.name -> {}
+            DrawerAppScreen.Orders.name -> {
+                onNavigateToOrderScreen()
+            }
+            DrawerAppScreen.Profile.name -> {
+                onNavigateToProfileScreen()
+            }
+            DrawerAppScreen.BulkOrders.name -> {}
+            DrawerAppScreen.Wallet.name -> {}
+            DrawerAppScreen.MembershipPlan.name -> {}
+            DrawerAppScreen.MyPlan.name -> {}
+            DrawerAppScreen.RateApp.name -> {}
+            DrawerAppScreen.ReferAndEarn.name -> {}
+            DrawerAppScreen.ShareApp.name -> {}
+            DrawerAppScreen.ContactUs.name -> {}
+            DrawerAppScreen.LogOut.name -> {
+                onNavigateLogoutScreen()
+            }
+        }
+    }) {
         AppScaffold(
             topBar = {
                 HomeAppBar {
@@ -74,11 +111,12 @@ fun HomeScreen() {
             }
         ) {
             Column {
-                SearchBar(value = searchValue, onValueChange = {
-                    searchValue = it
-                }) {}
+//                SearchBar(value = searchValue, onValueChange = {
+//                    searchValue = it
+//                }) {}
                 AddressBar("Address here") {}
                 LazyColumn(
+                    state = scrollState,
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     item {
@@ -127,6 +165,6 @@ fun HomeScreen() {
 @Composable
 fun HomePreview() {
     T2PCustomerAppTheme {
-        HomeScreen()
+        HomeScreen({},{},{},{},{},{},{},{},{},)
     }
 }

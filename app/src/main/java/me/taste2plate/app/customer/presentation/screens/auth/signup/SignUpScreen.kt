@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.AccountBox
 import androidx.compose.material.icons.outlined.Email
+import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material.icons.outlined.Phone
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -51,35 +52,42 @@ fun SignUpScreen(
             AppTextField(
                 value = emailValue,
                 onValueChanged = { emailValue = it },
-                hint = emailString,
-                leadingIcon = {
-                    MaterialIcon(
-                        imageVector = Icons.Outlined.Email
-                    )
-                }
-            )
+                hint = "Full Name"
+            ) {
+                MaterialIcon(
+                    imageVector = Icons.Outlined.Person
+                )
+            }
+            VerticalSpace(space = SpaceBetweenViews)
+            AppTextField(
+                value = emailValue,
+                onValueChanged = { emailValue = it },
+                hint = emailString
+            ) {
+                MaterialIcon(
+                    imageVector = Icons.Outlined.Email
+                )
+            }
             VerticalSpace(space = SpaceBetweenViews)
             AppTextField(
                 value = mobile,
                 onValueChanged = { mobile = it },
-                hint = mobileNumber,
-                leadingIcon = {
-                    MaterialIcon(
-                        imageVector = Icons.Outlined.Phone
-                    )
-                }
-            )
+                hint = mobileNumber
+            ) {
+                MaterialIcon(
+                    imageVector = Icons.Outlined.Phone
+                )
+            }
             VerticalSpace(space = SpaceBetweenViews)
             AppTextField(
                 value = referralCode,
                 onValueChanged = { referralCode = it },
-                hint = referralCodeString,
-                leadingIcon = {
-                    MaterialIcon(
-                        imageVector = Icons.Outlined.AccountBox
-                    )
-                }
-            )
+                hint = referralCodeString
+            ) {
+                MaterialIcon(
+                    imageVector = Icons.Outlined.AccountBox
+                )
+            }
             VerticalSpace(space = SpaceBetweenViews)
             val text = Html.fromHtml(
                 "By signing up, you agree to our <span style=\"color:#de2228\">Terms</span> and <span style=\"color:#de2228\">Conditions</span>".trim(),

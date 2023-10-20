@@ -31,3 +31,7 @@ data class Product(
     val delivery : String = "01 Dec, 4PM - 9PM",
     val price : String = "180"
 )
+
+val countries = listOf(
+    "India"
+)

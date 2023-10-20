@@ -35,14 +35,15 @@ fun SignInScreen(
             AppTextField(
                 value = mobile,
                 onValueChanged = { mobile = it },
-                hint = mobileNumber,
-                leadingIcon = {
-                    MaterialIcon(
-                        imageVector = Icons.Outlined.Phone
-                    )
-                }
-            )
+                hint = mobileNumber
+            ) {
+                MaterialIcon(
+                    imageVector = Icons.Outlined.Phone
+                )
+            }
+
             VerticalSpace(space = SpaceBetweenViews)
+
             AppButton(
                 text = getOtpString
             ) {

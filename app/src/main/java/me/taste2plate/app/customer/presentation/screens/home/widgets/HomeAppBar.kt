@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material.icons.outlined.ShoppingCart
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
@@ -46,7 +47,6 @@ fun HomeAppBar(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.Center
             ) {
-                HorizontalSpace(space = 10.dp)
                 DrawableImage(
                     id = R.drawable.logo_new,
                     modifier = Modifier.size(40.dp)
@@ -66,8 +66,11 @@ fun HomeAppBar(
             }
         },
         actions = {
-            DrawableIconButton(
+            /*DrawableIconButton(
                 painterResource = R.drawable.wallet
+            ) {}*/
+            MaterialIconButton(
+                imageVector = Icons.Outlined.Search,
             ) {}
             DrawableIconButton(
                 painterResource = R.drawable.heart,

@@ -19,10 +19,18 @@ val LowSpacing = 15.dp
 val VeryLowSpacing = 5.dp
 
 // ---------------------> Padding <--------------------
+val ExtraLowPadding = 2.dp
 val LowPadding = 5.dp
 val MediumPadding = 10.dp
 val HighPadding = 15.dp
 val ExtraHighPadding = 30.dp
+
+// ---------------------> Padding <--------------------
+val ExtraLowElevation = 2.dp
+val LowElevation = 5.dp
+val MediumElevation = 10.dp
+val HighElevation = 15.dp
+val ExtraHighElevation = 30.dp
 
 // ---------------------> Rounded Corners <--------------------
 val LowRoundedCorners = 5.dp
