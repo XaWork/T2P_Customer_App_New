@@ -4,8 +4,10 @@ import me.taste2plate.app.customer.R
 
 
 val ImageItemList = listOf(
-    R.drawable.home_brand, R.drawable.home_category,
-    R.drawable.home_city, R.drawable.home_cuisine
+    R.drawable.home_city,
+    R.drawable.home_brand,
+    R.drawable.home_category,
+    R.drawable.home_cuisine
 )
 
 val productList: List<Product> = listOf(

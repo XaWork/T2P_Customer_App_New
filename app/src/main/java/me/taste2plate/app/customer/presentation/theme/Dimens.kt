@@ -42,3 +42,6 @@ val SmallIcon = 24.dp
 val RegularIcon = 24.dp
 val MediumIcon = 40.dp
 val LargeIcon = 70.dp
+
+// -----------------------> Button  <--------------------
+val buttonRoundedShapeCornerRadius = 10.dp

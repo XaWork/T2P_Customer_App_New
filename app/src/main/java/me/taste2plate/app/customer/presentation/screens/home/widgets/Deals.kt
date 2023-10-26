@@ -3,6 +3,7 @@ package me.taste2plate.app.customer.presentation.screens.home.widgets
 import android.content.res.Configuration
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -50,7 +51,8 @@ import kotlin.math.absoluteValue
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun Deals(
-    title: String = ""
+    title: String = "",
+    onNavigateToProductDetailsScreen: () -> Unit
 ) {
     val pagerState = rememberPagerState(pageCount = { productList.size })
     Column(
@@ -72,7 +74,7 @@ fun Deals(
         HorizontalPager(
             state = pagerState,
         ) {
-            SingleBestSellerItem(it, pagerState = pagerState)
+            SingleBestSellerItem(it, pagerState = pagerState, modifier = Modifier.clickable { onNavigateToProductDetailsScreen() })
         }
     }
 }
@@ -204,6 +206,6 @@ fun DealsPriceCard(
 @Composable
 fun DealsPreview() {
     T2PCustomerAppTheme {
-        Deals()
+        //Deals({})
     }
 }

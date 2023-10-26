@@ -4,6 +4,7 @@ import android.content.res.Configuration
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -58,7 +59,9 @@ import kotlin.math.absoluteValue
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun MostOrderedItemList() {
+fun MostOrderedItemList(
+    onNavigateToProductDetailsScreen: () -> Unit,
+) {
     val pagerState = rememberPagerState(pageCount = { productList.size })
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -79,7 +82,8 @@ fun MostOrderedItemList() {
         HorizontalPager(
             state = pagerState,
         ) {
-            SingleMostOrderedItem(it, pagerState = pagerState)
+            SingleMostOrderedItem(it, pagerState = pagerState,
+                modifier = Modifier.clickable { onNavigateToProductDetailsScreen() })
         }
     }
 }
@@ -242,6 +246,6 @@ fun MostOrderedPriceCard(
 @Composable
 fun MostOrderedItemListPreview() {
     T2PCustomerAppTheme {
-        MostOrderedItemList()
+        MostOrderedItemList({})
     }
 }

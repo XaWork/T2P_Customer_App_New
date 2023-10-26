@@ -1,6 +1,7 @@
 package me.taste2plate.app.customer.presentation.screens.home.widgets
 
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -22,7 +23,9 @@ import kotlin.math.absoluteValue
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun TopOrderedFoodCityList() {
+fun TopOrderedFoodCityList(
+    onNavigateToProductListScreen: () -> Unit,
+) {
 
     val pagerState = rememberPagerState(pageCount = { ImageItemList.size })
 
@@ -32,6 +35,9 @@ fun TopOrderedFoodCityList() {
         SingleTopList(
             ImageItemList[page], modifier = Modifier
                 .fillMaxWidth()
+                .clickable {
+                        onNavigateToProductListScreen()
+                }
                 .padding(horizontal = ScreenPadding)
                 .height(300.dp)
                 .graphicsLayer {
@@ -52,6 +58,6 @@ fun TopOrderedFoodCityList() {
 @Composable
 fun TopOrderedFoodCityListPreview() {
     T2PCustomerAppTheme {
-        TopOrderedFoodCityList()
+        TopOrderedFoodCityList({})
     }
 }

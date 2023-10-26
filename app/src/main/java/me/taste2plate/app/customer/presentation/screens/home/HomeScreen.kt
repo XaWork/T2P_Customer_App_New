@@ -49,7 +49,12 @@ import me.taste2plate.app.customer.presentation.widgets.VerticalSpace
 @Composable
 fun HomeScreen(
     onNavigateToOrderScreen: () -> Unit,
+    onNavigateToCityBrandScreen: () -> Unit,
+    onNavigateToCartScreen: () -> Unit,
+    onNavigateToWishlistScreen: () -> Unit,
     onNavigateToProfileScreen: () -> Unit,
+    onNavigateToProductListScreen: () -> Unit,
+    onNavigateToProductDetailsScreen: () -> Unit,
     onNavigateToBulkOrdersScreen: () -> Unit,
     onNavigateToWalletScreen: () -> Unit,
     onNavigateToMembershipPlanScreen: () -> Unit,
@@ -63,7 +68,7 @@ fun HomeScreen(
     }
 
     val scrollState = rememberLazyListState()
-  //  val position by animateFloatAsState(if (scrollUpState.value == true) -150f else 0f, label = "")
+    //  val position by animateFloatAsState(if (scrollUpState.value == true) -150f else 0f, label = "")
 
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
 
@@ -75,9 +80,11 @@ fun HomeScreen(
             DrawerAppScreen.Orders.name -> {
                 onNavigateToOrderScreen()
             }
+
             DrawerAppScreen.Profile.name -> {
                 onNavigateToProfileScreen()
             }
+
             DrawerAppScreen.BulkOrders.name -> {}
             DrawerAppScreen.Wallet.name -> {}
             DrawerAppScreen.MembershipPlan.name -> {}
@@ -93,11 +100,16 @@ fun HomeScreen(
     }) {
         AppScaffold(
             topBar = {
-                HomeAppBar {
-                    scope.launch {
-                        drawerState.open()
+                HomeAppBar(
+                    onNavigateToWishlistScreen = onNavigateToWishlistScreen,
+                    onNavigateToCartScreen = onNavigateToCartScreen,
+                    onNavigateToSearchScreen = onNavigateToProductListScreen,
+                    onNavigationIconClick = {
+                        scope.launch {
+                            drawerState.open()
+                        }
                     }
-                }
+                )
             },
 
             floatingActionButton = {
@@ -120,28 +132,40 @@ fun HomeScreen(
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     item {
-                        TopList()
+                        TopList(
+                            onNavigateToCityBrandScreen = {
+                                onNavigateToCityBrandScreen()
+                            }
+                        )
                         AutoSlidingCarousel()
                         VerticalSpace(space = SpaceBetweenViewsAndSubViews)
 
                         //top order item
                         HeadingChip("Top Ordered Food/City")
                         VerticalSpace(space = SpaceBetweenViewsAndSubViews)
-                        TopOrderedFoodCityList()
+                        TopOrderedFoodCityList(
+                            onNavigateToProductListScreen = onNavigateToProductListScreen
+                        )
                         VerticalSpace(space = SpaceBetweenViews)
 
                         //most order item
-                        MostOrderedItemList()
+                        MostOrderedItemList(
+                            onNavigateToProductDetailsScreen = onNavigateToProductDetailsScreen
+                        )
                         VerticalSpace(space = SpaceBetweenViews)
 
                         //top brands
                         HeadingChip("Top Brands")
                         VerticalSpace(space = SpaceBetweenViews)
-                        TopBrands()
+                        TopBrands(
+                            onNavigateToProductListScreen = onNavigateToProductListScreen
+                        )
                         VerticalSpace(space = SpaceBetweenViewsAndSubViews)
 
                         //best seller
-                        Deals()
+                        Deals(
+                            onNavigateToProductDetailsScreen = onNavigateToProductDetailsScreen
+                        )
                         VerticalSpace(space = SpaceBetweenViews)
 
                         //Featured
@@ -150,7 +174,7 @@ fun HomeScreen(
                     }
                     //Featured
                     items(productList) { product ->
-                        SingleFeaturedItem(product)
+                        SingleFeaturedItem(product, onNavigateToProductDetailsScreen = onNavigateToProductDetailsScreen)
                     }
                 }
             }
@@ -165,6 +189,6 @@ fun HomeScreen(
 @Composable
 fun HomePreview() {
     T2PCustomerAppTheme {
-        HomeScreen({},{},{},{},{},{},{},{},{},)
+        // HomeScreen({},{},{},{},{},{},{},{},{},{})
     }
 }

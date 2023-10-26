@@ -3,6 +3,7 @@ package me.taste2plate.app.customer.presentation.screens.home.widgets
 import android.content.res.Configuration
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -52,9 +53,11 @@ import kotlin.math.absoluteValue
 @Composable
 fun SingleFeaturedItem(
     product: Product,
+    onNavigateToProductDetailsScreen : () -> Unit
 ) {
     BlackBorderCard(
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.background)
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.background),
+        modifier = Modifier.clickable { onNavigateToProductDetailsScreen() }
     ) {
         Column {
             ImageWithWishlistButton(image = product.image)
@@ -153,6 +156,6 @@ fun SingleFeaturedItem(
 @Composable
 fun FeaturedPreview() {
     T2PCustomerAppTheme {
-        SingleFeaturedItem(Product())
+        SingleFeaturedItem(Product(), {})
     }
 }

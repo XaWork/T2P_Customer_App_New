@@ -54,7 +54,9 @@ fun ContentAddEditAddressScreen() {
     }
 
     var expanded by remember { mutableStateOf(false) }
+    var pinCodeExpanded by remember { mutableStateOf(false) }
     var selectedText by remember { mutableStateOf(countries[0]) }
+    var pinCode by remember { mutableStateOf(countries[0]) }
 
     Box(
         modifier = Modifier
@@ -143,17 +145,18 @@ fun ContentAddEditAddressScreen() {
 
             SpaceBetweenRow(item1 = {
                 AppDropDown(
-                    expanded,
+                    pinCodeExpanded,
                     modifier = Modifier
+                        .fillMaxWidth()
                         .padding(end = LowSpacing)
                         .weight(1f),
                     onExpandedChange = {
-                        expanded = !expanded
+                        pinCodeExpanded = it
                     },
                     hint = "PinCode",
-                    selectedText = selectedText,
+                    selectedText = pinCode,
                     onTextChanged = {
-                        selectedText = it
+                        pinCode = it
                     }
                 )
             }) {

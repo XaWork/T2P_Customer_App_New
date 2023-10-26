@@ -1,5 +1,6 @@
 package me.taste2plate.app.customer.presentation.widgets
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -25,6 +26,7 @@ import androidx.compose.ui.unit.dp
 import me.taste2plate.app.customer.presentation.screens.countries
 import me.taste2plate.app.customer.presentation.theme.GreyDark
 import me.taste2plate.app.customer.presentation.theme.GreyLight
+import me.taste2plate.app.customer.presentation.theme.cardContainerOnSecondaryColor
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -124,7 +126,7 @@ private fun CharView(
 fun AppDropDown(
     expanded: Boolean,
     modifier: Modifier = Modifier,
-    onExpandedChange: () -> Unit,
+    onExpandedChange: (Boolean) -> Unit,
     selectedText: String,
     hint: String ="",
     onTextChanged: (String) -> Unit
@@ -134,7 +136,7 @@ fun AppDropDown(
         modifier = modifier,
         expanded = expanded,
         onExpandedChange = {
-            onExpandedChange()
+            onExpandedChange(!expanded)
         }
     ) {
         AppTextField(
@@ -147,15 +149,17 @@ fun AppDropDown(
         )
 
         ExposedDropdownMenu(
+            modifier = Modifier.fillMaxWidth()
+                .background(color = MaterialTheme.colorScheme.background),
             expanded = expanded,
-            onDismissRequest = { onExpandedChange() }
+            onDismissRequest = { onExpandedChange(false) }
         ) {
             countries.forEach { item ->
                 DropdownMenuItem(
                     text = { Text(text = item) },
                     onClick = {
                         onTextChanged(item)
-                        onExpandedChange()
+                        onExpandedChange(false)
                     }
                 )
             }

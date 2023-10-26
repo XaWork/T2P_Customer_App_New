@@ -19,6 +19,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import me.taste2plate.app.customer.presentation.theme.LowPadding
 import me.taste2plate.app.customer.presentation.theme.MediumPadding
 import me.taste2plate.app.customer.presentation.theme.MediumRoundedCorners
 import me.taste2plate.app.customer.presentation.theme.T2PCustomerAppTheme
@@ -36,14 +37,15 @@ fun HeadingChip(
         Text(
             text,
             modifier = Modifier
-                .padding(horizontal = MediumPadding)
+                .padding(horizontal = MediumPadding, vertical = LowPadding)
         )
     }
 }
 
 @Composable
 fun HeadingChipWithLine(
-    text: String
+    text: String,
+    textColor: Color = MaterialTheme.colorScheme.background
 ) {
     Row(
         modifier = Modifier.fillMaxWidth(),
@@ -52,19 +54,22 @@ fun HeadingChipWithLine(
     ) {
         Divider(
             thickness = 2.dp,
-            modifier = Modifier.width(90.dp)
-                .padding(horizontal = MediumPadding)
+            modifier = Modifier
+                .fillMaxWidth()
+                .weight(1f)
+                .padding(end = MediumPadding)
         )
         Text(
             text,
-            modifier = Modifier
-                .padding(horizontal = MediumPadding),
-            color = MaterialTheme.colorScheme.background
+            color = textColor,
+            maxLines = 1
         )
         Divider(
             thickness = 2.dp,
-            modifier = Modifier.width(90.dp)
-                .padding(horizontal = MediumPadding)
+            modifier = Modifier
+                .fillMaxWidth()
+                .weight(1f)
+                .padding(start = MediumPadding)
         )
     }
 }

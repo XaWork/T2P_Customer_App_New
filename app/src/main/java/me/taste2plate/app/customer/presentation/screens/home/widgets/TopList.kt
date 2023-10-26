@@ -1,5 +1,6 @@
 package me.taste2plate.app.customer.presentation.screens.home.widgets
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -14,24 +15,25 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import me.taste2plate.app.customer.R
+import me.taste2plate.app.customer.presentation.screens.ImageItemList
 import me.taste2plate.app.customer.presentation.theme.ScreenPadding
 import me.taste2plate.app.customer.presentation.theme.T2PCustomerAppTheme
 import me.taste2plate.app.customer.presentation.widgets.DrawableImage
 
 @Composable
-fun TopList() {
-    val itemList = listOf(
-        R.drawable.home_brand, R.drawable.home_category,
-        R.drawable.home_city, R.drawable.home_cuisine
-    )
+fun TopList(
+    onNavigateToCityBrandScreen : () -> Unit
+) {
     LazyVerticalGrid(
         modifier = Modifier.height(110.dp)
             .padding(ScreenPadding),
         columns = GridCells.Fixed(4),
         horizontalArrangement = Arrangement.spacedBy(10.dp),
         content = {
-            items(itemList) { item ->
-                SingleTopList(item)
+            items(ImageItemList) { item ->
+                SingleTopList(item, modifier = Modifier.clickable {
+                    onNavigateToCityBrandScreen()
+                })
             }
         })
 }
@@ -51,6 +53,6 @@ fun SingleTopList(image: Int, modifier: Modifier = Modifier) {
 @Composable
 fun TopListPreview() {
     T2PCustomerAppTheme {
-        TopList()
+        TopList({})
     }
 }

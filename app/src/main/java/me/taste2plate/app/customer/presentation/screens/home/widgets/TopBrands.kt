@@ -2,6 +2,7 @@ package me.taste2plate.app.customer.presentation.screens.home.widgets
 
 import android.content.res.Configuration
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -29,7 +30,9 @@ import kotlin.math.absoluteValue
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun TopBrands() {
+fun TopBrands(
+    onNavigateToProductListScreen: () -> Unit,
+) {
     val pagerState = rememberPagerState(pageCount = { productList.size })
     HorizontalPager(
         state = pagerState,
@@ -37,7 +40,9 @@ fun TopBrands() {
         val product = productList[page]
         BlackBorderCard(
             colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.background),
-            modifier = Modifier.graphicsLayer {
+            modifier = Modifier
+                .clickable { onNavigateToProductListScreen() }
+                .graphicsLayer {
                 val pageOffset: Float =
                     (pagerState.currentPage - page) + pagerState.currentPageOffsetFraction.absoluteValue
                 translationX = pageOffset * size.width
@@ -77,6 +82,6 @@ fun TopBrands() {
 @Composable
 fun TopBrandsPreview() {
     T2PCustomerAppTheme {
-        TopBrands()
+        TopBrands({})
     }
 }

@@ -1,39 +1,49 @@
 package me.taste2plate.app.customer.presentation.screens.auth.onboarding
 
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.wrapContentHeight
-import androidx.compose.foundation.pager.HorizontalPager
-import androidx.compose.foundation.pager.PageSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.pager.rememberPagerState
-import androidx.compose.material3.Tab
-import androidx.compose.material3.TabRow
-import androidx.compose.material3.TabRowDefaults
-import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Phone
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import kotlinx.coroutines.launch
 import me.taste2plate.app.customer.R
-import me.taste2plate.app.customer.presentation.navigation.Screens
-import me.taste2plate.app.customer.presentation.screens.auth.signin.SignInScreen
-import me.taste2plate.app.customer.presentation.screens.auth.signup.SignUpScreen
-import me.taste2plate.app.customer.presentation.theme.ExtraHighSpacing
+import me.taste2plate.app.customer.presentation.screens.home.widgets.HeadingChipWithLine
 import me.taste2plate.app.customer.presentation.theme.HighSpacing
+import me.taste2plate.app.customer.presentation.theme.LowRoundedCorners
+import me.taste2plate.app.customer.presentation.theme.ScreenPadding
 import me.taste2plate.app.customer.presentation.theme.SpaceBetweenViews
 import me.taste2plate.app.customer.presentation.theme.T2PCustomerAppTheme
+import me.taste2plate.app.customer.presentation.theme.buttonRoundedShapeCornerRadius
+import me.taste2plate.app.customer.presentation.utils.getOtpString
+import me.taste2plate.app.customer.presentation.utils.mobileNumber
+import me.taste2plate.app.customer.presentation.widgets.AppButton
 import me.taste2plate.app.customer.presentation.widgets.AppScaffold
-import me.taste2plate.app.customer.presentation.widgets.DrawableIcon
+import me.taste2plate.app.customer.presentation.widgets.AppTextField
 import me.taste2plate.app.customer.presentation.widgets.DrawableImage
+import me.taste2plate.app.customer.presentation.widgets.MaterialIcon
 import me.taste2plate.app.customer.presentation.widgets.VerticalSpace
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -44,23 +54,93 @@ fun OnBoardingScreen(
     val pages = listOf("Sign In", "Sign Up")
     val pagerState = rememberPagerState(pageCount = { pages.size })
     val scope = rememberCoroutineScope();
+    var mobile by remember {
+        mutableStateOf("")
+    }
+
     AppScaffold {
         Column(
-            modifier = Modifier.fillMaxSize(),
-            verticalArrangement = Arrangement.Center,
+            modifier = Modifier
+                .fillMaxSize()
+                .verticalScroll(state = rememberScrollState()),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            VerticalSpace(space = ExtraHighSpacing)
-            DrawableImage(id = R.drawable.logo_new, modifier = Modifier.size(100.dp))
-            VerticalSpace(space = HighSpacing)
-            TabRow(
+
+            Box {
+                DrawableImage(
+                    id = R.drawable.header_bg,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(300.dp),
+                    contentScale = ContentScale.Crop
+                )
+
+
+                DrawableImage(
+                    id = R.drawable.logo_new,
+                    modifier = Modifier
+                        .align(Alignment.Center)
+                )
+
+
+            }
+
+            VerticalSpace(space = SpaceBetweenViews)
+
+            Column(
+                modifier = Modifier.padding(ScreenPadding)
+            ) {
+                Text(
+                    text = "India's One & Only InterCity Food Delivery App",
+                    style = MaterialTheme.typography.headlineSmall,
+                    textAlign = TextAlign.Center,
+                    fontWeight = FontWeight.Bold
+                )
+
+                VerticalSpace(space = HighSpacing)
+
+                HeadingChipWithLine(
+                    text = "Login/Signup",
+                    textColor = Color.Unspecified
+                )
+
+                VerticalSpace(space = SpaceBetweenViews)
+
+                AppTextField(
+                    value = mobile,
+                    onValueChanged = { mobile = it },
+                    hint = mobileNumber,
+                    leadingIcon = {
+                        MaterialIcon(
+                            imageVector = Icons.Outlined.Phone
+                        )
+                    })
+
+                VerticalSpace(space = SpaceBetweenViews)
+
+                AppButton(
+                    text = getOtpString,
+                ) {
+                    onNavigateToOtpScreen()
+                }
+
+                VerticalSpace(space = SpaceBetweenViews)
+
+                Text(
+                    text = "By continuing, you agree to our terms and conditions",
+                    textAlign = TextAlign.Center
+                )
+
+            }
+
+            /*TabRow(
                 selectedTabIndex = pagerState.currentPage,
-                /*indicator = { tabPositions ->
+                *//*indicator = { tabPositions ->
                 TabRowDefaults.Indicator(
                     height = 2.dp,
                     color = Color.White
                 )
-            }*/
+            }*//*
             ) {
                 pages.forEachIndexed { index, s ->
                     Tab(
@@ -75,7 +155,9 @@ fun OnBoardingScreen(
                     )
                 }
             }
+
             VerticalSpace(space = SpaceBetweenViews)
+
             HorizontalPager(
                 state = pagerState
             ) { page ->
@@ -88,10 +170,11 @@ fun OnBoardingScreen(
 
                     1 -> {
                         SignUpScreen {
-                            onNavigateToOtpScreen()}
+                            onNavigateToOtpScreen()
+                        }
                     }
                 }
-            }
+            }*/
         }
     }
 }
@@ -100,6 +183,6 @@ fun OnBoardingScreen(
 @Composable
 fun OnBoardingPreview() {
     T2PCustomerAppTheme {
-        OnBoardingScreen{}
+        OnBoardingScreen {}
     }
 }

@@ -4,6 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -49,17 +50,22 @@ fun InfoWithIcon(
     tint: Color = LocalContentColor.current,
     maxLines: Int = 1,
     textColor: Color = Color.Unspecified,
-    fontSize: TextUnit = 12.sp
+    fontSize: TextUnit = 12.sp,
+    iconInStart: Boolean = true
 ) {
     Row(
         modifier = modifier,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        if (icon)
-            MaterialIcon(imageVector = imageVector, tint = tint, modifier = iconOrImageModifier)
-        else
-            DrawableImage(id = id, colorFilter = colorFilter, modifier = iconOrImageModifier)
+
+        if (iconInStart)
+            if (icon)
+                MaterialIcon(imageVector = imageVector, tint = tint, modifier = iconOrImageModifier)
+            else
+                DrawableImage(id = id, colorFilter = colorFilter, modifier = iconOrImageModifier)
+
         HorizontalSpace(space = SpaceBetweenViewsAndSubViews)
+
         Text(
             text = info,
             fontSize = fontSize,
@@ -67,6 +73,17 @@ fun InfoWithIcon(
             maxLines = maxLines,
             color = textColor
         )
+
+
+        if (!iconInStart) {
+            HorizontalSpace(space = SpaceBetweenViewsAndSubViews)
+            if (icon)
+                MaterialIcon(imageVector = imageVector, tint = tint, modifier = iconOrImageModifier)
+            else
+                DrawableImage(id = id, colorFilter = colorFilter, modifier = iconOrImageModifier)
+        }
+
+
     }
 }
 
@@ -119,8 +136,8 @@ fun RatingInfoRow(
 @Composable
 fun SpaceBetweenRow(
     modifier: Modifier = Modifier,
-    item1 : @Composable () -> Unit,
-    item2 : @Composable () -> Unit,
+    item1: @Composable RowScope.() -> Unit,
+    item2: @Composable RowScope.() -> Unit,
 ) {
     Row(
         horizontalArrangement = Arrangement.SpaceBetween,
@@ -129,6 +146,21 @@ fun SpaceBetweenRow(
     ) {
         item1()
         item2()
+    }
+}
+
+@Composable
+fun SpaceBetweenRow(
+    modifier: Modifier = Modifier,
+    items: List<@Composable RowScope.() -> Unit>
+) {
+    Row(
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = modifier.fillMaxWidth()
+    ) {
+        for (item in items)
+            item()
     }
 }
 
