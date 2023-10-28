@@ -1,5 +1,7 @@
 package me.taste2plate.app.customer.presentation.utils
 
+import androidx.compose.ui.tooling.preview.datasource.LoremIpsum
+
 const val appName = "Taste2plate"
 const val tagLine = "Intercity Food Delivery"
 const val mobileNumber = "Mobile Number"
@@ -12,6 +14,8 @@ const val verifyOtpString = "Verify OTP"
 const val otpString = "OTP"
 const val addToCartString = "Add To Cart"
 const val doneString = "Done"
+
+const val loremIpsum = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer sodales laoreet commodo. Phasellus a purus eu risus elementum consequat. Aenean eu elit ut nunc convallis laoreet non ut libero. Suspendisse interdum placerat risus vel ornare. Donec vehicula, turpis sed consectetur ullamcorper, ante nunc egestas quam, ultricies adipiscing velit enim at nunc. Aenean id dia neque. Praesent ut lacus sed justo viverra fermentum et ut sem. Fusce"  +      "convallis gravida lacinia. Integer semper dolor ut elit sagittis lacinia Praesent sodales scelerisque eros at rhoncus. Duis posuere sapien vel ipsum"
 
 
 const val rupeeSign = "\u20B9"

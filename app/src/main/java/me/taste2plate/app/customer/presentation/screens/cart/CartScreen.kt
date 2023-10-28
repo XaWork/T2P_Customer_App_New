@@ -2,6 +2,7 @@ package me.taste2plate.app.customer.presentation.screens.cart
 
 import android.content.res.Configuration
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.RowScope
@@ -11,6 +12,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Divider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -23,12 +25,15 @@ import androidx.compose.ui.unit.dp
 import me.taste2plate.app.customer.R
 import me.taste2plate.app.customer.presentation.screens.product.CartAddRemove
 import me.taste2plate.app.customer.presentation.screens.productList
+import me.taste2plate.app.customer.presentation.theme.ExtraHighPadding
 import me.taste2plate.app.customer.presentation.theme.LowRoundedCorners
 import me.taste2plate.app.customer.presentation.theme.MediumPadding
 import me.taste2plate.app.customer.presentation.theme.ScreenPadding
 import me.taste2plate.app.customer.presentation.theme.SpaceBetweenViewsAndSubViews
 import me.taste2plate.app.customer.presentation.theme.T2PCustomerAppTheme
+import me.taste2plate.app.customer.presentation.theme.dividerThickness
 import me.taste2plate.app.customer.presentation.utils.rupeeSign
+import me.taste2plate.app.customer.presentation.widgets.AppButton
 import me.taste2plate.app.customer.presentation.widgets.AppScaffold
 import me.taste2plate.app.customer.presentation.widgets.AppTopBar
 import me.taste2plate.app.customer.presentation.widgets.DrawableIcon
@@ -38,32 +43,47 @@ import me.taste2plate.app.customer.presentation.widgets.SpaceBetweenRow
 import me.taste2plate.app.customer.presentation.widgets.VerticalSpace
 
 @Composable
-fun CartScreen() {
+fun CartScreen(
+    onNavigateToCheckoutScreen: () -> Unit
+) {
     AppScaffold(
         topBar = {
             AppTopBar {}
         },
     ) {
-        ContentCartAndWishlist()
+        ContentCartAndWishlist(onNavigateToCheckoutScreen = onNavigateToCheckoutScreen)
     }
 }
 
 @Composable
 fun ContentCartAndWishlist(
-    isWishList: Boolean = false
+    isWishList: Boolean = false,
+    onNavigateToCheckoutScreen: () -> Unit
 ) {
-    LazyColumn(
+    Box(
         modifier = Modifier.fillMaxSize(),
-        contentPadding = PaddingValues(
-            ScreenPadding
-        ),
-        verticalArrangement = Arrangement.spacedBy(SpaceBetweenViewsAndSubViews)
     ) {
-        items(10) {
-            SingleCartAndWishlistItem(
-                isWishList = isWishList
-            )
+        LazyColumn(
+            verticalArrangement = Arrangement.spacedBy(SpaceBetweenViewsAndSubViews),
+            contentPadding = PaddingValues(bottom = ExtraHighPadding)
+        ) {
+            items(10) {
+                SingleCartAndWishlistItem(
+                    isWishList = isWishList
+                )
+            }
         }
+
+        if (!isWishList)
+            AppButton(
+                modifier = Modifier
+                    .align(Alignment.BottomCenter)
+                    .padding(ScreenPadding),
+                text = "Confirm Order"
+            ) {
+
+                onNavigateToCheckoutScreen()
+            }
     }
 }
 
@@ -76,7 +96,7 @@ fun SingleCartAndWishlistItem(
         NetworkImage(
             image = productList[0].image,
             modifier = Modifier
-                .size(70.dp)
+                .size(100.dp)
                 .weight(1f)
                 .clip(RoundedCornerShape(LowRoundedCorners)),
             contentScale = ContentScale.Crop
@@ -99,10 +119,10 @@ fun SingleCartAndWishlistItem(
 
             val innerItems = listOf<@Composable RowScope.() -> Unit> {
 
-                Text(text = "${rupeeSign}392")
-
                 if (!isWishList)
                     CartAddRemove()
+
+                Text(text = "${rupeeSign}392")
             }
             SpaceBetweenRow(items = innerItems)
         }
@@ -115,10 +135,17 @@ fun SingleCartAndWishlistItem(
 
     }
 
-    RoundedCornerCard {
+
+    Box {
         SpaceBetweenRow(
             modifier = Modifier.padding(MediumPadding),
             items = items
+        )
+        Divider(
+            modifier = Modifier
+                .align(Alignment.BottomCenter)
+                .padding(top = SpaceBetweenViewsAndSubViews),
+            thickness = dividerThickness
         )
     }
 }
@@ -128,6 +155,6 @@ fun SingleCartAndWishlistItem(
 @Composable
 fun CartScreenPreview() {
     T2PCustomerAppTheme {
-        CartScreen()
+        CartScreen({})
     }
 }

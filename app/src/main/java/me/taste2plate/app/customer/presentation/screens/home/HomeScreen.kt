@@ -85,14 +85,24 @@ fun HomeScreen(
                 onNavigateToProfileScreen()
             }
 
-            DrawerAppScreen.BulkOrders.name -> {}
-            DrawerAppScreen.Wallet.name -> {}
-            DrawerAppScreen.MembershipPlan.name -> {}
-            DrawerAppScreen.MyPlan.name -> {}
+            DrawerAppScreen.BulkOrders.name -> {
+                onNavigateToBulkOrdersScreen()
+            }
+            DrawerAppScreen.Wallet.name -> {
+                onNavigateToWalletScreen()
+            }
+            DrawerAppScreen.MembershipPlan.name -> {
+                onNavigateToMembershipPlanScreen()
+            }
+            DrawerAppScreen.MyPlan.name -> {
+                onNavigateToMyPlanScreen()
+            }
             DrawerAppScreen.RateApp.name -> {}
             DrawerAppScreen.ReferAndEarn.name -> {}
             DrawerAppScreen.ShareApp.name -> {}
-            DrawerAppScreen.ContactUs.name -> {}
+            DrawerAppScreen.ContactUs.name -> {
+                onNavigateContactUsScreen()
+            }
             DrawerAppScreen.LogOut.name -> {
                 onNavigateLogoutScreen()
             }

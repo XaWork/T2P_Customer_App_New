@@ -27,7 +27,11 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -44,7 +48,12 @@ fun InfoWithIcon(
     icon: Boolean = false,
     imageVector: ImageVector = Icons.Default.LocationOn,
     id: Int = 0,
-    info: String,
+    info: String? = null,
+    infoAnnotated: AnnotatedString = buildAnnotatedString {
+        withStyle(SpanStyle()) {
+            append("")
+        }
+    },
     iconOrImageModifier: Modifier = Modifier,
     colorFilter: ColorFilter? = null,
     tint: Color = LocalContentColor.current,
@@ -66,13 +75,22 @@ fun InfoWithIcon(
 
         HorizontalSpace(space = SpaceBetweenViewsAndSubViews)
 
-        Text(
-            text = info,
-            fontSize = fontSize,
-            overflow = TextOverflow.Ellipsis,
-            maxLines = maxLines,
-            color = textColor
-        )
+        if (infoAnnotated.text.isNotEmpty())
+            Text(
+                text = infoAnnotated,
+                fontSize = fontSize,
+                overflow = TextOverflow.Ellipsis,
+                maxLines = maxLines,
+                color = textColor
+            )
+        else
+            Text(
+                text = info!!,
+                fontSize = fontSize,
+                overflow = TextOverflow.Ellipsis,
+                maxLines = maxLines,
+                color = textColor
+            )
 
 
         if (!iconInStart) {

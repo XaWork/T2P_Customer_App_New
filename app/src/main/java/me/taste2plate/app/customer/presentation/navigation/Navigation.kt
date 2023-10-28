@@ -11,10 +11,15 @@ import me.taste2plate.app.customer.presentation.screens.auth.otp.OTPScreen
 import me.taste2plate.app.customer.presentation.screens.auth.permissions.NotificationPermissionScreen
 import me.taste2plate.app.customer.presentation.screens.auth.signin.SignInScreen
 import me.taste2plate.app.customer.presentation.screens.auth.signup.SignUpScreen
+import me.taste2plate.app.customer.presentation.screens.bulk_order.BulkOrderScreen
 import me.taste2plate.app.customer.presentation.screens.cart.CartScreen
+import me.taste2plate.app.customer.presentation.screens.checkout.CheckoutScreen
 import me.taste2plate.app.customer.presentation.screens.citybrand.CityBrandScreen
+import me.taste2plate.app.customer.presentation.screens.contact_us.ContactUsScreen
 import me.taste2plate.app.customer.presentation.screens.home.HomeScreen
 import me.taste2plate.app.customer.presentation.screens.location.LocationScreen
+import me.taste2plate.app.customer.presentation.screens.membership_plan.MembershipPlanScreen
+import me.taste2plate.app.customer.presentation.screens.my_plan.MyPlanScreen
 import me.taste2plate.app.customer.presentation.screens.order.OrderDetailsScreen
 import me.taste2plate.app.customer.presentation.screens.order.OrderListScreen
 import me.taste2plate.app.customer.presentation.screens.product.ProductDetailsScreen
@@ -22,13 +27,14 @@ import me.taste2plate.app.customer.presentation.screens.product.ProductListScree
 import me.taste2plate.app.customer.presentation.screens.profile.EditProfileScreen
 import me.taste2plate.app.customer.presentation.screens.profile.ProfileScreen
 import me.taste2plate.app.customer.presentation.screens.splash.SplashScreen
+import me.taste2plate.app.customer.presentation.screens.wallet.WalletScreen
 import me.taste2plate.app.customer.presentation.screens.wishlist.WishlistScreen
 
 @Composable
 fun Navigation() {
     val navController = rememberNavController()
 
-    NavHost(navController = navController, startDestination = Screens.SplashScreen.route) {
+    NavHost(navController = navController, startDestination = Screens.HomeScreen.route) {
 
         // --------------------------> Splash Screen <------------------------------------
         composable(route = Screens.SplashScreen.route) {
@@ -131,15 +137,27 @@ fun Navigation() {
                 onNavigateToProductListScreen = {
                     navController.navigate(Screens.ProductListScreen.route)
                 },
-                onNavigateContactUsScreen = {},
-                onNavigateReferAndEarnScreen = {},
-                onNavigateToBulkOrdersScreen = {},
-                onNavigateToMembershipPlanScreen = {},
-                onNavigateToMyPlanScreen = {},
+                onNavigateContactUsScreen = {
+                    navController.navigate(Screens.ContactUsScreen.route)
+                },
+                onNavigateReferAndEarnScreen = {
+                    navController.navigate(Screens.ProductListScreen.route)
+                },
+                onNavigateToBulkOrdersScreen = {
+                    navController.navigate(Screens.BulkOrderScreen.route)
+                },
+                onNavigateToMembershipPlanScreen = {
+                    navController.navigate(Screens.MembershipScreenScreen.route)
+                },
+                onNavigateToMyPlanScreen = {
+                    navController.navigate(Screens.MyPlanScreen.route)
+                },
                 onNavigateToProductDetailsScreen = {
                     navController.navigate(Screens.ProductDetailsScreen.route)
                 },
-                onNavigateToWalletScreen = {},
+                onNavigateToWalletScreen = {
+                    navController.navigate(Screens.WalletScreen.route)
+                },
                 onNavigateToWishlistScreen = {
                     navController.navigate(Screens.WishlistScreen.route)
                 }
@@ -167,6 +185,31 @@ fun Navigation() {
             WishlistScreen()
         }
 
+        // ----------------------------> Wallet <--------------------------------------
+        composable(route = Screens.WalletScreen.route) {
+            WalletScreen()
+        }
+
+        // ----------------------------> Contact Us <--------------------------------------
+        composable(route = Screens.ContactUsScreen.route) {
+            ContactUsScreen()
+        }
+
+        // ----------------------------> My Plan <--------------------------------------
+        composable(route = Screens.MyPlanScreen.route) {
+            MyPlanScreen()
+        }
+
+        // ----------------------------> Bulk Order <--------------------------------------
+        composable(route = Screens.BulkOrderScreen.route) {
+            BulkOrderScreen()
+        }
+
+        // ----------------------------> Membership <--------------------------------------
+        composable(route = Screens.MembershipScreenScreen.route) {
+            MembershipPlanScreen()
+        }
+
         // ----------------------------> City brand <--------------------------------------
         composable(route = Screens.CityBrandScreen.route) {
             CityBrandScreen(
@@ -190,7 +233,9 @@ fun Navigation() {
 
         // ----------------------------> Cart <--------------------------------------
         composable(route = Screens.CartScreen.route) {
-            CartScreen()
+            CartScreen(onNavigateToCheckoutScreen = {
+                navController.navigate(Screens.CheckoutScreen.route)
+            })
         }
 
         // ----------------------------> Product Details <--------------------------------------
@@ -200,6 +245,11 @@ fun Navigation() {
                     navController.navigate(Screens.CartScreen.route)
                 }
             )
+        }
+
+        // ----------------------------> Checkout <--------------------------------------
+        composable(route = Screens.CheckoutScreen.route) {
+            CheckoutScreen()
         }
 
         // ----------------------------> Profile <--------------------------------------

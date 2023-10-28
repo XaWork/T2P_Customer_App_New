@@ -3,7 +3,6 @@ package me.taste2plate.app.customer.presentation.screens.product
 import android.content.res.Configuration
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -14,12 +13,10 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -47,7 +44,6 @@ import androidx.compose.ui.unit.sp
 import me.taste2plate.app.customer.R
 import me.taste2plate.app.customer.presentation.screens.productList
 import me.taste2plate.app.customer.presentation.theme.ExtraLowElevation
-import me.taste2plate.app.customer.presentation.theme.LowElevation
 import me.taste2plate.app.customer.presentation.theme.MediumPadding
 import me.taste2plate.app.customer.presentation.theme.MediumRoundedCorners
 import me.taste2plate.app.customer.presentation.theme.ScreenPadding
@@ -56,13 +52,11 @@ import me.taste2plate.app.customer.presentation.theme.SpaceBetweenViewsAndSubVie
 import me.taste2plate.app.customer.presentation.theme.T2PCustomerAppTheme
 import me.taste2plate.app.customer.presentation.theme.backgroundColor
 import me.taste2plate.app.customer.presentation.theme.cardContainerOnSecondaryColor
-import me.taste2plate.app.customer.presentation.theme.forestGreen
 import me.taste2plate.app.customer.presentation.theme.onSecondaryColor
 import me.taste2plate.app.customer.presentation.theme.primaryColor
 import me.taste2plate.app.customer.presentation.theme.secondaryColor
 import me.taste2plate.app.customer.presentation.utils.rupeeSign
 import me.taste2plate.app.customer.presentation.widgets.AppOutlineButton
-import me.taste2plate.app.customer.presentation.widgets.AppRatingBar
 import me.taste2plate.app.customer.presentation.widgets.AppScaffold
 import me.taste2plate.app.customer.presentation.widgets.AppTopBar
 import me.taste2plate.app.customer.presentation.widgets.CircleIconButton
@@ -70,6 +64,7 @@ import me.taste2plate.app.customer.presentation.widgets.InfoWithIcon
 import me.taste2plate.app.customer.presentation.widgets.NetworkImage
 import me.taste2plate.app.customer.presentation.widgets.RoundedCornerCard
 import me.taste2plate.app.customer.presentation.widgets.SpaceBetweenRow
+import me.taste2plate.app.customer.presentation.widgets.TextInCircle
 import me.taste2plate.app.customer.presentation.widgets.VerticalSpace
 
 @Composable
@@ -325,48 +320,22 @@ fun SaleBanner(
 @Composable
 fun CartAddRemove() {
     Row(
-        modifier = Modifier
-            .width(120.dp)
-            .height(40.dp)
-            .border(1.dp, color = primaryColor.invoke())
-            .clip(RectangleShape),
-        horizontalArrangement = Arrangement.SpaceBetween,
+        horizontalArrangement = Arrangement.Center,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Text(
-            text = "-",
-            modifier = Modifier
-                .fillMaxWidth()
-                .weight(1f),
-            color = primaryColor.invoke(),
-            textAlign = TextAlign.Center,
-            fontSize = 22.sp
-        )
+        TextInCircle(text = "-")
 
         Text(
             text = "0",
             modifier = Modifier
-                .background(
-                    primaryColor
-                        .invoke()
-                        .copy(alpha = 0.5f)
-                )
                 .padding(
                     horizontal = MediumPadding,
-                    vertical = MediumPadding
                 ),
             textAlign = TextAlign.Center,
             fontSize = 18.sp
         )
 
-        Text(
-            text = "+",
-            modifier = Modifier
-                .weight(1f),
-            color = primaryColor.invoke(),
-            textAlign = TextAlign.Center,
-            fontSize = 22.sp
-        )
+        TextInCircle(text = "+")
     }
 }
 

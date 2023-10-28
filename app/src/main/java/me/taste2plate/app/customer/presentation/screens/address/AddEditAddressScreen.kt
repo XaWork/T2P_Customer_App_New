@@ -30,9 +30,11 @@ import me.taste2plate.app.customer.presentation.theme.SpaceBetweenViewsAndSubVie
 import me.taste2plate.app.customer.presentation.theme.T2PCustomerAppTheme
 import me.taste2plate.app.customer.presentation.widgets.AppButton
 import me.taste2plate.app.customer.presentation.widgets.AppDropDown
+import me.taste2plate.app.customer.presentation.widgets.AppRadioButton
 import me.taste2plate.app.customer.presentation.widgets.AppScaffold
 import me.taste2plate.app.customer.presentation.widgets.AppTextField
 import me.taste2plate.app.customer.presentation.widgets.AppTopBar
+import me.taste2plate.app.customer.presentation.widgets.RadioButtonInfo
 import me.taste2plate.app.customer.presentation.widgets.SpaceBetweenRow
 import me.taste2plate.app.customer.presentation.widgets.VerticalSpace
 
@@ -173,34 +175,27 @@ fun ContentAddEditAddressScreen() {
 
             VerticalSpace(space = SpaceBetweenViewsAndSubViews)
 
-            val radioOptions = listOf("Home", "Work", "Other")
-            val (selectedOption, onOptionSelected) = remember { mutableStateOf(radioOptions[0]) }
-            Row(Modifier.selectableGroup()) {
-                radioOptions.forEach { text ->
-                    Row(
-                        Modifier
-                            .height(56.dp)
-                            .selectable(
-                                selected = (text == selectedOption),
-                                onClick = { onOptionSelected(text) },
-                                role = Role.RadioButton
-                            )
-                            .padding(horizontal = 16.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        RadioButton(
-                            selected = (text == selectedOption),
-                            onClick = null // null recommended for accessibility with screenreaders
-                        )
+            val radioOptions = listOf(
+                RadioButtonInfo(
+                    id = 1,
+                    text = "Home"
+                ),
+                RadioButtonInfo(
+                    id = 1,
+                    text = "Work"
+                ),
+                RadioButtonInfo(
+                    id = 1,
+                    text = "Other"
+                )
+            )
 
-                        Text(
-                            text = text,
-                            style = MaterialTheme.typography.bodyLarge,
-                            modifier = Modifier.padding(start = 16.dp)
-                        )
-                    }
-                }
-            }
+            val (selectedOption, onOptionSelected) = remember { mutableStateOf(radioOptions[0]) }
+            AppRadioButton(
+                radioOptions,
+                selectedOption.text,
+                onOptionSelected
+            )
         }
 
         AppButton(

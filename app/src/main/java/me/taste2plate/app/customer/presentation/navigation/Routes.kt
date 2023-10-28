@@ -13,7 +13,12 @@ class Routes{
         const val profileRoute: String = "profile"
         const val cityBrandRoute: String = "cityBrand"
         const val productListRoute: String = "productList"
+        const val bulkOrderRoute: String = "bulkOrderRoute"
+        const val membershipRoute: String = "membershipRoute"
+        const val myPlanRoute: String = "myPlanRoute"
         const val productDetailsRoute: String = "productDetails"
+        const val walletRoute: String = "walletRoute"
+        const val contactUsRoute: String = "contactUsRoute"
         const val wishlistRoute: String = "wishlistRoute"
         const val cartRoute: String = "cartRoute"
         const val editProfileRoute: String = "editprofile"
@@ -21,6 +26,7 @@ class Routes{
         const val addEditAddressRoute: String = "addeditaddress"
         const val notificationRoute: String = "notificationRoute"
         const val orderDetailsRoute: String = "orderdetails"
+        const val checkoutRoute: String = "checkoutRoute"
         const val requestPermissionRoute: String = "requestpermission"
     }
 }

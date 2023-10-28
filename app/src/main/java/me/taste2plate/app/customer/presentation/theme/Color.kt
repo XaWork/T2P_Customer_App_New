@@ -1,6 +1,8 @@
 package me.taste2plate.app.customer.presentation.theme
 
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.material3.ButtonColors
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CardColors
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
@@ -86,8 +88,14 @@ val ForestGreenDark = Color(0xFF86d988)
 
 val forestGreen : @Composable () -> Color = {
     if(isSystemInDarkTheme())
-        ForestGreen
-    else ForestGreenDark
+        ForestGreenDark
+    else ForestGreen
+}
+
+val yellowBannerColor : @Composable () -> Color = {
+    if(isSystemInDarkTheme())
+        YellowBannerDark
+    else YellowBanner
 }
 
 
@@ -103,6 +111,10 @@ val backgroundColor: @Composable () -> Color = {
     MaterialTheme.colorScheme.background
 }
 
+val onBackgroundColor: @Composable () -> Color = {
+    MaterialTheme.colorScheme.onBackground
+}
+
 val secondaryColor: @Composable () -> Color = {
     MaterialTheme.colorScheme.secondary
 }
@@ -114,5 +126,13 @@ val outlineColor: @Composable () -> Color = {
 val cardContainerOnSecondaryColor: @Composable () -> CardColors = {
     CardDefaults.cardColors(
         MaterialTheme.colorScheme.onSecondary
+    )
+}
+
+
+val whiteBackgroundButtonColor: @Composable () -> ButtonColors = {
+    ButtonDefaults.buttonColors(
+        containerColor = MaterialTheme.colorScheme.background,
+        contentColor = MaterialTheme.colorScheme.secondary
     )
 }

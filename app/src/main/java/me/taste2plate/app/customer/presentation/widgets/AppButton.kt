@@ -17,6 +17,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import me.taste2plate.app.customer.presentation.theme.T2PCustomerAppTheme
 import me.taste2plate.app.customer.presentation.theme.buttonRoundedShapeCornerRadius
@@ -26,7 +27,10 @@ import me.taste2plate.app.customer.presentation.theme.primaryColor
 fun AppButton(
     modifier: Modifier = Modifier,
     text: String = "",
+    maxLines: Int = 1,
+    fontSize: TextUnit = TextUnit.Unspecified,
     shape: Shape = RoundedCornerShape(buttonRoundedShapeCornerRadius),
+    buttonColors: ButtonColors = ButtonDefaults.buttonColors(),
     paddingValues: PaddingValues = PaddingValues(horizontal = 10.dp),
     onClick: () -> Unit
 ) {
@@ -34,8 +38,13 @@ fun AppButton(
         modifier = modifier
             .fillMaxWidth(),
         shape = shape,
+        colors = buttonColors,
         onClick = { onClick() }) {
-        Text(text = text.uppercase())
+        Text(
+            text = text.uppercase(),
+            fontSize = fontSize,
+            maxLines = maxLines
+        )
     }
 }
 
@@ -61,7 +70,7 @@ fun AppOutlineButton(
         ),
         elevation = ButtonDefaults.elevatedButtonElevation(0.dp)
     ) {
-        Text(text = text.uppercase(), color =  primaryColor.invoke())
+        Text(text = text.uppercase(), color = primaryColor.invoke())
     }
 }
 

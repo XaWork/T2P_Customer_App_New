@@ -17,7 +17,7 @@ fun WishlistScreen() {
     ) {
         ContentCartAndWishlist(
             isWishList = true
-        )
+        ) {}
     }
 }
 

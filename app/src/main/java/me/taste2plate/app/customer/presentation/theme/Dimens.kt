@@ -45,3 +45,6 @@ val LargeIcon = 70.dp
 
 // -----------------------> Button  <--------------------
 val buttonRoundedShapeCornerRadius = 10.dp
+
+// -----------------------> Divider  <--------------------
+val dividerThickness = 0.5.dp
