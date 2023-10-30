@@ -15,7 +15,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
+import me.taste2plate.app.customer.presentation.theme.backgroundColor
+import me.taste2plate.app.customer.presentation.theme.onBackgroundColor
 import me.taste2plate.app.customer.presentation.theme.primaryColor
+import me.taste2plate.app.customer.presentation.theme.secondaryColor
 
 @Composable
 fun AppRadioButton(
@@ -47,7 +50,13 @@ fun AppRadioButton(
                         modifier = Modifier
                             .size(70.dp)
                             .padding(start = 16.dp),
-                        colorFilter = ColorFilter.tint(color = primaryColor.invoke())
+                        colorFilter = ColorFilter.tint(
+                            color =
+                            if ((text.text == selectedOption))
+                                primaryColor.invoke()
+                            else
+                                onBackgroundColor.invoke()
+                        )
                     )
                 else
                     Text(

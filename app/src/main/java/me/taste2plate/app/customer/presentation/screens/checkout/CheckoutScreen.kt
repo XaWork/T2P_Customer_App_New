@@ -40,8 +40,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import me.taste2plate.app.customer.R
 import me.taste2plate.app.customer.presentation.screens.address.AddressBottomSheet
+import me.taste2plate.app.customer.presentation.screens.cart.SingleCartAndWishlistItem
 import me.taste2plate.app.customer.presentation.screens.productList
-import me.taste2plate.app.customer.presentation.theme.ExtraLowPadding
 import me.taste2plate.app.customer.presentation.theme.LowElevation
 import me.taste2plate.app.customer.presentation.theme.LowPadding
 import me.taste2plate.app.customer.presentation.theme.LowRoundedCorners
@@ -74,7 +74,9 @@ import me.taste2plate.app.customer.presentation.widgets.VerticalSpace
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CheckoutScreen() {
+fun CheckoutScreen(
+    onNavigateToOrderConfirmScreen: () -> Unit
+) {
     var showBottomSheet by remember {
         mutableStateOf(false)
     }
@@ -90,7 +92,8 @@ fun CheckoutScreen() {
         CheckoutScreenContent(
             openAddressSheet = {
                 showBottomSheet = true
-            }
+            },
+            onNavigateToOrderConfirmScreen  = onNavigateToOrderConfirmScreen
         )
 
         if (showBottomSheet) {
@@ -108,7 +111,8 @@ fun CheckoutScreen() {
 
 @Composable
 fun CheckoutScreenContent(
-    openAddressSheet: () -> Unit
+    openAddressSheet: () -> Unit,
+    onNavigateToOrderConfirmScreen: () -> Unit
 ) {
     val priceList = listOf(
         PriceData(
@@ -160,7 +164,7 @@ fun CheckoutScreenContent(
         }
 
         items(2) {
-            SingleCartItem()
+            SingleCartAndWishlistItem(isWishList = false)
         }
 
         item {
@@ -235,7 +239,7 @@ fun CheckoutScreenContent(
             AppButton(
                 text = "Continue"
             ) {
-
+                onNavigateToOrderConfirmScreen()
             }
         }
     }
@@ -536,6 +540,6 @@ fun PaymentInfo() {
 @Composable
 fun CheckoutScreenPreview() {
     T2PCustomerAppTheme {
-        CheckoutScreen()
+        CheckoutScreen({})
     }
 }

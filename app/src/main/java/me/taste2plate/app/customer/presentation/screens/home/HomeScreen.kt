@@ -1,8 +1,6 @@
 package me.taste2plate.app.customer.presentation.screens.home
 
 import android.content.res.Configuration
-import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -11,7 +9,9 @@ import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.FloatingActionButtonDefaults
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.rememberDrawerState
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -24,6 +24,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
 import me.taste2plate.app.customer.R
+import me.taste2plate.app.customer.presentation.screens.address.AddressBottomSheet
 import me.taste2plate.app.customer.presentation.screens.home.navigation.DrawerAppScreen
 import me.taste2plate.app.customer.presentation.screens.home.navigation.NavigationDrawer
 import me.taste2plate.app.customer.presentation.screens.home.widgets.AddressBar
@@ -32,7 +33,6 @@ import me.taste2plate.app.customer.presentation.screens.home.widgets.Deals
 import me.taste2plate.app.customer.presentation.screens.home.widgets.HeadingChip
 import me.taste2plate.app.customer.presentation.screens.home.widgets.HomeAppBar
 import me.taste2plate.app.customer.presentation.screens.home.widgets.MostOrderedItemList
-import me.taste2plate.app.customer.presentation.screens.home.widgets.SearchBar
 import me.taste2plate.app.customer.presentation.screens.home.widgets.SingleFeaturedItem
 import me.taste2plate.app.customer.presentation.screens.home.widgets.TopBrands
 import me.taste2plate.app.customer.presentation.screens.home.widgets.TopList
@@ -72,7 +72,25 @@ fun HomeScreen(
 
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
 
+    //bottom sheet
     val scope = rememberCoroutineScope()
+
+    var showBottomSheet by remember {
+        mutableStateOf(false)
+    }
+
+    val sheetState = rememberModalBottomSheetState()
+
+    if (showBottomSheet) {
+        ModalBottomSheet(
+            onDismissRequest = {
+                showBottomSheet = false
+            },
+            sheetState = sheetState
+        ) {
+            AddressBottomSheet()
+        }
+    }
 
     NavigationDrawer(drawerState = drawerState, onItemClick = { id ->
         when (id) {
@@ -136,7 +154,9 @@ fun HomeScreen(
 //                SearchBar(value = searchValue, onValueChange = {
 //                    searchValue = it
 //                }) {}
-                AddressBar("Address here") {}
+                AddressBar("Address here") {
+                    showBottomSheet = true
+                }
                 LazyColumn(
                     state = scrollState,
                     horizontalAlignment = Alignment.CenterHorizontally

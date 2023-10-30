@@ -27,6 +27,7 @@ sealed class Screens(val route: String) {
     object NotificationScreen : Screens(route = Routes.notificationRoute)
     object OrderDetailsScreen : Screens(route = Routes.orderDetailsRoute)
     object CheckoutScreen : Screens(route = Routes.checkoutRoute)
+    object OrderConfirmScreen : Screens(route = Routes.OrderConfirmRoute)
     object RequestPermissionScreen : Screens(route = Routes.requestPermissionRoute)
 
     fun withArgs(vararg args: String): String {

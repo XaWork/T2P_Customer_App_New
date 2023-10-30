@@ -27,6 +27,7 @@ class Routes{
         const val notificationRoute: String = "notificationRoute"
         const val orderDetailsRoute: String = "orderdetails"
         const val checkoutRoute: String = "checkoutRoute"
+        const val OrderConfirmRoute: String = "OrderConfirmRoute"
         const val requestPermissionRoute: String = "requestpermission"
     }
 }

@@ -14,6 +14,7 @@ import me.taste2plate.app.customer.presentation.screens.auth.signup.SignUpScreen
 import me.taste2plate.app.customer.presentation.screens.bulk_order.BulkOrderScreen
 import me.taste2plate.app.customer.presentation.screens.cart.CartScreen
 import me.taste2plate.app.customer.presentation.screens.checkout.CheckoutScreen
+import me.taste2plate.app.customer.presentation.screens.checkout.OrderConfirmScreen
 import me.taste2plate.app.customer.presentation.screens.citybrand.CityBrandScreen
 import me.taste2plate.app.customer.presentation.screens.contact_us.ContactUsScreen
 import me.taste2plate.app.customer.presentation.screens.home.HomeScreen
@@ -34,7 +35,7 @@ import me.taste2plate.app.customer.presentation.screens.wishlist.WishlistScreen
 fun Navigation() {
     val navController = rememberNavController()
 
-    NavHost(navController = navController, startDestination = Screens.HomeScreen.route) {
+    NavHost(navController = navController, startDestination = Screens.SplashScreen.route) {
 
         // --------------------------> Splash Screen <------------------------------------
         composable(route = Screens.SplashScreen.route) {
@@ -249,7 +250,20 @@ fun Navigation() {
 
         // ----------------------------> Checkout <--------------------------------------
         composable(route = Screens.CheckoutScreen.route) {
-            CheckoutScreen()
+            CheckoutScreen(onNavigateToOrderConfirmScreen = {
+                navController.navigate(Screens.OrderConfirmScreen.route)
+            })
+        }
+
+        // ----------------------------> Checkout <--------------------------------------
+        composable(route = Screens.OrderConfirmScreen.route) {
+            OrderConfirmScreen(onNavigateToHomeScreen = {
+                navController.navigate(Screens.HomeScreen.route) {
+                    popUpTo(Screens.HomeScreen.route) {
+                        inclusive = true
+                    }
+                }
+            })
         }
 
         // ----------------------------> Profile <--------------------------------------

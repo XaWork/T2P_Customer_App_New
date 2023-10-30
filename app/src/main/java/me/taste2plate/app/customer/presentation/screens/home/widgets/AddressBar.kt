@@ -32,7 +32,7 @@ import kotlin.math.max
 @Composable
 fun AddressBar(
     address: String,
-    onClick: () -> Unit
+    showAddressSheet: () -> Unit
 ) {
     Row(
         modifier = Modifier
@@ -44,9 +44,9 @@ fun AddressBar(
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Row(modifier = Modifier.clickable { onClick() }
+        Row(modifier = Modifier.clickable { showAddressSheet() }
             .fillMaxWidth(1f)
-            .weight(1f)) {
+            .weight(1f) ) {
             MaterialIcon(
                 imageVector = Icons.Outlined.LocationOn,
             )
