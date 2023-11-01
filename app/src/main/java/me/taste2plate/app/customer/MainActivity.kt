@@ -1,4 +1,4 @@
-package me.taste2plate.app.customer.presentation
+package me.taste2plate.app.customer
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -10,10 +10,12 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import dagger.hilt.android.AndroidEntryPoint
 import me.taste2plate.app.customer.presentation.navigation.Navigation
 import me.taste2plate.app.customer.presentation.screens.splash.SplashScreen
 import me.taste2plate.app.customer.presentation.theme.T2PCustomerAppTheme
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

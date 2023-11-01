@@ -1,5 +1,6 @@
 package me.taste2plate.app.customer.presentation.screens.auth.otp
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -8,6 +9,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -20,6 +22,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import kotlinx.coroutines.delay
+import me.taste2plate.app.customer.presentation.screens.auth.AuthEvents
+import me.taste2plate.app.customer.presentation.screens.auth.AuthViewModel
 import me.taste2plate.app.customer.presentation.theme.HighSpacing
 import me.taste2plate.app.customer.presentation.theme.ScreenPadding
 import me.taste2plate.app.customer.presentation.theme.SpaceBetweenViews
@@ -32,19 +36,18 @@ import me.taste2plate.app.customer.presentation.widgets.AppButton
 import me.taste2plate.app.customer.presentation.widgets.AppScaffold
 import me.taste2plate.app.customer.presentation.widgets.AppTopBar
 import me.taste2plate.app.customer.presentation.widgets.OtpTextField
+import me.taste2plate.app.customer.presentation.widgets.ShowLoading
 import me.taste2plate.app.customer.presentation.widgets.VerticalSpace
 
 @Composable
 fun OTPScreen(
+    viewModel: AuthViewModel,
     onNavigateToHomeScreen: () -> Unit,
     onNavigateToSignUPScreen: () -> Unit,
 ) {
-    var otp by remember {
-        mutableStateOf("")
-    }
 
-    var seconds by remember { mutableStateOf(59) }
-    var resendClicked by remember { mutableStateOf(false) }
+    val state = viewModel.state
+    var seconds by remember { mutableIntStateOf(59) }
 
     if (seconds > 0) {
         LaunchedEffect(Unit) {
@@ -88,19 +91,23 @@ fun OTPScreen(
             VerticalSpace(space = HighSpacing)
 
             OtpTextField(
-                otpText = otp,
+                otpText = viewModel.otp,
                 onOtpTextChange = { value, _ ->
-                    otp = value
+                    viewModel.otp = value
                 }
             )
 
             VerticalSpace(space = HighSpacing)
 
-            AppButton(
-                text = verifyOtpString
-            ) {
-                onNavigateToSignUPScreen()
-            }
+            if (state.loading)
+                ShowLoading()
+            else
+                AppButton(
+                    text = verifyOtpString
+                ) {
+                    viewModel.onEvent(AuthEvents.VerifyOTP)
+                }
+
             val resendOTP = buildAnnotatedString {
                 withStyle(
                     SpanStyle(
@@ -131,7 +138,11 @@ fun OTPScreen(
 
             VerticalSpace(space = SpaceBetweenViews)
 
-            Text(resendOTP, textAlign = TextAlign.Start)
+            Text(resendOTP, textAlign = TextAlign.Start, modifier = Modifier
+                .clickable {
+                    if (seconds == 0)
+                        viewModel.onEvent(AuthEvents.ResendOTP)
+                })
         }
     }
 }
@@ -140,6 +151,6 @@ fun OTPScreen(
 @Composable
 fun SignInPreview() {
     T2PCustomerAppTheme {
-        OTPScreen({}, {})
+        // OTPScreen({}, {})
     }
 }

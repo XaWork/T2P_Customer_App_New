@@ -27,32 +27,53 @@ import me.taste2plate.app.customer.presentation.screens.countries
 import me.taste2plate.app.customer.presentation.theme.GreyDark
 import me.taste2plate.app.customer.presentation.theme.GreyLight
 import me.taste2plate.app.customer.presentation.theme.cardContainerOnSecondaryColor
+import me.taste2plate.app.customer.presentation.theme.primaryColor
 
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AppTextField(
     modifier: Modifier = Modifier,
     value: String,
     onValueChanged: (String) -> Unit,
     hint: String = "",
-    readOnly : Boolean = false,
+    errorMessage: String = "",
+    readOnly: Boolean = false,
+    isError: Boolean = false,
+    keyboardType: KeyboardType = KeyboardType.Text,
     leadingIcon: @Composable (() -> Unit)? = null,
     trailingIcon: @Composable (() -> Unit)? = null,
 ) {
     OutlinedTextField(
         modifier = modifier
             .fillMaxWidth(),
-        value = "",
+        value = value,
         onValueChange = { onValueChanged(it) },
         leadingIcon = leadingIcon,
         trailingIcon = trailingIcon,
+        keyboardOptions = KeyboardOptions(
+            keyboardType = keyboardType
+        ),
+        isError = isError,
+        supportingText = {
+            if (isError)
+                Text(
+                    errorMessage,
+                    color = primaryColor.invoke()
+                )
+            else
+                Text(
+                    errorMessage,
+                )
+
+        },
         readOnly = readOnly,
-        label = { Text(
-            text = hint,
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis
-        ) },
+        label = {
+            Text(
+                text = hint,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
+            )
+        },
     )
 }
 
@@ -128,7 +149,7 @@ fun AppDropDown(
     modifier: Modifier = Modifier,
     onExpandedChange: (Boolean) -> Unit,
     selectedText: String,
-    hint: String ="",
+    hint: String = "",
     onTextChanged: (String) -> Unit
 
 ) {
@@ -149,7 +170,8 @@ fun AppDropDown(
         )
 
         ExposedDropdownMenu(
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier
+                .fillMaxWidth()
                 .background(color = MaterialTheme.colorScheme.background),
             expanded = expanded,
             onDismissRequest = { onExpandedChange(false) }

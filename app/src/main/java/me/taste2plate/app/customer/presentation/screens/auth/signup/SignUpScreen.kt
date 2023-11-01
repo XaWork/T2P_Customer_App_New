@@ -17,6 +17,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import me.taste2plate.app.customer.R
+import me.taste2plate.app.customer.presentation.screens.auth.AuthViewModel
 import me.taste2plate.app.customer.presentation.theme.HighSpacing
 import me.taste2plate.app.customer.presentation.theme.ScreenPadding
 import me.taste2plate.app.customer.presentation.theme.SpaceBetweenViews
@@ -32,6 +33,7 @@ import me.taste2plate.app.customer.presentation.widgets.VerticalSpace
 
 @Composable
 fun SignUpScreen(
+    viewModel: AuthViewModel,
     onNavigateToHomeScreen: () -> Unit
 ) {
     var mobile by remember {
@@ -115,6 +117,6 @@ fun SignUpScreen(
 @Composable
 fun SignInPreview() {
     T2PCustomerAppTheme {
-        SignUpScreen {}
+        //SignUpScreen {}
     }
 }

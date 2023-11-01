@@ -1,11 +1,18 @@
 package me.taste2plate.app.customer.presentation.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.ViewModel
+import androidx.navigation.NavBackStackEntry
+import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navigation
 import me.taste2plate.app.customer.presentation.screens.address.AddEditAddressScreen
 import me.taste2plate.app.customer.presentation.screens.address.AddressListScreen
+import me.taste2plate.app.customer.presentation.screens.auth.AuthViewModel
 import me.taste2plate.app.customer.presentation.screens.auth.onboarding.OnBoardingScreen
 import me.taste2plate.app.customer.presentation.screens.auth.otp.OTPScreen
 import me.taste2plate.app.customer.presentation.screens.auth.permissions.NotificationPermissionScreen
@@ -42,56 +49,66 @@ fun Navigation() {
             SplashScreen(
                 onNavigateToOnBoardingScreen = {
                     navController.navigate(Screens.OnBoardingScreen.route) {
-                        popUpTo(Screens.OnBoardingScreen.route) {
-                            inclusive = true
-                        }
+                        popUpTo(0)
+
                     }
                 },
-                onNavigateToHomeScreen = {}
+                onNavigateToHomeScreen = {
+                    navController.navigate(Screens.HomeScreen.route) {
+                        popUpTo(0)
+                    }
+                }
             )
         }
 
-        // ----------------------------> On Boarding <--------------------------------------
-        composable(route = Screens.OnBoardingScreen.route) {
-            OnBoardingScreen {
-                navController.navigate(Screens.OTPScreen.route)
-            }
-        }
+        // ----------------------------> Shared view model for auth screens <--------------------------------------
+        navigation(startDestination = Screens.OnBoardingScreen.route, route = "auth"){
 
+            // ----------------------------> On Boarding <--------------------------------------
+            composable(route = Screens.OnBoardingScreen.route) {entry ->
+                val viewModel =
+                    entry.sharedViewModel<AuthViewModel>(navHostController = navController)
 
-        // ----------------------------> Sign In <--------------------------------------
-        composable(route = Screens.SignInScreen.route) {
-            SignInScreen {
-                navController.navigate(Screens.OTPScreen.route) {
-                    /*popUpTo(Screens.OTPScreen.route) {
-                        inclusive = true
-                    }*/
+                OnBoardingScreen(
+                    viewModel = viewModel
+                ) {
+                    navController.navigate(Screens.OTPScreen.route)
                 }
             }
-        }
 
-        // ----------------------------> Sign Up <--------------------------------------
-        composable(route = Screens.SignUpScreen.route) {
-            SignUpScreen {
-                navController.navigate(Screens.LocationScreen.route) {/*
+            // ----------------------------> Sign Up <--------------------------------------
+            composable(route = Screens.SignUpScreen.route) {entry ->
+                val viewModel =
+                    entry.sharedViewModel<AuthViewModel>(navHostController = navController)
+
+                SignUpScreen(
+                    viewModel = viewModel
+                ) {
+                    navController.navigate(Screens.LocationScreen.route) {/*
                      popUpTo(Screens.HomeScreen.route) {
                          inclusive = true
                      }*/
-                }
-            }
-        }
-
-        // ----------------------------> OTP <--------------------------------------
-        composable(route = Screens.OTPScreen.route) {
-            OTPScreen(onNavigateToSignUPScreen = {
-                navController.navigate(Screens.SignUpScreen.route)
-            }, onNavigateToHomeScreen = {
-                navController.navigate(Screens.HomeScreen.route) {
-                    popUpTo(Screens.HomeScreen.route) {
-                        inclusive = true
                     }
                 }
-            })
+            }
+
+            // ----------------------------> OTP <--------------------------------------
+            composable(route = Screens.OTPScreen.route) {entry ->
+                val viewModel =
+                    entry.sharedViewModel<AuthViewModel>(navHostController = navController)
+
+                OTPScreen(
+                    viewModel = viewModel,
+                    onNavigateToSignUPScreen = {
+                    navController.navigate(Screens.SignUpScreen.route)
+                }, onNavigateToHomeScreen = {
+                    navController.navigate(Screens.HomeScreen.route) {
+                        popUpTo(Screens.HomeScreen.route) {
+                            inclusive = true
+                        }
+                    }
+                })
+            }
         }
 
         /*  // ----------------------------> Request Permission <--------------------------------------
@@ -298,4 +315,15 @@ fun Navigation() {
             )
         }
     }
+}
+
+@Composable
+inline fun <reified T : ViewModel> NavBackStackEntry.sharedViewModel(
+    navHostController: NavHostController
+): T {
+    val navGraphRoute = destination.parent?.route ?: return hiltViewModel()
+    val parentEntry = remember(this) {
+        navHostController.getBackStackEntry(navGraphRoute)
+    }
+    return hiltViewModel(parentEntry)
 }

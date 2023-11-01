@@ -1,42 +1,40 @@
 package me.taste2plate.app.customer.presentation.screens.auth.onboarding
 
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Phone
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import me.taste2plate.app.customer.R
+import me.taste2plate.app.customer.presentation.screens.auth.AuthEvents
+import me.taste2plate.app.customer.presentation.screens.auth.AuthViewModel
 import me.taste2plate.app.customer.presentation.screens.home.widgets.HeadingChipWithLine
 import me.taste2plate.app.customer.presentation.theme.HighSpacing
-import me.taste2plate.app.customer.presentation.theme.LowRoundedCorners
 import me.taste2plate.app.customer.presentation.theme.ScreenPadding
 import me.taste2plate.app.customer.presentation.theme.SpaceBetweenViews
 import me.taste2plate.app.customer.presentation.theme.T2PCustomerAppTheme
-import me.taste2plate.app.customer.presentation.theme.buttonRoundedShapeCornerRadius
 import me.taste2plate.app.customer.presentation.utils.getOtpString
 import me.taste2plate.app.customer.presentation.utils.mobileNumber
 import me.taste2plate.app.customer.presentation.widgets.AppButton
@@ -44,18 +42,27 @@ import me.taste2plate.app.customer.presentation.widgets.AppScaffold
 import me.taste2plate.app.customer.presentation.widgets.AppTextField
 import me.taste2plate.app.customer.presentation.widgets.DrawableImage
 import me.taste2plate.app.customer.presentation.widgets.MaterialIcon
+import me.taste2plate.app.customer.presentation.widgets.ShowLoading
 import me.taste2plate.app.customer.presentation.widgets.VerticalSpace
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun OnBoardingScreen(
+    viewModel: AuthViewModel,
     onNavigateToOtpScreen: () -> Unit,
 ) {
-    val pages = listOf("Sign In", "Sign Up")
-    val pagerState = rememberPagerState(pageCount = { pages.size })
-    val scope = rememberCoroutineScope();
-    var mobile by remember {
-        mutableStateOf("")
+
+    val state = viewModel.state
+    val scope = rememberCoroutineScope()
+
+    LaunchedEffect(key1 = state){
+        when{
+            state.loginModel != null  -> {
+                scope.launch {
+                    delay(1000)
+                    onNavigateToOtpScreen()
+                }
+            }
+        }
     }
 
     AppScaffold {
@@ -107,9 +114,15 @@ fun OnBoardingScreen(
                 VerticalSpace(space = SpaceBetweenViews)
 
                 AppTextField(
-                    value = mobile,
-                    onValueChanged = { mobile = it },
+                    value = viewModel.mobile,
+                    onValueChanged = {
+                        if (it.length <= viewModel.mobileLength) viewModel.mobile = it
+                    },
                     hint = mobileNumber,
+                    keyboardType = KeyboardType.Phone,
+                    isError = state.isError,
+                    errorMessage = if (state.isError) state.message!!
+                    else "Limit: ${viewModel.mobile.length}/${viewModel.mobileLength}",
                     leadingIcon = {
                         MaterialIcon(
                             imageVector = Icons.Outlined.Phone
@@ -118,11 +131,14 @@ fun OnBoardingScreen(
 
                 VerticalSpace(space = SpaceBetweenViews)
 
-                AppButton(
-                    text = getOtpString,
-                ) {
-                    onNavigateToOtpScreen()
-                }
+                if (state.loading)
+                    ShowLoading()
+                else
+                    AppButton(
+                        text = getOtpString,
+                    ) {
+                        viewModel.onEvent(AuthEvents.Login)
+                    }
 
                 VerticalSpace(space = SpaceBetweenViews)
 
@@ -132,49 +148,6 @@ fun OnBoardingScreen(
                 )
 
             }
-
-            /*TabRow(
-                selectedTabIndex = pagerState.currentPage,
-                *//*indicator = { tabPositions ->
-                TabRowDefaults.Indicator(
-                    height = 2.dp,
-                    color = Color.White
-                )
-            }*//*
-            ) {
-                pages.forEachIndexed { index, s ->
-                    Tab(
-                        pagerState.currentPage == index, {
-                            scope.launch {
-                                pagerState.animateScrollToPage(index)
-                            }
-                        },
-                        text = {
-                            Text(text = s.uppercase(), color = Color.Black)
-                        }
-                    )
-                }
-            }
-
-            VerticalSpace(space = SpaceBetweenViews)
-
-            HorizontalPager(
-                state = pagerState
-            ) { page ->
-                when (page) {
-                    0 -> {
-                        SignInScreen {
-                            onNavigateToOtpScreen()
-                        }
-                    }
-
-                    1 -> {
-                        SignUpScreen {
-                            onNavigateToOtpScreen()
-                        }
-                    }
-                }
-            }*/
         }
     }
 }
@@ -183,6 +156,6 @@ fun OnBoardingScreen(
 @Composable
 fun OnBoardingPreview() {
     T2PCustomerAppTheme {
-        OnBoardingScreen {}
+        //OnBoardingScreen {}
     }
 }
