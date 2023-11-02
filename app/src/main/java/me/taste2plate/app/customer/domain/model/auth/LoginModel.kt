@@ -7,7 +7,7 @@ data class LoginModel(
     @SerializedName("message")
     val message: String,
     @SerializedName("OTP")
-    val oTP: Int,
+    val oTP: String,
     @SerializedName("status")
     val status: String
 )

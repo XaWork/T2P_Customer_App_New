@@ -20,6 +20,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
+import me.taste2plate.app.customer.domain.model.HomeModel
 import me.taste2plate.app.customer.presentation.screens.productList
 import me.taste2plate.app.customer.presentation.theme.ExtraHighPadding
 import me.taste2plate.app.customer.presentation.theme.ScreenPadding
@@ -32,12 +33,13 @@ import kotlin.math.absoluteValue
 @Composable
 fun TopBrands(
     onNavigateToProductListScreen: () -> Unit,
+    topBrands: List<HomeModel.TopBrand>
 ) {
-    val pagerState = rememberPagerState(pageCount = { productList.size })
+    val pagerState = rememberPagerState(pageCount = { topBrands.size })
     HorizontalPager(
         state = pagerState,
     ) { page ->
-        val product = productList[page]
+        val product = topBrands[page]
         BlackBorderCard(
             colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.background),
             modifier = Modifier
@@ -57,7 +59,7 @@ fun TopBrands(
                 cameraDistance = 8 * density
 
             }) {
-            ImageWithWishlistButton(image = product.image, withButton = false)
+            ImageWithWishlistButton(image = product.file, withButton = false)
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -66,10 +68,10 @@ fun TopBrands(
                 verticalArrangement = Arrangement.Center
             ) {
                 Text(
-                    product.brand, style = MaterialTheme.typography.headlineMedium,
+                    product.name, style = MaterialTheme.typography.headlineMedium,
                     fontWeight = FontWeight.Bold
                 )
-                Text(product.address, style = MaterialTheme.typography.bodyLarge)
+                Text(product.shortDesc, style = MaterialTheme.typography.bodyLarge)
             }
         }
     }
@@ -82,6 +84,6 @@ fun TopBrands(
 @Composable
 fun TopBrandsPreview() {
     T2PCustomerAppTheme {
-        TopBrands({})
+       // TopBrands({})
     }
 }

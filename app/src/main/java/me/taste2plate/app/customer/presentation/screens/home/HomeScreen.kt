@@ -13,6 +13,7 @@ import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -22,6 +23,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import kotlinx.coroutines.launch
 import me.taste2plate.app.customer.R
 import me.taste2plate.app.customer.presentation.screens.address.AddressBottomSheet
@@ -43,6 +45,7 @@ import me.taste2plate.app.customer.presentation.theme.SpaceBetweenViewsAndSubVie
 import me.taste2plate.app.customer.presentation.theme.T2PCustomerAppTheme
 import me.taste2plate.app.customer.presentation.widgets.AppScaffold
 import me.taste2plate.app.customer.presentation.widgets.DrawableImage
+import me.taste2plate.app.customer.presentation.widgets.ShowLoading
 import me.taste2plate.app.customer.presentation.widgets.VerticalSpace
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -62,10 +65,14 @@ fun HomeScreen(
     onNavigateContactUsScreen: () -> Unit,
     onNavigateReferAndEarnScreen: () -> Unit,
     onNavigateLogoutScreen: () -> Unit,
+    viewModel: HomeViewModel = hiltViewModel()
 ) {
     var searchValue by remember {
         mutableStateOf("")
     }
+
+    //obser state
+    val state = viewModel.state
 
     val scrollState = rememberLazyListState()
     //  val position by animateFloatAsState(if (scrollUpState.value == true) -150f else 0f, label = "")
@@ -92,6 +99,12 @@ fun HomeScreen(
         }
     }
 
+    // Launched Effects
+    LaunchedEffect(Unit) {
+        viewModel.onEvent(HomeEvent.GetHome)
+    }
+
+
     NavigationDrawer(drawerState = drawerState, onItemClick = { id ->
         when (id) {
             DrawerAppScreen.Home.name -> {}
@@ -106,21 +119,26 @@ fun HomeScreen(
             DrawerAppScreen.BulkOrders.name -> {
                 onNavigateToBulkOrdersScreen()
             }
+
             DrawerAppScreen.Wallet.name -> {
                 onNavigateToWalletScreen()
             }
+
             DrawerAppScreen.MembershipPlan.name -> {
                 onNavigateToMembershipPlanScreen()
             }
+
             DrawerAppScreen.MyPlan.name -> {
                 onNavigateToMyPlanScreen()
             }
+
             DrawerAppScreen.RateApp.name -> {}
             DrawerAppScreen.ReferAndEarn.name -> {}
             DrawerAppScreen.ShareApp.name -> {}
             DrawerAppScreen.ContactUs.name -> {
                 onNavigateContactUsScreen()
             }
+
             DrawerAppScreen.LogOut.name -> {
                 onNavigateLogoutScreen()
             }
@@ -150,64 +168,85 @@ fun HomeScreen(
                 }
             }
         ) {
-            Column {
-//                SearchBar(value = searchValue, onValueChange = {
-//                    searchValue = it
-//                }) {}
-                AddressBar("Address here") {
-                    showBottomSheet = true
-                }
-                LazyColumn(
-                    state = scrollState,
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    item {
-                        TopList(
-                            onNavigateToCityBrandScreen = {
-                                onNavigateToCityBrandScreen()
+            if (state.isLoading)
+                ShowLoading()
+            else
+                Column {
+                    AddressBar("Address here") {
+                        showBottomSheet = true
+                    }
+                    LazyColumn(
+                        state = scrollState,
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        val home = state.homeData
+                        item {
+                            TopList(
+                                onNavigateToCityBrandScreen = {
+                                    onNavigateToCityBrandScreen()
+                                }
+                            )
+
+                            if (home?.slider != null)
+                                AutoSlidingCarousel(
+                                    pages = home.slider
+                                )
+
+                            VerticalSpace(space = SpaceBetweenViewsAndSubViews)
+
+                            //top order item
+                            if (home?.topMostOrderedProducts != null) {
+                                Column {
+                                    HeadingChip("Top Ordered Food/City")
+                                    VerticalSpace(space = SpaceBetweenViewsAndSubViews)
+                                    TopOrderedFoodCityList(
+                                        onNavigateToProductListScreen = onNavigateToProductListScreen,
+                                        home.topMostOrderedProducts
+                                    )
+                                    VerticalSpace(space = SpaceBetweenViews)
+                                }
                             }
-                        )
-                        AutoSlidingCarousel()
-                        VerticalSpace(space = SpaceBetweenViewsAndSubViews)
 
-                        //top order item
-                        HeadingChip("Top Ordered Food/City")
-                        VerticalSpace(space = SpaceBetweenViewsAndSubViews)
-                        TopOrderedFoodCityList(
-                            onNavigateToProductListScreen = onNavigateToProductListScreen
-                        )
-                        VerticalSpace(space = SpaceBetweenViews)
+                            //most order item
 
-                        //most order item
-                        MostOrderedItemList(
-                            onNavigateToProductDetailsScreen = onNavigateToProductDetailsScreen
-                        )
-                        VerticalSpace(space = SpaceBetweenViews)
+                            if (home?.mostOrderdItem != null)
+                                MostOrderedItemList(
+                                    onNavigateToProductDetailsScreen = onNavigateToProductDetailsScreen,
+                                    foodItems = home.mostOrderdItem
+                                )
+                            VerticalSpace(space = SpaceBetweenViews)
 
-                        //top brands
-                        HeadingChip("Top Brands")
-                        VerticalSpace(space = SpaceBetweenViews)
-                        TopBrands(
-                            onNavigateToProductListScreen = onNavigateToProductListScreen
-                        )
-                        VerticalSpace(space = SpaceBetweenViewsAndSubViews)
+                            //top brands
+                            if (home?.topBrands != null)
+                                Column {
+                                    HeadingChip("Top Brands")
+                                    VerticalSpace(space = SpaceBetweenViews)
+                                    TopBrands(
+                                        onNavigateToProductListScreen = onNavigateToProductListScreen,
+                                        topBrands = home.topBrands
+                                    )
+                                    VerticalSpace(space = SpaceBetweenViewsAndSubViews)
+                                }
 
-                        //best seller
-                        Deals(
-                            onNavigateToProductDetailsScreen = onNavigateToProductDetailsScreen
-                        )
-                        VerticalSpace(space = SpaceBetweenViews)
+                            //best seller
+                            Deals(
+                                onNavigateToProductDetailsScreen = onNavigateToProductDetailsScreen
+                            )
+                            VerticalSpace(space = SpaceBetweenViews)
 
+                            //Featured
+                            HeadingChip("Featured")
+                            VerticalSpace(space = SpaceBetweenViews)
+                        }
                         //Featured
-                        HeadingChip("Featured")
-                        VerticalSpace(space = SpaceBetweenViews)
-                    }
-                    //Featured
-                    items(productList) { product ->
-                        SingleFeaturedItem(product, onNavigateToProductDetailsScreen = onNavigateToProductDetailsScreen)
+                        items(productList) { product ->
+                            SingleFeaturedItem(
+                                product,
+                                onNavigateToProductDetailsScreen = onNavigateToProductDetailsScreen
+                            )
+                        }
                     }
                 }
-            }
 
         }
     }

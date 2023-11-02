@@ -26,20 +26,29 @@ class SplashViewModel @Inject constructor(
             SplashEvents.GetSettings -> {
                 getSettings()
             }
+
+            SplashEvents.IsUserLogin -> {
+                isUserLogin()
+            }
+        }
+    }
+
+    private fun isUserLogin() {
+        viewModelScope.launch {
+            state = state.copy(isLogin = userPref.isLogin())
         }
     }
 
     private fun getSettings() {
         viewModelScope.launch {
             settingsUseCase.settings().collect { result ->
-                Log.e("Result", result.data.toString())
                 state = when (result) {
                     is Resource.Loading -> {
                         state.copy(loading = true)
                     }
 
                     is Resource.Success -> {
-                        Log.e("Result", result.data.toString())
+                        isUserLogin()
                         state.copy(loading = false, settings = result.data)
                     }
 

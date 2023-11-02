@@ -36,6 +36,7 @@ import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.yield
 import me.taste2plate.app.customer.R
+import me.taste2plate.app.customer.domain.model.HomeModel
 import me.taste2plate.app.customer.presentation.theme.ScreenPadding
 import me.taste2plate.app.customer.presentation.widgets.DrawableImage
 import kotlin.math.absoluteValue
@@ -45,11 +46,8 @@ import kotlin.math.absoluteValue
 fun AutoSlidingCarousel(
     modifier: Modifier = Modifier,
     autoSlideDuration: Long = 3000L,
+    pages: List<HomeModel.Slider>
 ) {
-    val pages = listOf(
-        R.drawable.home_brand, R.drawable.home_category,
-        R.drawable.home_city, R.drawable.home_cuisine
-    )
     val pagerState =
         rememberPagerState(pageCount = { pages.size }, initialPageOffsetFraction = 0.4f)
     val isDragged by pagerState.interactionSource.collectIsDraggedAsState()
@@ -76,7 +74,7 @@ fun AutoSlidingCarousel(
             state = pagerState
         ) { page ->
             SingleTopList(
-                pages[page],
+                image = pages[page].file,
                 modifier =
                 Modifier
                     .fillMaxWidth()

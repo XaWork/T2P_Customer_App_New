@@ -15,8 +15,8 @@ import me.taste2plate.app.customer.presentation.screens.address.AddressListScree
 import me.taste2plate.app.customer.presentation.screens.auth.AuthViewModel
 import me.taste2plate.app.customer.presentation.screens.auth.onboarding.OnBoardingScreen
 import me.taste2plate.app.customer.presentation.screens.auth.otp.OTPScreen
+import me.taste2plate.app.customer.presentation.screens.auth.permissions.LocationPermissionScreen
 import me.taste2plate.app.customer.presentation.screens.auth.permissions.NotificationPermissionScreen
-import me.taste2plate.app.customer.presentation.screens.auth.signin.SignInScreen
 import me.taste2plate.app.customer.presentation.screens.auth.signup.SignUpScreen
 import me.taste2plate.app.customer.presentation.screens.bulk_order.BulkOrderScreen
 import me.taste2plate.app.customer.presentation.screens.cart.CartScreen
@@ -62,10 +62,10 @@ fun Navigation() {
         }
 
         // ----------------------------> Shared view model for auth screens <--------------------------------------
-        navigation(startDestination = Screens.OnBoardingScreen.route, route = "auth"){
+        navigation(startDestination = Screens.OnBoardingScreen.route, route = "auth") {
 
             // ----------------------------> On Boarding <--------------------------------------
-            composable(route = Screens.OnBoardingScreen.route) {entry ->
+            composable(route = Screens.OnBoardingScreen.route) { entry ->
                 val viewModel =
                     entry.sharedViewModel<AuthViewModel>(navHostController = navController)
 
@@ -77,7 +77,7 @@ fun Navigation() {
             }
 
             // ----------------------------> Sign Up <--------------------------------------
-            composable(route = Screens.SignUpScreen.route) {entry ->
+            composable(route = Screens.SignUpScreen.route) { entry ->
                 val viewModel =
                     entry.sharedViewModel<AuthViewModel>(navHostController = navController)
 
@@ -93,21 +93,19 @@ fun Navigation() {
             }
 
             // ----------------------------> OTP <--------------------------------------
-            composable(route = Screens.OTPScreen.route) {entry ->
+            composable(route = Screens.OTPScreen.route) { entry ->
                 val viewModel =
                     entry.sharedViewModel<AuthViewModel>(navHostController = navController)
 
                 OTPScreen(
                     viewModel = viewModel,
                     onNavigateToSignUPScreen = {
-                    navController.navigate(Screens.SignUpScreen.route)
-                }, onNavigateToHomeScreen = {
-                    navController.navigate(Screens.HomeScreen.route) {
-                        popUpTo(Screens.HomeScreen.route) {
-                            inclusive = true
+                        navController.navigate(Screens.SignUpScreen.route)
+                    }, onNavigateToLocationScreen = {
+                        navController.navigate(Screens.LocationScreen.route) {
+                            popUpTo(0)
                         }
-                    }
-                })
+                    })
             }
         }
 
@@ -123,13 +121,22 @@ fun Navigation() {
         composable(route = Screens.LocationScreen.route) {
             LocationScreen(
                 onNavigateToHomeScreen = {
-                    navController.navigate(Screens.HomeScreen.route)
+                    navController.navigate(Screens.HomeScreen.route){
+                        popUpTo(0)
+                    }
                 },
                 onNavigateToAddEditAddressScreen = {
                     navController.navigate(Screens.AddEditAddressScreen.route)
                 },
                 onNavigateToNotificationScreen = {
-                    navController.navigate(Screens.NotificationScreen.route)
+                    navController.navigate(Screens.NotificationScreen.route){
+                        popUpTo(0)
+                    }
+                },
+                onNavigateToLocationPermissionScreen = {
+                    navController.navigate(Screens.LocationPermissionScreen.route){
+                        popUpTo(0)
+                    }
                 }
             )
         }
@@ -201,6 +208,17 @@ fun Navigation() {
         // ----------------------------> WishList <--------------------------------------
         composable(route = Screens.WishlistScreen.route) {
             WishlistScreen()
+        }
+
+        // ----------------------------> Location Permission <--------------------------------------
+        composable(route = Screens.LocationPermissionScreen.route) {
+            LocationPermissionScreen(
+                onNavigateToLocationScreen = {
+                    navController.navigate(Screens.LocationScreen.route){
+                        popUpTo(0)
+                    }
+                }
+            )
         }
 
         // ----------------------------> Wallet <--------------------------------------

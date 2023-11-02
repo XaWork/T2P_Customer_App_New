@@ -27,15 +27,21 @@ fun SplashScreen(
 
     LaunchedEffect(state) {
         when {
-            state.settings != null -> {
+            !state.isLogin && state.settings != null -> {
                 onNavigateToOnBoardingScreen()
             }
+
+            state.isLogin  && state.settings != null-> {
+                onNavigateToHomeScreen()
+            }
+
         }
     }
 
     LaunchedEffect(Unit) {
         viewModel.onEvent(SplashEvents.GetSettings)
     }
+
 
     AppScaffold(
         paddingValues = PaddingValues(0.dp)

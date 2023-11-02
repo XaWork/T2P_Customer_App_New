@@ -99,9 +99,12 @@ dependencies {
     //kotlin coroutine
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.1")
 
-    //google maps
+    //google
+    //maps
     implementation("com.google.maps.android:maps-compose:2.7.2")
     implementation("com.google.android.gms:play-services-maps:18.2.0")
+    //location
+    implementation("com.google.android.gms:play-services-location:21.0.1")
 
     //permission
     implementation("com.google.accompanist:accompanist-permissions:0.33.2-alpha")

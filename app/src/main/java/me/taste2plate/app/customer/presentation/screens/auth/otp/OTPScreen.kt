@@ -10,7 +10,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -27,10 +26,10 @@ import me.taste2plate.app.customer.presentation.screens.auth.AuthViewModel
 import me.taste2plate.app.customer.presentation.theme.HighSpacing
 import me.taste2plate.app.customer.presentation.theme.ScreenPadding
 import me.taste2plate.app.customer.presentation.theme.SpaceBetweenViews
+import me.taste2plate.app.customer.presentation.theme.SpaceBetweenViewsAndSubViews
 import me.taste2plate.app.customer.presentation.theme.T2PCustomerAppTheme
 import me.taste2plate.app.customer.presentation.theme.outlineColor
 import me.taste2plate.app.customer.presentation.theme.primaryColor
-import me.taste2plate.app.customer.presentation.utils.otpString
 import me.taste2plate.app.customer.presentation.utils.verifyOtpString
 import me.taste2plate.app.customer.presentation.widgets.AppButton
 import me.taste2plate.app.customer.presentation.widgets.AppScaffold
@@ -42,12 +41,19 @@ import me.taste2plate.app.customer.presentation.widgets.VerticalSpace
 @Composable
 fun OTPScreen(
     viewModel: AuthViewModel,
-    onNavigateToHomeScreen: () -> Unit,
+    onNavigateToLocationScreen: () -> Unit,
     onNavigateToSignUPScreen: () -> Unit,
 ) {
 
     val state = viewModel.state
     var seconds by remember { mutableIntStateOf(59) }
+
+    //Observe State
+    when {
+        state.verifyOTPModel != null -> {
+            onNavigateToLocationScreen()
+        }
+    }
 
     if (seconds > 0) {
         LaunchedEffect(Unit) {
@@ -82,7 +88,7 @@ fun OTPScreen(
                         fontWeight = FontWeight.Bold
                     )
                 ) {
-                    append("\n+91 7892323453")
+                    append("\n+91 ${viewModel.mobile}")
                 }
             }
 
@@ -96,6 +102,16 @@ fun OTPScreen(
                     viewModel.otp = value
                 }
             )
+
+            VerticalSpace(space = SpaceBetweenViewsAndSubViews)
+
+            if (state.isError)
+                Text(
+                    state.message!!,
+                    textAlign = TextAlign.Center,
+                    color =
+                    primaryColor.invoke()
+                )
 
             VerticalSpace(space = HighSpacing)
 

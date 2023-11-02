@@ -11,6 +11,7 @@ import kotlinx.coroutines.launch
 import me.taste2plate.app.customer.data.Resource
 import me.taste2plate.app.customer.data.Status
 import me.taste2plate.app.customer.data.UserPref
+import me.taste2plate.app.customer.domain.model.auth.User
 import me.taste2plate.app.customer.domain.use_case.auth.LoginUseCase
 import me.taste2plate.app.customer.domain.use_case.auth.VerifyOTPUseCase
 import me.taste2plate.app.customer.utils.Constants
@@ -28,16 +29,18 @@ class AuthViewModel @Inject constructor(
     var mobile by mutableStateOf("")
     var otp by mutableStateOf("")
     val mobileLength = 10
-    val otpLength = 6
+    private val otpLength = 6
 
     fun onEvent(event: AuthEvents) {
         when (event) {
             AuthEvents.Login -> {
                 validateMobile()
             }
+
             AuthEvents.VerifyOTP -> {
                 validateOTP()
             }
+
             AuthEvents.ResendOTP -> {
                 login()
             }
@@ -72,8 +75,8 @@ class AuthViewModel @Inject constructor(
                             state.copy(
                                 loading = false,
                                 loginModel = result.data,
-                                message = result.data.message,
-                                isError = true,
+                                isError =  false,
+                                message =  ""
                             )
                         else
                             state.copy(
@@ -120,14 +123,13 @@ class AuthViewModel @Inject constructor(
                     }
 
                     is Resource.Success -> {
-                        state = if (result.data?.status == Status.success.name)
+                        state = if (result.data?.status == Status.success.name) {
+                            saveUser(result.data.data)
                             state.copy(
                                 loading = false,
                                 verifyOTPModel = result.data,
-                                message = result.data.message,
-                                isError = false,
                             )
-                        else
+                        } else
                             state.copy(
                                 loading = false,
                                 message = result.data?.message,
@@ -144,6 +146,13 @@ class AuthViewModel @Inject constructor(
                     }
                 }
             }
+        }
+    }
+
+    private fun saveUser(user: User) {
+        viewModelScope.launch {
+            userPref.setLogin(true)
+            userPref.saveUser(user)
         }
     }
 

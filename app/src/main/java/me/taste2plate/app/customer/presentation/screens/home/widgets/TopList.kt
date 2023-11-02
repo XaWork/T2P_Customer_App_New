@@ -19,13 +19,15 @@ import me.taste2plate.app.customer.presentation.screens.ImageItemList
 import me.taste2plate.app.customer.presentation.theme.ScreenPadding
 import me.taste2plate.app.customer.presentation.theme.T2PCustomerAppTheme
 import me.taste2plate.app.customer.presentation.widgets.DrawableImage
+import me.taste2plate.app.customer.presentation.widgets.NetworkImage
 
 @Composable
 fun TopList(
-    onNavigateToCityBrandScreen : () -> Unit
+    onNavigateToCityBrandScreen: () -> Unit
 ) {
     LazyVerticalGrid(
-        modifier = Modifier.height(110.dp)
+        modifier = Modifier
+            .height(110.dp)
             .padding(ScreenPadding),
         columns = GridCells.Fixed(4),
         horizontalArrangement = Arrangement.spacedBy(10.dp),
@@ -39,14 +41,25 @@ fun TopList(
 }
 
 @Composable
-fun SingleTopList(image: Int, modifier: Modifier = Modifier) {
-    DrawableImage(
-        id = image,
-        modifier = modifier
-            .clip(RoundedCornerShape(10.dp))
-            .height(80.dp),
-        contentScale = ContentScale.Crop
-    )
+fun SingleTopList(
+    drawableImage: Int? = null, image: String? = null, modifier: Modifier = Modifier
+) {
+    if (drawableImage != null)
+        DrawableImage(
+            id = drawableImage,
+            contentScale = ContentScale.Crop,
+            modifier = modifier
+                .clip(RoundedCornerShape(10.dp))
+                .height(80.dp)
+        )
+    else
+        NetworkImage(
+            image = image!!,
+            modifier = modifier
+                .clip(RoundedCornerShape(10.dp))
+                .height(80.dp),
+            contentScale = ContentScale.Crop
+        )
 }
 
 @Preview

@@ -1,31 +1,26 @@
-package me.taste2plate.app.customer.domain.use_case.auth
+package me.taste2plate.app.customer.domain.use_case
 
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import me.taste2plate.app.customer.data.ApiErrorMessages
 import me.taste2plate.app.customer.data.Resource
-import me.taste2plate.app.customer.domain.model.auth.VerifyOTPModel
-import me.taste2plate.app.customer.domain.repo.UserRepo
+import me.taste2plate.app.customer.domain.model.HomeModel
+import me.taste2plate.app.customer.domain.model.SettingsModel
+import me.taste2plate.app.customer.domain.repo.CustomRepo
 import retrofit2.HttpException
 import java.io.IOException
 import javax.inject.Inject
 
-class VerifyOTPUseCase @Inject constructor(
-    private val repo: UserRepo
+class HomeUseCase @Inject constructor(
+    private val customRepo: CustomRepo
 ) {
     suspend fun execute(
-        mobile: String,
-        token: String,
-        otp: String
-    ): Flow<Resource<VerifyOTPModel>> {
+        taste: String
+    ): Flow<Resource<HomeModel>> {
         return flow {
             emit(Resource.Loading(true))
             try {
-                val response = repo.verifyOTP(
-                    mobile = mobile,
-                    token = token,
-                    otp = otp
-                )
+                val response = customRepo.home(taste)
                 emit(Resource.Success(response))
             } catch (io: IOException) {
                 io.printStackTrace()

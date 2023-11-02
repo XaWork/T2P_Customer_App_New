@@ -39,6 +39,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import me.taste2plate.app.customer.R
+import me.taste2plate.app.customer.domain.model.HomeModel
 import me.taste2plate.app.customer.presentation.screens.productList
 import me.taste2plate.app.customer.presentation.theme.ForestGreen
 import me.taste2plate.app.customer.presentation.theme.ForestGreenDark
@@ -61,8 +62,9 @@ import kotlin.math.absoluteValue
 @Composable
 fun MostOrderedItemList(
     onNavigateToProductDetailsScreen: () -> Unit,
+    foodItems: List<HomeModel.MostOrderdItem>
 ) {
-    val pagerState = rememberPagerState(pageCount = { productList.size })
+    val pagerState = rememberPagerState(pageCount = { foodItems.size })
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center,
@@ -82,8 +84,12 @@ fun MostOrderedItemList(
         HorizontalPager(
             state = pagerState,
         ) {
-            SingleMostOrderedItem(it, pagerState = pagerState,
-                modifier = Modifier.clickable { onNavigateToProductDetailsScreen() })
+            SingleMostOrderedItem(
+                it,
+                pagerState = pagerState,
+                modifier = Modifier.clickable { onNavigateToProductDetailsScreen() },
+                product = foodItems[it]
+            )
         }
     }
 }
@@ -94,8 +100,8 @@ fun SingleMostOrderedItem(
     page: Int,
     modifier: Modifier = Modifier,
     pagerState: PagerState,
+    product: HomeModel.MostOrderdItem
 ) {
-    val product = productList[page]
     RedBorderCard(
         modifier = modifier.graphicsLayer {
             val pageOffset: Float =
@@ -105,7 +111,7 @@ fun SingleMostOrderedItem(
         }
     ) {
         Column {
-            ImageWithWishlistButton(image = product.image)
+            ImageWithWishlistButton(image = product.file[0].location)
 
             VerticalSpace(space = SpaceBetweenViewsAndSubViews)
 
@@ -119,7 +125,7 @@ fun SingleMostOrderedItem(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
-                        "Flat $rupeeSign${product.flatOff} OFF",
+                        "Flat $rupeeSign${product.discountedPrice} OFF",
                         color = MaterialTheme.colorScheme.tertiary
                     )
 
@@ -136,7 +142,7 @@ fun SingleMostOrderedItem(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Text(
-                            text = product.rating,
+                            text = "",
                             color = MaterialTheme.colorScheme.background,
                             fontSize = 14.sp
                         )
@@ -167,7 +173,7 @@ fun SingleMostOrderedItem(
                 InfoWithIcon(
                     icon = true,
                     imageVector = Icons.Outlined.LocationOn,
-                    info = product.address
+                    info = product.city
                 )
 
                 VerticalSpace(space = SpaceBetweenViewsAndSubViews)
@@ -175,7 +181,7 @@ fun SingleMostOrderedItem(
                 InfoWithIcon(
                     icon = false,
                     id = R.drawable.delivery_bike,
-                    info = product.delivery,
+                    info = "Estimate Delivery",
                     colorFilter = ColorFilter.tint(
                         color = MaterialTheme.colorScheme.onSurface
                     )
@@ -183,7 +189,7 @@ fun SingleMostOrderedItem(
 
                 VerticalSpace(space = SpaceBetweenViews)
 
-                MostOrderedPriceCard("250")
+                MostOrderedPriceCard(product.price.toString())
             }
         }
     }
@@ -246,6 +252,6 @@ fun MostOrderedPriceCard(
 @Composable
 fun MostOrderedItemListPreview() {
     T2PCustomerAppTheme {
-        MostOrderedItemList({})
+        //MostOrderedItemList({})
     }
 }

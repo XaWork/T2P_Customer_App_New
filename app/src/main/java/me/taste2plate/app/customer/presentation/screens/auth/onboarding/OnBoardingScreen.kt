@@ -58,7 +58,6 @@ fun OnBoardingScreen(
         when{
             state.loginModel != null  -> {
                 scope.launch {
-                    delay(1000)
                     onNavigateToOtpScreen()
                 }
             }
