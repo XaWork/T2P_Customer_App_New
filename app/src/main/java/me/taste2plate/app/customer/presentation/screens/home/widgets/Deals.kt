@@ -33,6 +33,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import me.taste2plate.app.customer.R
+import me.taste2plate.app.customer.domain.model.HomeModel
 import me.taste2plate.app.customer.presentation.screens.productList
 import me.taste2plate.app.customer.presentation.theme.LowRoundedCorners
 import me.taste2plate.app.customer.presentation.theme.ScreenPadding
@@ -46,15 +47,16 @@ import me.taste2plate.app.customer.presentation.widgets.RatingInfoRow
 import me.taste2plate.app.customer.presentation.widgets.RedBorderCard
 import me.taste2plate.app.customer.presentation.widgets.RoundedCornerIconButton
 import me.taste2plate.app.customer.presentation.widgets.VerticalSpace
+import me.taste2plate.app.customer.presentation.widgets.simpleAnimation
 import kotlin.math.absoluteValue
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun Deals(
-    title: String = "",
-    onNavigateToProductDetailsScreen: () -> Unit
+    onNavigateToProductDetailsScreen: () -> Unit,
+    deals: List<HomeModel.ProductDeal>
 ) {
-    val pagerState = rememberPagerState(pageCount = { productList.size })
+    val pagerState = rememberPagerState(pageCount = { deals.size })
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center,
@@ -74,7 +76,12 @@ fun Deals(
         HorizontalPager(
             state = pagerState,
         ) {
-            SingleBestSellerItem(it, pagerState = pagerState, modifier = Modifier.clickable { onNavigateToProductDetailsScreen() })
+            SingleBestSellerItem(
+                it,
+                pagerState = pagerState,
+                modifier = Modifier.clickable { onNavigateToProductDetailsScreen() },
+                deal = deals[it]
+            )
         }
     }
 }
@@ -85,18 +92,13 @@ fun SingleBestSellerItem(
     page: Int,
     modifier: Modifier = Modifier,
     pagerState: PagerState,
+    deal: HomeModel.ProductDeal
 ) {
-    val product = productList[page]
     RedBorderCard(
-        modifier = modifier.graphicsLayer {
-            val pageOffset: Float =
-                (pagerState.currentPage - page) + pagerState.currentPageOffsetFraction.absoluteValue
-            translationX = pageOffset * size.width
-            alpha = 1 - pageOffset.absoluteValue
-        }
+        modifier = modifier.simpleAnimation(pagerState, page)
     ) {
         Column {
-            ImageWithWishlistButton(image = product.image)
+            ImageWithWishlistButton(image = deal.file[0].location)
 
             VerticalSpace(space = SpaceBetweenViewsAndSubViews)
 
@@ -104,8 +106,8 @@ fun SingleBestSellerItem(
                 modifier = Modifier.padding(ScreenPadding)
             ) {
                 RatingInfoRow(
-                    flatOff = "Flat $rupeeSign${product.flatOff} OFF",
-                    rating = product.rating
+                    flatOff = "Flat $rupeeSign${deal.discountedPrice} OFF",
+                    rating = ""
                 )
 
                 VerticalSpace(space = SpaceBetweenViews)
@@ -116,12 +118,14 @@ fun SingleBestSellerItem(
                 ) {
                     Column(modifier = Modifier.weight(2f)) {
                         Text(
-                            text = product.name,
-                            style = MaterialTheme.typography.titleMedium
+                            text = deal.name,
+                            style = MaterialTheme.typography.titleMedium,
+                            maxLines = 2,
+                            minLines = 2
                         )
 
                         Text(
-                            text = product.brand,
+                            text = deal.brand,
                             style = MaterialTheme.typography.titleMedium,
                             fontWeight = FontWeight.Light
                         )
@@ -131,7 +135,7 @@ fun SingleBestSellerItem(
                         InfoWithIcon(
                             icon = true,
                             imageVector = Icons.Outlined.LocationOn,
-                            info = product.address
+                            info = deal.city
                         )
 
                         VerticalSpace(space = SpaceBetweenViewsAndSubViews)
@@ -139,13 +143,13 @@ fun SingleBestSellerItem(
                         InfoWithIcon(
                             icon = false,
                             id = R.drawable.delivery_bike,
-                            info = product.delivery,
+                            info = "Estimate Delivery",
                             colorFilter = ColorFilter.tint(
                                 color = MaterialTheme.colorScheme.onSurface
                             )
                         )
                     }
-                    DealsPriceCard(product.price)
+                    DealsPriceCard(deal.price)
                 }
 
                 VerticalSpace(space = SpaceBetweenViews)

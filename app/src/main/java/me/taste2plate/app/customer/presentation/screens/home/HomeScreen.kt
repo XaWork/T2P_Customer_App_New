@@ -1,7 +1,9 @@
 package me.taste2plate.app.customer.presentation.screens.home
 
 import android.content.res.Configuration
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -20,6 +22,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -39,7 +42,6 @@ import me.taste2plate.app.customer.presentation.screens.home.widgets.SingleFeatu
 import me.taste2plate.app.customer.presentation.screens.home.widgets.TopBrands
 import me.taste2plate.app.customer.presentation.screens.home.widgets.TopList
 import me.taste2plate.app.customer.presentation.screens.home.widgets.TopOrderedFoodCityList
-import me.taste2plate.app.customer.presentation.screens.productList
 import me.taste2plate.app.customer.presentation.theme.SpaceBetweenViews
 import me.taste2plate.app.customer.presentation.theme.SpaceBetweenViewsAndSubViews
 import me.taste2plate.app.customer.presentation.theme.T2PCustomerAppTheme
@@ -187,16 +189,19 @@ fun HomeScreen(
                                 }
                             )
 
+                            //slider
                             if (home?.slider != null)
-                                AutoSlidingCarousel(
-                                    pages = home.slider
-                                )
+                                CenterColumn {
+                                    AutoSlidingCarousel(
+                                        pages = home.slider
+                                    )
+                                    VerticalSpace(space = SpaceBetweenViewsAndSubViews)
+                                }
 
-                            VerticalSpace(space = SpaceBetweenViewsAndSubViews)
 
                             //top order item
                             if (home?.topMostOrderedProducts != null) {
-                                Column {
+                                CenterColumn {
                                     HeadingChip("Top Ordered Food/City")
                                     VerticalSpace(space = SpaceBetweenViewsAndSubViews)
                                     TopOrderedFoodCityList(
@@ -208,17 +213,18 @@ fun HomeScreen(
                             }
 
                             //most order item
-
                             if (home?.mostOrderdItem != null)
-                                MostOrderedItemList(
-                                    onNavigateToProductDetailsScreen = onNavigateToProductDetailsScreen,
-                                    foodItems = home.mostOrderdItem
-                                )
-                            VerticalSpace(space = SpaceBetweenViews)
+                                CenterColumn {
+                                    MostOrderedItemList(
+                                        onNavigateToProductDetailsScreen = onNavigateToProductDetailsScreen,
+                                        foodItems = home.mostOrderdItem
+                                    )
+                                    VerticalSpace(space = SpaceBetweenViews)
+                                }
 
                             //top brands
                             if (home?.topBrands != null)
-                                Column {
+                                CenterColumn {
                                     HeadingChip("Top Brands")
                                     VerticalSpace(space = SpaceBetweenViews)
                                     TopBrands(
@@ -228,29 +234,50 @@ fun HomeScreen(
                                     VerticalSpace(space = SpaceBetweenViewsAndSubViews)
                                 }
 
-                            //best seller
-                            Deals(
-                                onNavigateToProductDetailsScreen = onNavigateToProductDetailsScreen
-                            )
-                            VerticalSpace(space = SpaceBetweenViews)
+                            //Deals
+                            if (home?.productDeal != null)
+                                CenterColumn {
+                                    Deals(
+                                        onNavigateToProductDetailsScreen = onNavigateToProductDetailsScreen,
+                                        home.productDeal
+                                    )
+                                    VerticalSpace(space = SpaceBetweenViews)
+                                }
 
                             //Featured
-                            HeadingChip("Featured")
-                            VerticalSpace(space = SpaceBetweenViews)
+                            if (home?.featured != null)
+                                CenterColumn {
+                                    HeadingChip("Featured")
+                                    VerticalSpace(space = SpaceBetweenViews)
+                                }
                         }
-                        //Featured
-                        items(productList) { product ->
-                            SingleFeaturedItem(
-                                product,
-                                onNavigateToProductDetailsScreen = onNavigateToProductDetailsScreen
-                            )
-                        }
+
+                        if (home?.featured != null)
+                            items(home.featured) { product ->
+                                SingleFeaturedItem(
+                                    product,
+                                    onNavigateToProductDetailsScreen = onNavigateToProductDetailsScreen
+                                )
+                            }
                     }
                 }
 
         }
     }
 
+}
+
+@Composable
+fun CenterColumn(
+    content: @Composable () -> Unit
+) {
+    Column(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+        content()
+    }
 }
 
 @Preview

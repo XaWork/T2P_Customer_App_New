@@ -56,6 +56,7 @@ import me.taste2plate.app.customer.presentation.widgets.MaterialIcon
 import me.taste2plate.app.customer.presentation.widgets.RedBorderCard
 import me.taste2plate.app.customer.presentation.widgets.RoundedCornerIconButton
 import me.taste2plate.app.customer.presentation.widgets.VerticalSpace
+import me.taste2plate.app.customer.presentation.widgets.simpleAnimation
 import kotlin.math.absoluteValue
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -103,12 +104,7 @@ fun SingleMostOrderedItem(
     product: HomeModel.MostOrderdItem
 ) {
     RedBorderCard(
-        modifier = modifier.graphicsLayer {
-            val pageOffset: Float =
-                (pagerState.currentPage - page) + pagerState.currentPageOffsetFraction.absoluteValue
-            translationX = pageOffset * size.width
-            alpha = 1 - pageOffset.absoluteValue
-        }
+        modifier = modifier.simpleAnimation(pagerState, page)
     ) {
         Column {
             ImageWithWishlistButton(image = product.file[0].location)
@@ -159,13 +155,17 @@ fun SingleMostOrderedItem(
 
                 Text(
                     text = product.name,
-                    style = MaterialTheme.typography.titleMedium
+                    style = MaterialTheme.typography.titleMedium,
+                    maxLines = 2,
+                    minLines = 2
                 )
 
                 Text(
                     text = product.brand,
                     style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Light
+                    fontWeight = FontWeight.Light,
+                    maxLines = 2,
+                    minLines = 2
                 )
 
                 VerticalSpace(space = SpaceBetweenViewsAndSubViews)

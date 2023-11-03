@@ -30,6 +30,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import me.taste2plate.app.customer.R
+import me.taste2plate.app.customer.domain.model.HomeModel
 import me.taste2plate.app.customer.presentation.screens.Product
 import me.taste2plate.app.customer.presentation.screens.productList
 import me.taste2plate.app.customer.presentation.theme.ScreenPadding
@@ -52,7 +53,7 @@ import kotlin.math.absoluteValue
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun SingleFeaturedItem(
-    product: Product,
+    product: HomeModel.Featured,
     onNavigateToProductDetailsScreen : () -> Unit
 ) {
     BlackBorderCard(
@@ -60,7 +61,7 @@ fun SingleFeaturedItem(
         modifier = Modifier.clickable { onNavigateToProductDetailsScreen() }
     ) {
         Column {
-            ImageWithWishlistButton(image = product.image)
+            ImageWithWishlistButton(image = product.file[0].location)
 
             VerticalSpace(space = SpaceBetweenViewsAndSubViews)
 
@@ -68,8 +69,8 @@ fun SingleFeaturedItem(
                 modifier = Modifier.padding(ScreenPadding)
             ) {
                 RatingInfoRow(
-                    flatOff = "Flat $rupeeSign${product.flatOff} OFF",
-                    rating = product.rating
+                    flatOff = "Flat $rupeeSign${product.discountedPrice} OFF",
+                    rating = ""
                 )
 
                 VerticalSpace(space = SpaceBetweenViews)
@@ -81,7 +82,9 @@ fun SingleFeaturedItem(
                     Column(modifier = Modifier.weight(2f)) {
                         Text(
                             text = product.name,
-                            style = MaterialTheme.typography.titleMedium
+                            style = MaterialTheme.typography.titleMedium,
+                            maxLines = 2,
+                            minLines = 2
                         )
 
                         Text(
@@ -95,7 +98,7 @@ fun SingleFeaturedItem(
                         InfoWithIcon(
                             icon = true,
                             imageVector = Icons.Outlined.LocationOn,
-                            info = product.address
+                            info = product.city
                         )
 
                         VerticalSpace(space = SpaceBetweenViewsAndSubViews)
@@ -103,7 +106,7 @@ fun SingleFeaturedItem(
                         InfoWithIcon(
                             icon = false,
                             id = R.drawable.delivery_bike,
-                            info = product.delivery,
+                            info = "Estimate Delivery",
                             colorFilter = ColorFilter.tint(
                                 color = MaterialTheme.colorScheme.onSurface
                             )
@@ -156,6 +159,6 @@ fun SingleFeaturedItem(
 @Composable
 fun FeaturedPreview() {
     T2PCustomerAppTheme {
-        SingleFeaturedItem(Product(), {})
+       // SingleFeaturedItem(Product(), {})
     }
 }

@@ -14,7 +14,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import me.taste2plate.app.customer.R
 import me.taste2plate.app.customer.presentation.screens.ImageItemList
 import me.taste2plate.app.customer.presentation.theme.ScreenPadding
 import me.taste2plate.app.customer.presentation.theme.T2PCustomerAppTheme
@@ -33,7 +32,7 @@ fun TopList(
         horizontalArrangement = Arrangement.spacedBy(10.dp),
         content = {
             items(ImageItemList) { item ->
-                SingleTopList(item, modifier = Modifier.clickable {
+                SingleTopList(drawableImage = item, modifier = Modifier.clickable {
                     onNavigateToCityBrandScreen()
                 })
             }
@@ -42,7 +41,9 @@ fun TopList(
 
 @Composable
 fun SingleTopList(
-    drawableImage: Int? = null, image: String? = null, modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    drawableImage: Int? = null,
+    image: String? = null,
 ) {
     if (drawableImage != null)
         DrawableImage(

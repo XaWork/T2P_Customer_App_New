@@ -19,6 +19,7 @@ import androidx.compose.ui.layout.lerp
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import me.taste2plate.app.customer.domain.model.HomeModel
 import me.taste2plate.app.customer.presentation.screens.productList
@@ -27,6 +28,7 @@ import me.taste2plate.app.customer.presentation.theme.ScreenPadding
 import me.taste2plate.app.customer.presentation.theme.T2PCustomerAppTheme
 import me.taste2plate.app.customer.presentation.widgets.BlackBorderCard
 import me.taste2plate.app.customer.presentation.widgets.ImageWithWishlistButton
+import me.taste2plate.app.customer.presentation.widgets.simpleAnimation
 import kotlin.math.absoluteValue
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -44,34 +46,29 @@ fun TopBrands(
             colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.background),
             modifier = Modifier
                 .clickable { onNavigateToProductListScreen() }
-                .graphicsLayer {
-                val pageOffset: Float =
-                    (pagerState.currentPage - page) + pagerState.currentPageOffsetFraction.absoluteValue
-                translationX = pageOffset * size.width
-                lerp(
-                    start = ScaleFactor(0.5f, 0.5f),
-                    stop = ScaleFactor(1f, 1f),
-                    fraction = 1f - pageOffset.absoluteValue.coerceIn(0f, 1f),
-                ).also {
-                    scaleX = scaleX
-                    scaleY = scaleY
-                }
-                cameraDistance = 8 * density
-
-            }) {
+                .simpleAnimation(pagerState, page)) {
             ImageWithWishlistButton(image = product.file, withButton = false)
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(vertical = ExtraHighPadding),
+                    .padding(
+                        vertical = ExtraHighPadding,
+                        horizontal = ScreenPadding
+                    ),
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center
             ) {
                 Text(
-                    product.name, style = MaterialTheme.typography.headlineMedium,
-                    fontWeight = FontWeight.Bold
+                    product.name, style = MaterialTheme.typography.titleLarge,
+                    fontWeight = FontWeight.Bold,
+                    textAlign = TextAlign.Center,
+                    maxLines = 2,
+                    minLines = 2
                 )
-                Text(product.shortDesc, style = MaterialTheme.typography.bodyLarge)
+                Text(
+                    "City Name", style = MaterialTheme.typography.bodyLarge,
+                    maxLines = 1
+                )
             }
         }
     }
@@ -84,6 +81,6 @@ fun TopBrands(
 @Composable
 fun TopBrandsPreview() {
     T2PCustomerAppTheme {
-       // TopBrands({})
+        // TopBrands({})
     }
 }

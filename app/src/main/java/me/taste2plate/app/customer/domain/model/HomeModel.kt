@@ -39,11 +39,11 @@ data class HomeModel(
 ) {
     data class Category(
         @SerializedName("active")
-        val active: Int,
+        val active: String,
         @SerializedName("created_date")
         val createdDate: String,
         @SerializedName("deleted")
-        val deleted: Int,
+        val deleted: String,
         @SerializedName("description")
         val description: String,
         @SerializedName("description_after_content")
@@ -69,18 +69,18 @@ data class HomeModel(
         @SerializedName("update_date")
         val updateDate: String,
         @SerializedName("__v")
-        val v: Int
+        val v: String
     )
 
     data class City(
         @SerializedName("active")
-        val active: Int,
+        val active: String,
         @SerializedName("cod")
         val cod: Boolean,
         @SerializedName("created_date")
         val createdDate: String,
         @SerializedName("deleted")
-        val deleted: Int,
+        val deleted: String,
         @SerializedName("description")
         val description: String,
         @SerializedName("description_after_content")
@@ -90,7 +90,7 @@ data class HomeModel(
         @SerializedName("file2")
         val file2: String,
         @SerializedName("footer")
-        val footer: Int,
+        val footer: String,
         @SerializedName("footer_content")
         val footerContent: String,
         @SerializedName("heading")
@@ -118,16 +118,16 @@ data class HomeModel(
         @SerializedName("update_date")
         val updateDate: String,
         @SerializedName("__v")
-        val v: Int
+        val v: String
     )
 
     data class Cuisine(
         @SerializedName("active")
-        val active: Int,
+        val active: String,
         @SerializedName("created_date")
         val createdDate: String,
         @SerializedName("deleted")
-        val deleted: Int,
+        val deleted: String,
         @SerializedName("description")
         val description: String,
         @SerializedName("description_after_content")
@@ -151,12 +151,12 @@ data class HomeModel(
         @SerializedName("update_date")
         val updateDate: String,
         @SerializedName("__v")
-        val v: Int
+        val v: String
     )
 
     data class Featured(
         @SerializedName("active")
-        val active: Int,
+        val active: String,
         @SerializedName("added_by")
         val addedBy: String,
         @SerializedName("attribute")
@@ -178,15 +178,15 @@ data class HomeModel(
         @SerializedName("commission")
         val commission: String,
         @SerializedName("consumable")
-        val consumable: Int,
+        val consumable: String,
         @SerializedName("created_date")
         val createdDate: String,
         @SerializedName("cuisine")
         val cuisine: String,
         @SerializedName("deal")
-        val deal: Int,
+        val deal: String,
         @SerializedName("deleted")
-        val deleted: Int,
+        val deleted: String,
         @SerializedName("desc")
         val desc: String,
         @SerializedName("discounted_price")
@@ -196,7 +196,7 @@ data class HomeModel(
         @SerializedName("express")
         val express: Boolean,
         @SerializedName("featured")
-        val featured: Int,
+        val featured: String,
         @SerializedName("file")
         val `file`: List<File>,
         @SerializedName("height")
@@ -208,21 +208,21 @@ data class HomeModel(
         @SerializedName("length")
         val length: String,
         @SerializedName("manage_stock")
-        val manageStock: Int,
+        val manageStock: String,
         @SerializedName("name")
         val name: String,
         @SerializedName("packaging_charge")
         val packagingCharge: String,
         @SerializedName("point")
-        val point: Int,
+        val point: String,
         @SerializedName("point_exp_date")
         val pointExpDate: String,
         @SerializedName("price")
-        val price: Int,
+        val price: String,
         @SerializedName("purchase_price")
         val purchasePrice: String,
         @SerializedName("selling_price")
-        val sellingPrice: Int,
+        val sellingPrice: String,
         @SerializedName("seo_description")
         val seoDescription: String,
         @SerializedName("seo_keywords")
@@ -250,17 +250,17 @@ data class HomeModel(
         @SerializedName("tags")
         val tags: String,
         @SerializedName("taste")
-        val taste: Int,
+        val taste: String,
         @SerializedName("tax_status")
         val taxStatus: String,
         @SerializedName("threshold")
         val threshold: String,
         @SerializedName("top")
-        val top: Int,
+        val top: String,
         @SerializedName("update_date")
         val updateDate: String,
         @SerializedName("__v")
-        val v: Int,
+        val v: String,
         @SerializedName("vendor")
         val vendor: String,
         @SerializedName("weight")
@@ -298,7 +298,7 @@ data class HomeModel(
             @SerializedName("serverSideEncryption")
             val serverSideEncryption: Any,
             @SerializedName("size")
-            val size: Int,
+            val size: String,
             @SerializedName("storageClass")
             val storageClass: String,
             @SerializedName("versionId")
@@ -308,7 +308,7 @@ data class HomeModel(
 
     data class MostOrderdItem(
         @SerializedName("active")
-        val active: Int,
+        val active: String,
         @SerializedName("added_by")
         val addedBy: String,
         @SerializedName("attribute")
@@ -330,15 +330,15 @@ data class HomeModel(
         @SerializedName("commission")
         val commission: String,
         @SerializedName("consumable")
-        val consumable: Int,
+        val consumable: String,
         @SerializedName("created_date")
         val createdDate: String,
         @SerializedName("cuisine")
         val cuisine: String,
         @SerializedName("deal")
-        val deal: Int,
+        val deal: String,
         @SerializedName("deleted")
-        val deleted: Int,
+        val deleted: String,
         @SerializedName("desc")
         val desc: String,
         @SerializedName("discounted_price")
@@ -348,7 +348,7 @@ data class HomeModel(
         @SerializedName("express")
         val express: Boolean,
         @SerializedName("featured")
-        val featured: Int,
+        val featured: String,
         @SerializedName("file")
         val `file`: List<File>,
         @SerializedName("height")
@@ -360,17 +360,17 @@ data class HomeModel(
         @SerializedName("length")
         val length: String,
         @SerializedName("manage_stock")
-        val manageStock: Int,
+        val manageStock: String,
         @SerializedName("name")
         val name: String,
         @SerializedName("packaging_charge")
         val packagingCharge: String,
         @SerializedName("point")
-        val point: Int,
+        val point: String,
         @SerializedName("point_exp_date")
         val pointExpDate: String,
         @SerializedName("price")
-        val price: Int,
+        val price: String,
         @SerializedName("purchase_price")
         val purchasePrice: String,
         @SerializedName("selling_price")
@@ -402,17 +402,17 @@ data class HomeModel(
         @SerializedName("tags")
         val tags: String,
         @SerializedName("taste")
-        val taste: Int,
+        val taste: String,
         @SerializedName("tax_status")
         val taxStatus: String,
         @SerializedName("threshold")
         val threshold: String,
         @SerializedName("top")
-        val top: Int,
+        val top: String,
         @SerializedName("update_date")
         val updateDate: String,
         @SerializedName("__v")
-        val v: Int,
+        val v: String,
         @SerializedName("vendor")
         val vendor: String,
         @SerializedName("weight")
@@ -450,7 +450,7 @@ data class HomeModel(
             @SerializedName("serverSideEncryption")
             val serverSideEncryption: Any,
             @SerializedName("size")
-            val size: Int,
+            val size: String,
             @SerializedName("storageClass")
             val storageClass: String,
             @SerializedName("versionId")
@@ -460,7 +460,7 @@ data class HomeModel(
 
     data class ProductDeal(
         @SerializedName("active")
-        val active: Int,
+        val active: String,
         @SerializedName("added_by")
         val addedBy: String,
         @SerializedName("attribute")
@@ -482,15 +482,15 @@ data class HomeModel(
         @SerializedName("commission")
         val commission: String,
         @SerializedName("consumable")
-        val consumable: Int,
+        val consumable: String,
         @SerializedName("created_date")
         val createdDate: String,
         @SerializedName("cuisine")
         val cuisine: String,
         @SerializedName("deal")
-        val deal: Int,
+        val deal: String,
         @SerializedName("deleted")
-        val deleted: Int,
+        val deleted: String,
         @SerializedName("desc")
         val desc: String,
         @SerializedName("discounted_price")
@@ -500,7 +500,7 @@ data class HomeModel(
         @SerializedName("express")
         val express: Boolean,
         @SerializedName("featured")
-        val featured: Int,
+        val featured: String,
         @SerializedName("file")
         val `file`: List<File>,
         @SerializedName("height")
@@ -512,21 +512,21 @@ data class HomeModel(
         @SerializedName("length")
         val length: String,
         @SerializedName("manage_stock")
-        val manageStock: Int,
+        val manageStock: String,
         @SerializedName("name")
         val name: String,
         @SerializedName("packaging_charge")
         val packagingCharge: String,
         @SerializedName("point")
-        val point: Int,
+        val point: String,
         @SerializedName("point_exp_date")
         val pointExpDate: String,
         @SerializedName("price")
-        val price: Int,
+        val price: String,
         @SerializedName("purchase_price")
         val purchasePrice: String,
         @SerializedName("selling_price")
-        val sellingPrice: Int,
+        val sellingPrice: String,
         @SerializedName("seo_description")
         val seoDescription: String,
         @SerializedName("seo_keywords")
@@ -554,17 +554,17 @@ data class HomeModel(
         @SerializedName("tags")
         val tags: String,
         @SerializedName("taste")
-        val taste: Int,
+        val taste: String,
         @SerializedName("tax_status")
         val taxStatus: String,
         @SerializedName("threshold")
         val threshold: String,
         @SerializedName("top")
-        val top: Int,
+        val top: String,
         @SerializedName("update_date")
         val updateDate: String,
         @SerializedName("__v")
-        val v: Int,
+        val v: String,
         @SerializedName("vendor")
         val vendor: String,
         @SerializedName("weight")
@@ -600,7 +600,7 @@ data class HomeModel(
             @SerializedName("serverSideEncryption")
             val serverSideEncryption: Any,
             @SerializedName("size")
-            val size: Int,
+            val size: String,
             @SerializedName("storageClass")
             val storageClass: String
         )
@@ -608,13 +608,13 @@ data class HomeModel(
 
     data class ServiceCity(
         @SerializedName("active")
-        val active: Int,
+        val active: String,
         @SerializedName("cod")
         val cod: Boolean,
         @SerializedName("created_date")
         val createdDate: String,
         @SerializedName("deleted")
-        val deleted: Int,
+        val deleted: String,
         @SerializedName("description")
         val description: String,
         @SerializedName("description_after_content")
@@ -624,7 +624,7 @@ data class HomeModel(
         @SerializedName("file2")
         val file2: String,
         @SerializedName("footer")
-        val footer: Int,
+        val footer: String,
         @SerializedName("footer_content")
         val footerContent: String,
         @SerializedName("heading")
@@ -652,18 +652,18 @@ data class HomeModel(
         @SerializedName("update_date")
         val updateDate: String,
         @SerializedName("__v")
-        val v: Int
+        val v: String
     )
 
     data class Slider(
         @SerializedName("active")
-        val active: Int,
+        val active: String,
         @SerializedName("city")
         val city: City,
         @SerializedName("created_date")
         val createdDate: String,
         @SerializedName("deleted")
-        val deleted: Int,
+        val deleted: String,
         @SerializedName("file")
         val `file`: String,
         @SerializedName("_id")
@@ -673,7 +673,7 @@ data class HomeModel(
         @SerializedName("update_date")
         val updateDate: String,
         @SerializedName("__v")
-        val v: Int
+        val v: String
     ) {
         data class City(
             @SerializedName("_id")
@@ -685,7 +685,7 @@ data class HomeModel(
 
     data class Special(
         @SerializedName("active")
-        val active: Int,
+        val active: String,
         @SerializedName("amount")
         val amount: String,
         @SerializedName("brand")
@@ -699,7 +699,7 @@ data class HomeModel(
         @SerializedName("customer")
         val customer: List<String>,
         @SerializedName("deleted")
-        val deleted: Int,
+        val deleted: String,
         @SerializedName("desc")
         val desc: String,
         @SerializedName("exclusive")
@@ -709,9 +709,9 @@ data class HomeModel(
         @SerializedName("_id")
         val id: String,
         @SerializedName("max_usage_limit")
-        val maxUsageLimit: Int,
+        val maxUsageLimit: String,
         @SerializedName("max_usage_limit_user")
-        val maxUsageLimitUser: Int,
+        val maxUsageLimitUser: String,
         @SerializedName("maximum_amount")
         val maximumAmount: String,
         @SerializedName("minimum_amount")
@@ -725,22 +725,22 @@ data class HomeModel(
         @SerializedName("update_date")
         val updateDate: String,
         @SerializedName("__v")
-        val v: Int
+        val v: String
     )
 
     data class TopBrand(
         @SerializedName("active")
-        val active: Int,
+        val active: String,
         @SerializedName("created_date")
         val createdDate: String,
         @SerializedName("deleted")
-        val deleted: Int,
+        val deleted: String,
         @SerializedName("desc")
         val desc: String,
         @SerializedName("file")
         val `file`: String,
         @SerializedName("gem")
-        val gem: Int,
+        val gem: String,
         @SerializedName("_id")
         val id: String,
         @SerializedName("name")
@@ -758,20 +758,20 @@ data class HomeModel(
         @SerializedName("slug_history")
         val slugHistory: List<String>,
         @SerializedName("top")
-        val top: Int,
+        val top: String,
         @SerializedName("update_date")
         val updateDate: String,
         @SerializedName("__v")
-        val v: Int
+        val v: String
     )
 
     data class TopMostOrderedProduct(
         @SerializedName("active")
-        val active: Int,
+        val active: String,
         @SerializedName("createdAt")
         val createdAt: String,
         @SerializedName("deleted")
-        val deleted: Int,
+        val deleted: String,
         @SerializedName("_id")
         val id: String,
         @SerializedName("image")
@@ -783,11 +783,11 @@ data class HomeModel(
         @SerializedName("updatedAt")
         val updatedAt: String,
         @SerializedName("__v")
-        val v: Int
+        val v: String
     ) {
         data class Product(
             @SerializedName("active")
-            val active: Int,
+            val active: String,
             @SerializedName("added_by")
             val addedBy: String,
             @SerializedName("attribute")
@@ -809,15 +809,15 @@ data class HomeModel(
             @SerializedName("commission")
             val commission: String,
             @SerializedName("consumable")
-            val consumable: Int,
+            val consumable: String,
             @SerializedName("created_date")
             val createdDate: String,
             @SerializedName("cuisine")
             val cuisine: String,
             @SerializedName("deal")
-            val deal: Int,
+            val deal: String,
             @SerializedName("deleted")
-            val deleted: Int,
+            val deleted: String,
             @SerializedName("desc")
             val desc: String,
             @SerializedName("discounted_price")
@@ -827,7 +827,7 @@ data class HomeModel(
             @SerializedName("express")
             val express: Boolean,
             @SerializedName("featured")
-            val featured: Int,
+            val featured: String,
             @SerializedName("file")
             val `file`: List<File>,
             @SerializedName("height")
@@ -839,21 +839,21 @@ data class HomeModel(
             @SerializedName("length")
             val length: String,
             @SerializedName("manage_stock")
-            val manageStock: Int,
+            val manageStock: String,
             @SerializedName("name")
             val name: String,
             @SerializedName("packaging_charge")
             val packagingCharge: String,
             @SerializedName("point")
-            val point: Int,
+            val point: String,
             @SerializedName("point_exp_date")
             val pointExpDate: String,
             @SerializedName("price")
-            val price: Int,
+            val price: String,
             @SerializedName("purchase_price")
             val purchasePrice: String,
             @SerializedName("selling_price")
-            val sellingPrice: Int,
+            val sellingPrice: String,
             @SerializedName("seo_description")
             val seoDescription: String,
             @SerializedName("seo_keywords")
@@ -881,17 +881,17 @@ data class HomeModel(
             @SerializedName("tags")
             val tags: String,
             @SerializedName("taste")
-            val taste: Int,
+            val taste: String,
             @SerializedName("tax_status")
             val taxStatus: String,
             @SerializedName("threshold")
             val threshold: String,
             @SerializedName("top")
-            val top: Int,
+            val top: String,
             @SerializedName("update_date")
             val updateDate: String,
             @SerializedName("__v")
-            val v: Int,
+            val v: String,
             @SerializedName("vendor")
             val vendor: String,
             @SerializedName("weight")
@@ -929,7 +929,7 @@ data class HomeModel(
                 @SerializedName("serverSideEncryption")
                 val serverSideEncryption: Any,
                 @SerializedName("size")
-                val size: Int,
+                val size: String,
                 @SerializedName("storageClass")
                 val storageClass: String,
                 @SerializedName("versionId")

@@ -6,6 +6,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.interaction.collectIsDraggedAsState
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -67,7 +68,7 @@ fun AutoSlidingCarousel(
     Box(
         modifier = modifier
             .fillMaxWidth()
-            .height(200.dp),
+            .height(140.dp),
     ) {
         HorizontalPager(
             beyondBoundsPageCount = pages.size,
@@ -79,7 +80,7 @@ fun AutoSlidingCarousel(
                 Modifier
                     .fillMaxWidth()
                     .clip(RoundedCornerShape(10.dp))
-                    .height(200.dp)
+                    .fillMaxHeight()
                     .padding(horizontal = ScreenPadding)
                     .graphicsLayer {
                         val pageOffset: Float =

@@ -2,6 +2,8 @@ package me.taste2plate.app.customer.data.repo
 
 import me.taste2plate.app.customer.data.api.UserApi
 import me.taste2plate.app.customer.domain.model.auth.LoginModel
+import me.taste2plate.app.customer.domain.model.user.CartModel
+import me.taste2plate.app.customer.domain.model.user.WishListModel
 import me.taste2plate.app.customer.domain.repo.UserRepo
 import javax.inject.Inject
 
@@ -28,4 +30,9 @@ class UserRepoImpl @Inject constructor(
             deviceToken = token,
             otp = otp
         )
+
+    override suspend fun getWishlist(userId: String) = api.getWishlist(userId)
+
+    override suspend fun getCart(userId: String, city: String, zip: String) =
+        api.getCart(userId, city, zip)
 }

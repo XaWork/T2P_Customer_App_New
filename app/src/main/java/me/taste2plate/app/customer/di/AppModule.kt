@@ -11,6 +11,7 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
+import me.taste2plate.app.customer.T2PApp
 import me.taste2plate.app.customer.data.UserPref
 import me.taste2plate.app.customer.data.api.CustomApi
 import me.taste2plate.app.customer.data.api.UserApi
@@ -28,6 +29,19 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 object AppModule {
+
+
+    internal var app: T2PApp? = null
+
+    internal fun AppModule(application: T2PApp) {
+        app = application
+    }
+
+    @Provides
+    @Singleton
+    internal fun providesApplication(): T2PApp {
+        return app!!
+    }
 
     @Provides
     @Singleton
