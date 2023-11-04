@@ -49,6 +49,7 @@ import me.taste2plate.app.customer.presentation.widgets.AppScaffold
 import me.taste2plate.app.customer.presentation.widgets.DrawableImage
 import me.taste2plate.app.customer.presentation.widgets.ShowLoading
 import me.taste2plate.app.customer.presentation.widgets.VerticalSpace
+import me.taste2plate.app.customer.presentation.widgets.showToast
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -75,6 +76,14 @@ fun HomeScreen(
 
     //obser state
     val state = viewModel.state
+    LaunchedEffect(state) {
+        when {
+            state.message != null && state.addToWishlistResponse != null -> {
+                showToast(message = state.message)
+                viewModel.onEvent(HomeEvent.UpdateState(changeAddToWishlistResponse = true))
+            }
+        }
+    }
 
     val scrollState = rememberLazyListState()
     //  val position by animateFloatAsState(if (scrollUpState.value == true) -150f else 0f, label = "")
@@ -103,7 +112,7 @@ fun HomeScreen(
 
     // Launched Effects
     LaunchedEffect(Unit) {
-        viewModel.onEvent(HomeEvent.GetHome)
+        // viewModel.onEvent(HomeEvent.GetHome)
     }
 
 
@@ -171,7 +180,9 @@ fun HomeScreen(
             }
         ) {
             if (state.isLoading)
-                ShowLoading()
+                ShowLoading(
+                    isButton = false
+                )
             else
                 Column {
                     AddressBar("Address here") {
@@ -217,7 +228,7 @@ fun HomeScreen(
                                 CenterColumn {
                                     MostOrderedItemList(
                                         onNavigateToProductDetailsScreen = onNavigateToProductDetailsScreen,
-                                        foodItems = home.mostOrderdItem
+                                        viewModel = viewModel
                                     )
                                     VerticalSpace(space = SpaceBetweenViews)
                                 }
@@ -239,7 +250,7 @@ fun HomeScreen(
                                 CenterColumn {
                                     Deals(
                                         onNavigateToProductDetailsScreen = onNavigateToProductDetailsScreen,
-                                        home.productDeal
+                                        viewModel = viewModel
                                     )
                                     VerticalSpace(space = SpaceBetweenViews)
                                 }
@@ -256,8 +267,16 @@ fun HomeScreen(
                             items(home.featured) { product ->
                                 SingleFeaturedItem(
                                     product,
+                                    alreadyWishListed =
+                                    if (state.wishListData!!.result.isEmpty()) false
+                                    else state.wishListData.result.any { it.product.id == product.id },
+                                    foodItemUpdateInfo = if (state.foodItemUpdateInfo != null && state.foodItemUpdateInfo.id == product.id)
+                                        state.foodItemUpdateInfo
+                                    else null,
                                     onNavigateToProductDetailsScreen = onNavigateToProductDetailsScreen
-                                )
+                                ) {
+                                    viewModel.onEvent(HomeEvent.AddToWishlist(product.id))
+                                }
                             }
                     }
                 }

@@ -47,7 +47,7 @@ fun TopBrands(
             modifier = Modifier
                 .clickable { onNavigateToProductListScreen() }
                 .simpleAnimation(pagerState, page)) {
-            ImageWithWishlistButton(image = product.file, withButton = false)
+            ImageWithWishlistButton(image = product.file, withButton = false){}
             Column(
                 modifier = Modifier
                     .fillMaxWidth()

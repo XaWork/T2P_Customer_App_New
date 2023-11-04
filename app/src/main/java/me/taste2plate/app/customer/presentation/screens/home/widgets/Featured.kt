@@ -2,7 +2,6 @@ package me.taste2plate.app.customer.presentation.screens.home.widgets
 
 import android.content.res.Configuration
 import androidx.compose.foundation.Canvas
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -10,9 +9,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.pager.HorizontalPager
-import androidx.compose.foundation.pager.PagerState
-import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.LocationOn
 import androidx.compose.material.icons.outlined.ShoppingCart
@@ -25,14 +21,12 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.PathEffect
-import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import me.taste2plate.app.customer.R
 import me.taste2plate.app.customer.domain.model.HomeModel
-import me.taste2plate.app.customer.presentation.screens.Product
-import me.taste2plate.app.customer.presentation.screens.productList
+import me.taste2plate.app.customer.presentation.screens.home.FoodItemUpdateInfo
 import me.taste2plate.app.customer.presentation.theme.ScreenPadding
 import me.taste2plate.app.customer.presentation.theme.SpaceBetweenViews
 import me.taste2plate.app.customer.presentation.theme.SpaceBetweenViewsAndSubViews
@@ -45,23 +39,29 @@ import me.taste2plate.app.customer.presentation.widgets.ImageWithWishlistButton
 import me.taste2plate.app.customer.presentation.widgets.InfoWithIcon
 import me.taste2plate.app.customer.presentation.widgets.MaterialIcon
 import me.taste2plate.app.customer.presentation.widgets.RatingInfoRow
-import me.taste2plate.app.customer.presentation.widgets.RedBorderCard
 import me.taste2plate.app.customer.presentation.widgets.VerticalSpace
-import kotlin.math.absoluteValue
 
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun SingleFeaturedItem(
     product: HomeModel.Featured,
-    onNavigateToProductDetailsScreen : () -> Unit
+    onNavigateToProductDetailsScreen: () -> Unit,
+    alreadyWishListed: Boolean = false,
+    foodItemUpdateInfo: FoodItemUpdateInfo? = null,
+    addToWishlist: () -> Unit,
 ) {
     BlackBorderCard(
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.background),
         modifier = Modifier.clickable { onNavigateToProductDetailsScreen() }
     ) {
         Column {
-            ImageWithWishlistButton(image = product.file[0].location)
+            ImageWithWishlistButton(
+                image = product.file[0].location,
+                alreadyWishListed = alreadyWishListed,
+                foodItemUpdateInfo = foodItemUpdateInfo
+            ) {
+                addToWishlist()
+            }
 
             VerticalSpace(space = SpaceBetweenViewsAndSubViews)
 
@@ -159,6 +159,6 @@ fun SingleFeaturedItem(
 @Composable
 fun FeaturedPreview() {
     T2PCustomerAppTheme {
-       // SingleFeaturedItem(Product(), {})
+        // SingleFeaturedItem(Product(), {})
     }
 }

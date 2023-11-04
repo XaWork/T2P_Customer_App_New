@@ -11,7 +11,10 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.Divider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -23,6 +26,8 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import me.taste2plate.app.customer.R
+import me.taste2plate.app.customer.domain.mapper.CommonForWishAndCartItem
+import me.taste2plate.app.customer.domain.model.user.WishListModel
 import me.taste2plate.app.customer.presentation.screens.product.CartAddRemove
 import me.taste2plate.app.customer.presentation.screens.productList
 import me.taste2plate.app.customer.presentation.theme.ExtraHighPadding
@@ -32,11 +37,14 @@ import me.taste2plate.app.customer.presentation.theme.ScreenPadding
 import me.taste2plate.app.customer.presentation.theme.SpaceBetweenViewsAndSubViews
 import me.taste2plate.app.customer.presentation.theme.T2PCustomerAppTheme
 import me.taste2plate.app.customer.presentation.theme.dividerThickness
+import me.taste2plate.app.customer.presentation.theme.primaryColor
 import me.taste2plate.app.customer.presentation.utils.rupeeSign
 import me.taste2plate.app.customer.presentation.widgets.AppButton
 import me.taste2plate.app.customer.presentation.widgets.AppScaffold
 import me.taste2plate.app.customer.presentation.widgets.AppTopBar
 import me.taste2plate.app.customer.presentation.widgets.DrawableIcon
+import me.taste2plate.app.customer.presentation.widgets.DrawableIconButton
+import me.taste2plate.app.customer.presentation.widgets.MaterialIconButton
 import me.taste2plate.app.customer.presentation.widgets.NetworkImage
 import me.taste2plate.app.customer.presentation.widgets.RoundedCornerCard
 import me.taste2plate.app.customer.presentation.widgets.SpaceBetweenRow
@@ -51,14 +59,16 @@ fun CartScreen(
             AppTopBar {}
         },
     ) {
-        ContentCartAndWishlist(onNavigateToCheckoutScreen = onNavigateToCheckoutScreen)
+        // ContentCartAndWishlist(onNavigateToCheckoutScreen = onNavigateToCheckoutScreen)
     }
 }
 
 @Composable
 fun ContentCartAndWishlist(
     isWishList: Boolean = false,
-    onNavigateToCheckoutScreen: () -> Unit
+    items: List<CommonForWishAndCartItem>,
+    removeFromWishlist: (productId: String) -> Unit = {},
+    onNavigateToCheckoutScreen: () -> Unit = {},
 ) {
     Box(
         modifier = Modifier.fillMaxSize(),
@@ -67,9 +77,13 @@ fun ContentCartAndWishlist(
             verticalArrangement = Arrangement.spacedBy(SpaceBetweenViewsAndSubViews),
             contentPadding = PaddingValues(bottom = ExtraHighPadding)
         ) {
-            items(10) {
+            items(items) { item ->
                 SingleCartAndWishlistItem(
-                    isWishList = isWishList
+                    isWishList = isWishList,
+                    item = item,
+                    removeFromWishlist = {
+                        removeFromWishlist(item.id)
+                    }
                 )
             }
         }
@@ -81,7 +95,6 @@ fun ContentCartAndWishlist(
                     .padding(ScreenPadding),
                 text = "Confirm Order"
             ) {
-
                 onNavigateToCheckoutScreen()
             }
     }
@@ -90,11 +103,13 @@ fun ContentCartAndWishlist(
 
 @Composable
 fun SingleCartAndWishlistItem(
-    isWishList: Boolean
+    isWishList: Boolean,
+    item: CommonForWishAndCartItem,
+    removeFromWishlist: () -> Unit
 ) {
     val items = listOf<@Composable RowScope.() -> Unit> {
         NetworkImage(
-            image = productList[0].image,
+            image = item.image,
             modifier = Modifier
                 .size(100.dp)
                 .weight(1f)
@@ -109,7 +124,7 @@ fun SingleCartAndWishlistItem(
                 .padding(horizontal = SpaceBetweenViewsAndSubViews)
         ) {
             Text(
-                text = "Product name",
+                text = item.name,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis
             )
@@ -122,16 +137,19 @@ fun SingleCartAndWishlistItem(
                 if (!isWishList)
                     CartAddRemove()
 
-                Text(text = "${rupeeSign}392")
+                Text(text = "${rupeeSign}${item.price}")
             }
             SpaceBetweenRow(items = innerItems)
         }
 
         if (isWishList)
-            DrawableIcon(
-                id = R.drawable.baseline_cancel_24,
-                modifier = Modifier.align(Alignment.Top)
-            )
+            MaterialIconButton(
+                imageVector = Icons.Default.Delete,
+                modifier = Modifier.align(Alignment.Top),
+                tint = primaryColor.invoke()
+            ) {
+                removeFromWishlist()
+            }
 
     }
 

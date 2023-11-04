@@ -30,7 +30,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.ColorFilter
-import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
@@ -40,7 +39,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import me.taste2plate.app.customer.R
 import me.taste2plate.app.customer.domain.model.HomeModel
-import me.taste2plate.app.customer.presentation.screens.productList
+import me.taste2plate.app.customer.presentation.screens.home.FoodItemUpdateInfo
+import me.taste2plate.app.customer.presentation.screens.home.HomeEvent
+import me.taste2plate.app.customer.presentation.screens.home.HomeViewModel
 import me.taste2plate.app.customer.presentation.theme.ForestGreen
 import me.taste2plate.app.customer.presentation.theme.ForestGreenDark
 import me.taste2plate.app.customer.presentation.theme.LowPadding
@@ -57,14 +58,18 @@ import me.taste2plate.app.customer.presentation.widgets.RedBorderCard
 import me.taste2plate.app.customer.presentation.widgets.RoundedCornerIconButton
 import me.taste2plate.app.customer.presentation.widgets.VerticalSpace
 import me.taste2plate.app.customer.presentation.widgets.simpleAnimation
-import kotlin.math.absoluteValue
+import timber.log.Timber
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun MostOrderedItemList(
     onNavigateToProductDetailsScreen: () -> Unit,
-    foodItems: List<HomeModel.MostOrderdItem>
+    viewModel: HomeViewModel
 ) {
+    val state = viewModel.state
+    val foodItems = state.homeData!!.mostOrderdItem
+    val wishlistItems = state.wishListData!!.result
+
     val pagerState = rememberPagerState(pageCount = { foodItems.size })
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -84,13 +89,30 @@ fun MostOrderedItemList(
         VerticalSpace(space = SpaceBetweenViewsAndSubViews)
         HorizontalPager(
             state = pagerState,
-        ) {
+        ) { page ->
+            val wishlistIdList: List<String> =
+                if (wishlistItems.isNotEmpty()) wishlistItems.map { it.product.id }
+                    .toList() else emptyList()
+
+            val alreadyInWishlist =
+                if (wishlistIdList.isEmpty())
+                    false
+                else
+                    wishlistIdList.contains(foodItems[page].id)
+
+
             SingleMostOrderedItem(
-                it,
+                page,
                 pagerState = pagerState,
                 modifier = Modifier.clickable { onNavigateToProductDetailsScreen() },
-                product = foodItems[it]
-            )
+                product = foodItems[page],
+                alreadyWishListed = alreadyInWishlist,
+                foodItemUpdateInfo = if (state.foodItemUpdateInfo != null && state.foodItemUpdateInfo.id == foodItems[page].id)
+                    state.foodItemUpdateInfo
+                else null
+            ) {
+                viewModel.onEvent(HomeEvent.AddToWishlist(foodItems[page].id))
+            }
         }
     }
 }
@@ -101,13 +123,22 @@ fun SingleMostOrderedItem(
     page: Int,
     modifier: Modifier = Modifier,
     pagerState: PagerState,
-    product: HomeModel.MostOrderdItem
+    product: HomeModel.MostOrderdItem,
+    alreadyWishListed: Boolean = false,
+    foodItemUpdateInfo: FoodItemUpdateInfo? = null,
+    addToWishlist: () -> Unit,
 ) {
     RedBorderCard(
         modifier = modifier.simpleAnimation(pagerState, page)
     ) {
         Column {
-            ImageWithWishlistButton(image = product.file[0].location)
+            ImageWithWishlistButton(
+                image = product.file[0].location,
+                alreadyWishListed = alreadyWishListed,
+                foodItemUpdateInfo = foodItemUpdateInfo
+            ) {
+                addToWishlist()
+            }
 
             VerticalSpace(space = SpaceBetweenViewsAndSubViews)
 
@@ -189,7 +220,7 @@ fun SingleMostOrderedItem(
 
                 VerticalSpace(space = SpaceBetweenViews)
 
-                MostOrderedPriceCard(product.price.toString())
+                MostOrderedPriceCard(product.price)
             }
         }
     }

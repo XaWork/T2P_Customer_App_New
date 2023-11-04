@@ -11,9 +11,10 @@ import me.taste2plate.app.customer.T2PApp
 import me.taste2plate.app.customer.data.Resource
 import me.taste2plate.app.customer.data.Status
 import me.taste2plate.app.customer.data.UserPref
-import me.taste2plate.app.customer.domain.use_case.CartUseCase
+import me.taste2plate.app.customer.domain.use_case.user.CartUseCase
 import me.taste2plate.app.customer.domain.use_case.HomeUseCase
-import me.taste2plate.app.customer.domain.use_case.WishlistUseCase
+import me.taste2plate.app.customer.domain.use_case.user.AddToWishlistUseCase
+import me.taste2plate.app.customer.domain.use_case.user.wishlist.WishlistUseCase
 import javax.inject.Inject
 
 @HiltViewModel
@@ -22,14 +23,31 @@ class HomeViewModel @Inject constructor(
     private val homeUseCase: HomeUseCase,
     private val wishlistUseCase: WishlistUseCase,
     private val cartUseCase: CartUseCase,
+    private val addToWishlistUseCase: AddToWishlistUseCase,
 ) : ViewModel() {
 
     var state by mutableStateOf(HomeState())
+
+    init {
+        getHomeData()
+    }
 
     fun onEvent(event: HomeEvent) {
         when (event) {
             is HomeEvent.GetHome -> {
                 getHomeData()
+            }
+
+            is HomeEvent.AddToWishlist -> {
+                addToWishlist(event.productId)
+            }
+
+            is HomeEvent.UpdateState -> {
+                when {
+                    event.changeAddToWishlistResponse -> {
+                        state = state.copy(message = null, addToWishlistResponse = null)
+                    }
+                }
             }
         }
     }
@@ -45,17 +63,16 @@ class HomeViewModel @Inject constructor(
                     }
 
                     is Resource.Success -> {
-                        getWishlist()
-                        state = if (result.data?.status == Status.success.name)
+                        state = if (result.data?.status == Status.success.name) {
+                            getWishlist()
                             state.copy(
-                                isLoading = false,
                                 homeData = result.data
                             )
-                        else
+                        } else
                             state.copy(
                                 isLoading = false,
                                 isError = true,
-                                error = "Something Went wrong"
+                                errorMessage = "Something Went wrong"
                             )
                     }
 
@@ -63,7 +80,7 @@ class HomeViewModel @Inject constructor(
                         state = state.copy(
                             isLoading = false,
                             isError = true,
-                            error = result.message
+                            errorMessage = result.message
                         )
                     }
                 }
@@ -83,18 +100,17 @@ class HomeViewModel @Inject constructor(
                     }
 
                     is Resource.Success -> {
-                        getCart()
                         state = if (result.data?.status == Status.success.name) {
                             T2PApp.wishlistCount = result.data.result.size
+                            getCart()
                             state.copy(
-                                isLoading = false,
                                 wishListData = result.data
                             )
                         } else
                             state.copy(
                                 isLoading = false,
                                 isError = true,
-                                error = "Something Went wrong"
+                                errorMessage = "Something Went wrong"
                             )
                     }
 
@@ -102,7 +118,7 @@ class HomeViewModel @Inject constructor(
                         state = state.copy(
                             isLoading = false,
                             isError = true,
-                            error = result.message
+                            errorMessage = result.message
                         )
                     }
                 }
@@ -131,7 +147,7 @@ class HomeViewModel @Inject constructor(
                             state.copy(
                                 isLoading = false,
                                 isError = true,
-                                error = "Something Went wrong"
+                                errorMessage = "Something Went wrong"
                             )
                     }
 
@@ -139,7 +155,55 @@ class HomeViewModel @Inject constructor(
                         state = state.copy(
                             isLoading = false,
                             isError = true,
-                            error = result.message
+                            errorMessage = result.message
+                        )
+                    }
+                }
+
+            }
+        }
+    }
+
+    private fun addToWishlist(productId: String) {
+        viewModelScope.launch {
+            addToWishlistUseCase.execute(
+                productId
+            ).collect { result ->
+                when (result) {
+                    is Resource.Loading -> {
+                        state = state.copy(
+                            foodItemUpdateInfo = FoodItemUpdateInfo(
+                                id = productId,
+                                isLoading = true
+                            )
+                        )
+                    }
+
+                    is Resource.Success -> {
+                        getWishlist()
+                        state =
+                            state.copy(
+                                isLoading = false,
+                                addToWishlistResponse = result.data,
+                                message = result.data?.message,
+                                isError = result.data?.status == Status.error.name,
+                                errorMessage = result.data?.message,
+                                foodItemUpdateInfo = state.foodItemUpdateInfo?.copy(
+                                    isLoading = false,
+                                    added = result.data?.status == Status.success.name
+                                )
+                            )
+                    }
+
+                    is Resource.Error -> {
+                        state = state.copy(
+                            isLoading = false,
+                            isError = true,
+                            errorMessage = result.message,
+                            foodItemUpdateInfo = state.foodItemUpdateInfo?.copy(
+                                isLoading = false,
+                                added = false
+                            )
                         )
                     }
                 }

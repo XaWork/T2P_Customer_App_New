@@ -3,6 +3,8 @@ package me.taste2plate.app.customer.data.api
 import me.taste2plate.app.customer.domain.model.auth.LoginModel
 import me.taste2plate.app.customer.domain.model.auth.VerifyOTPModel
 import me.taste2plate.app.customer.domain.model.user.CartModel
+import me.taste2plate.app.customer.domain.model.user.CommonResponse
+import me.taste2plate.app.customer.domain.model.user.DeleteFromWishlistModel
 import me.taste2plate.app.customer.domain.model.user.WishListModel
 import retrofit2.Call
 import retrofit2.http.Field
@@ -31,12 +33,28 @@ interface UserApi {
     ): VerifyOTPModel
 
 
+    // ------------------------- Wishlist -------------------------
     @GET("get-wish")
     suspend fun getWishlist(
         @Query("id") userId: String
     ): WishListModel
 
 
+    @FormUrlEncoded
+    @POST("add-to-wish")
+    suspend fun addToWishlist(
+        @Field("id") userId: String,
+        @Field("productid") productId: String
+    ): CommonResponse
+
+    @GET("delete-wish")
+    suspend fun deleteFromWishlist(
+        @Query("userid") userId: String,
+        @Query("id") productId: String
+    ): DeleteFromWishlistModel
+
+
+    // ------------------------- Cart -------------------------
 
     @GET("get-cart")
     suspend fun getCart(

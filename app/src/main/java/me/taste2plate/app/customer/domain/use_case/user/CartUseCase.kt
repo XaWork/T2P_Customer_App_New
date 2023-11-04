@@ -1,4 +1,4 @@
-package me.taste2plate.app.customer.domain.use_case
+package me.taste2plate.app.customer.domain.use_case.user
 
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow

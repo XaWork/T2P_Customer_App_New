@@ -164,7 +164,7 @@ fun CheckoutScreenContent(
         }
 
         items(2) {
-            SingleCartAndWishlistItem(isWishList = false)
+           // SingleCartAndWishlistItem(isWishList = false)
         }
 
         item {

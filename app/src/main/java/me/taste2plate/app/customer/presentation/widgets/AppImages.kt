@@ -5,19 +5,15 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Call
-import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.LocationOn
-import androidx.compose.material.icons.filled.Lock
+import androidx.compose.material.icons.outlined.Favorite
 import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material3.Badge
 import androidx.compose.material3.BadgedBox
@@ -41,15 +37,14 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import me.taste2plate.app.customer.R
+import me.taste2plate.app.customer.presentation.screens.home.FoodItemUpdateInfo
 import me.taste2plate.app.customer.presentation.theme.ExtraLowPadding
-import me.taste2plate.app.customer.presentation.theme.HighRoundedCorners
 import me.taste2plate.app.customer.presentation.theme.LowPadding
 import me.taste2plate.app.customer.presentation.theme.SpaceBetweenViewsAndSubViews
 import me.taste2plate.app.customer.presentation.theme.backgroundColor
@@ -185,8 +180,11 @@ fun HorizontalSpace(space: Dp) {
 
 @Composable
 fun CircleIconButton(
-    painterResource: Int,
     modifier: Modifier = Modifier,
+    painterResource: Int? = null,
+    icon: ImageVector? = null,
+    isDrawableIcon: Boolean = true,
+    tint: Color = LocalContentColor.current,
     onclick: () -> Unit,
 ) {
     Card(
@@ -196,12 +194,20 @@ fun CircleIconButton(
             containerColor = MaterialTheme.colorScheme.outlineVariant
         )
     ) {
-        DrawableIconButton(
-            modifier = Modifier.padding(LowPadding),
-            painterResource = painterResource,
-        ) {
-            onclick()
-        }
+        if (isDrawableIcon)
+            DrawableIconButton(
+                tint = tint,
+                painterResource = painterResource!!,
+            ) {
+                onclick()
+            }
+        else
+            MaterialIconButton(
+                tint = tint,
+                imageVector = icon!!
+            ) {
+                onclick()
+            }
     }
 }
 
@@ -256,7 +262,10 @@ fun NetworkImage(
 @Composable
 fun ImageWithWishlistButton(
     withButton: Boolean = true,
-    image: String
+    alreadyWishListed: Boolean = false,
+    image: String,
+    foodItemUpdateInfo: FoodItemUpdateInfo? = null,
+    onclick: () -> Unit
 ) {
     Box {
         NetworkImage(
@@ -266,12 +275,24 @@ fun ImageWithWishlistButton(
                 .height(200.dp),
             contentScale = ContentScale.Crop
         )
+        val modifier = Modifier
+            .align(Alignment.TopEnd)
+            .padding(LowPadding)
+
         if (withButton)
-            CircleIconButton(
-                painterResource = R.drawable.heart,
-                modifier = Modifier
-                    .align(Alignment.TopEnd)
-                    .padding(10.dp)
-            ) {}
+            if (foodItemUpdateInfo != null && foodItemUpdateInfo.isLoading)
+                ShowLoading(progressBarModifier = modifier)
+            else
+                CircleIconButton(
+                    isDrawableIcon = false,
+                    icon = if (alreadyWishListed || foodItemUpdateInfo != null && foodItemUpdateInfo.added)
+                        Icons.Outlined.Favorite
+                    else
+                        Icons.Outlined.FavoriteBorder,
+                    tint = if (alreadyWishListed || foodItemUpdateInfo != null && foodItemUpdateInfo.added) primaryColor.invoke() else LocalContentColor.current,
+                    modifier = modifier
+                ) {
+                    onclick()
+                }
     }
 }
