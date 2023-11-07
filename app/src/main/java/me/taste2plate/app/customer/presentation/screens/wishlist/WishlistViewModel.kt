@@ -37,14 +37,14 @@ class WishlistViewModel @Inject constructor(
     }
 
 
-    private fun getWishlist() {
+    private fun getWishlist(isLoading: Boolean = true) {
         viewModelScope.launch {
             wishlistUseCase.execute(
                 userId = userPref.getUser().id
             ).collect { result ->
                 when (result) {
                     is Resource.Loading -> {
-                        state = state.copy(isLoading = true)
+                        state = state.copy(isLoading = isLoading)
                     }
 
                     is Resource.Success -> {
@@ -82,7 +82,7 @@ class WishlistViewModel @Inject constructor(
             ).collect { result ->
                 when (result) {
                     is Resource.Loading -> {
-                       // state = state.copy(isLoading = true)
+                        // state = state.copy(isLoading = true)
                     }
 
                     is Resource.Success -> {
@@ -94,7 +94,7 @@ class WishlistViewModel @Inject constructor(
                             deleteFromWishlistModel = result.data
                         )
 
-                        getWishlist()
+                        getWishlist(isLoading = false)
 
                     }
 

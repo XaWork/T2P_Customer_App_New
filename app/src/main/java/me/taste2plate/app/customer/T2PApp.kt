@@ -2,8 +2,11 @@ package me.taste2plate.app.customer
 
 import android.app.Application
 import android.content.Context
+import androidx.core.content.ContentProviderCompat.requireContext
+import com.google.android.libraries.places.api.Places
 import com.google.firebase.BuildConfig
 import dagger.hilt.android.HiltAndroidApp
+import me.taste2plate.app.customer.presentation.utils.mapApiKey
 import timber.log.Timber
 import timber.log.Timber.Forest.plant
 import javax.inject.Inject
@@ -31,5 +34,7 @@ class T2PApp: Application() {
         if (BuildConfig.DEBUG) {
             plant(Timber.DebugTree())
         }
+
+        Places.initialize(this.applicationContext, mapApiKey)
     }
 }

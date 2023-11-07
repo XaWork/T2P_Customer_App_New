@@ -208,7 +208,7 @@ fun ProductDetails() {
                     fontSize = 22.sp,
                 )
             }) {
-                CartAddRemove()
+               // CartAddRemove()
             }
 
             VerticalSpace(space = SpaceBetweenViews)
@@ -318,15 +318,24 @@ fun SaleBanner(
 }
 
 @Composable
-fun CartAddRemove() {
+fun CartAddRemove(
+    cartItemLength: Int,
+    onUpdateCart: (quantity: Int) -> Unit
+) {
     Row(
         horizontalArrangement = Arrangement.Center,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        TextInCircle(text = "-")
+        TextInCircle(
+            modifier = Modifier.clickable {
+                if (cartItemLength > 0)
+                    onUpdateCart(cartItemLength - 1)
+            },
+            text = "-"
+        )
 
         Text(
-            text = "0",
+            text = cartItemLength.toString(),
             modifier = Modifier
                 .padding(
                     horizontal = MediumPadding,
@@ -335,7 +344,12 @@ fun CartAddRemove() {
             fontSize = 18.sp
         )
 
-        TextInCircle(text = "+")
+        TextInCircle(
+            modifier = Modifier.clickable {
+                onUpdateCart(cartItemLength + 1)
+            },
+            text = "+"
+        )
     }
 }
 

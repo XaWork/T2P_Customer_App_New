@@ -1,6 +1,9 @@
 package me.taste2plate.app.customer.presentation.utils
 
-import androidx.compose.ui.tooling.preview.datasource.LoremIpsum
+
+// api keys
+const val mapApiKey = "AIzaSyBbpYO8zLmSh0-c5_MDiyPiQnMCl4Jc6ko"
+
 
 const val appName = "Taste2plate"
 const val tagLine = "Intercity Food Delivery"

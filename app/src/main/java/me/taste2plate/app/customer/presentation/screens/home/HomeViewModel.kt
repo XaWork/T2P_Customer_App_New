@@ -11,9 +11,11 @@ import me.taste2plate.app.customer.T2PApp
 import me.taste2plate.app.customer.data.Resource
 import me.taste2plate.app.customer.data.Status
 import me.taste2plate.app.customer.data.UserPref
-import me.taste2plate.app.customer.domain.use_case.user.CartUseCase
+import me.taste2plate.app.customer.domain.model.user.address.AddressListModel
+import me.taste2plate.app.customer.domain.use_case.user.cart.CartUseCase
 import me.taste2plate.app.customer.domain.use_case.HomeUseCase
-import me.taste2plate.app.customer.domain.use_case.user.AddToWishlistUseCase
+import me.taste2plate.app.customer.domain.use_case.user.address.AllAddressUseCase
+import me.taste2plate.app.customer.domain.use_case.user.wishlist.AddToWishlistUseCase
 import me.taste2plate.app.customer.domain.use_case.user.wishlist.WishlistUseCase
 import javax.inject.Inject
 
@@ -24,6 +26,7 @@ class HomeViewModel @Inject constructor(
     private val wishlistUseCase: WishlistUseCase,
     private val cartUseCase: CartUseCase,
     private val addToWishlistUseCase: AddToWishlistUseCase,
+    private val allAddressUseCase: AllAddressUseCase,
 ) : ViewModel() {
 
     var state by mutableStateOf(HomeState())
@@ -38,8 +41,16 @@ class HomeViewModel @Inject constructor(
                 getHomeData()
             }
 
+            is HomeEvent.GetAddress -> {
+                getAddress()
+            }
+
             is HomeEvent.AddToWishlist -> {
                 addToWishlist(event.productId)
+            }
+
+            is HomeEvent.SetDefaultAddress -> {
+                setDefaultAddress(event.address)
             }
 
             is HomeEvent.UpdateState -> {
@@ -49,6 +60,13 @@ class HomeViewModel @Inject constructor(
                     }
                 }
             }
+        }
+    }
+
+    private fun setDefaultAddress(address: AddressListModel.Result) {
+        viewModelScope.launch {
+            userPref.saveDefaultAddress(address)
+            state = state.copy(defaultAddress = address)
         }
     }
 
@@ -84,9 +102,22 @@ class HomeViewModel @Inject constructor(
                         )
                     }
                 }
-
             }
         }
+    }
+
+    private fun hasDefaultAddress(): Boolean {
+        var hasDefaultAddress = false
+
+        viewModelScope.launch {
+            val defaultAddress = userPref.getDefaultAddress()
+            if (defaultAddress != null) {
+                state = state.copy(defaultAddress = defaultAddress)
+                hasDefaultAddress = true
+            }
+        }
+
+        return hasDefaultAddress
     }
 
     private fun getWishlist() {
@@ -101,8 +132,12 @@ class HomeViewModel @Inject constructor(
 
                     is Resource.Success -> {
                         state = if (result.data?.status == Status.success.name) {
+                            if (hasDefaultAddress())
+                                getCart()
+                            else
+                                getAddress()
+
                             T2PApp.wishlistCount = result.data.result.size
-                            getCart()
                             state.copy(
                                 wishListData = result.data
                             )
@@ -129,31 +164,70 @@ class HomeViewModel @Inject constructor(
 
     private fun getCart() {
         viewModelScope.launch {
-            cartUseCase.execute(
-            ).collect { result ->
+            cartUseCase.execute().collect { result ->
                 when (result) {
                     is Resource.Loading -> {
                         //state = state.copy(isLoading = true)
                     }
 
                     is Resource.Success -> {
-                        state = if (result.data?.status == Status.success.name) {
-                            T2PApp.cartCount = result.data.result.size
+                        val isError = result.data?.status == Status.error.name
+                        if (!isError)
+                            T2PApp.cartCount = result.data!!.result.size
+                        state =
                             state.copy(
                                 isLoading = false,
-                                cartData = result.data
+                                cartData = result.data,
+                                isError = isError,
+                                errorMessage = if (isError) "Something Went wrong" else ""
                             )
-                        } else
-                            state.copy(
-                                isLoading = false,
-                                isError = true,
-                                errorMessage = "Something Went wrong"
-                            )
+
                     }
 
                     is Resource.Error -> {
                         state = state.copy(
                             isLoading = false,
+                            isError = true,
+                            errorMessage = result.message
+                        )
+                    }
+                }
+
+            }
+        }
+    }
+
+    private fun getAddress() {
+        viewModelScope.launch {
+            allAddressUseCase.execute(
+            ).collect { result ->
+                when (result) {
+                    is Resource.Loading -> {
+                        state = state.copy(addressLoader = true)
+                    }
+
+                    is Resource.Success -> {
+                        val isError = result.data?.status == Status.error.name
+                        state =
+                            state.copy(
+                                addressLoader = false,
+                                isError = isError,
+                                message = if (isError) result.data?.message else "",
+                                addressListModel = result.data
+                            )
+
+                        if (!isError) {
+                            if (state.defaultAddress != null && result.data != null && result.data.result.isNotEmpty()) {
+                                setDefaultAddress(result.data.result[0])
+                            }
+                            if (state.cartData == null)
+                                getCart()
+                        }
+                    }
+
+                    is Resource.Error -> {
+                        state = state.copy(
+                            addressLoader = false,
                             isError = true,
                             errorMessage = result.message
                         )

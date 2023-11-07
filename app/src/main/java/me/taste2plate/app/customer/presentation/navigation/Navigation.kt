@@ -15,11 +15,11 @@ import me.taste2plate.app.customer.presentation.screens.address.AddressListScree
 import me.taste2plate.app.customer.presentation.screens.auth.AuthViewModel
 import me.taste2plate.app.customer.presentation.screens.auth.onboarding.OnBoardingScreen
 import me.taste2plate.app.customer.presentation.screens.auth.otp.OTPScreen
-import me.taste2plate.app.customer.presentation.screens.auth.permissions.LocationPermissionScreen
-import me.taste2plate.app.customer.presentation.screens.auth.permissions.NotificationPermissionScreen
+import me.taste2plate.app.customer.presentation.screens.permissions.NotificationPermissionScreen
 import me.taste2plate.app.customer.presentation.screens.auth.signup.SignUpScreen
 import me.taste2plate.app.customer.presentation.screens.bulk_order.BulkOrderScreen
 import me.taste2plate.app.customer.presentation.screens.cart.CartScreen
+import me.taste2plate.app.customer.presentation.screens.cart.CheckOutViewModel
 import me.taste2plate.app.customer.presentation.screens.checkout.CheckoutScreen
 import me.taste2plate.app.customer.presentation.screens.checkout.OrderConfirmScreen
 import me.taste2plate.app.customer.presentation.screens.citybrand.CityBrandScreen
@@ -101,8 +101,8 @@ fun Navigation() {
                     viewModel = viewModel,
                     onNavigateToSignUPScreen = {
                         navController.navigate(Screens.SignUpScreen.route)
-                    }, onNavigateToLocationScreen = {
-                        navController.navigate(Screens.LocationScreen.route) {
+                    }, onNavigateToHomeScreen = {
+                        navController.navigate(Screens.HomeScreen.route) {
                             popUpTo(0)
                         }
                     })
@@ -120,24 +120,14 @@ fun Navigation() {
         // ----------------------------> Location <--------------------------------------
         composable(route = Screens.LocationScreen.route) {
             LocationScreen(
-                onNavigateToHomeScreen = {
-                    navController.navigate(Screens.HomeScreen.route){
-                        popUpTo(0)
-                    }
-                },
                 onNavigateToAddEditAddressScreen = {
                     navController.navigate(Screens.AddEditAddressScreen.route)
                 },
                 onNavigateToNotificationScreen = {
-                    navController.navigate(Screens.NotificationScreen.route){
+                    navController.navigate(Screens.NotificationScreen.route) {
                         popUpTo(0)
                     }
                 },
-                onNavigateToLocationPermissionScreen = {
-                    navController.navigate(Screens.LocationPermissionScreen.route){
-                        popUpTo(0)
-                    }
-                }
             )
         }
 
@@ -185,6 +175,9 @@ fun Navigation() {
                 },
                 onNavigateToWishlistScreen = {
                     navController.navigate(Screens.WishlistScreen.route)
+                },
+                onNavigateToAddressListScreen = {
+                    navController.navigate(Screens.AddressListScreen.route)
                 }
             )
         }
@@ -200,9 +193,11 @@ fun Navigation() {
 
         // ----------------------------> Order List <--------------------------------------
         composable(route = Screens.NotificationScreen.route) {
-            NotificationPermissionScreen {
-                navController.navigate(Screens.HomeScreen.route)
-            }
+            NotificationPermissionScreen(
+                onNavigateToHomeScreen = {
+                    navController.navigate(Screens.HomeScreen.route)
+                }
+            )
         }
 
         // ----------------------------> WishList <--------------------------------------
@@ -211,15 +206,15 @@ fun Navigation() {
         }
 
         // ----------------------------> Location Permission <--------------------------------------
-        composable(route = Screens.LocationPermissionScreen.route) {
-            LocationPermissionScreen(
-                onNavigateToLocationScreen = {
-                    navController.navigate(Screens.LocationScreen.route){
-                        popUpTo(0)
-                    }
-                }
-            )
-        }
+        /* composable(route = Screens.LocationPermissionScreen.route) {
+             LocationPermissionScreen(
+                 onNavigateToLocationScreen = {
+                     navController.navigate(Screens.LocationScreen.route) {
+                         popUpTo(0)
+                     }
+                 }
+             )
+         }*/
 
         // ----------------------------> Wallet <--------------------------------------
         composable(route = Screens.WalletScreen.route) {
@@ -267,11 +262,41 @@ fun Navigation() {
             OrderDetailsScreen()
         }
 
-        // ----------------------------> Cart <--------------------------------------
-        composable(route = Screens.CartScreen.route) {
-            CartScreen(onNavigateToCheckoutScreen = {
-                navController.navigate(Screens.CheckoutScreen.route)
-            })
+
+        navigation(startDestination = Screens.CartScreen.route, route = "checkout") {
+
+            // ----------------------------> Cart <--------------------------------------
+            composable(route = Screens.CartScreen.route) { entry ->
+                val viewModel =
+                    entry.sharedViewModel<CheckOutViewModel>(navHostController = navController)
+
+                CartScreen(
+                    viewModel = viewModel,
+                    onNavigateToCheckoutScreen = {
+                        navController.navigate(Screens.CheckoutScreen.route)
+                    }, onBackPress = {
+                        navController.popBackStack()
+                    })
+            }
+
+
+            // ----------------------------> Checkout <--------------------------------------
+            composable(route = Screens.CheckoutScreen.route) {
+                CheckoutScreen(onNavigateToOrderConfirmScreen = {
+                    navController.navigate(Screens.OrderConfirmScreen.route)
+                })
+            }
+
+            // ----------------------------> Order Confirmed <--------------------------------------
+            composable(route = Screens.OrderConfirmScreen.route) {
+                OrderConfirmScreen(onNavigateToHomeScreen = {
+                    navController.navigate(Screens.HomeScreen.route) {
+                        popUpTo(Screens.HomeScreen.route) {
+                            inclusive = true
+                        }
+                    }
+                })
+            }
         }
 
         // ----------------------------> Product Details <--------------------------------------
@@ -283,23 +308,6 @@ fun Navigation() {
             )
         }
 
-        // ----------------------------> Checkout <--------------------------------------
-        composable(route = Screens.CheckoutScreen.route) {
-            CheckoutScreen(onNavigateToOrderConfirmScreen = {
-                navController.navigate(Screens.OrderConfirmScreen.route)
-            })
-        }
-
-        // ----------------------------> Checkout <--------------------------------------
-        composable(route = Screens.OrderConfirmScreen.route) {
-            OrderConfirmScreen(onNavigateToHomeScreen = {
-                navController.navigate(Screens.HomeScreen.route) {
-                    popUpTo(Screens.HomeScreen.route) {
-                        inclusive = true
-                    }
-                }
-            })
-        }
 
         // ----------------------------> Profile <--------------------------------------
         composable(route = Screens.ProfileScreen.route) {

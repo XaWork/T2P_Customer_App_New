@@ -57,7 +57,7 @@ android {
 
 
 dependencies {
-    val navVersion = "2.7.4"
+    val navVersion = "2.7.5"
     val hiltVersion = "2.47"
     val retrofitVersion = "2.9.0"
 
@@ -105,6 +105,8 @@ dependencies {
     implementation("com.google.android.gms:play-services-maps:18.2.0")
     //location
     implementation("com.google.android.gms:play-services-location:21.0.1")
+    //place
+    implementation("com.google.android.libraries.places:places:3.2.0")
 
     //permission
     implementation("com.google.accompanist:accompanist-permissions:0.33.2-alpha")
@@ -112,8 +114,8 @@ dependencies {
     //dagger hilt
     implementation("com.google.dagger:hilt-android:$hiltVersion")
     kapt("com.google.dagger:hilt-android-compiler:$hiltVersion")
-    kapt("androidx.hilt:hilt-compiler:1.0.0")
-    implementation("androidx.hilt:hilt-navigation-compose:1.0.0")
+    kapt("androidx.hilt:hilt-compiler:1.1.0")
+    implementation("androidx.hilt:hilt-navigation-compose:1.1.0")
 
     //retrofit
     implementation("com.squareup.retrofit2:retrofit:$retrofitVersion")

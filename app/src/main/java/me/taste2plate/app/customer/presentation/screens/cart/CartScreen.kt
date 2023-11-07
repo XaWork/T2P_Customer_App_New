@@ -18,6 +18,7 @@ import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.Divider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -25,11 +26,9 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import me.taste2plate.app.customer.R
 import me.taste2plate.app.customer.domain.mapper.CommonForWishAndCartItem
-import me.taste2plate.app.customer.domain.model.user.WishListModel
+import me.taste2plate.app.customer.domain.mapper.toCommonForWishAndCartItem
 import me.taste2plate.app.customer.presentation.screens.product.CartAddRemove
-import me.taste2plate.app.customer.presentation.screens.productList
 import me.taste2plate.app.customer.presentation.theme.ExtraHighPadding
 import me.taste2plate.app.customer.presentation.theme.LowRoundedCorners
 import me.taste2plate.app.customer.presentation.theme.MediumPadding
@@ -40,26 +39,55 @@ import me.taste2plate.app.customer.presentation.theme.dividerThickness
 import me.taste2plate.app.customer.presentation.theme.primaryColor
 import me.taste2plate.app.customer.presentation.utils.rupeeSign
 import me.taste2plate.app.customer.presentation.widgets.AppButton
+import me.taste2plate.app.customer.presentation.widgets.AppEmptyView
 import me.taste2plate.app.customer.presentation.widgets.AppScaffold
 import me.taste2plate.app.customer.presentation.widgets.AppTopBar
-import me.taste2plate.app.customer.presentation.widgets.DrawableIcon
-import me.taste2plate.app.customer.presentation.widgets.DrawableIconButton
 import me.taste2plate.app.customer.presentation.widgets.MaterialIconButton
 import me.taste2plate.app.customer.presentation.widgets.NetworkImage
-import me.taste2plate.app.customer.presentation.widgets.RoundedCornerCard
+import me.taste2plate.app.customer.presentation.widgets.ShowLoading
 import me.taste2plate.app.customer.presentation.widgets.SpaceBetweenRow
 import me.taste2plate.app.customer.presentation.widgets.VerticalSpace
+import me.taste2plate.app.customer.presentation.widgets.showToast
 
 @Composable
 fun CartScreen(
-    onNavigateToCheckoutScreen: () -> Unit
+    viewModel: CheckOutViewModel,
+    onNavigateToCheckoutScreen: () -> Unit,
+    onBackPress: () -> Unit,
 ) {
+    val state = viewModel.state
+
+    LaunchedEffect(state) {
+        if (state.isError || state.normalMessage != null) {
+            showToast(
+                message = if (state.isError)
+                    state.errorMessage!!
+                else state.normalMessage!!
+            )
+
+            viewModel.onEvent(CheckoutEvents.UpdateState)
+        }
+    }
+
     AppScaffold(
         topBar = {
             AppTopBar {}
         },
     ) {
-        // ContentCartAndWishlist(onNavigateToCheckoutScreen = onNavigateToCheckoutScreen)
+        if (state.isLoading)
+            ShowLoading(isButton = false)
+        else if (state.cart?.result == null || state.cart.result.isEmpty())
+            AppEmptyView()
+        else {
+            val items = state.cart.result.map { it.toCommonForWishAndCartItem() }.toList()
+            ContentCartAndWishlist(
+                items = items,
+                updateCart = { productId, quantity ->
+                    viewModel.onEvent(CheckoutEvents.UpdateCart(productId, quantity))
+                },
+                onNavigateToCheckoutScreen = onNavigateToCheckoutScreen,
+            )
+        }
     }
 }
 
@@ -68,6 +96,7 @@ fun ContentCartAndWishlist(
     isWishList: Boolean = false,
     items: List<CommonForWishAndCartItem>,
     removeFromWishlist: (productId: String) -> Unit = {},
+    updateCart: (productId: String, quantity: Int) -> Unit = { _, _ -> },
     onNavigateToCheckoutScreen: () -> Unit = {},
 ) {
     Box(
@@ -83,6 +112,9 @@ fun ContentCartAndWishlist(
                     item = item,
                     removeFromWishlist = {
                         removeFromWishlist(item.id)
+                    },
+                    updateCart = { quantity ->
+                        updateCart(item.id, quantity)
                     }
                 )
             }
@@ -105,7 +137,8 @@ fun ContentCartAndWishlist(
 fun SingleCartAndWishlistItem(
     isWishList: Boolean,
     item: CommonForWishAndCartItem,
-    removeFromWishlist: () -> Unit
+    removeFromWishlist: () -> Unit,
+    updateCart: (quantity: Int) -> Unit
 ) {
     val items = listOf<@Composable RowScope.() -> Unit> {
         NetworkImage(
@@ -125,7 +158,8 @@ fun SingleCartAndWishlistItem(
         ) {
             Text(
                 text = item.name,
-                maxLines = 1,
+                maxLines = 2,
+                minLines = 2,
                 overflow = TextOverflow.Ellipsis
             )
 
@@ -135,7 +169,9 @@ fun SingleCartAndWishlistItem(
             val innerItems = listOf<@Composable RowScope.() -> Unit> {
 
                 if (!isWishList)
-                    CartAddRemove()
+                    CartAddRemove(item.quantity!!) { quantity ->
+                        updateCart(quantity)
+                    }
 
                 Text(text = "${rupeeSign}${item.price}")
             }
@@ -173,6 +209,6 @@ fun SingleCartAndWishlistItem(
 @Composable
 fun CartScreenPreview() {
     T2PCustomerAppTheme {
-        CartScreen({})
+        //CartScreen({})
     }
 }

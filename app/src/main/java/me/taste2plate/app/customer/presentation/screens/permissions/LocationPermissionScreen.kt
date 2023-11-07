@@ -1,4 +1,4 @@
-package me.taste2plate.app.customer.presentation.screens.auth.permissions
+package me.taste2plate.app.customer.presentation.screens.permissions
 
 import android.content.res.Configuration
 import androidx.compose.foundation.layout.Box
@@ -7,7 +7,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Notifications
+import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -26,8 +26,8 @@ import me.taste2plate.app.customer.presentation.widgets.MaterialIcon
 import me.taste2plate.app.customer.presentation.widgets.VerticalSpace
 
 @Composable
-fun NotificationPermissionScreen(
-    onNavigateToHomeScreen : () -> Unit
+fun LocationPermissionScreen(
+    onClick: () -> Unit,
 ) {
     AppScaffold {
         Box(
@@ -39,7 +39,7 @@ fun NotificationPermissionScreen(
                 modifier = Modifier.align(Alignment.TopStart)
             ) {
                 Text(
-                    text = "Get regular update of your order & offers.",
+                    text = "Permission Required",
                     style = MaterialTheme.typography.headlineMedium,
                     fontWeight = FontWeight.Bold
                 )
@@ -47,7 +47,7 @@ fun NotificationPermissionScreen(
                 VerticalSpace(space = SpaceBetweenViewsAndSubViews)
 
                 Text(
-                    text = "Allow push notification to get real-time update on your orders",
+                    text = "Allow location permission to get your location",
                     fontWeight = FontWeight.Light
                 )
 
@@ -56,7 +56,7 @@ fun NotificationPermissionScreen(
 
             MaterialIcon(
                 imageVector =
-                Icons.Default.Notifications,
+                Icons.Default.LocationOn,
                 tint = primaryColor.invoke(),
                 modifier = Modifier
                     .size(200.dp)
@@ -64,10 +64,10 @@ fun NotificationPermissionScreen(
             )
 
             AppButton(
-                text = "Turn on notifications",
+                text = "Allow Permission",
                 modifier = Modifier.align(Alignment.BottomCenter)
             ) {
-                onNavigateToHomeScreen()
+                onClick()
             }
         }
     }
@@ -77,8 +77,8 @@ fun NotificationPermissionScreen(
 @Preview
 @Preview(name = "Dark Preview", uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
-fun NotificationPermissionScreenPreview() {
+fun LocationPermissionScreenPreview() {
     T2PCustomerAppTheme {
-        NotificationPermissionScreen({})
+        // LocationPermissionScreen()
     }
 }

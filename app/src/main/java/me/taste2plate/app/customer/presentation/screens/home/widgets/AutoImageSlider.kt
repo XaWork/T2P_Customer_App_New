@@ -68,7 +68,7 @@ fun AutoSlidingCarousel(
     Box(
         modifier = modifier
             .fillMaxWidth()
-            .height(140.dp),
+            .height(200.dp),
     ) {
         HorizontalPager(
             beyondBoundsPageCount = pages.size,

@@ -1,7 +1,7 @@
 package me.taste2plate.app.customer.presentation.screens.splash
 
 import android.content.res.Configuration
-import android.util.Log
+import android.os.Build
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
@@ -14,6 +14,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import me.taste2plate.app.customer.R
+import me.taste2plate.app.customer.presentation.utils.RequestPermissions
 import me.taste2plate.app.customer.presentation.widgets.AppScaffold
 
 @Composable
@@ -25,13 +26,18 @@ fun SplashScreen(
 
     val state = viewModel.state
 
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU)
+        RequestPermissions(permission = listOf(
+            android.Manifest.permission.POST_NOTIFICATIONS
+        ), permissionStatus = {})
+
     LaunchedEffect(state) {
         when {
             !state.isLogin && state.settings != null -> {
                 onNavigateToOnBoardingScreen()
             }
 
-            state.isLogin  && state.settings != null-> {
+            state.isLogin && state.settings != null -> {
                 onNavigateToHomeScreen()
             }
 

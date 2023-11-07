@@ -3,8 +3,10 @@ package me.taste2plate.app.customer.data.repo
 import me.taste2plate.app.customer.data.api.UserApi
 import me.taste2plate.app.customer.domain.model.auth.LoginModel
 import me.taste2plate.app.customer.domain.model.user.CartModel
+import me.taste2plate.app.customer.domain.model.user.CommonResponse
 import me.taste2plate.app.customer.domain.model.user.DeleteFromWishlistModel
 import me.taste2plate.app.customer.domain.model.user.WishListModel
+import me.taste2plate.app.customer.domain.model.user.address.AddressListModel
 import me.taste2plate.app.customer.domain.repo.UserRepo
 import javax.inject.Inject
 
@@ -44,4 +46,17 @@ class UserRepoImpl @Inject constructor(
 
     override suspend fun getCart(userId: String, city: String, zip: String) =
         api.getCart(userId, city, zip)
+
+    override suspend fun updateCart(
+        userId: String,
+        productID: String,
+        quantity: Int
+    ) = api.updateCart(userId, productID, quantity)
+
+    override suspend fun deleteCart(userId: String, productID: String) =
+        api.deleteCart(userId, productID)
+
+    override suspend fun allAddress(userId: String): AddressListModel {
+        return api.allAddress(userId)
+    }
 }

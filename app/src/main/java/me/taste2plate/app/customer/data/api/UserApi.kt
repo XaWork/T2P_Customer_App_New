@@ -6,6 +6,7 @@ import me.taste2plate.app.customer.domain.model.user.CartModel
 import me.taste2plate.app.customer.domain.model.user.CommonResponse
 import me.taste2plate.app.customer.domain.model.user.DeleteFromWishlistModel
 import me.taste2plate.app.customer.domain.model.user.WishListModel
+import me.taste2plate.app.customer.domain.model.user.address.AddressListModel
 import retrofit2.Call
 import retrofit2.http.Field
 import retrofit2.http.FormUrlEncoded
@@ -62,4 +63,26 @@ interface UserApi {
         @Query("customer_city") cityId: String,
         @Query("customer_zip") zipCode: String
     ): CartModel
+
+
+
+    @FormUrlEncoded
+    @POST("update-cart")
+    suspend fun updateCart(
+        @Field("userid") userId: String,
+        @Field("id") productID: String,
+        @Field("quantity") quantity: Int
+    ): CommonResponse
+
+
+    @GET("delete-cart")
+    suspend fun deleteCart(
+        @Query("userid") userId: String,
+        @Query("id") productId: String
+    ): CommonResponse
+
+    //-------------------------- Address ----------------------
+
+    @GET("all-address")
+    suspend fun allAddress(@Query("id") userId: String): AddressListModel
 }

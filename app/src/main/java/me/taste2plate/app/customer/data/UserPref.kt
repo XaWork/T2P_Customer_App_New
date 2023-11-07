@@ -12,6 +12,7 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import me.taste2plate.app.customer.domain.model.auth.User
+import me.taste2plate.app.customer.domain.model.user.address.AddressListModel
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -24,6 +25,7 @@ class UserPref @Inject constructor(
     companion object {
         private val KEY_TOKEN = stringPreferencesKey("token")
         private val KEY_USER = stringPreferencesKey("user")
+        private val KEY_ADDRESS = stringPreferencesKey("address")
         private val KEY_TASTE = stringPreferencesKey("taste")
         private val KEY_IS_LOGIN = booleanPreferencesKey("isLogin")
     }
@@ -99,6 +101,32 @@ class UserPref @Inject constructor(
         Timber.e("User is ${userFlow.first()}")
 
         return user
+    }
+
+
+    //=====================> Default address <=================
+    suspend fun saveDefaultAddress(address: AddressListModel.Result) {
+        val stringAddress = Gson().toJson(address)
+        dataStore.edit { preferences ->
+            preferences[KEY_ADDRESS] = stringAddress
+        }
+        getDefaultAddress()
+    }
+
+    suspend fun getDefaultAddress(): AddressListModel.Result? {
+        val addressFlow = dataStore.data.map { preferences ->
+            preferences[KEY_ADDRESS]
+        }
+
+        return if (addressFlow.first() == null)
+            null
+        else {
+            val address: AddressListModel.Result =
+                Gson().fromJson(addressFlow.first(), AddressListModel.Result::class.java)
+            Timber.e("address is ${addressFlow.first()}")
+
+            address
+        }
     }
 
 }

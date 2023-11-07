@@ -6,6 +6,7 @@ import me.taste2plate.app.customer.domain.model.user.CartModel
 import me.taste2plate.app.customer.domain.model.user.CommonResponse
 import me.taste2plate.app.customer.domain.model.user.DeleteFromWishlistModel
 import me.taste2plate.app.customer.domain.model.user.WishListModel
+import me.taste2plate.app.customer.domain.model.user.address.AddressListModel
 
 interface UserRepo {
     suspend fun login(
@@ -39,4 +40,19 @@ interface UserRepo {
         city: String,
         zip: String
     ): CartModel
+
+    suspend fun updateCart(
+        userId: String,
+        productID: String,
+        quantity: Int
+    ): CommonResponse
+
+    suspend fun deleteCart(
+        userId: String,
+        productID: String,
+    ): CommonResponse
+
+    suspend fun allAddress(
+        userId: String,
+    ): AddressListModel
 }

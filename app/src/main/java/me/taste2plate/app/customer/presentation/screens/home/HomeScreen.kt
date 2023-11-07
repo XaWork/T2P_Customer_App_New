@@ -59,6 +59,7 @@ fun HomeScreen(
     onNavigateToCartScreen: () -> Unit,
     onNavigateToWishlistScreen: () -> Unit,
     onNavigateToProfileScreen: () -> Unit,
+    onNavigateToAddressListScreen: () -> Unit,
     onNavigateToProductListScreen: () -> Unit,
     onNavigateToProductDetailsScreen: () -> Unit,
     onNavigateToBulkOrdersScreen: () -> Unit,
@@ -70,9 +71,6 @@ fun HomeScreen(
     onNavigateLogoutScreen: () -> Unit,
     viewModel: HomeViewModel = hiltViewModel()
 ) {
-    var searchValue by remember {
-        mutableStateOf("")
-    }
 
     //obser state
     val state = viewModel.state
@@ -86,17 +84,12 @@ fun HomeScreen(
     }
 
     val scrollState = rememberLazyListState()
-    //  val position by animateFloatAsState(if (scrollUpState.value == true) -150f else 0f, label = "")
 
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
 
     //bottom sheet
     val scope = rememberCoroutineScope()
-
-    var showBottomSheet by remember {
-        mutableStateOf(false)
-    }
-
+    var showBottomSheet by remember { mutableStateOf(false) }
     val sheetState = rememberModalBottomSheetState()
 
     if (showBottomSheet) {
@@ -106,16 +99,25 @@ fun HomeScreen(
             },
             sheetState = sheetState
         ) {
-            AddressBottomSheet()
+            if (state.addressListModel != null && state.addressListModel.result.isNotEmpty())
+                AddressBottomSheet(
+                    isLoading = state.addressLoader,
+                    state.addressListModel.result,
+                    setDefaultAddress = { address ->
+                        showBottomSheet = false
+                        viewModel.onEvent(
+                            HomeEvent.SetDefaultAddress(address)
+                        )
+                    },
+                    onNavigateToAddressListScreen = {
+                        showBottomSheet = false
+                        onNavigateToAddressListScreen()
+                    }
+                )
         }
     }
 
-    // Launched Effects
-    LaunchedEffect(Unit) {
-        // viewModel.onEvent(HomeEvent.GetHome)
-    }
-
-
+//Navigation Drawer
     NavigationDrawer(drawerState = drawerState, onItemClick = { id ->
         when (id) {
             DrawerAppScreen.Home.name -> {}
@@ -185,7 +187,8 @@ fun HomeScreen(
                 )
             else
                 Column {
-                    AddressBar("Address here") {
+                    AddressBar(state.defaultAddress!!.address) {
+                        viewModel.onEvent(HomeEvent.GetAddress)
                         showBottomSheet = true
                     }
                     LazyColumn(

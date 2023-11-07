@@ -184,12 +184,14 @@ fun SpaceBetweenRow(
 
 
 @Composable
-fun VegNonVegFilter() {
+fun VegNonVegFilter(
+    modifier: Modifier = Modifier
+) {
     var checked by remember { mutableStateOf(false) }
     Row(
         horizontalArrangement = Arrangement.Center,
         verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier.padding(horizontal = LowPadding)
+        modifier = modifier.padding(horizontal = LowPadding)
     ) {
         Text(text = "Veg")
         Switch(

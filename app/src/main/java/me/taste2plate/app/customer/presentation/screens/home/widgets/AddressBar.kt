@@ -44,9 +44,10 @@ fun AddressBar(
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Row(modifier = Modifier.clickable { showAddressSheet() }
+        Row(modifier = Modifier
+            .clickable { showAddressSheet() }
             .fillMaxWidth(1f)
-            .weight(1f) ) {
+            .weight(1f)) {
             MaterialIcon(
                 imageVector = Icons.Outlined.LocationOn,
             )
@@ -60,7 +61,11 @@ fun AddressBar(
             )
         }
 
-        VegNonVegFilter()
+        VegNonVegFilter(
+            modifier = Modifier
+                .fillMaxWidth(1f)
+                .weight(1f)
+        )
     }
 }
 

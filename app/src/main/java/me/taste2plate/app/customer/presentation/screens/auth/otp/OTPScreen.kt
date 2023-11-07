@@ -41,7 +41,7 @@ import me.taste2plate.app.customer.presentation.widgets.VerticalSpace
 @Composable
 fun OTPScreen(
     viewModel: AuthViewModel,
-    onNavigateToLocationScreen: () -> Unit,
+    onNavigateToHomeScreen: () -> Unit,
     onNavigateToSignUPScreen: () -> Unit,
 ) {
 
@@ -51,7 +51,7 @@ fun OTPScreen(
     //Observe State
     when {
         state.verifyOTPModel != null -> {
-            onNavigateToLocationScreen()
+            onNavigateToHomeScreen()
         }
     }
 

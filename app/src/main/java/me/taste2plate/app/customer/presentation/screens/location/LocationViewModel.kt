@@ -4,18 +4,29 @@ import android.Manifest
 import android.app.Activity
 import android.content.Context
 import android.content.pm.PackageManager
+import android.location.Geocoder
 import android.location.LocationRequest
+import android.util.Log
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.core.app.ActivityCompat
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
+import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.tasks.CancellationToken
 import com.google.android.gms.tasks.CancellationTokenSource
 import com.google.android.gms.tasks.OnTokenCanceledListener
+import com.google.android.libraries.places.api.model.Place
+import com.google.android.libraries.places.api.net.FetchPlaceRequest
+import com.google.android.libraries.places.api.net.FindAutocompletePredictionsRequest
+import com.google.android.libraries.places.api.net.PlacesClient
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
 import me.taste2plate.app.customer.data.UserPref
 import timber.log.Timber
 import javax.inject.Inject
@@ -23,9 +34,14 @@ import javax.inject.Inject
 @HiltViewModel
 class LocationViewModel @Inject constructor(
     private val userPref: UserPref
-): ViewModel() {
+) : ViewModel() {
 
     var state by mutableStateOf(LocationState())
+    private var job: Job? = null
+    val locationAutofill = mutableStateListOf<AutocompleteResult>()
+    lateinit var placesClient: PlacesClient
+    lateinit var geoCoder: Geocoder
+    var currentLatLong by mutableStateOf(LatLng(28.646938, 77.274676))
 
 
     fun onEvent(event: LocationEvent) {
@@ -65,7 +81,7 @@ class LocationViewModel @Inject constructor(
 
                         state = if (it != null) {
                             state.copy(isLoading = false, location = it)
-                        }else{
+                        } else {
                             state.copy(
                                 isLoading = false,
                                 error = "Failed to get location"
@@ -89,6 +105,47 @@ class LocationViewModel @Inject constructor(
                 ),
                 0  // You need to define a unique request code
             )
+        }
+    }
+
+    fun searchPlaces(query: String) {
+        job?.cancel()
+        locationAutofill.clear()
+        job = viewModelScope.launch {
+            val request = FindAutocompletePredictionsRequest.builder().setQuery(query).build()
+            placesClient.findAutocompletePredictions(request).addOnSuccessListener { response ->
+                locationAutofill += response.autocompletePredictions.map {
+                    AutocompleteResult(
+                        it.getFullText(null).toString(), it.placeId
+                    )
+                }
+            }.addOnFailureListener {
+                it.printStackTrace()
+                println(it.cause)
+                println(it.message)
+            }
+        }
+    }
+
+    fun getCoordinates(result: AutocompleteResult) {
+        val placeFields = listOf(Place.Field.LAT_LNG)
+        val request = FetchPlaceRequest.newInstance(result.placeId, placeFields)
+        placesClient.fetchPlace(request).addOnSuccessListener {
+            if (it != null) {
+                currentLatLong = it.place.latLng!!
+            }
+        }.addOnFailureListener {
+            it.printStackTrace()
+        }
+    }
+
+    var text by mutableStateOf("")
+
+    fun getAddress(latLng: LatLng) {
+        currentLatLong = latLng
+        viewModelScope.launch {
+            val address = geoCoder.getFromLocation(latLng.latitude, latLng.longitude, 1)
+            text = address?.get(0)?.getAddressLine(0).toString()
         }
     }
 }
