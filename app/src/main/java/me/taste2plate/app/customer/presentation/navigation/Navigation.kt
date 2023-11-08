@@ -1,17 +1,22 @@
 package me.taste2plate.app.customer.presentation.navigation
 
+import android.location.Location
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.ViewModel
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import androidx.navigation.navigation
+import com.google.gson.Gson
 import me.taste2plate.app.customer.presentation.screens.address.AddEditAddressScreen
 import me.taste2plate.app.customer.presentation.screens.address.AddressListScreen
+import me.taste2plate.app.customer.presentation.screens.address.AddressViewModel
 import me.taste2plate.app.customer.presentation.screens.auth.AuthViewModel
 import me.taste2plate.app.customer.presentation.screens.auth.onboarding.OnBoardingScreen
 import me.taste2plate.app.customer.presentation.screens.auth.otp.OTPScreen
@@ -128,6 +133,14 @@ fun Navigation() {
                         popUpTo(0)
                     }
                 },
+                onNavigateBackToAddEditAddressScreen = { location ->
+                    val args = Gson().toJson(location, Location::class.java)
+                    navController.navigate(Screens.AddEditAddressScreen.withArgs(args)) {
+                        popUpTo(Screens.AddressListScreen.route) {
+                            inclusive = true
+                        }
+                    }
+                }
             )
         }
 
@@ -326,20 +339,41 @@ fun Navigation() {
             EditProfileScreen()
         }
 
-        // ----------------------------> Address List <--------------------------------------
-        composable(route = Screens.AddressListScreen.route) {
-            AddressListScreen(
-                onNavigateToEditAddEditScreen = {
-                    navController.navigate(Screens.AddEditAddressScreen.route)
+
+
+        navigation(startDestination = Screens.CartScreen.route, route = "address") {
+            // ----------------------------> Address List <--------------------------------------
+            composable(route = Screens.AddressListScreen.route) { entry ->
+                val viewModel =
+                    entry.sharedViewModel<AddressViewModel>(navHostController = navController)
+                AddressListScreen(
+                    viewModel = viewModel,
+                    onNavigateToEditAddEditScreen = {
+                        navController.navigate(Screens.AddEditAddressScreen.route)
+                    }
+                )
+            }
+
+            // ----------------------------> Add Edit Address <--------------------------------------
+            composable(route = Screens.AddEditAddressScreen.route, arguments = listOf(
+                navArgument(name = "location") {
+                    type = NavType.StringType
+                    defaultValue = ""
+                    nullable = true
                 }
-            )
+            )) { entry ->
+                val location =
+                    Gson().fromJson(entry.arguments?.getString("location"), Location::class.java)
+                val viewModel =
+                    entry.sharedViewModel<AddressViewModel>(navHostController = navController)
+                AddEditAddressScreen(
+                    viewModel = viewModel,
+                    location = location,
+                )
+            }
+
         }
 
-        // ----------------------------> Add Edit Address <--------------------------------------
-        composable(route = Screens.AddEditAddressScreen.route) {
-            AddEditAddressScreen(
-            )
-        }
     }
 }
 

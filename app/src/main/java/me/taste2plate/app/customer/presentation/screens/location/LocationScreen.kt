@@ -4,6 +4,7 @@ import android.Manifest
 import android.content.Intent
 import android.content.res.Configuration
 import android.location.Geocoder
+import android.location.Location
 import android.net.Uri
 import android.os.Build
 import android.provider.Settings
@@ -81,6 +82,7 @@ source : https://blog.sanskar10100.dev/integrating-google-maps-places-api-and-re
 fun LocationScreen(
     onNavigateToNotificationScreen: () -> Unit,
     onNavigateToAddEditAddressScreen: () -> Unit,
+    onNavigateBackToAddEditAddressScreen: (location: Location) -> Unit,
     viewModel: LocationViewModel = hiltViewModel()
 ) {
 

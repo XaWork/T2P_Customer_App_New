@@ -71,7 +71,9 @@ fun CartScreen(
 
     AppScaffold(
         topBar = {
-            AppTopBar {}
+            AppTopBar {
+                onBackPress()
+            }
         },
     ) {
         if (state.isLoading)

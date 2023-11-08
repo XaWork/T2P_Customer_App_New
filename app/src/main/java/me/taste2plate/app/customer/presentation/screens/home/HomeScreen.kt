@@ -83,6 +83,10 @@ fun HomeScreen(
         }
     }
 
+    LaunchedEffect(key1 = Unit){
+
+    }
+
     val scrollState = rememberLazyListState()
 
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)

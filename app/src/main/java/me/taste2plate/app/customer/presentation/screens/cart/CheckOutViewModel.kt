@@ -7,6 +7,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
+import me.taste2plate.app.customer.T2PApp
 import me.taste2plate.app.customer.data.Resource
 import me.taste2plate.app.customer.data.Status
 import me.taste2plate.app.customer.domain.use_case.user.cart.CartUseCase
@@ -59,6 +60,8 @@ class CheckOutViewModel @Inject constructor(
                     is Resource.Loading -> state.copy(isLoading = isLoading)
                     is Resource.Success -> {
                         val data = result.data
+
+                        T2PApp.cartCount = if(data!!.result.isEmpty()) 0 else data.result.size
                         state.copy(
                             isLoading = false,
                             /*isError = data?.status == Status.error.name,

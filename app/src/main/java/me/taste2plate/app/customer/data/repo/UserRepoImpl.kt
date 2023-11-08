@@ -59,4 +59,68 @@ class UserRepoImpl @Inject constructor(
     override suspend fun allAddress(userId: String): AddressListModel {
         return api.allAddress(userId)
     }
+
+    override suspend fun deleteAddress(addressId: String): CommonResponse {
+        return api.deleteAddress(addressId)
+    }
+
+    override suspend fun addAddress(
+        userId: String,
+        name: String,
+        phone: String,
+        city: String,
+        state: String,
+        pincode: String,
+        postOffice: String,
+        addressLine: String,
+        secondary: String,
+        lat: Double,
+        lng: Double,
+        type: String
+    ): CommonResponse {
+        return api.addAddress(
+            userId,
+            name,
+            phone,
+            city,
+            state,
+            pincode,
+            postOffice,
+            addressLine,
+            secondary,
+            lat,
+            lng,
+            type
+        )
+    }
+
+    override suspend fun editAddress(
+        addressId: String,
+        name: String,
+        phone: String,
+        city: String,
+        state: String,
+        pincode: String,
+        postOffice: String,
+        addressLine: String,
+        secondary: String,
+        lat: Double,
+        lng: Double,
+        type: String
+    ): CommonResponse {
+       return api.editAddress(
+            addressId,
+            name,
+            phone,
+            city,
+            state,
+            pincode,
+            postOffice,
+            addressLine,
+            secondary,
+            lat,
+            lng,
+            type
+        )
+    }
 }

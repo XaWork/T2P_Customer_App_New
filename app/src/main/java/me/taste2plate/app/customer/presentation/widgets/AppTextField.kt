@@ -150,6 +150,7 @@ fun AppDropDown(
     onExpandedChange: (Boolean) -> Unit,
     selectedText: String,
     hint: String = "",
+    items: List<String> = emptyList(),
     onTextChanged: (String) -> Unit
 
 ) {
@@ -176,7 +177,7 @@ fun AppDropDown(
             expanded = expanded,
             onDismissRequest = { onExpandedChange(false) }
         ) {
-            countries.forEach { item ->
+            items.forEach { item ->
                 DropdownMenuItem(
                     text = { Text(text = item) },
                     onClick = {

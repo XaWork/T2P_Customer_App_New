@@ -1,29 +1,26 @@
 package me.taste2plate.app.customer.presentation.screens.address
 
 import android.content.res.Configuration
+import android.location.Location
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.selection.selectable
-import androidx.compose.foundation.selection.selectableGroup
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.RadioButton
-import androidx.compose.material3.Text
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import me.taste2plate.app.customer.presentation.screens.countries
+import me.taste2plate.app.customer.presentation.theme.ExtraHighPadding
 import me.taste2plate.app.customer.presentation.theme.LowSpacing
 import me.taste2plate.app.customer.presentation.theme.ScreenPadding
 import me.taste2plate.app.customer.presentation.theme.SpaceBetweenViewsAndSubViews
@@ -34,41 +31,69 @@ import me.taste2plate.app.customer.presentation.widgets.AppRadioButton
 import me.taste2plate.app.customer.presentation.widgets.AppScaffold
 import me.taste2plate.app.customer.presentation.widgets.AppTextField
 import me.taste2plate.app.customer.presentation.widgets.AppTopBar
-import me.taste2plate.app.customer.presentation.widgets.RadioButtonInfo
 import me.taste2plate.app.customer.presentation.widgets.SpaceBetweenRow
 import me.taste2plate.app.customer.presentation.widgets.VerticalSpace
 
 @Composable
-fun AddEditAddressScreen() {
+fun AddEditAddressScreen(
+    viewModel: AddressViewModel,
+    location: Location? = null,
+    onNavigateToLocationScreen: () -> Unit
+) {
+    val state = viewModel.state
+
+    LaunchedEffect(key1 = Unit) {
+        viewModel.location = location
+    }
+
+
+    LaunchedEffect(state.stateList.isEmpty()) {
+        viewModel.onEvent(AddressEvents.SetData)
+    }
+
+
     AppScaffold(
         topBar = {
-            AppTopBar {}
+            AppTopBar(
+                title = if (viewModel.addressIndex != -1) "Edit Address" else "Add Address"
+            ) {}
         }
     ) {
-        ContentAddEditAddressScreen()
+        ContentAddEditAddressScreen(viewModel) { onNavigateToLocationScreen() }
     }
 }
 
 @Composable
-fun ContentAddEditAddressScreen() {
-    var fullName by remember {
-        mutableStateOf("")
-    }
-
-    var expanded by remember { mutableStateOf(false) }
+fun ContentAddEditAddressScreen(
+    viewModel: AddressViewModel,
+    onNavigateToLocationScreen: () -> Unit
+) {
+    val state = viewModel.state
+    var countryExpanded by remember { mutableStateOf(false) }
+    var stateExpanded by remember { mutableStateOf(false) }
+    var cityExpanded by remember { mutableStateOf(false) }
     var pinCodeExpanded by remember { mutableStateOf(false) }
+
     var selectedText by remember { mutableStateOf(countries[0]) }
     var pinCode by remember { mutableStateOf(countries[0]) }
 
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .padding(ScreenPadding)
+            .padding(
+                top = ScreenPadding,
+                start = ScreenPadding,
+                end = ScreenPadding
+            )
     ) {
-        Column {
+        Column(
+            modifier = Modifier
+                .verticalScroll(rememberScrollState())
+                .padding(bottom = ExtraHighPadding + ExtraHighPadding)
+        ) {
             AppTextField(
-                value = fullName, onValueChanged = {
-                    fullName = it
+                value = viewModel.fullName.value, onValueChanged = {
+                    viewModel.fullName.value = it
                 },
                 hint = "Full name"
             )
@@ -77,17 +102,18 @@ fun ContentAddEditAddressScreen() {
 
 
             AppTextField(
-                value = fullName, onValueChanged = {
-                    fullName = it
+                value = viewModel.phone.value, onValueChanged = {
+                    if (it.length <= 10) viewModel.phone.value = it
                 },
-                hint = "Phone"
+                hint = "Phone",
+                keyboardType = KeyboardType.Phone
             )
 
             VerticalSpace(space = SpaceBetweenViewsAndSubViews)
 
             AppTextField(
-                value = fullName, onValueChanged = {
-                    fullName = it
+                value = viewModel.address1.value, onValueChanged = {
+                    viewModel.address1.value = it
                 },
                 hint = "House No./Building Name"
             )
@@ -95,8 +121,8 @@ fun ContentAddEditAddressScreen() {
             VerticalSpace(space = SpaceBetweenViewsAndSubViews)
 
             AppTextField(
-                value = fullName, onValueChanged = {
-                    fullName = it
+                value = viewModel.address2A.value, onValueChanged = {
+                    viewModel.address2A.value = it
                 },
                 hint = "Road no/Area/Colony"
             )
@@ -104,10 +130,11 @@ fun ContentAddEditAddressScreen() {
             VerticalSpace(space = SpaceBetweenViewsAndSubViews)
 
             AppDropDown(
-                expanded,
+                countryExpanded,
                 hint = "Country",
+                items = countries,
                 onExpandedChange = {
-                    expanded = !expanded
+                    countryExpanded = !countryExpanded
                 },
                 selectedText = selectedText,
                 onTextChanged = {
@@ -118,28 +145,32 @@ fun ContentAddEditAddressScreen() {
             VerticalSpace(space = SpaceBetweenViewsAndSubViews)
 
             AppDropDown(
-                expanded,
+                stateExpanded,
                 hint = "State",
+                items = state.stateList.map { it.name },
                 onExpandedChange = {
-                    expanded = !expanded
+                    stateExpanded = !stateExpanded
                 },
-                selectedText = selectedText,
+                selectedText = viewModel.stateA.value,
                 onTextChanged = {
-                    selectedText = it
+                    viewModel.stateA.value = it
+                    viewModel.onEvent(AddressEvents.GetCityList)
                 }
             )
 
             VerticalSpace(space = SpaceBetweenViewsAndSubViews)
 
             AppDropDown(
-                expanded,
+                cityExpanded,
                 hint = "City",
+                items = state.cityList.map { it.name },
                 onExpandedChange = {
-                    expanded = !expanded
+                    cityExpanded = !cityExpanded
                 },
-                selectedText = selectedText,
+                selectedText = viewModel.cityA.value,
                 onTextChanged = {
-                    selectedText = it
+                    viewModel.cityA.value = it
+                    viewModel.onEvent(AddressEvents.GetZipList)
                 }
             )
 
@@ -148,17 +179,18 @@ fun ContentAddEditAddressScreen() {
             SpaceBetweenRow(item1 = {
                 AppDropDown(
                     pinCodeExpanded,
+                    items = state.zipList.map { it.name },
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(end = LowSpacing)
                         .weight(1f),
                     onExpandedChange = {
-                        pinCodeExpanded = it
+                        pinCodeExpanded = !pinCodeExpanded
                     },
                     hint = "PinCode",
-                    selectedText = pinCode,
+                    selectedText = viewModel.pincodeA.value,
                     onTextChanged = {
-                        pinCode = it
+                        viewModel.pincodeA.value = it
                     }
                 )
             }) {
@@ -166,8 +198,8 @@ fun ContentAddEditAddressScreen() {
                     modifier = Modifier
                         .padding(start = LowSpacing)
                         .weight(1f),
-                    value = fullName, onValueChanged = {
-                        fullName = it
+                    value = viewModel.landmarkA.value, onValueChanged = {
+                        viewModel.landmarkA.value = it
                     },
                     hint = "Landmark(Optional)"
                 )
@@ -175,33 +207,36 @@ fun ContentAddEditAddressScreen() {
 
             VerticalSpace(space = SpaceBetweenViewsAndSubViews)
 
-            val radioOptions = listOf(
-                RadioButtonInfo(
-                    id = 1,
-                    text = "Home"
-                ),
-                RadioButtonInfo(
-                    id = 1,
-                    text = "Work"
-                ),
-                RadioButtonInfo(
-                    id = 1,
-                    text = "Other"
-                )
-            )
-
-            val (selectedOption, onOptionSelected) = remember { mutableStateOf(radioOptions[0]) }
             AppRadioButton(
-                radioOptions,
-                selectedOption.text,
-                onOptionSelected
+                viewModel.addressTypes,
+                viewModel.addressType.value.text,
+                onOptionSelected = {
+                    viewModel.addressType.value = it
+                }
+            )
+        }
+
+        val buttonText by remember {
+            mutableStateOf(
+                if (viewModel.location == null) "Select Location" else {
+                    if (viewModel.addressIndex != -1) "Edit" else "Add"
+                }
             )
         }
 
         AppButton(
-            text = "Add",
+            text = buttonText,
             modifier = Modifier.align(Alignment.BottomCenter)
-        ) {}
+        ) {
+            when (buttonText) {
+                "Select Location" -> {
+                    onNavigateToLocationScreen()
+                }
+
+                "Edit" -> {}
+                "Add" -> {}
+            }
+        }
     }
 }
 
@@ -211,6 +246,6 @@ fun ContentAddEditAddressScreen() {
 @Composable
 fun AddEditAddressScreenPreview() {
     T2PCustomerAppTheme {
-        AddEditAddressScreen()
+        //  AddEditAddressScreen()
     }
 }

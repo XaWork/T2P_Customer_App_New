@@ -55,4 +55,38 @@ interface UserRepo {
     suspend fun allAddress(
         userId: String,
     ): AddressListModel
+
+    suspend fun deleteAddress(
+        addressId: String,
+    ): CommonResponse
+
+    suspend fun addAddress(
+        userId: String,
+        name: String,
+        phone: String,
+        city: String,
+        state: String,
+        pincode: String,
+        postOffice: String,
+        addressLine: String,
+        secondary: String,
+        lat: Double,
+        lng: Double,
+        type: String
+    ): CommonResponse
+
+    suspend fun editAddress(
+        addressId: String,
+        name: String,
+        phone: String,
+        city: String,
+        state: String,
+        pincode: String,
+        postOffice: String,
+        addressLine: String,
+        secondary: String,
+        lat: Double,
+        lng: Double,
+        type: String
+    ): CommonResponse
 }

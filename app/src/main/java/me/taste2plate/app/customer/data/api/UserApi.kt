@@ -81,8 +81,45 @@ interface UserApi {
         @Query("id") productId: String
     ): CommonResponse
 
-    //-------------------------- Address ----------------------
 
+    //-------------------------- Address ----------------------
     @GET("all-address")
     suspend fun allAddress(@Query("id") userId: String): AddressListModel
+
+    @GET("delete-address")
+    suspend fun deleteAddress(@Query("id") id: String): CommonResponse
+
+    @FormUrlEncoded
+    @POST("add-address")
+    suspend fun addAddress(
+        @Field("userid") userId: String,
+        @Field("contact_name") name: String,
+        @Field("contact_mobile") phone: String,
+        @Field("city") city: String,
+        @Field("state") state: String,
+        @Field("pincode") pincode: String,
+        @Field("landmark") postOffice: String,
+        @Field("address") addressLine: String,
+        @Field("address2") secondary: String,
+        @Field("lat") lat: Double,
+        @Field("lng") lng: Double,
+        @Field("title") type: String
+    ): CommonResponse
+
+    @FormUrlEncoded
+    @POST("edit-address")
+    suspend fun editAddress(
+        @Field("id") addressId: String,
+        @Field("contact_name") name: String,
+        @Field("contact_mobile") phone: String,
+        @Field("city") city: String,
+        @Field("state") state: String,
+        @Field("pincode") pincode: String,
+        @Field("landmark") postOffice: String,
+        @Field("address") addressLine: String,
+        @Field("address2") secondary: String,
+        @Field("lat") lat: Double,
+        @Field("lng") lng: Double,
+        @Field("title") type: String
+    ): CommonResponse
 }
