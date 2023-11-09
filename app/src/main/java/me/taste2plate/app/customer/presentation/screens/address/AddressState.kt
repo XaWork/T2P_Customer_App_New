@@ -15,5 +15,7 @@ data class AddressState(
     val stateList: List<StateListModel.Result> = emptyList(),
     val cityList: List<CityListModel.Result> = emptyList(),
     val zipList: List<ZipListModel.Result> = emptyList(),
-    val deleteAddressResponse: CommonResponse? = null
+    val deleteAddressResponse: CommonResponse? = null,
+    val addAddressResponse: CommonResponse? = null,
+    val editAddressResponse: CommonResponse? = null
 )

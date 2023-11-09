@@ -1,20 +1,24 @@
 package me.taste2plate.app.customer.presentation.screens.address
 
-import android.location.Location
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.google.android.gms.maps.model.LatLng
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import me.taste2plate.app.customer.data.Resource
 import me.taste2plate.app.customer.data.Status
+import me.taste2plate.app.customer.domain.model.CityListModel
+import me.taste2plate.app.customer.domain.model.StateListModel
 import me.taste2plate.app.customer.domain.use_case.CityListUseCase
 import me.taste2plate.app.customer.domain.use_case.StateListUseCase
 import me.taste2plate.app.customer.domain.use_case.ZipListUseCase
+import me.taste2plate.app.customer.domain.use_case.user.address.AddAddressUseCase
 import me.taste2plate.app.customer.domain.use_case.user.address.AllAddressUseCase
 import me.taste2plate.app.customer.domain.use_case.user.address.DeleteAddressUseCase
+import me.taste2plate.app.customer.domain.use_case.user.address.EditAddressUseCase
 import me.taste2plate.app.customer.presentation.widgets.RadioButtonInfo
 import javax.inject.Inject
 
@@ -24,18 +28,20 @@ class AddressViewModel @Inject constructor(
     private val deleteAddressUseCase: DeleteAddressUseCase,
     private val stateListUseCase: StateListUseCase,
     private val cityListUseCase: CityListUseCase,
-    private val zipListUseCase: ZipListUseCase
+    private val zipListUseCase: ZipListUseCase,
+    private val addAddressUseCase: AddAddressUseCase,
+    private val editAddressUseCase: EditAddressUseCase
 ) : ViewModel() {
 
     var state by mutableStateOf(AddressState())
     var addressIndex: Int = -1
-    var location: Location? by mutableStateOf(null)
+    var latLng: LatLng? by mutableStateOf(null)
 
     var fullName = mutableStateOf("")
     var phone = mutableStateOf("")
     var address1 = mutableStateOf("")
     var address2A = mutableStateOf("")
-    var country = mutableStateOf("India")
+    private var country = mutableStateOf("India")
     var stateA = mutableStateOf("")
     var cityA = mutableStateOf("")
     var pincodeA = mutableStateOf("")
@@ -72,6 +78,20 @@ class AddressViewModel @Inject constructor(
 
             is AddressEvents.GetCityList -> {
                 getCityList()
+            }
+
+            is AddressEvents.AddAddress -> {
+                if (validateFrom())
+                    addAddress()
+                else
+                    state = state.copy(isError = true, message = "Fill all mandatory fields.")
+            }
+
+            is AddressEvents.EditAddress -> {
+                if (validateFrom())
+                    editAddress()
+                else
+                    state = state.copy(isError = true, message = "Fill all mandatory fields.")
             }
 
             is AddressEvents.GetZipList -> {
@@ -127,9 +147,9 @@ class AddressViewModel @Inject constructor(
                         val data = result.data
                         val isError = data?.status == Status.error.name
 
-                        if (!isError) {
-                            stateA.value = data!!.result[0].name
-                        }
+                        /* if (!isError) {
+                             stateA.value = data!!.result[0].name
+                         }*/
 
                         state.copy(
                             isLoading = false,
@@ -150,13 +170,24 @@ class AddressViewModel @Inject constructor(
         }
     }
 
+    private fun getItemId(
+        city: Boolean = false,
+        cityList: List<CityListModel.Result>? = null,
+        stateList: List<StateListModel.Result>? = null,
+    ): String {
+        return if (state.cityList.isEmpty()) state.addressList[addressIndex].city.id
+        else if (city) cityList!!.find { it.name == cityA.value }!!.id
+        else stateList!!.find { it.name == stateA.value }!!.id
+
+    }
+
     private fun getCityList(
     ) {
         //change value
         cityA.value = ""
         pincodeA.value = ""
 
-        val stateId = state.stateList.find { it.name == stateA.value }!!.id
+        val stateId = getItemId(stateList = state.stateList)
 
         viewModelScope.launch {
             cityListUseCase.execute(stateId).collect { result ->
@@ -187,7 +218,10 @@ class AddressViewModel @Inject constructor(
     private fun getZipList() {
         pincodeA.value = ""
 
-        val cityId = state.cityList.find { it.name == cityA.value }!!.id
+        val cityId = getItemId(
+            city = true,
+            cityList = state.cityList
+        )
 
         viewModelScope.launch {
             zipListUseCase.execute(cityId).collect { result ->
@@ -245,8 +279,18 @@ class AddressViewModel @Inject constructor(
         }
     }
 
-    private fun deleteAddress(
-    ) {
+    private fun validateFrom(): Boolean {
+        return fullName.value.isNotEmpty() &&
+                phone.value.isNotEmpty() &&
+                address1.value.isNotEmpty() &&
+                address2A.value.isNotEmpty() &&
+                country.value.isNotEmpty() &&
+                stateA.value.isNotEmpty() &&
+                cityA.value.isNotEmpty() &&
+                pincodeA.value.isNotEmpty()
+    }
+
+    private fun deleteAddress() {
         val addressId = state.addressList[addressIndex].id
         addressIndex = -1
         viewModelScope.launch {
@@ -265,6 +309,89 @@ class AddressViewModel @Inject constructor(
                             isError = isError,
                             message = data?.message,
                             deleteAddressResponse = data
+                        )
+                    }
+
+                    is Resource.Error ->
+                        state.copy(
+                            isLoading = false,
+                            isError = true,
+                            message = result.message
+                        )
+                }
+
+            }
+        }
+    }
+
+    private fun addAddress() {
+        viewModelScope.launch {
+            addAddressUseCase.execute(
+                name = fullName.value,
+                phone = phone.value,
+                city = getItemId(city = true, cityList = state.cityList),
+                state = getItemId(stateList = state.stateList),
+                pincode = pincodeA.value,
+                addressLine = address1.value,
+                postOffice = landmarkA.value,
+                secondary = address2A.value,
+                lat = latLng!!.latitude,
+                lng = latLng!!.longitude,
+                type = addressType.value.text
+            ).collect { result ->
+                state = when (result) {
+                    is Resource.Loading -> state.copy(isLoading = true)
+                    is Resource.Success -> {
+                        val data = result.data
+                        val isError = data?.status == Status.error.name
+
+                        state.copy(
+                            isLoading = false,
+                            isError = isError,
+                            message = data?.message,
+                            addAddressResponse = data
+                        )
+                    }
+
+                    is Resource.Error ->
+                        state.copy(
+                            isLoading = false,
+                            isError = true,
+                            message = result.message
+                        )
+                }
+
+            }
+        }
+    }
+
+    private fun editAddress() {
+        viewModelScope.launch {
+            editAddressUseCase.execute(
+                addressId = state.addressList[addressIndex].id,
+                name = fullName.value,
+                phone = phone.value,
+                city = getItemId(city = true, cityList = state.cityList),
+                state = getItemId(stateList = state.stateList),
+                pincode = pincodeA.value,
+                addressLine = address1.value,
+                postOffice = landmarkA.value,
+                secondary = address2A.value,
+                lat = latLng!!.latitude,
+                lng = latLng!!.longitude,
+                type = addressType.value.text
+            ).collect { result ->
+                state = when (result) {
+                    is Resource.Loading -> state.copy(isLoading = true)
+                    is Resource.Success -> {
+                        val data = result.data
+                        val isError = data?.status == Status.error.name
+
+                        state.copy(
+                            isLoading = false,
+                            isError = isError,
+                            message = data?.message,
+                            editAddressResponse = data
                         )
                     }
 

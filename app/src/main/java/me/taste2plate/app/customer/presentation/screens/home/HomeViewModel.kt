@@ -1,5 +1,6 @@
 package me.taste2plate.app.customer.presentation.screens.home
 
+import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -131,22 +132,24 @@ class HomeViewModel @Inject constructor(
                     }
 
                     is Resource.Success -> {
-                        state = if (result.data?.status == Status.success.name) {
-                            if (hasDefaultAddress())
-                                getCart()
-                            else
-                                getAddress()
+                        val isError = result.data?.status == Status.error.name
+                        val data = result.data
 
-                            T2PApp.wishlistCount = result.data.result.size
-                            state.copy(
-                                wishListData = result.data
-                            )
-                        } else
-                            state.copy(
-                                isLoading = false,
-                                isError = true,
-                                errorMessage = "Something Went wrong"
-                            )
+                        state = state.copy(
+                            wishListData = data,
+                            isError = isError,
+                            errorMessage = null,
+                        )
+
+                        if (!isError)
+                            T2PApp.wishlistCount = data?.result?.size ?: 0
+
+
+                        if (hasDefaultAddress())
+                            getCart()
+                        else
+                            getAddress()
+
                     }
 
                     is Resource.Error -> {
@@ -217,7 +220,7 @@ class HomeViewModel @Inject constructor(
                             )
 
                         if (!isError) {
-                            if (state.defaultAddress != null && result.data != null && result.data.result.isNotEmpty()) {
+                            if (state.defaultAddress == null && result.data != null && result.data.result.isNotEmpty()) {
                                 setDefaultAddress(result.data.result[0])
                             }
                             if (state.cartData == null)

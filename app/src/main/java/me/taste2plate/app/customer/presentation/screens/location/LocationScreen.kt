@@ -8,6 +8,7 @@ import android.location.Location
 import android.net.Uri
 import android.os.Build
 import android.provider.Settings
+import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -80,11 +81,14 @@ source : https://blog.sanskar10100.dev/integrating-google-maps-places-api-and-re
 
 @Composable
 fun LocationScreen(
+    screen: String? = null,
     onNavigateToNotificationScreen: () -> Unit,
     onNavigateToAddEditAddressScreen: () -> Unit,
-    onNavigateBackToAddEditAddressScreen: (location: Location) -> Unit,
+    onNavigateBackToAddEditAddressScreen: (latLng: LatLng) -> Unit,
     viewModel: LocationViewModel = hiltViewModel()
 ) {
+
+    Log.e("LocationScreen", "Screen is $screen")
 
     var permissionGranted by remember {
         mutableStateOf(false)
@@ -101,9 +105,15 @@ fun LocationScreen(
 
     if (permissionGranted)
         LocationScreenContent(
-            onNavigateToAddEditAddressScreen = { onNavigateToAddEditAddressScreen() },
+            screen = screen,
+            onNavigateToAddEditAddressScreen = {
+                onNavigateToAddEditAddressScreen()
+            },
             onNavigateToNotificationScreen = {
-                onNavigateToNotificationScreen()
+                if (screen == null)
+                    onNavigateToNotificationScreen()
+                else
+                    onNavigateBackToAddEditAddressScreen(viewModel.currentLatLong)
             },
             viewModel = viewModel
         )
@@ -119,6 +129,7 @@ fun LocationScreen(
 
 @Composable
 fun LocationScreenContent(
+    screen: String? = null,
     onNavigateToAddEditAddressScreen: () -> Unit,
     onNavigateToNotificationScreen: () -> Unit,
     viewModel: LocationViewModel
@@ -152,6 +163,7 @@ fun LocationScreenContent(
         },
         bottomBar = {
             MapBottomSheet(
+                screen = screen,
                 onNavigateToAddEditAddressScreen = {
                     onNavigateToAddEditAddressScreen()
                 },
@@ -256,6 +268,7 @@ fun MapAppBar(
 @Composable
 fun MapBottomSheet(
     modifier: Modifier = Modifier,
+    screen: String? = null,
     onNavigateToAddEditAddressScreen: () -> Unit,
     onNavigateToNotificationScreen: () -> Unit,
 ) {
@@ -272,14 +285,15 @@ fun MapBottomSheet(
                 onNavigateToNotificationScreen()
             }
 
-            TextButton(
-                modifier = Modifier.fillMaxWidth(),
-                onClick = { onNavigateToAddEditAddressScreen() }) {
-                Text(
-                    text = "Enter Location Manually",
-                    textAlign = TextAlign.Center,
-                )
-            }
+            if (screen == null)
+                TextButton(
+                    modifier = Modifier.fillMaxWidth(),
+                    onClick = { onNavigateToAddEditAddressScreen() }) {
+                    Text(
+                        text = "Enter Location Manually",
+                        textAlign = TextAlign.Center,
+                    )
+                }
         }
     }
 }

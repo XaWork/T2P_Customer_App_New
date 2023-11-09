@@ -1,6 +1,7 @@
 package me.taste2plate.app.customer.presentation.navigation
 
 import android.location.Location
+import android.util.Log
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -13,6 +14,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import androidx.navigation.navigation
+import com.google.android.gms.maps.model.LatLng
 import com.google.gson.Gson
 import me.taste2plate.app.customer.presentation.screens.address.AddEditAddressScreen
 import me.taste2plate.app.customer.presentation.screens.address.AddressListScreen
@@ -123,8 +125,16 @@ fun Navigation() {
 
 
         // ----------------------------> Location <--------------------------------------
-        composable(route = Screens.LocationScreen.route) {
+        composable(route = Screens.LocationScreen.route + "?screen={screen}", arguments = listOf(
+            navArgument(name = "screen") {
+                type = NavType.StringType
+                defaultValue = ""
+                nullable = true
+            }
+        )) { entry ->
+            val screen = entry.arguments?.getString("screen")
             LocationScreen(
+                screen = screen,
                 onNavigateToAddEditAddressScreen = {
                     navController.navigate(Screens.AddEditAddressScreen.route)
                 },
@@ -133,9 +143,10 @@ fun Navigation() {
                         popUpTo(0)
                     }
                 },
-                onNavigateBackToAddEditAddressScreen = { location ->
-                    val args = Gson().toJson(location, Location::class.java)
-                    navController.navigate(Screens.AddEditAddressScreen.withArgs(args)) {
+                onNavigateBackToAddEditAddressScreen = { latLng ->
+                    val args = Gson().toJson(latLng, LatLng::class.java)
+                    Log.e("AddEditScreen", "Lat long is from location $latLng")
+                    navController.navigate(Screens.AddEditAddressScreen.route + "?latLng=$args") {
                         popUpTo(Screens.AddressListScreen.route) {
                             inclusive = true
                         }
@@ -355,20 +366,34 @@ fun Navigation() {
             }
 
             // ----------------------------> Add Edit Address <--------------------------------------
-            composable(route = Screens.AddEditAddressScreen.route, arguments = listOf(
-                navArgument(name = "location") {
-                    type = NavType.StringType
-                    defaultValue = ""
-                    nullable = true
-                }
-            )) { entry ->
-                val location =
-                    Gson().fromJson(entry.arguments?.getString("location"), Location::class.java)
+            composable(route = Screens.AddEditAddressScreen.route + "?latLng={latLng}",
+                arguments = listOf(
+                    navArgument(name = "latLng") {
+                        type = NavType.StringType
+                        defaultValue = ""
+                        nullable = true
+                    }
+                )) { entry ->
+                val latLng =
+                    Gson().fromJson(entry.arguments?.getString("latLng"), LatLng::class.java)
+
+                Log.e("AddEditScreen", "Lat long is in add edit$latLng")
+
                 val viewModel =
                     entry.sharedViewModel<AddressViewModel>(navHostController = navController)
                 AddEditAddressScreen(
                     viewModel = viewModel,
-                    location = location,
+                    latLng = latLng,
+                    onNavigateToLocationScreen = { args ->
+                        navController.navigate(Screens.LocationScreen.route + "?screen=$args") {
+                            popUpTo(Screens.LocationScreen.route)
+                        }
+                    },
+                    onNavigateToHomeScreen = {
+                        navController.navigate(Screens.HomeScreen.route){
+                            popUpTo(0)
+                        }
+                    }
                 )
             }
 
