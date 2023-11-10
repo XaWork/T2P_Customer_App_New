@@ -5,8 +5,10 @@ import dagger.Module
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import me.taste2plate.app.customer.data.repo.CustomRepoImpl
+import me.taste2plate.app.customer.data.repo.ProductRepoImpl
 import me.taste2plate.app.customer.data.repo.UserRepoImpl
 import me.taste2plate.app.customer.domain.repo.CustomRepo
+import me.taste2plate.app.customer.domain.repo.ProductRepo
 import me.taste2plate.app.customer.domain.repo.UserRepo
 import javax.inject.Singleton
 
@@ -25,4 +27,10 @@ abstract class RepositoryModule {
     abstract fun bindUserRepo(
         appReposImpl: UserRepoImpl
     ): UserRepo
+
+    @Binds
+    @Singleton
+    abstract fun bindProductRepo(
+        appReposImpl: ProductRepoImpl
+    ): ProductRepo
 }

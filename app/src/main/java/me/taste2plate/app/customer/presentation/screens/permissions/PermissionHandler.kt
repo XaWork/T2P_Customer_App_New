@@ -1,4 +1,4 @@
-package me.taste2plate.app.customer.presentation.utils
+package me.taste2plate.app.customer.presentation.screens.permissions
 
 import android.Manifest
 import androidx.compose.runtime.Composable

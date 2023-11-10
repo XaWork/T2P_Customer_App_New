@@ -4,21 +4,24 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import me.taste2plate.app.customer.data.ApiErrorMessages
 import me.taste2plate.app.customer.data.Resource
-import me.taste2plate.app.customer.domain.model.CityBrandModel
+import me.taste2plate.app.customer.data.UserPref
+import me.taste2plate.app.customer.domain.model.HomeModel
+import me.taste2plate.app.customer.domain.model.SettingsModel
 import me.taste2plate.app.customer.domain.repo.CustomRepo
 import retrofit2.HttpException
 import java.io.IOException
 import javax.inject.Inject
 
-class CityListUseCase @Inject constructor(
-    private val customRepo: CustomRepo
+class CuisineUseCase @Inject constructor(
+    private val customRepo: CustomRepo,
+    private val userPref: UserPref
 ) {
-    suspend fun execute(
-    ): Flow<Resource<CityBrandModel>> {
+    suspend fun execute(): Flow<Resource<HomeModel>> {
         return flow {
             emit(Resource.Loading(true))
             try {
-                val response = customRepo.cityList()
+                val cityId = userPref.getDefaultAddress()?.city?.id
+                val response = customRepo.getCuisine(cityId ?: "")
                 emit(Resource.Success(response))
             } catch (io: IOException) {
                 io.printStackTrace()

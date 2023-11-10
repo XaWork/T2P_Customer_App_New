@@ -13,9 +13,11 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -23,53 +25,89 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import me.taste2plate.app.customer.presentation.screens.productList
+import androidx.hilt.navigation.compose.hiltViewModel
+import me.taste2plate.app.customer.domain.mapper.CommonForItem
+import me.taste2plate.app.customer.domain.model.CityBrandModel
+import me.taste2plate.app.customer.presentation.screens.home.CityBrandScreens
 import me.taste2plate.app.customer.presentation.theme.HighPadding
 import me.taste2plate.app.customer.presentation.theme.HighRoundedCorners
 import me.taste2plate.app.customer.presentation.theme.LowElevation
 import me.taste2plate.app.customer.presentation.theme.LowPadding
-import me.taste2plate.app.customer.presentation.theme.MediumPadding
 import me.taste2plate.app.customer.presentation.theme.ScreenPadding
 import me.taste2plate.app.customer.presentation.theme.SpaceBetweenViews
-import me.taste2plate.app.customer.presentation.theme.SpaceBetweenViewsAndSubViews
 import me.taste2plate.app.customer.presentation.theme.T2PCustomerAppTheme
 import me.taste2plate.app.customer.presentation.theme.backgroundColor
 import me.taste2plate.app.customer.presentation.theme.cardContainerOnSecondaryColor
-import me.taste2plate.app.customer.presentation.theme.forestGreen
 import me.taste2plate.app.customer.presentation.theme.primaryColor
+import me.taste2plate.app.customer.presentation.widgets.AppEmptyView
 import me.taste2plate.app.customer.presentation.widgets.AppScaffold
 import me.taste2plate.app.customer.presentation.widgets.AppTopBar
 import me.taste2plate.app.customer.presentation.widgets.NetworkImage
 import me.taste2plate.app.customer.presentation.widgets.RoundedCornerCard
+import me.taste2plate.app.customer.presentation.widgets.ShowLoading
 import me.taste2plate.app.customer.presentation.widgets.SpaceBetweenRow
 
 @Composable
 fun CityBrandScreen(
-    onNavigateToProductListScreen: () -> Unit
+    screen: CityBrandScreens,
+    viewModel: CityBrandViewModel,
+    onNavigateToProductListScreen: (itemInfo: CommonForItem) -> Unit,
+    onNavigateToDetailsScreen: () -> Unit,
 ) {
+    val state = viewModel.state
+
+    LaunchedEffect(key1 = Unit) {
+        viewModel.onEvent(CityBrandEvents.GetData(screen))
+    }
+
+
     AppScaffold(
         topBar = {
-            AppTopBar {}
+            AppTopBar(
+                title = when (screen) {
+                    CityBrandScreens.City -> "City"
+                    CityBrandScreens.Brand -> "Brand"
+                    CityBrandScreens.Category -> "Explore"
+                    else -> "Flavours Of India"
+                }
+            ) {}
         }
     ) {
-        ContentCityBrandScreen(
-            onNavigateToProductListScreen = onNavigateToProductListScreen
-        )
+        if (state.isLoading)
+            ShowLoading(isButton = false)
+        else if (!state.isLoading && state.itemList.isEmpty())
+            AppEmptyView()
+        else
+            ContentCityBrandScreen(
+                state.itemList,
+                onNavigateToProductListScreen = {
+                    val itemInfo = it.copy(type = screen.name)
+                    onNavigateToProductListScreen(itemInfo)
+                },
+                onNavigateToDetailsScreen = {
+                    viewModel.onEvent(CityBrandEvents.SetSelectedItem(it))
+                    onNavigateToDetailsScreen()
+                }
+            )
     }
 }
 
 @Composable
 fun ContentCityBrandScreen(
-    onNavigateToProductListScreen: () -> Unit
+    items: List<CommonForItem>,
+    onNavigateToProductListScreen: (item: CommonForItem) -> Unit,
+    onNavigateToDetailsScreen: (item: CommonForItem) -> Unit,
 ) {
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
         contentPadding = PaddingValues(ScreenPadding),
         verticalArrangement = Arrangement.spacedBy(SpaceBetweenViews),
     ) {
-        items(10) {
+        items(items) { item ->
             SingleCityBrand(
-                onNavigateToProductListScreen = onNavigateToProductListScreen
+                item,
+                onNavigateToProductListScreen = { onNavigateToProductListScreen(item) },
+                onNavigateToDetailsScreen = { onNavigateToDetailsScreen(item) }
             )
         }
     }
@@ -77,7 +115,9 @@ fun ContentCityBrandScreen(
 
 @Composable
 fun SingleCityBrand(
-    onNavigateToProductListScreen: () -> Unit
+    item: CommonForItem,
+    onNavigateToProductListScreen: () -> Unit,
+    onNavigateToDetailsScreen: () -> Unit,
 ) {
     RoundedCornerCard(
         cardColor = cardContainerOnSecondaryColor.invoke(),
@@ -87,14 +127,14 @@ fun SingleCityBrand(
         Column {
             Box {
                 NetworkImage(
-                    image = productList[0].image, modifier = Modifier
+                    image = item.image, modifier = Modifier
                         .fillMaxWidth()
                         .height(150.dp),
                     contentScale = ContentScale.Crop
                 )
 
                 Text(
-                    text = "Name",
+                    text = item.name,
                     modifier = Modifier
                         .offset(y = (15).dp)
                         .clip(RoundedCornerShape(HighRoundedCorners))
@@ -112,11 +152,13 @@ fun SingleCityBrand(
             SpaceBetweenRow(
                 modifier = Modifier.padding(ScreenPadding),
                 item1 = {
-                    Text("View Products", color = primaryColor.invoke())
+                    Text("View Products", color = primaryColor.invoke(), modifier =
+                    Modifier.clickable { onNavigateToProductListScreen() })
                 }) {
                 Text(
                     "View Details", color = primaryColor.invoke(),
-                    textDecoration = TextDecoration.Underline
+                    textDecoration = TextDecoration.Underline, modifier =
+                    Modifier.clickable { onNavigateToDetailsScreen() }
                 )
             }
         }
@@ -129,6 +171,6 @@ fun SingleCityBrand(
 @Composable
 fun CityBrandScreenPreview() {
     T2PCustomerAppTheme {
-        CityBrandScreen({})
+        // CityBrandScreen({})
     }
 }

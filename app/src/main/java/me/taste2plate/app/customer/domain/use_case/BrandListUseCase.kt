@@ -10,7 +10,7 @@ import retrofit2.HttpException
 import java.io.IOException
 import javax.inject.Inject
 
-class CityListUseCase @Inject constructor(
+class BrandListUseCase @Inject constructor(
     private val customRepo: CustomRepo
 ) {
     suspend fun execute(
@@ -18,7 +18,7 @@ class CityListUseCase @Inject constructor(
         return flow {
             emit(Resource.Loading(true))
             try {
-                val response = customRepo.cityList()
+                val response = customRepo.brandList()
                 emit(Resource.Success(response))
             } catch (io: IOException) {
                 io.printStackTrace()

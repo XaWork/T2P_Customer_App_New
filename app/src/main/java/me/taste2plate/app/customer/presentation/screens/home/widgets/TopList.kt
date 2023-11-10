@@ -6,7 +6,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.lazy.grid.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -15,6 +15,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import me.taste2plate.app.customer.presentation.screens.ImageItemList
+import me.taste2plate.app.customer.presentation.screens.home.CityBrandScreens
 import me.taste2plate.app.customer.presentation.theme.ScreenPadding
 import me.taste2plate.app.customer.presentation.theme.T2PCustomerAppTheme
 import me.taste2plate.app.customer.presentation.widgets.DrawableImage
@@ -22,7 +23,7 @@ import me.taste2plate.app.customer.presentation.widgets.NetworkImage
 
 @Composable
 fun TopList(
-    onNavigateToCityBrandScreen: () -> Unit
+    onNavigateToCityBrandScreen: (name: CityBrandScreens) -> Unit
 ) {
     LazyVerticalGrid(
         modifier = Modifier
@@ -31,9 +32,17 @@ fun TopList(
         columns = GridCells.Fixed(4),
         horizontalArrangement = Arrangement.spacedBy(10.dp),
         content = {
-            items(ImageItemList) { item ->
+            itemsIndexed(ImageItemList) { index, item ->
                 SingleTopList(drawableImage = item, modifier = Modifier.clickable {
-                    onNavigateToCityBrandScreen()
+                    onNavigateToCityBrandScreen(
+                        when (index) {
+                            0 -> CityBrandScreens.City
+                            1 -> CityBrandScreens.Brand
+                            2 -> CityBrandScreens.Category
+                            3 -> CityBrandScreens.Flavours_Of_India
+                            else -> CityBrandScreens.City
+                        }
+                    )
                 })
             }
         })
@@ -67,6 +76,6 @@ fun SingleTopList(
 @Composable
 fun TopListPreview() {
     T2PCustomerAppTheme {
-        TopList({})
+        //TopList({})
     }
 }

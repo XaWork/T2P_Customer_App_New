@@ -6,6 +6,8 @@ import kotlinx.coroutines.flow.flow
 import me.taste2plate.app.customer.data.ApiErrorMessages
 import me.taste2plate.app.customer.data.api.CustomApi
 import me.taste2plate.app.customer.data.Resource
+import me.taste2plate.app.customer.domain.model.CategoryModel
+import me.taste2plate.app.customer.domain.model.CityBrandModel
 import me.taste2plate.app.customer.domain.model.CityListModel
 import me.taste2plate.app.customer.domain.model.HomeModel
 import me.taste2plate.app.customer.domain.model.SettingsModel
@@ -29,15 +31,31 @@ class CustomRepoImpl @Inject constructor(
         return api.home(taste)
     }
 
+    override suspend fun getCuisine(city: String): HomeModel {
+        return api.getCuisine(city)
+    }
+
     override suspend fun stateList(): StateListModel {
         return api.getStateList()
     }
 
-    override suspend fun cityList(stateId: String): CityListModel {
+    override suspend fun cityListByState(stateId: String): CityListModel {
         return api.fetchCityByState(stateId)
     }
 
     override suspend fun zipList(cityId: String): ZipListModel {
         return api.fetchZipList(cityId)
+    }
+
+    override suspend fun cityList(): CityBrandModel {
+        return api.cityList()
+    }
+
+    override suspend fun brandList(): CityBrandModel {
+        return api.brandList()
+    }
+
+    override suspend fun allCategories(): CategoryModel {
+        return api.allCategories()
     }
 }

@@ -12,7 +12,7 @@ import me.taste2plate.app.customer.data.Resource
 import me.taste2plate.app.customer.data.Status
 import me.taste2plate.app.customer.domain.model.CityListModel
 import me.taste2plate.app.customer.domain.model.StateListModel
-import me.taste2plate.app.customer.domain.use_case.CityListUseCase
+import me.taste2plate.app.customer.domain.use_case.CityListByStateUseCase
 import me.taste2plate.app.customer.domain.use_case.StateListUseCase
 import me.taste2plate.app.customer.domain.use_case.ZipListUseCase
 import me.taste2plate.app.customer.domain.use_case.user.address.AddAddressUseCase
@@ -27,7 +27,7 @@ class AddressViewModel @Inject constructor(
     private val addressUseCase: AllAddressUseCase,
     private val deleteAddressUseCase: DeleteAddressUseCase,
     private val stateListUseCase: StateListUseCase,
-    private val cityListUseCase: CityListUseCase,
+    private val cityListUseCase: CityListByStateUseCase,
     private val zipListUseCase: ZipListUseCase,
     private val addAddressUseCase: AddAddressUseCase,
     private val editAddressUseCase: EditAddressUseCase
@@ -175,7 +175,7 @@ class AddressViewModel @Inject constructor(
         cityList: List<CityListModel.Result>? = null,
         stateList: List<StateListModel.Result>? = null,
     ): String {
-        return if (state.cityList.isEmpty()) state.addressList[addressIndex].city.id
+        return if (city && state.cityList.isEmpty()) state.addressList[addressIndex].city.id
         else if (city) cityList!!.find { it.name == cityA.value }!!.id
         else stateList!!.find { it.name == stateA.value }!!.id
 

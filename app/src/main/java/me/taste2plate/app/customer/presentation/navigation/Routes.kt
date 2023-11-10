@@ -13,6 +13,7 @@ class Routes{
         const val profileRoute: String = "profile"
         const val cityBrandRoute: String = "cityBrand"
         const val productListRoute: String = "productList"
+        const val detailsRoute: String = "detailsRoute"
         const val bulkOrderRoute: String = "bulkOrderRoute"
         const val membershipRoute: String = "membershipRoute"
         const val myPlanRoute: String = "myPlanRoute"

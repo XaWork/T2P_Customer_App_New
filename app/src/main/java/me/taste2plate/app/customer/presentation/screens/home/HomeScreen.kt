@@ -55,7 +55,7 @@ import me.taste2plate.app.customer.presentation.widgets.showToast
 @Composable
 fun HomeScreen(
     onNavigateToOrderScreen: () -> Unit,
-    onNavigateToCityBrandScreen: () -> Unit,
+    onNavigateToCityBrandScreen: (screen: CityBrandScreens) -> Unit,
     onNavigateToCartScreen: () -> Unit,
     onNavigateToWishlistScreen: () -> Unit,
     onNavigateToProfileScreen: () -> Unit,
@@ -202,8 +202,10 @@ fun HomeScreen(
                         val home = state.homeData
                         item {
                             TopList(
-                                onNavigateToCityBrandScreen = {
-                                    onNavigateToCityBrandScreen()
+                                onNavigateToCityBrandScreen = {screen ->
+                                    //if(screen == CityBrandScreens.Category)
+
+                                    onNavigateToCityBrandScreen(screen)
                                 }
                             )
 

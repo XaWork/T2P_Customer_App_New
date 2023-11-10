@@ -26,7 +26,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import me.taste2plate.app.customer.domain.mapper.CommonForWishAndCartItem
+import me.taste2plate.app.customer.domain.mapper.CommonForItem
 import me.taste2plate.app.customer.domain.mapper.toCommonForWishAndCartItem
 import me.taste2plate.app.customer.presentation.screens.product.CartAddRemove
 import me.taste2plate.app.customer.presentation.theme.ExtraHighPadding
@@ -96,7 +96,7 @@ fun CartScreen(
 @Composable
 fun ContentCartAndWishlist(
     isWishList: Boolean = false,
-    items: List<CommonForWishAndCartItem>,
+    items: List<CommonForItem>,
     removeFromWishlist: (productId: String) -> Unit = {},
     updateCart: (productId: String, quantity: Int) -> Unit = { _, _ -> },
     onNavigateToCheckoutScreen: () -> Unit = {},
@@ -138,7 +138,7 @@ fun ContentCartAndWishlist(
 @Composable
 fun SingleCartAndWishlistItem(
     isWishList: Boolean,
-    item: CommonForWishAndCartItem,
+    item: CommonForItem,
     removeFromWishlist: () -> Unit,
     updateCart: (quantity: Int) -> Unit
 ) {

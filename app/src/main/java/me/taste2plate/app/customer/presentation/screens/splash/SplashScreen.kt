@@ -1,5 +1,6 @@
 package me.taste2plate.app.customer.presentation.screens.splash
 
+import android.Manifest
 import android.content.res.Configuration
 import android.os.Build
 import androidx.compose.foundation.Image
@@ -14,7 +15,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import me.taste2plate.app.customer.R
-import me.taste2plate.app.customer.presentation.utils.RequestPermissions
+import me.taste2plate.app.customer.presentation.screens.permissions.RequestPermissions
 import me.taste2plate.app.customer.presentation.widgets.AppScaffold
 
 @Composable
@@ -28,7 +29,7 @@ fun SplashScreen(
 
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU)
         RequestPermissions(permission = listOf(
-            android.Manifest.permission.POST_NOTIFICATIONS
+            Manifest.permission.POST_NOTIFICATIONS
         ), permissionStatus = {})
 
     LaunchedEffect(state) {

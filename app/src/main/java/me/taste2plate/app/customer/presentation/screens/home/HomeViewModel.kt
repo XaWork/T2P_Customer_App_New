@@ -144,7 +144,6 @@ class HomeViewModel @Inject constructor(
                         if (!isError)
                             T2PApp.wishlistCount = data?.result?.size ?: 0
 
-
                         if (hasDefaultAddress())
                             getCart()
                         else
@@ -222,9 +221,12 @@ class HomeViewModel @Inject constructor(
                         if (!isError) {
                             if (state.defaultAddress == null && result.data != null && result.data.result.isNotEmpty()) {
                                 setDefaultAddress(result.data.result[0])
-                            }
-                            if (state.cartData == null)
                                 getCart()
+                            } else {
+                                if (state.cartData == null)
+                                    getCart()
+                            }
+
                         }
                     }
 

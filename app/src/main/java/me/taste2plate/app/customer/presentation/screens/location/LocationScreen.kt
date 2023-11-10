@@ -4,9 +4,7 @@ import android.Manifest
 import android.content.Intent
 import android.content.res.Configuration
 import android.location.Geocoder
-import android.location.Location
 import android.net.Uri
-import android.os.Build
 import android.provider.Settings
 import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
@@ -58,7 +56,7 @@ import me.taste2plate.app.customer.presentation.screens.permissions.LocationPerm
 import me.taste2plate.app.customer.presentation.theme.ScreenPadding
 import me.taste2plate.app.customer.presentation.theme.T2PCustomerAppTheme
 import me.taste2plate.app.customer.presentation.theme.primaryColor
-import me.taste2plate.app.customer.presentation.utils.RequestPermissions
+import me.taste2plate.app.customer.presentation.screens.permissions.RequestPermissions
 import me.taste2plate.app.customer.presentation.widgets.AppButton
 import me.taste2plate.app.customer.presentation.widgets.AppScaffold
 import me.taste2plate.app.customer.presentation.widgets.RoundedCornerCard

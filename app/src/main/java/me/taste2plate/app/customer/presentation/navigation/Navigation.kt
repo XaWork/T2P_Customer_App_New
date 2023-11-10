@@ -1,6 +1,5 @@
 package me.taste2plate.app.customer.presentation.navigation
 
-import android.location.Location
 import android.util.Log
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
@@ -16,6 +15,7 @@ import androidx.navigation.navArgument
 import androidx.navigation.navigation
 import com.google.android.gms.maps.model.LatLng
 import com.google.gson.Gson
+import me.taste2plate.app.customer.domain.mapper.CommonForItem
 import me.taste2plate.app.customer.presentation.screens.address.AddEditAddressScreen
 import me.taste2plate.app.customer.presentation.screens.address.AddressListScreen
 import me.taste2plate.app.customer.presentation.screens.address.AddressViewModel
@@ -30,7 +30,10 @@ import me.taste2plate.app.customer.presentation.screens.cart.CheckOutViewModel
 import me.taste2plate.app.customer.presentation.screens.checkout.CheckoutScreen
 import me.taste2plate.app.customer.presentation.screens.checkout.OrderConfirmScreen
 import me.taste2plate.app.customer.presentation.screens.citybrand.CityBrandScreen
+import me.taste2plate.app.customer.presentation.screens.citybrand.CityBrandViewModel
+import me.taste2plate.app.customer.presentation.screens.citybrand.DetailScreen
 import me.taste2plate.app.customer.presentation.screens.contact_us.ContactUsScreen
+import me.taste2plate.app.customer.presentation.screens.home.CityBrandScreens
 import me.taste2plate.app.customer.presentation.screens.home.HomeScreen
 import me.taste2plate.app.customer.presentation.screens.location.LocationScreen
 import me.taste2plate.app.customer.presentation.screens.membership_plan.MembershipPlanScreen
@@ -38,7 +41,7 @@ import me.taste2plate.app.customer.presentation.screens.my_plan.MyPlanScreen
 import me.taste2plate.app.customer.presentation.screens.order.OrderDetailsScreen
 import me.taste2plate.app.customer.presentation.screens.order.OrderListScreen
 import me.taste2plate.app.customer.presentation.screens.product.ProductDetailsScreen
-import me.taste2plate.app.customer.presentation.screens.product.ProductListScreen
+import me.taste2plate.app.customer.presentation.screens.product.list.ProductListScreen
 import me.taste2plate.app.customer.presentation.screens.profile.EditProfileScreen
 import me.taste2plate.app.customer.presentation.screens.profile.ProfileScreen
 import me.taste2plate.app.customer.presentation.screens.splash.SplashScreen
@@ -145,7 +148,6 @@ fun Navigation() {
                 },
                 onNavigateBackToAddEditAddressScreen = { latLng ->
                     val args = Gson().toJson(latLng, LatLng::class.java)
-                    Log.e("AddEditScreen", "Lat long is from location $latLng")
                     navController.navigate(Screens.AddEditAddressScreen.route + "?latLng=$args") {
                         popUpTo(Screens.AddressListScreen.route) {
                             inclusive = true
@@ -162,7 +164,8 @@ fun Navigation() {
                     navController.navigate(Screens.OrderListScreen.route)
                 },
                 onNavigateToCityBrandScreen = {
-                    navController.navigate(Screens.CityBrandScreen.route)
+                    val screen = Gson().toJson(it, CityBrandScreens::class.java)
+                    navController.navigate(Screens.CityBrandScreen.withArgs(screen))
                 },
                 onNavigateToProfileScreen = {
                     navController.navigate(Screens.ProfileScreen.route)
@@ -265,21 +268,70 @@ fun Navigation() {
             MembershipPlanScreen()
         }
 
-        // ----------------------------> City brand <--------------------------------------
-        composable(route = Screens.CityBrandScreen.route) {
-            CityBrandScreen(
-                onNavigateToProductListScreen = {
-                    navController.navigate(Screens.ProductListScreen.route)
+        // ----------------------------> Product List <--------------------------------------
+        composable(route = Screens.ProductListScreen.route + "?categoryInfo={categoryInfo}",
+            arguments = listOf(
+                navArgument("categoryInfo") {
+                    type = NavType.StringType
+                    defaultValue = ""
+                    nullable = true
                 }
             )
+        ) { entry ->
+            val itemInfo = Gson().fromJson(
+                entry.arguments?.getString("categoryInfo"),
+                CommonForItem::class.java
+            )
+            ProductListScreen(
+                itemInfo = itemInfo,
+                onNavigateToProductDetailsScreen = {
+                    navController.navigate(Screens.ProductDetailsScreen.route)
+                })
         }
 
-        // ----------------------------> City brand <--------------------------------------
-        composable(route = Screens.ProductListScreen.route) {
-            ProductListScreen(onNavigateToProductDetailsScreen = {
-                navController.navigate(Screens.ProductDetailsScreen.route)
-            })
+
+        navigation(startDestination = Screens.CartScreen.route, route = "citybrand") {
+
+            // ----------------------------> City brand <--------------------------------------
+            composable(route = Screens.CityBrandScreen.route + "/{screen}", arguments = listOf(
+                navArgument(name = "screen") {
+                    type = NavType.StringType
+                    defaultValue = ""
+                    nullable = true
+                }
+            )) { entry ->
+                val screen =
+                    Gson().fromJson(
+                        entry.arguments?.getString("screen"),
+                        CityBrandScreens::class.java
+                    )
+                val viewModel =
+                    entry.sharedViewModel<CityBrandViewModel>(navHostController = navController)
+
+                CityBrandScreen(
+                    viewModel = viewModel,
+                    screen = screen,
+                    onNavigateToProductListScreen = {
+                        val itemInfo = Gson().toJson(
+                            it,
+                            CommonForItem::class.java
+                        )
+                        navController.navigate(Screens.ProductListScreen.route+"?categoryInfo=$itemInfo")
+                    },
+                    onNavigateToDetailsScreen = {
+                        navController.navigate(Screens.DetailsScreen.route)
+                    }
+                )
+            }
+
+            // ----------------------------> Details Screen <--------------------------------------
+            composable(route = Screens.DetailsScreen.route) { entry ->
+                val viewModel =
+                    entry.sharedViewModel<CityBrandViewModel>(navHostController = navController)
+                DetailScreen(viewModel)
+            }
         }
+
 
         // ----------------------------> Order Details <--------------------------------------
         composable(route = Screens.OrderDetailsScreen.route) {
@@ -376,11 +428,9 @@ fun Navigation() {
                 )) { entry ->
                 val latLng =
                     Gson().fromJson(entry.arguments?.getString("latLng"), LatLng::class.java)
-
-                Log.e("AddEditScreen", "Lat long is in add edit$latLng")
-
                 val viewModel =
                     entry.sharedViewModel<AddressViewModel>(navHostController = navController)
+
                 AddEditAddressScreen(
                     viewModel = viewModel,
                     latLng = latLng,
@@ -390,7 +440,7 @@ fun Navigation() {
                         }
                     },
                     onNavigateToHomeScreen = {
-                        navController.navigate(Screens.HomeScreen.route){
+                        navController.navigate(Screens.HomeScreen.route) {
                             popUpTo(0)
                         }
                     }
