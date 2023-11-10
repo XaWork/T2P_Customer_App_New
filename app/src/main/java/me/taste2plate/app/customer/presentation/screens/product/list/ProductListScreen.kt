@@ -5,6 +5,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -129,8 +130,11 @@ fun SingleProductItem(
 
             VerticalSpace(space = SpaceBetweenViewsAndSubViews)
 
-            SpaceBetweenRow(item1 = {
-                Column {
+            val items = listOf<@Composable RowScope.() -> Unit> {
+                Column(
+                    modifier = Modifier
+                        .weight(2.5f)
+                ) {
                     Text(
                         text = product.name,
                         style = MaterialTheme.typography.titleMedium,
@@ -167,12 +171,14 @@ fun SingleProductItem(
                         text = priceInfo
                     )
                 }
-            }) {
+
                 Column(
                     horizontalAlignment = Alignment.CenterHorizontally,
-                    modifier = Modifier.padding(
-                        start = ScreenPadding
-                    )
+                    modifier = Modifier
+                        .weight(1f)
+                        .padding(
+                            start = ScreenPadding
+                        )
                 ) {
                     AppOutlineButton(text = "Add") {}
 
@@ -182,6 +188,8 @@ fun SingleProductItem(
                     )
                 }
             }
+
+            SpaceBetweenRow(items = items)
         }
     }
 }

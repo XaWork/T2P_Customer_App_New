@@ -15,7 +15,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.sp
-import me.taste2plate.app.customer.presentation.theme.ExtraLowElevation
+import androidx.hilt.navigation.compose.hiltViewModel
+import me.taste2plate.app.customer.domain.model.auth.User
 import me.taste2plate.app.customer.presentation.theme.HighSpacing
 import me.taste2plate.app.customer.presentation.theme.LowElevation
 import me.taste2plate.app.customer.presentation.theme.ScreenPadding
@@ -32,9 +33,11 @@ import me.taste2plate.app.customer.presentation.widgets.VerticalSpace
 
 @Composable
 fun ProfileScreen(
-    onNavigateToEditProfileScreen: () ->Unit,
-    onNavigateToAddressListScreen: () ->Unit,
-) {
+    viewModel: ProfileViewModel = hiltViewModel(),
+    onNavigateToEditProfileScreen: () -> Unit,
+    onNavigateToAddressListScreen: () -> Unit,
+
+    ) {
     AppScaffold(
         topBar = {
             AppTopBar(
@@ -43,10 +46,11 @@ fun ProfileScreen(
         }
     ) {
         ContentProfileScreen(
+            user = if (viewModel.state.user == null) null else viewModel.state.user,
             onNavigateToEditProfileScreen = {
                 onNavigateToEditProfileScreen()
             }
-        ){
+        ) {
             onNavigateToAddressListScreen()
         }
     }
@@ -54,8 +58,9 @@ fun ProfileScreen(
 
 @Composable
 fun ContentProfileScreen(
-    onNavigateToEditProfileScreen : () -> Unit,
-    onNavigateToAddressListScreen : () -> Unit,
+    user: User?,
+    onNavigateToEditProfileScreen: () -> Unit,
+    onNavigateToAddressListScreen: () -> Unit,
 ) {
     Column(
         modifier = Modifier.padding(ScreenPadding)
@@ -73,11 +78,11 @@ fun ContentProfileScreen(
                     fontWeight = FontWeight.W400
                 )
             ) {
-                append("Xa Kaler")
+                append(user?.fullName)
             }
 
             withStyle(SpanStyle()) {
-                append("\nxakaler@gmail.com\n7832456789")
+                append("\n${user?.email}\n${user?.mobile}")
             }
         }
 
@@ -128,6 +133,6 @@ fun ContentProfileScreen(
 @Composable
 fun ProfileScreenPreview() {
     T2PCustomerAppTheme {
-        ProfileScreen({}){}
+        //ProfileScreen({}) {}
     }
 }

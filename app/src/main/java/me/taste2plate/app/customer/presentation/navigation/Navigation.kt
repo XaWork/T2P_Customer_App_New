@@ -278,6 +278,7 @@ fun Navigation() {
                 }
             )
         ) { entry ->
+            Log.e("ProductList", "${entry.arguments?.getString("categoryInfo")}")
             val itemInfo = Gson().fromJson(
                 entry.arguments?.getString("categoryInfo"),
                 CommonForItem::class.java

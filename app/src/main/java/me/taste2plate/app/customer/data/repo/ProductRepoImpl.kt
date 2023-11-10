@@ -8,7 +8,15 @@ import javax.inject.Inject
 class ProductRepoImpl @Inject constructor(
     private val api: ProductApi
 ) : ProductRepo {
-    override suspend fun productByCity(cityId: String, taste: String): ProductListModel {
-        return api.productsByCity(cityId, taste)
+    override suspend fun productByCity(id: String, taste: String): ProductListModel {
+        return api.productsByCity(id, taste)
+    }
+
+    override suspend fun productByBrand(id: String, taste: String): ProductListModel {
+        return api.productsByBrand(id, taste)
+    }
+
+    override suspend fun productByCuisine(id: String, taste: String): ProductListModel {
+        return api.productsByCuisine(id, taste)
     }
 }

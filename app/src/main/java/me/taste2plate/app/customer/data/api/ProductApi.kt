@@ -11,4 +11,18 @@ interface ProductApi {
         @Query("city") cityId: String,
         @Query("taste") taste: String
     ): ProductListModel
+
+
+    @GET("all-products")
+    suspend fun productsByBrand(
+        @Query("brand") id: String,
+        @Query("taste") taste: String
+    ): ProductListModel
+
+
+    @GET("all-products")
+    suspend fun productsByCuisine(
+        @Query("cuisine") id: String,
+        @Query("taste") taste: String
+    ): ProductListModel
 }

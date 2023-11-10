@@ -39,7 +39,7 @@ fun TopList(
                             0 -> CityBrandScreens.City
                             1 -> CityBrandScreens.Brand
                             2 -> CityBrandScreens.Category
-                            3 -> CityBrandScreens.Flavours_Of_India
+                            3 -> CityBrandScreens.Cuisine
                             else -> CityBrandScreens.City
                         }
                     )

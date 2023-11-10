@@ -11,12 +11,13 @@ import me.taste2plate.app.customer.data.Resource
 import me.taste2plate.app.customer.data.Status
 import me.taste2plate.app.customer.domain.use_case.product.ProductBy
 import me.taste2plate.app.customer.domain.use_case.product.ProductListUseCase
+import me.taste2plate.app.customer.domain.use_case.user.cart.DeleteCartUseCase
 import me.taste2plate.app.customer.presentation.screens.home.CityBrandScreens
 import javax.inject.Inject
 
 @HiltViewModel
 class ProductListViewModel @Inject constructor(
-    private val productListUseCase: ProductListUseCase
+    private val productListUseCase: ProductListUseCase,
 ) : ViewModel() {
 
     var state by mutableStateOf(ProductListState())
@@ -30,16 +31,25 @@ class ProductListViewModel @Inject constructor(
                         getProductList(ProductBy.City, itemId)
                     }
 
-                    CityBrandScreens.Brand.name -> {}
-                    CityBrandScreens.Flavours_Of_India.name -> {}
-                    CityBrandScreens.Category.name -> {}
+                    CityBrandScreens.Brand.name -> {
+                        getProductList(ProductBy.Brand, itemId)
+                    }
+
+                    CityBrandScreens.Cuisine.name -> {
+                        getProductList(ProductBy.Cuisine, itemId)
+                    }
+
+                    CityBrandScreens.Category.name -> {
+                        //    getProductList(ProductBy.City, itemId)
+                    }
+
                     "slider" -> {}
                 }
             }
         }
     }
 
-    fun getProductList(
+    private fun getProductList(
         productBy: ProductBy,
         id: String
     ) {

@@ -4,5 +4,5 @@ enum class CityBrandScreens {
     City,
     Brand,
     Category,
-    Flavours_Of_India
+    Cuisine
 }

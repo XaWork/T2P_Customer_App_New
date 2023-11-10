@@ -166,7 +166,7 @@ fun HomeScreen(
                 HomeAppBar(
                     onNavigateToWishlistScreen = onNavigateToWishlistScreen,
                     onNavigateToCartScreen = onNavigateToCartScreen,
-                    onNavigateToSearchScreen = onNavigateToProductListScreen,
+                    onNavigateToSearchScreen = {  },
                     onNavigationIconClick = {
                         scope.launch {
                             drawerState.open()

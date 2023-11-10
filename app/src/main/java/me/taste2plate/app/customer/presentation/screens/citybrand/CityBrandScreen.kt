@@ -81,7 +81,7 @@ fun CityBrandScreen(
             ContentCityBrandScreen(
                 state.itemList,
                 onNavigateToProductListScreen = {
-                    val itemInfo = it.copy(type = screen.name)
+                    val itemInfo = it.copy(type = screen.name, description = null)
                     onNavigateToProductListScreen(itemInfo)
                 },
                 onNavigateToDetailsScreen = {
