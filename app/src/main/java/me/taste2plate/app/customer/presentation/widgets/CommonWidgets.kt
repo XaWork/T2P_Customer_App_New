@@ -15,6 +15,7 @@ import androidx.compose.material.icons.rounded.Star
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Switch
+import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -40,6 +41,8 @@ import me.taste2plate.app.customer.presentation.theme.ForestGreenDark
 import me.taste2plate.app.customer.presentation.theme.LowPadding
 import me.taste2plate.app.customer.presentation.theme.LowRoundedCorners
 import me.taste2plate.app.customer.presentation.theme.SpaceBetweenViewsAndSubViews
+import me.taste2plate.app.customer.presentation.theme.backgroundColor
+import me.taste2plate.app.customer.presentation.theme.primaryColor
 import me.taste2plate.app.customer.presentation.utils.rupeeSign
 
 @Composable
@@ -185,21 +188,27 @@ fun SpaceBetweenRow(
 
 @Composable
 fun VegNonVegFilter(
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    checked: Boolean = false,
+    onCheckChange: () -> Unit = {}
 ) {
-    var checked by remember { mutableStateOf(false) }
     Row(
         horizontalArrangement = Arrangement.Center,
         verticalAlignment = Alignment.CenterVertically,
         modifier = modifier.padding(horizontal = LowPadding)
     ) {
         Text(text = "Veg")
+
         Switch(
-            checked = checked, onCheckedChange = {
-                checked = it
-            },
-            modifier = Modifier.padding(horizontal = SpaceBetweenViewsAndSubViews)
+            checked = checked, onCheckedChange = { onCheckChange() },
+            modifier = Modifier.padding(horizontal = SpaceBetweenViewsAndSubViews),
+            colors = SwitchDefaults.colors(
+                checkedBorderColor = primaryColor.invoke(),
+                checkedTrackColor = backgroundColor.invoke(),
+                checkedThumbColor = primaryColor.invoke()
+            )
         )
+
         Text(text = "Non-veg")
     }
 }

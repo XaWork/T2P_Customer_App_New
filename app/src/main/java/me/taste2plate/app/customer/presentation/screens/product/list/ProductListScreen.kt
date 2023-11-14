@@ -30,9 +30,9 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.hilt.navigation.compose.hiltViewModel
 import me.taste2plate.app.customer.domain.mapper.CommonForItem
 import me.taste2plate.app.customer.domain.model.product.ProductListModel
+import me.taste2plate.app.customer.presentation.screens.product.ProductViewModel
 import me.taste2plate.app.customer.presentation.theme.MediumElevation
 import me.taste2plate.app.customer.presentation.theme.MediumRoundedCorners
 import me.taste2plate.app.customer.presentation.theme.ScreenPadding
@@ -56,20 +56,24 @@ import me.taste2plate.app.customer.presentation.widgets.VerticalSpace
 @Composable
 fun ProductListScreen(
     itemInfo: CommonForItem,
-    viewModel: ProductListViewModel = hiltViewModel(),
+    viewModel: ProductViewModel,
     onNavigateToProductDetailsScreen: () -> Unit
 ) {
     val state = viewModel.state
 
-    LaunchedEffect(Unit) {
-        viewModel.onEvent(ProductListEvents.GetProducts(itemInfo))
+    LaunchedEffect(state.productList.isEmpty()) {
+        viewModel.onEvent(ProductEvents.GetProducts(itemInfo))
     }
 
     AppScaffold(
         topBar = {
             AppTopBar(
                 title = itemInfo.name,
-                tasteVisible = true
+                tasteVisible = true,
+                checked = state.checked,
+                onCheckChange = {
+                    viewModel.onEvent(ProductEvents.ChangeTaste)
+                }
             ) {}
         }
     ) {
@@ -80,7 +84,10 @@ fun ProductListScreen(
         else
             ContentProductListScreen(
                 state.productList,
-                onNavigateToProductDetailsScreen = onNavigateToProductDetailsScreen
+                onNavigateToProductDetailsScreen = {
+                    viewModel.selectedProductId = it
+                    onNavigateToProductDetailsScreen()
+                }
             )
     }
 }
@@ -88,7 +95,7 @@ fun ProductListScreen(
 @Composable
 fun ContentProductListScreen(
     items: List<ProductListModel.Result>,
-    onNavigateToProductDetailsScreen: () -> Unit
+    onNavigateToProductDetailsScreen: (productId: String) -> Unit
 ) {
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
@@ -98,7 +105,9 @@ fun ContentProductListScreen(
         items(items) { item ->
             SingleProductItem(
                 item,
-                onNavigateToProductDetailsScreen = onNavigateToProductDetailsScreen
+                onNavigateToProductDetailsScreen = {
+                    onNavigateToProductDetailsScreen(item.id)
+                }
             )
         }
     }

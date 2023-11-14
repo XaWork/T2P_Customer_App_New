@@ -25,9 +25,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
 import me.taste2plate.app.customer.domain.mapper.CommonForItem
-import me.taste2plate.app.customer.domain.model.CityBrandModel
 import me.taste2plate.app.customer.presentation.screens.home.CityBrandScreens
 import me.taste2plate.app.customer.presentation.theme.HighPadding
 import me.taste2plate.app.customer.presentation.theme.HighRoundedCorners
@@ -53,6 +51,7 @@ fun CityBrandScreen(
     viewModel: CityBrandViewModel,
     onNavigateToProductListScreen: (itemInfo: CommonForItem) -> Unit,
     onNavigateToDetailsScreen: () -> Unit,
+    onNavigateToSubCategoryScreen: () -> Unit,
 ) {
     val state = viewModel.state
 
@@ -75,14 +74,19 @@ fun CityBrandScreen(
     ) {
         if (state.isLoading)
             ShowLoading(isButton = false)
-        else if (!state.isLoading && state.itemList.isEmpty())
+        else if (state.itemList.isEmpty())
             AppEmptyView()
         else
             ContentCityBrandScreen(
                 state.itemList,
                 onNavigateToProductListScreen = {
-                    val itemInfo = it.copy(type = screen.name, description = null)
-                    onNavigateToProductListScreen(itemInfo)
+                    if (screen == CityBrandScreens.Category) {
+                        viewModel.onEvent(CityBrandEvents.SetSelectedItem(it))
+                        onNavigateToSubCategoryScreen()
+                    } else {
+                        val itemInfo = it.copy(type = screen.name, description = null)
+                        onNavigateToProductListScreen(itemInfo)
+                    }
                 },
                 onNavigateToDetailsScreen = {
                     viewModel.onEvent(CityBrandEvents.SetSelectedItem(it))

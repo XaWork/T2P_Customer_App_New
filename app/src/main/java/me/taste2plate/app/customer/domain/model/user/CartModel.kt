@@ -5,15 +5,15 @@ import com.google.gson.annotations.SerializedName
 
 data class CartModel(
     @SerializedName("cartprice")
-    val cartprice: Int,
+    val cartprice: String,
     @SerializedName("customer_point")
-    val customerPoint: Int,
+    val customerPoint: String,
     @SerializedName("express")
     val express: Boolean,
     @SerializedName("express_timeslot")
     val expressTimeslot: String,
     @SerializedName("final_price")
-    val finalPrice: Int,
+    val finalPrice: String,
     @SerializedName("gst")
     val gst: Gst,
     @SerializedName("gst_with_point")
@@ -29,7 +29,7 @@ data class CartModel(
     @SerializedName("open_order_value")
     val openOrderValue: String,
     @SerializedName("plan_discount")
-    val planDiscount: Int,
+    val planDiscount: String,
     @SerializedName("result")
     val result: List<Result>,
     @SerializedName("shipping")
@@ -39,13 +39,13 @@ data class CartModel(
     @SerializedName("status")
     val status: String,
     @SerializedName("total_cgst")
-    val totalCgst: Int,
+    val totalCgst: String,
     @SerializedName("total_igst")
-    val totalIgst: Int,
+    val totalIgst: String,
     @SerializedName("total_packing_price")
-    val totalPackingPrice: Int,
+    val totalPackingPrice: String,
     @SerializedName("total_sgst")
-    val totalSgst: Int
+    val totalSgst: String
 ) {
     data class Gst(
         @SerializedName("express")
@@ -55,20 +55,20 @@ data class CartModel(
     ) {
         data class Express(
             @SerializedName("total_cgst")
-            val totalCgst: Int,
+            val totalCgst: String,
             @SerializedName("total_igst")
             val totalIgst: String,
             @SerializedName("total_sgst")
-            val totalSgst: Int
+            val totalSgst: String
         )
 
         data class Normal(
             @SerializedName("total_cgst")
-            val totalCgst: Int,
+            val totalCgst: String,
             @SerializedName("total_igst")
             val totalIgst: String,
             @SerializedName("total_sgst")
-            val totalSgst: Int
+            val totalSgst: String
         )
     }
 
@@ -80,20 +80,20 @@ data class CartModel(
     ) {
         data class Express(
             @SerializedName("total_cgst")
-            val totalCgst: Int,
+            val totalCgst: String,
             @SerializedName("total_igst")
             val totalIgst: String,
             @SerializedName("total_sgst")
-            val totalSgst: Int
+            val totalSgst: String
         )
 
         data class Normal(
             @SerializedName("total_cgst")
-            val totalCgst: Int,
+            val totalCgst: String,
             @SerializedName("total_igst")
             val totalIgst: String,
             @SerializedName("total_sgst")
-            val totalSgst: Int
+            val totalSgst: String
         )
     }
 
@@ -133,7 +133,7 @@ data class CartModel(
         @SerializedName("_id")
         val id: String,
         @SerializedName("price")
-        val price: Int,
+        val price: String,
         @SerializedName("product")
         val product: Product,
         @SerializedName("productname")
@@ -147,13 +147,13 @@ data class CartModel(
         @SerializedName("user")
         val user: String,
         @SerializedName("__v")
-        val v: Int,
+        val v: String,
         @SerializedName("vendor")
         val vendor: Vendor
     ) {
         data class Product(
             @SerializedName("active")
-            val active: Int,
+            val active: String,
             @SerializedName("added_by")
             val addedBy: String,
             @SerializedName("attribute")
@@ -175,15 +175,15 @@ data class CartModel(
             @SerializedName("commission")
             val commission: String,
             @SerializedName("consumable")
-            val consumable: Int,
+            val consumable: String,
             @SerializedName("created_date")
             val createdDate: String,
             @SerializedName("cuisine")
             val cuisine: Cuisine,
             @SerializedName("deal")
-            val deal: Int,
+            val deal: String,
             @SerializedName("deleted")
-            val deleted: Int,
+            val deleted: String,
             @SerializedName("desc")
             val desc: String,
             @SerializedName("discounted_price")
@@ -193,7 +193,7 @@ data class CartModel(
             @SerializedName("express")
             val express: Boolean,
             @SerializedName("featured")
-            val featured: Int,
+            val featured: String,
             @SerializedName("file")
             val `file`: List<File>,
             @SerializedName("height")
@@ -205,21 +205,21 @@ data class CartModel(
             @SerializedName("length")
             val length: String,
             @SerializedName("manage_stock")
-            val manageStock: Int,
+            val manageStock: String,
             @SerializedName("name")
             val name: String,
             @SerializedName("packaging_charge")
             val packagingCharge: String,
             @SerializedName("point")
-            val point: Int,
+            val point: String,
             @SerializedName("point_exp_date")
             val pointExpDate: String,
             @SerializedName("price")
-            val price: Int,
+            val price: String,
             @SerializedName("purchase_price")
             val purchasePrice: String,
             @SerializedName("selling_price")
-            val sellingPrice: Int,
+            val sellingPrice: String,
             @SerializedName("seo_description")
             val seoDescription: String,
             @SerializedName("seo_keywords")
@@ -247,17 +247,17 @@ data class CartModel(
             @SerializedName("tags")
             val tags: String,
             @SerializedName("taste")
-            val taste: Int,
+            val taste: String,
             @SerializedName("tax_status")
             val taxStatus: String,
             @SerializedName("threshold")
             val threshold: String,
             @SerializedName("top")
-            val top: Int,
+            val top: String,
             @SerializedName("update_date")
             val updateDate: String,
             @SerializedName("__v")
-            val v: Int,
+            val v: String,
             @SerializedName("vendor")
             val vendor: Vendor,
             @SerializedName("weight")
@@ -321,7 +321,7 @@ data class CartModel(
                 @SerializedName("serverSideEncryption")
                 val serverSideEncryption: Any,
                 @SerializedName("size")
-                val size: Int,
+                val size: String,
                 @SerializedName("storageClass")
                 val storageClass: String
             )
@@ -351,11 +351,11 @@ data class CartModel(
             @SerializedName("acc_number")
             val accNumber: Any,
             @SerializedName("active")
-            val active: Int,
+            val active: String,
             @SerializedName("additional_cost1")
-            val additionalCost1: Int,
+            val additionalCost1: String,
             @SerializedName("additional_cost2")
-            val additionalCost2: Int,
+            val additionalCost2: String,
             @SerializedName("address")
             val address: String,
             @SerializedName("bag_no")
@@ -373,9 +373,9 @@ data class CartModel(
             @SerializedName("city2")
             val city2: String,
             @SerializedName("cod")
-            val cod: Int,
+            val cod: String,
             @SerializedName("cod_order_cost")
-            val codOrderCost: Int,
+            val codOrderCost: String,
             @SerializedName("commission")
             val commission: String,
             @SerializedName("commission_type")
@@ -393,7 +393,7 @@ data class CartModel(
             @SerializedName("date_of_releiving")
             val dateOfReleiving: Any,
             @SerializedName("deleted")
-            val deleted: Int,
+            val deleted: String,
             @SerializedName("delivery_boy")
             val deliveryBoy: List<Any>,
             @SerializedName("delivery_city")
@@ -419,13 +419,13 @@ data class CartModel(
             @SerializedName("email")
             val email: String,
             @SerializedName("email_otp")
-            val emailOtp: Int,
+            val emailOtp: String,
             @SerializedName("father_name")
             val fatherName: String,
             @SerializedName("file")
             val `file`: String,
             @SerializedName("first_time")
-            val firstTime: Int,
+            val firstTime: String,
             @SerializedName("full_name")
             val fullName: String,
             @SerializedName("health_insurance_number")
@@ -435,7 +435,7 @@ data class CartModel(
             @SerializedName("ifsc")
             val ifsc: Any,
             @SerializedName("login_active")
-            val loginActive: Int,
+            val loginActive: String,
             @SerializedName("lp_manager")
             val lpManager: List<Any>,
             @SerializedName("master")
@@ -449,7 +449,7 @@ data class CartModel(
             @SerializedName("office")
             val office: Any,
             @SerializedName("otp")
-            val otp: Int,
+            val otp: String,
             @SerializedName("pan")
             val pan: String,
             @SerializedName("password")
@@ -491,7 +491,7 @@ data class CartModel(
             @SerializedName("user_type")
             val userType: String,
             @SerializedName("__v")
-            val v: Int,
+            val v: String,
             @SerializedName("vendor_position")
             val vendorPosition: VendorPosition,
             @SerializedName("zipcode")
@@ -499,14 +499,14 @@ data class CartModel(
         ) {
             data class CargoPosition(
                 @SerializedName("coordinates")
-                val coordinates: List<Int>,
+                val coordinates: List<String>,
                 @SerializedName("type")
                 val type: String
             )
 
             data class DeliveryPartnerPosition(
                 @SerializedName("coordinates")
-                val coordinates: List<Int>,
+                val coordinates: List<String>,
                 @SerializedName("type")
                 val type: String
             )
@@ -519,14 +519,14 @@ data class CartModel(
                 @SerializedName("plan")
                 val plan: Any,
                 @SerializedName("point")
-                val point: Int,
+                val point: String,
                 @SerializedName("updated")
                 val updated: Any
             )
 
             data class VendorPosition(
                 @SerializedName("coordinates")
-                val coordinates: List<Int>,
+                val coordinates: List<String>,
                 @SerializedName("type")
                 val type: String
             )

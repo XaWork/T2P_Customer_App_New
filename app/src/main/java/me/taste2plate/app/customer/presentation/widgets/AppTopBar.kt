@@ -19,10 +19,12 @@ import me.taste2plate.app.customer.presentation.theme.T2PCustomerAppTheme
 fun AppTopBar(
     title: String = "Taste2Plate",
     tasteVisible: Boolean = false,
+    checked: Boolean = false,
+    onCheckChange: () -> Unit = {},
     onBackClick: () -> Unit
 ) {
     TopAppBar(
-        colors = TopAppBarDefaults.smallTopAppBarColors(
+        colors = TopAppBarDefaults.topAppBarColors(
             containerColor = MaterialTheme.colorScheme.primary,
             titleContentColor = MaterialTheme.colorScheme.background,
             actionIconContentColor = MaterialTheme.colorScheme.background,
@@ -41,7 +43,10 @@ fun AppTopBar(
             )
         }, actions = {
             if (tasteVisible)
-                VegNonVegFilter()
+                VegNonVegFilter(
+                    checked = checked,
+                    onCheckChange = onCheckChange
+                )
         })
 }
 

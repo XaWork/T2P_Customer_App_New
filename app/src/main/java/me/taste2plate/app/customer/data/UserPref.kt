@@ -11,6 +11,7 @@ import com.google.gson.Gson
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
+import me.taste2plate.app.customer.domain.model.SettingsModel
 import me.taste2plate.app.customer.domain.model.auth.User
 import me.taste2plate.app.customer.domain.model.user.address.AddressListModel
 import timber.log.Timber
@@ -25,6 +26,7 @@ class UserPref @Inject constructor(
     companion object {
         private val KEY_TOKEN = stringPreferencesKey("token")
         private val KEY_USER = stringPreferencesKey("user")
+        private val KEY_SETTINGS = stringPreferencesKey("settings")
         private val KEY_ADDRESS = stringPreferencesKey("address")
         private val KEY_TASTE = stringPreferencesKey("taste")
         private val KEY_IS_LOGIN = booleanPreferencesKey("isLogin")
@@ -50,9 +52,12 @@ class UserPref @Inject constructor(
 
 
     //=====================> TASTE <=================
-    suspend fun setTaste(taste: String) {
+    // 1 -> Veg
+    // 0 -> Non-Veg
+    suspend fun setTaste() {
         dataStore.edit { preferences ->
-            preferences[KEY_TASTE] = taste
+            val taste = getTaste()
+            preferences[KEY_TASTE] = if (taste == Taste.veg) Taste.nonVeg else Taste.veg
         }
         getTaste()
     }
@@ -62,7 +67,7 @@ class UserPref @Inject constructor(
             preferences[KEY_TASTE]
         }
         Timber.e("Taste is ${taste.first()}")
-        return taste.first() ?: "1"
+        return taste.first() ?: Taste.veg
     }
 
 
@@ -104,6 +109,28 @@ class UserPref @Inject constructor(
     }
 
 
+    //=====================> Settings <=================
+    suspend fun saveSettings(setting: SettingsModel.Result) {
+        val string = Gson().toJson(setting, SettingsModel.Result::class.java)
+        dataStore.edit { preferences ->
+            preferences[KEY_SETTINGS] = string
+        }
+        getSettings()
+    }
+
+    suspend fun getSettings(): SettingsModel.Result {
+        val flow = dataStore.data.map { preferences ->
+            preferences[KEY_SETTINGS]
+        }
+
+        val setting: SettingsModel.Result =
+            Gson().fromJson(flow.first(), SettingsModel.Result::class.java)
+        Timber.e("Setting is ${flow.first()}")
+
+        return setting
+    }
+
+
     //=====================> Default address <=================
     suspend fun saveDefaultAddress(address: AddressListModel.Result) {
         val stringAddress = Gson().toJson(address)
@@ -129,4 +156,12 @@ class UserPref @Inject constructor(
         }
     }
 
+}
+
+
+class Taste {
+    companion object {
+        const val veg: String = "1"
+        const val nonVeg: String = "0"
+    }
 }

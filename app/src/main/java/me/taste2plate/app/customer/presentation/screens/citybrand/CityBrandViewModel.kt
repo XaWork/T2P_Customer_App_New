@@ -15,6 +15,7 @@ import me.taste2plate.app.customer.domain.use_case.BrandListUseCase
 import me.taste2plate.app.customer.domain.use_case.CategoryUseCase
 import me.taste2plate.app.customer.domain.use_case.CityListUseCase
 import me.taste2plate.app.customer.domain.use_case.CuisineUseCase
+import me.taste2plate.app.customer.domain.use_case.SubCategoryUseCase
 import me.taste2plate.app.customer.presentation.screens.home.CityBrandScreens
 import javax.inject.Inject
 
@@ -24,6 +25,7 @@ class CityBrandViewModel @Inject constructor(
     private val brandListUseCase: BrandListUseCase,
     private val cuisineUseCase: CuisineUseCase,
     private val categoryUseCase: CategoryUseCase,
+    private val subCategoryUseCase: SubCategoryUseCase
 ) : ViewModel() {
 
     var state by mutableStateOf(CityBrandState())
@@ -58,9 +60,12 @@ class CityBrandViewModel @Inject constructor(
             is CityBrandEvents.SetSelectedItem -> {
                 selectedItem = event.item
             }
+
+            is CityBrandEvents.GetSubCategory -> {
+                getAllSubCategories()
+            }
         }
     }
-
 
     private fun getCityList() {
         viewModelScope.launch {
@@ -187,6 +192,42 @@ class CityBrandViewModel @Inject constructor(
                             isLoading = false,
                             isError = isError,
                             itemList = itemList
+                        )
+                    }
+
+                    is Resource.Error -> {
+                        state = state.copy(
+                            isLoading = false,
+                            isError = true,
+                            message = result.message
+                        )
+                    }
+                }
+
+            }
+        }
+    }
+
+    private fun getAllSubCategories() {
+        viewModelScope.launch {
+            subCategoryUseCase.execute(selectedItem.id).collect { result ->
+                when (result) {
+                    is Resource.Loading -> {
+                        state = state.copy(isLoading = true)
+                    }
+
+                    is Resource.Success -> {
+                        val data = result.data!!
+                        val isError = data.status == Status.error.name || data.result.isEmpty()
+
+                        val itemList =
+                            if (data.result.isEmpty()) emptyList() else data.result.map { it.toCommonItem() }
+
+                        state = state.copy(
+                            isLoading = false,
+                            showSubCategories = true,
+                            isError = isError,
+                            subCategoryItemList = itemList
                         )
                     }
 

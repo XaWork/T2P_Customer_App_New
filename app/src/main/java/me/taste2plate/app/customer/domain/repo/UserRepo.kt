@@ -5,6 +5,7 @@ import me.taste2plate.app.customer.domain.model.auth.VerifyOTPModel
 import me.taste2plate.app.customer.domain.model.user.CartModel
 import me.taste2plate.app.customer.domain.model.user.CommonResponse
 import me.taste2plate.app.customer.domain.model.user.DeleteFromWishlistModel
+import me.taste2plate.app.customer.domain.model.user.OrderListModel
 import me.taste2plate.app.customer.domain.model.user.WishListModel
 import me.taste2plate.app.customer.domain.model.user.address.AddressListModel
 
@@ -89,4 +90,6 @@ interface UserRepo {
         lng: Double,
         type: String
     ): CommonResponse
+
+    suspend fun getOrders(userId: String): OrderListModel
 }

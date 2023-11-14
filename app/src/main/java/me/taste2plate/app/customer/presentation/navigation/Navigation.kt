@@ -32,6 +32,7 @@ import me.taste2plate.app.customer.presentation.screens.checkout.OrderConfirmScr
 import me.taste2plate.app.customer.presentation.screens.citybrand.CityBrandScreen
 import me.taste2plate.app.customer.presentation.screens.citybrand.CityBrandViewModel
 import me.taste2plate.app.customer.presentation.screens.citybrand.DetailScreen
+import me.taste2plate.app.customer.presentation.screens.citybrand.SubCategoryScreen
 import me.taste2plate.app.customer.presentation.screens.contact_us.ContactUsScreen
 import me.taste2plate.app.customer.presentation.screens.home.CityBrandScreens
 import me.taste2plate.app.customer.presentation.screens.home.HomeScreen
@@ -40,7 +41,9 @@ import me.taste2plate.app.customer.presentation.screens.membership_plan.Membersh
 import me.taste2plate.app.customer.presentation.screens.my_plan.MyPlanScreen
 import me.taste2plate.app.customer.presentation.screens.order.OrderDetailsScreen
 import me.taste2plate.app.customer.presentation.screens.order.OrderListScreen
+import me.taste2plate.app.customer.presentation.screens.order.OrderViewModel
 import me.taste2plate.app.customer.presentation.screens.product.ProductDetailsScreen
+import me.taste2plate.app.customer.presentation.screens.product.ProductViewModel
 import me.taste2plate.app.customer.presentation.screens.product.list.ProductListScreen
 import me.taste2plate.app.customer.presentation.screens.profile.EditProfileScreen
 import me.taste2plate.app.customer.presentation.screens.profile.ProfileScreen
@@ -209,23 +212,30 @@ fun Navigation() {
             )
         }
 
-        // ----------------------------> Order List <--------------------------------------
-        composable(route = Screens.OrderListScreen.route) {
-            OrderListScreen(
-                onNavigateToOrderDetailsScreen = {
-                    navController.navigate(Screens.OrderDetailsScreen.route)
-                }
-            )
+
+        navigation(startDestination = Screens.CartScreen.route, route = "order") {
+            // ----------------------------> Order List <--------------------------------------
+            composable(route = Screens.OrderListScreen.route) { entry ->
+                val viewModel =
+                    entry.sharedViewModel<OrderViewModel>(navHostController = navController)
+                OrderListScreen(
+                    viewModel,
+                    onNavigateToOrderDetailsScreen = {
+                        navController.navigate(Screens.OrderDetailsScreen.route)
+                    }
+                )
+            }
+
+            // ----------------------------> Order List <--------------------------------------
+            composable(route = Screens.NotificationScreen.route) {
+                NotificationPermissionScreen(
+                    onNavigateToHomeScreen = {
+                        navController.navigate(Screens.HomeScreen.route)
+                    }
+                )
+            }
         }
 
-        // ----------------------------> Order List <--------------------------------------
-        composable(route = Screens.NotificationScreen.route) {
-            NotificationPermissionScreen(
-                onNavigateToHomeScreen = {
-                    navController.navigate(Screens.HomeScreen.route)
-                }
-            )
-        }
 
         // ----------------------------> WishList <--------------------------------------
         composable(route = Screens.WishlistScreen.route) {
@@ -268,28 +278,50 @@ fun Navigation() {
             MembershipPlanScreen()
         }
 
-        // ----------------------------> Product List <--------------------------------------
-        composable(route = Screens.ProductListScreen.route + "?categoryInfo={categoryInfo}",
-            arguments = listOf(
-                navArgument("categoryInfo") {
-                    type = NavType.StringType
-                    defaultValue = ""
-                    nullable = true
-                }
-            )
-        ) { entry ->
-            Log.e("ProductList", "${entry.arguments?.getString("categoryInfo")}")
-            val itemInfo = Gson().fromJson(
-                entry.arguments?.getString("categoryInfo"),
-                CommonForItem::class.java
-            )
-            ProductListScreen(
-                itemInfo = itemInfo,
-                onNavigateToProductDetailsScreen = {
-                    navController.navigate(Screens.ProductDetailsScreen.route)
-                })
-        }
 
+        navigation(startDestination = Screens.CartScreen.route, route = "product") {
+
+            // ----------------------------> Product List <--------------------------------------
+            composable(route = Screens.ProductListScreen.route + "?categoryInfo={categoryInfo}",
+                arguments = listOf(
+                    navArgument("categoryInfo") {
+                        type = NavType.StringType
+                        defaultValue = ""
+                        nullable = true
+                    }
+                )
+            ) { entry ->
+                val itemInfo = Gson().fromJson(
+                    entry.arguments?.getString("categoryInfo"),
+                    CommonForItem::class.java
+                )
+
+                val viewModel =
+                    entry.sharedViewModel<ProductViewModel>(navHostController = navController)
+
+                ProductListScreen(
+                    viewModel = viewModel,
+                    itemInfo = itemInfo,
+                    onNavigateToProductDetailsScreen = {
+                        navController.navigate(Screens.ProductDetailsScreen.route)
+                    })
+            }
+
+
+            // ----------------------------> Product Details <--------------------------------------
+            composable(route = Screens.ProductDetailsScreen.route) { entry ->
+
+                val viewModel =
+                    entry.sharedViewModel<ProductViewModel>(navHostController = navController)
+                ProductDetailsScreen(
+                    viewModel = viewModel,
+                    onNavigateToCartScreen = {
+                        navController.navigate(Screens.CartScreen.route)
+                    }
+                )
+            }
+
+        }
 
         navigation(startDestination = Screens.CartScreen.route, route = "citybrand") {
 
@@ -317,10 +349,13 @@ fun Navigation() {
                             it,
                             CommonForItem::class.java
                         )
-                        navController.navigate(Screens.ProductListScreen.route+"?categoryInfo=$itemInfo")
+                        navController.navigate(Screens.ProductListScreen.route + "?categoryInfo=$itemInfo")
                     },
                     onNavigateToDetailsScreen = {
                         navController.navigate(Screens.DetailsScreen.route)
+                    },
+                    onNavigateToSubCategoryScreen = {
+                        navController.navigate(Screens.SubCategoryScreen.route)
                     }
                 )
             }
@@ -330,6 +365,19 @@ fun Navigation() {
                 val viewModel =
                     entry.sharedViewModel<CityBrandViewModel>(navHostController = navController)
                 DetailScreen(viewModel)
+            }
+
+            // ----------------------------> SubCategory Screen <--------------------------------------
+            composable(route = Screens.SubCategoryScreen.route) { entry ->
+                val viewModel =
+                    entry.sharedViewModel<CityBrandViewModel>(navHostController = navController)
+                SubCategoryScreen(viewModel) {
+                    val itemInfo = Gson().toJson(
+                        it,
+                        CommonForItem::class.java
+                    )
+                    navController.navigate(Screens.ProductListScreen.route + "?categoryInfo=$itemInfo")
+                }
             }
         }
 
@@ -374,15 +422,6 @@ fun Navigation() {
                     }
                 })
             }
-        }
-
-        // ----------------------------> Product Details <--------------------------------------
-        composable(route = Screens.ProductDetailsScreen.route) {
-            ProductDetailsScreen(
-                onNavigateToCartScreen = {
-                    navController.navigate(Screens.CartScreen.route)
-                }
-            )
         }
 
 

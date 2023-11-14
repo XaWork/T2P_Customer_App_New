@@ -14,6 +14,7 @@ sealed class Screens(val route: String) {
     object CityBrandScreen : Screens(route = Routes.cityBrandRoute)
     object ProductListScreen : Screens(route = Routes.productListRoute)
     object DetailsScreen : Screens(route = Routes.detailsRoute)
+    object SubCategoryScreen : Screens(route = Routes.subCategoryRoute)
     object BulkOrderScreen : Screens(route = Routes.bulkOrderRoute)
     object ProductDetailsScreen : Screens(route = Routes.productDetailsRoute)
     object ContactUsScreen : Screens(route = Routes.contactUsRoute)

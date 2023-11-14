@@ -7,6 +7,7 @@ sealed class CityBrandEvents {
     data class GetData(
         val screen: CityBrandScreens
     ) : CityBrandEvents()
+    object GetSubCategory : CityBrandEvents()
 
     data class SetSelectedItem(
         val item: CommonForItem

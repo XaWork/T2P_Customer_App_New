@@ -7,23 +7,27 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.filled.ShoppingCart
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -36,13 +40,15 @@ import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import me.taste2plate.app.customer.R
-import me.taste2plate.app.customer.presentation.screens.productList
+import me.taste2plate.app.customer.domain.model.product.ProductDetailsModel
+import me.taste2plate.app.customer.presentation.screens.product.list.ProductEvents
 import me.taste2plate.app.customer.presentation.theme.ExtraLowElevation
 import me.taste2plate.app.customer.presentation.theme.MediumPadding
 import me.taste2plate.app.customer.presentation.theme.MediumRoundedCorners
@@ -56,6 +62,7 @@ import me.taste2plate.app.customer.presentation.theme.onSecondaryColor
 import me.taste2plate.app.customer.presentation.theme.primaryColor
 import me.taste2plate.app.customer.presentation.theme.secondaryColor
 import me.taste2plate.app.customer.presentation.utils.rupeeSign
+import me.taste2plate.app.customer.presentation.widgets.AppEmptyView
 import me.taste2plate.app.customer.presentation.widgets.AppOutlineButton
 import me.taste2plate.app.customer.presentation.widgets.AppScaffold
 import me.taste2plate.app.customer.presentation.widgets.AppTopBar
@@ -63,14 +70,24 @@ import me.taste2plate.app.customer.presentation.widgets.CircleIconButton
 import me.taste2plate.app.customer.presentation.widgets.InfoWithIcon
 import me.taste2plate.app.customer.presentation.widgets.NetworkImage
 import me.taste2plate.app.customer.presentation.widgets.RoundedCornerCard
+import me.taste2plate.app.customer.presentation.widgets.ShowLoading
 import me.taste2plate.app.customer.presentation.widgets.SpaceBetweenRow
 import me.taste2plate.app.customer.presentation.widgets.TextInCircle
 import me.taste2plate.app.customer.presentation.widgets.VerticalSpace
+import me.taste2plate.app.customer.utils.fromHtml
+import me.taste2plate.app.customer.utils.toDate
 
 @Composable
 fun ProductDetailsScreen(
+    viewModel: ProductViewModel,
     onNavigateToCartScreen: () -> Unit
 ) {
+
+    val state = viewModel.state
+
+    LaunchedEffect(Unit) {
+        viewModel.onEvent(ProductEvents.GetProductDetails)
+    }
 
     AppScaffold(
         topBar = {
@@ -82,37 +99,44 @@ fun ProductDetailsScreen(
             )
         }
     ) {
-        LazyColumn(
-            modifier = Modifier
-                .fillMaxSize(),
-            contentPadding = PaddingValues(top = ScreenPadding)
-        ) {
-            item {
-                ProductImages()
 
-                VerticalSpace(space = SpaceBetweenViews)
-
-                Column(
-                    modifier = Modifier.padding(ScreenPadding)
-                ) {
-                    ProductDetails()
+        if (state.isLoading || state.productDetails == null)
+            ShowLoading(isButton = false)
+        else if (state.isError)
+            AppEmptyView()
+        else {
+            val details = state.productDetails.result[0]
+            LazyColumn(
+                modifier = Modifier
+                    .fillMaxSize(),
+            ) {
+                item {
+                    ProductImages(details)
 
                     VerticalSpace(space = SpaceBetweenViews)
 
-                    SpaceBetweenRow(item1 = {
-                        Text(
-                            text = "Reviews",
-                            fontWeight = FontWeight.W500,
-                            fontSize = 18.sp
-                        )
-                    }) {
-                        Text(text = "Add Reviews", color = primaryColor.invoke())
+                    Column(
+                        modifier = Modifier.padding(ScreenPadding)
+                    ) {
+                        ProductDetails(details, onPinCodeCheck = {})
+
+                        VerticalSpace(space = SpaceBetweenViews)
+
+                        SpaceBetweenRow(item1 = {
+                            Text(
+                                text = "Reviews",
+                                fontWeight = FontWeight.W500,
+                                fontSize = 18.sp
+                            )
+                        }) {
+                            Text(text = "Add Reviews", color = primaryColor.invoke())
+                        }
                     }
                 }
-            }
 
-            items(10) {
-                ProductReviews()
+                items(state.productDetails.review) { review ->
+                    ProductReviews(review)
+                }
             }
         }
     }
@@ -133,7 +157,8 @@ fun BottomBar(
                 info = "Items in cart", icon = true,
                 imageVector = Icons.Default.ShoppingCart,
                 textColor = backgroundColor.invoke(),
-                tint = backgroundColor.invoke()
+                tint = backgroundColor.invoke(),
+                fontSize = 14.sp
             )
         }) {
 
@@ -145,14 +170,17 @@ fun BottomBar(
                 colorFilter = ColorFilter.tint(color = backgroundColor.invoke()),
                 modifier = Modifier.clickable {
                     onNavigateToCartScreen()
-                }
+                },
+                fontSize = 14.sp
             )
         }
     }
 }
 
 @Composable
-fun ProductReviews() {
+fun ProductReviews(
+    review: ProductDetailsModel.Review
+) {
     RoundedCornerCard(
         cardColor = cardContainerOnSecondaryColor.invoke(),
         modifier = Modifier.padding(ScreenPadding),
@@ -164,7 +192,7 @@ fun ProductReviews() {
                 .padding(ScreenPadding)
         ) {
             Text(
-                text = "07-05-2023",
+                text = review.createdDate.toDate(),
                 color = secondaryColor.invoke(),
                 modifier = Modifier.align(Alignment.End)
             )
@@ -178,15 +206,17 @@ fun ProductReviews() {
 
             VerticalSpace(space = SpaceBetweenViewsAndSubViews)
 
-            Text(text = "Review")
+            Text(text = review.review)
 
         }
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ProductDetails() {
+fun ProductDetails(
+    details: ProductDetailsModel.Result,
+    onPinCodeCheck: (pin: String) -> Unit
+) {
     var pincode by remember {
         mutableStateOf("")
     }
@@ -200,16 +230,21 @@ fun ProductDetails() {
                 .fillMaxWidth()
                 .padding(ScreenPadding)
         ) {
-            SpaceBetweenRow(item1 = {
+
+            val items = listOf<@Composable RowScope.() -> Unit> {
                 Text(
-                    text = "Product name",
+                    text = details.name,
                     maxLines = 5,
                     fontWeight = FontWeight.W500,
                     fontSize = 22.sp,
                 )
-            }) {
-               // CartAddRemove()
+
+                CartAddRemove(
+                    0,
+                ) {}
             }
+
+            SpaceBetweenRow(items = items)
 
             VerticalSpace(space = SpaceBetweenViews)
 
@@ -224,8 +259,10 @@ fun ProductDetails() {
                 TextField(
                     value = pincode,
                     onValueChange = {
-                        pincode = it
+                        if (it.length <= 6)
+                            pincode = it
                     },
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(end = SpaceBetweenViewsAndSubViews)
@@ -234,36 +271,46 @@ fun ProductDetails() {
                     placeholder = {
                         Text(text = "Pincode")
                     },
-                    colors = TextFieldDefaults.textFieldColors(containerColor = backgroundColor.invoke()),
+                    colors = TextFieldDefaults.colors(
+                        focusedContainerColor = backgroundColor.invoke(),
+                        unfocusedContainerColor = backgroundColor.invoke()
+                    ),
                 )
             }) {
                 AppOutlineButton(
                     text = "Check",
                     modifier = Modifier.weight(1f)
-                ) {}
+                ) {
+                    onPinCodeCheck(pincode)
+                }
             }
 
             VerticalSpace(space = SpaceBetweenViews)
 
-            Text(text = "Description", fontWeight = FontWeight.Light)
+            Text(text = details.desc.fromHtml(), fontWeight = FontWeight.Light)
         }
     }
 }
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun ProductImages() {
+fun ProductImages(
+    details: ProductDetailsModel.Result,
+) {
+    val isOnSale = details.sellingPrice != null && details.sellingPrice.isNotEmpty()
+    val images = details.file
+
     Box(
         modifier = Modifier.fillMaxWidth()
     ) {
-        val pagerState = rememberPagerState(pageCount = { 5 })
+        val pagerState = rememberPagerState(pageCount = { images.size })
 
         HorizontalPager(
             state = pagerState,
             pageSpacing = 10.dp
         ) {
             NetworkImage(
-                image = productList[0].image,
+                image = images[it].location,
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(300.dp)
@@ -274,23 +321,29 @@ fun ProductImages() {
             )
         }
 
-        SaleBanner(modifier = Modifier.align(Alignment.TopStart))
+        if (isOnSale)
+            SaleBanner(modifier = Modifier.align(Alignment.TopStart))
 
         CircleIconButton(
-            painterResource = R.drawable.heart,
+            isDrawableIcon = false,
+            icon = Icons.Default.FavoriteBorder,
             modifier = Modifier
-                .align(Alignment.TopEnd)
                 .padding(10.dp)
+                .align(Alignment.TopEnd),
+            iconModifier = Modifier
+                .size(30.dp)
         ) {}
 
         Column(
             modifier = Modifier.align(Alignment.BottomEnd)
         ) {
-            SaleBanner(
-                text = "$rupeeSign 324", textDecoration = TextDecoration.LineThrough,
-                backgroundColor = secondaryColor.invoke()
-            )
-            SaleBanner(text = "$rupeeSign 224")
+            if (isOnSale)
+                SaleBanner(
+                    text = "$rupeeSign ${details.sellingPrice}",
+                    textDecoration = TextDecoration.LineThrough,
+                    backgroundColor = secondaryColor.invoke()
+                )
+            SaleBanner(text = "$rupeeSign ${details.price}")
         }
 
 
@@ -359,6 +412,6 @@ fun CartAddRemove(
 @Composable
 fun ProductDetailsScreenPreview() {
     T2PCustomerAppTheme {
-        ProductDetailsScreen({})
+        // ProductDetailsScreen({})
     }
 }

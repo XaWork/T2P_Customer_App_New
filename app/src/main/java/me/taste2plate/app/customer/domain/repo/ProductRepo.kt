@@ -1,5 +1,6 @@
 package me.taste2plate.app.customer.domain.repo
 
+import me.taste2plate.app.customer.domain.model.product.ProductDetailsModel
 import me.taste2plate.app.customer.domain.model.product.ProductListModel
 
 interface ProductRepo {
@@ -17,4 +18,13 @@ interface ProductRepo {
         id: String,
         taste: String
     ): ProductListModel
+
+    suspend fun productByCategory(
+        id: String,
+        taste: String
+    ): ProductListModel
+
+    suspend fun productDetails(
+        id: String,
+    ): ProductDetailsModel
 }

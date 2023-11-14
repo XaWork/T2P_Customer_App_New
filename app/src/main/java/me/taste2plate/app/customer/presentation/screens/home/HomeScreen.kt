@@ -191,10 +191,10 @@ fun HomeScreen(
                 )
             else
                 Column {
-                    AddressBar(state.defaultAddress!!.address) {
+                    /*AddressBar(state.defaultAddress!!.address) {
                         viewModel.onEvent(HomeEvent.GetAddress)
                         showBottomSheet = true
-                    }
+                    }*/
                     LazyColumn(
                         state = scrollState,
                         horizontalAlignment = Alignment.CenterHorizontally

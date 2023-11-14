@@ -12,6 +12,7 @@ import me.taste2plate.app.customer.domain.model.CityListModel
 import me.taste2plate.app.customer.domain.model.HomeModel
 import me.taste2plate.app.customer.domain.model.SettingsModel
 import me.taste2plate.app.customer.domain.model.StateListModel
+import me.taste2plate.app.customer.domain.model.SubCategoryModel
 import me.taste2plate.app.customer.domain.model.ZipListModel
 import me.taste2plate.app.customer.domain.repo.CustomRepo
 import retrofit2.HttpException
@@ -57,5 +58,9 @@ class CustomRepoImpl @Inject constructor(
 
     override suspend fun allCategories(): CategoryModel {
         return api.allCategories()
+    }
+
+    override suspend fun allSubCategories(categoryId: String): SubCategoryModel {
+        return api.subCategories(categoryId)
     }
 }

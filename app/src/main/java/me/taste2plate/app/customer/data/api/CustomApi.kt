@@ -7,6 +7,7 @@ import me.taste2plate.app.customer.domain.model.CityListModel
 import me.taste2plate.app.customer.domain.model.HomeModel
 import me.taste2plate.app.customer.domain.model.SettingsModel
 import me.taste2plate.app.customer.domain.model.StateListModel
+import me.taste2plate.app.customer.domain.model.SubCategoryModel
 import me.taste2plate.app.customer.domain.model.ZipListModel
 import retrofit2.Call
 import retrofit2.http.Field
@@ -52,5 +53,8 @@ interface CustomApi {
 
     @GET("all-parent-categories")
     suspend fun allCategories(): CategoryModel
+
+    @GET("all-sub-categories")
+    suspend fun subCategories(@Query("parent") parentId: String): SubCategoryModel
 
 }

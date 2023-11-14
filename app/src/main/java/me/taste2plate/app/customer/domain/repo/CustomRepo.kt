@@ -6,6 +6,7 @@ import me.taste2plate.app.customer.domain.model.CityListModel
 import me.taste2plate.app.customer.domain.model.HomeModel
 import me.taste2plate.app.customer.domain.model.SettingsModel
 import me.taste2plate.app.customer.domain.model.StateListModel
+import me.taste2plate.app.customer.domain.model.SubCategoryModel
 import me.taste2plate.app.customer.domain.model.ZipListModel
 
 interface CustomRepo {
@@ -33,4 +34,8 @@ interface CustomRepo {
     suspend fun brandList(): CityBrandModel
 
     suspend fun allCategories(): CategoryModel
+
+    suspend fun allSubCategories(
+        categoryId: String
+    ): SubCategoryModel
 }

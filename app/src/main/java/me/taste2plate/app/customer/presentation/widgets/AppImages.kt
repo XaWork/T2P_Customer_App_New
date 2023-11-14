@@ -181,6 +181,7 @@ fun HorizontalSpace(space: Dp) {
 @Composable
 fun CircleIconButton(
     modifier: Modifier = Modifier,
+    iconModifier: Modifier = Modifier,
     painterResource: Int? = null,
     icon: ImageVector? = null,
     isDrawableIcon: Boolean = true,
@@ -196,6 +197,7 @@ fun CircleIconButton(
     ) {
         if (isDrawableIcon)
             DrawableIconButton(
+                modifier = iconModifier,
                 tint = tint,
                 painterResource = painterResource!!,
             ) {
@@ -203,6 +205,7 @@ fun CircleIconButton(
             }
         else
             MaterialIconButton(
+                modifier = iconModifier,
                 tint = tint,
                 imageVector = icon!!
             ) {

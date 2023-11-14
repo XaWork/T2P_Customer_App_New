@@ -64,10 +64,14 @@ class HomeViewModel @Inject constructor(
         }
     }
 
-    private fun setDefaultAddress(address: AddressListModel.Result) {
+    private fun setDefaultAddress(
+        address: AddressListModel.Result,
+        isLoading: Boolean = false
+    ) {
         viewModelScope.launch {
             userPref.saveDefaultAddress(address)
-            state = state.copy(defaultAddress = address)
+            state = state.copy(isLoading = isLoading,defaultAddress = address)
+            getCart()
         }
     }
 
@@ -220,8 +224,7 @@ class HomeViewModel @Inject constructor(
 
                         if (!isError) {
                             if (state.defaultAddress == null && result.data != null && result.data.result.isNotEmpty()) {
-                                setDefaultAddress(result.data.result[0])
-                                getCart()
+                                setDefaultAddress(result.data.result[0], isLoading = true)
                             } else {
                                 if (state.cartData == null)
                                     getCart()

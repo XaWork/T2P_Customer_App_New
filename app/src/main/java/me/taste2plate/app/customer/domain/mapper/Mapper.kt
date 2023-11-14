@@ -3,6 +3,7 @@ package me.taste2plate.app.customer.domain.mapper
 import me.taste2plate.app.customer.domain.model.Category
 import me.taste2plate.app.customer.domain.model.CityBrandModel
 import me.taste2plate.app.customer.domain.model.HomeModel
+import me.taste2plate.app.customer.domain.model.SubCategoryModel
 import me.taste2plate.app.customer.domain.model.user.CartModel
 import me.taste2plate.app.customer.domain.model.user.WishListModel
 
@@ -22,7 +23,7 @@ fun CartModel.Result.toCommonForWishAndCartItem(): CommonForItem {
         image = product.file[0].location,
         name = product.name,
         quantity = quantity,
-        price = product.price.toString()
+        price = product.price
     )
 
 }
@@ -61,6 +62,16 @@ fun CityBrandModel.Result.toCommonItem(): CommonForItem {
 
 
 fun Category.toCommonItem(): CommonForItem {
+    return CommonForItem(
+        id = id,
+        image = file,
+        name = name,
+        description = description
+    )
+}
+
+
+fun SubCategoryModel.Result.toCommonItem(): CommonForItem {
     return CommonForItem(
         id = id,
         image = file,

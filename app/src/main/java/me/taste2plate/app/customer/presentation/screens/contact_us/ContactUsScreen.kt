@@ -1,6 +1,11 @@
 package me.taste2plate.app.customer.presentation.screens.contact_us
 
+import android.content.Context
+import android.content.Intent
 import android.content.res.Configuration
+import android.net.Uri
+import android.util.Log
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -13,8 +18,12 @@ import androidx.compose.material.icons.outlined.Phone
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.sp
+import androidx.core.content.ContextCompat.startActivity
+import androidx.hilt.navigation.compose.hiltViewModel
 import me.taste2plate.app.customer.R
 import me.taste2plate.app.customer.presentation.theme.MediumSpacing
 import me.taste2plate.app.customer.presentation.theme.ScreenPadding
@@ -29,38 +38,50 @@ import me.taste2plate.app.customer.presentation.widgets.InfoWithIcon
 import me.taste2plate.app.customer.presentation.widgets.VerticalSpace
 
 @Composable
-fun ContactUsScreen() {
+fun ContactUsScreen(
+    viewModel: ContactUsViewModel = hiltViewModel()
+) {
+    val state = viewModel.state
+
     AppScaffold(
         topBar = {
             AppTopBar {}
         },
     ) {
-        ContactUsScreenContent()
+        if (state.setting != null)
+            ContactUsScreenContent(state)
     }
 }
 
 @Composable
-fun ContactUsScreenContent() {
+fun ContactUsScreenContent(
+    state: ContactUsState
+) {
+    val context = LocalContext.current
     val itemList = listOf(
         ContactInfoItem(
+            id = ContactId.Call,
             isIcon = true,
             icon = Icons.Outlined.Phone,
-            title = "Call : 7801832728"
+            title = "Call : ${state.setting?.contactPhone}"
         ),
         ContactInfoItem(
+            id = ContactId.Whatsapp,
             isIcon = true,
             icon = Icons.Outlined.Phone,
-            title = "Whatsapp : 7801832728"
+            title = "Whatsapp : ${state.setting?.whatsapp}"
         ),
         ContactInfoItem(
+            id = ContactId.Email,
             isIcon = true,
             icon = Icons.Outlined.Email,
-            title = "support@taste2plate.com"
+            title = state.setting?.contactEmail.toString()
         ),
         ContactInfoItem(
+            id = ContactId.Address,
             isIcon = true,
             icon = Icons.Outlined.LocationOn,
-            title = "Address here"
+            title = state.setting?.address.toString()
         )
     )
 
@@ -81,7 +102,20 @@ fun ContactUsScreenContent() {
         }
 
         items(itemList) { item ->
-            SingleContactInfo(item)
+            SingleContactInfo(item) {
+                when (item.id!!) {
+                    ContactId.Call -> {
+                        dialPhone(context, state.setting!!.contactPhone)
+                    }
+
+                    ContactId.Whatsapp -> {}
+                    ContactId.Email -> {
+                        sendMail(context, item.title)
+                    }
+
+                    ContactId.Address -> {}
+                }
+            }
         }
 
     }
@@ -89,7 +123,8 @@ fun ContactUsScreenContent() {
 
 @Composable
 fun SingleContactInfo(
-    info: ContactInfoItem
+    info: ContactInfoItem,
+    onItemClick: () -> Unit
 ) {
     Column {
         AppDivider()
@@ -99,10 +134,36 @@ fun SingleContactInfo(
                 icon = isIcon,
                 imageVector = icon!!,
                 info = title,
-                tint = primaryColor.invoke()
+                maxLines = 5,
+                tint = primaryColor.invoke(),
+                modifier = Modifier.clickable { onItemClick() }
             )
         }
     }
+}
+
+
+private fun dialPhone(context: Context, mob: String) {
+    var mobileNumber = ""
+    for (singleNumber in mob.trim()) {
+        if (singleNumber == ' ')
+            break
+        else
+            mobileNumber += singleNumber
+    }
+
+    Log.e("mobile", mobileNumber)
+
+    val intent = Intent(Intent.ACTION_DIAL)
+    intent.data = Uri.parse("tel:$mobileNumber")
+    context.startActivity(intent)
+}
+
+private fun sendMail(context: Context, contactEmail: String) {
+    val intent = Intent(Intent.ACTION_SEND)
+    intent.type = "text/plain"
+    intent.putExtra(Intent.EXTRA_EMAIL, arrayOf(contactEmail))
+    context.startActivity(Intent.createChooser(intent, "Send Via"))
 }
 
 
@@ -113,5 +174,12 @@ fun ContactUsScreenPreview() {
     T2PCustomerAppTheme {
         ContactUsScreen()
     }
+}
+
+enum class ContactId {
+    Call,
+    Whatsapp,
+    Email,
+    Address
 }
 
