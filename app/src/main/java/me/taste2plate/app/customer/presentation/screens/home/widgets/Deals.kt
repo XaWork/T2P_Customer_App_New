@@ -47,13 +47,14 @@ import me.taste2plate.app.customer.presentation.widgets.InfoWithIcon
 import me.taste2plate.app.customer.presentation.widgets.RatingInfoRow
 import me.taste2plate.app.customer.presentation.widgets.RedBorderCard
 import me.taste2plate.app.customer.presentation.widgets.RoundedCornerIconButton
+import me.taste2plate.app.customer.presentation.widgets.ShowLoading
 import me.taste2plate.app.customer.presentation.widgets.VerticalSpace
 import me.taste2plate.app.customer.presentation.widgets.simpleAnimation
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun Deals(
-    onNavigateToProductDetailsScreen: () -> Unit,
+    onNavigateToProductDetailsScreen: (productId: String) -> Unit,
     viewModel: HomeViewModel
 ) {
 
@@ -85,15 +86,19 @@ fun Deals(
             SingleBestSellerItem(
                 page,
                 pagerState = pagerState,
-                modifier = Modifier.clickable { onNavigateToProductDetailsScreen() },
+                modifier = Modifier.clickable { onNavigateToProductDetailsScreen(deal.id) },
                 deal = deal,
                 alreadyWishListed = if (wishlistItems.isEmpty()) false else wishlistItems.any { it.product.id == deal.id },
                 foodItemUpdateInfo = if (state.foodItemUpdateInfo != null && state.foodItemUpdateInfo.id == deal.id)
                     state.foodItemUpdateInfo
-                else null
-            ) {
-                viewModel.onEvent(HomeEvent.AddToWishlist(deal.id))
-            }
+                else null,
+                addToCart = {
+                    viewModel.onEvent(HomeEvent.AddToCart(deal.id))
+                },
+                addToWishlist = {
+                    viewModel.onEvent(HomeEvent.AddToWishlist(deal.id))
+                }
+            )
         }
     }
 }
@@ -108,6 +113,7 @@ fun SingleBestSellerItem(
     alreadyWishListed: Boolean = false,
     foodItemUpdateInfo: FoodItemUpdateInfo? = null,
     addToWishlist: () -> Unit,
+    addToCart: () -> Unit
 ) {
     RedBorderCard(
         modifier = modifier.simpleAnimation(pagerState, page)
@@ -125,8 +131,11 @@ fun SingleBestSellerItem(
                 modifier = Modifier.padding(ScreenPadding)
             ) {
                 RatingInfoRow(
-                    flatOff = "Flat $rupeeSign${deal.discountedPrice} OFF",
-                    rating = ""
+                    flatOff = if (deal.sellingPrice != null && deal.sellingPrice.isNotEmpty())
+                        "Flat $rupeeSign${(deal.sellingPrice.toInt() - deal.price.toInt())} OFF"
+                    else "",
+                    rating = "",
+                    weight = deal.weight
                 )
 
                 VerticalSpace(space = SpaceBetweenViews)
@@ -144,7 +153,7 @@ fun SingleBestSellerItem(
                         )
 
                         Text(
-                            text = deal.brand,
+                            text = deal.brand.name,
                             style = MaterialTheme.typography.titleMedium,
                             fontWeight = FontWeight.Light
                         )
@@ -154,7 +163,7 @@ fun SingleBestSellerItem(
                         InfoWithIcon(
                             icon = true,
                             imageVector = Icons.Outlined.LocationOn,
-                            info = deal.city
+                            info = deal.city.name
                         )
 
                         VerticalSpace(space = SpaceBetweenViewsAndSubViews)
@@ -168,7 +177,9 @@ fun SingleBestSellerItem(
                             )
                         )
                     }
-                    DealsPriceCard(deal.price)
+                    DealsPriceCard(deal.price, foodItemUpdateInfo = foodItemUpdateInfo) {
+                        addToCart()
+                    }
                 }
 
                 VerticalSpace(space = SpaceBetweenViews)
@@ -182,7 +193,9 @@ fun SingleBestSellerItem(
 @Composable
 fun DealsPriceCard(
     price: String,
+    foodItemUpdateInfo: FoodItemUpdateInfo? = null,
     showAddToCartButton: Boolean = true,
+    addToCart: () -> Unit
 ) {
     Column(
         horizontalAlignment = Alignment.End
@@ -213,14 +226,17 @@ fun DealsPriceCard(
         VerticalSpace(space = SpaceBetweenViews)
 
         if (showAddToCartButton)
-            RoundedCornerIconButton(
-                isMaterialIcon = true,
-                icon = Icons.Outlined.ShoppingCart,
-                cornerRadius = LowRoundedCorners,
-                cardColors = CardDefaults.cardColors(
-                    containerColor = MaterialTheme.colorScheme.primary
-                )
-            ) {}
+            /*if (foodItemUpdateInfo != null && !foodItemUpdateInfo.wishlistItem && foodItemUpdateInfo.isLoading)
+                ShowLoading()
+            else*/
+                RoundedCornerIconButton(
+                    isMaterialIcon = true,
+                    icon = Icons.Outlined.ShoppingCart,
+                    cornerRadius = LowRoundedCorners,
+                    cardColors = CardDefaults.cardColors(
+                        containerColor = MaterialTheme.colorScheme.primary
+                    )
+                ) { addToCart() }
     }
 }
 

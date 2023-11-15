@@ -9,6 +9,7 @@ import me.taste2plate.app.customer.domain.model.user.address.AddressListModel
 data class HomeState(
     val isLoading: Boolean = false,
     val addressLoader: Boolean = false,
+    val checked: Boolean = false,
     val errorMessage: String? = null,
     val message: String? = null,
     val isError: Boolean = false,
@@ -17,6 +18,7 @@ data class HomeState(
     val cartData: CartModel? = null,
     val addressListModel: AddressListModel? = null,
     val addToWishlistResponse: CommonResponse? = null,
+    val addToCartResponse: CommonResponse? = null,
     val foodItemUpdateInfo: FoodItemUpdateInfo? = null,
     val defaultAddress: AddressListModel.Result? = null,
 )
@@ -24,5 +26,6 @@ data class HomeState(
 data class FoodItemUpdateInfo(
     val id : String,
     val isLoading: Boolean = false,
+    val wishlistItem: Boolean = true,
     val added: Boolean = false,
 )

@@ -1,6 +1,5 @@
 package me.taste2plate.app.customer.data.api
 
-import me.taste2plate.app.customer.domain.model.Category
 import me.taste2plate.app.customer.domain.model.CategoryModel
 import me.taste2plate.app.customer.domain.model.CityBrandModel
 import me.taste2plate.app.customer.domain.model.CityListModel
@@ -9,13 +8,9 @@ import me.taste2plate.app.customer.domain.model.SettingsModel
 import me.taste2plate.app.customer.domain.model.StateListModel
 import me.taste2plate.app.customer.domain.model.SubCategoryModel
 import me.taste2plate.app.customer.domain.model.ZipListModel
-import retrofit2.Call
-import retrofit2.http.Field
-import retrofit2.http.FormUrlEncoded
 import retrofit2.http.GET
 import retrofit2.http.POST
 import retrofit2.http.Query
-import retrofit2.http.QueryMap
 
 interface CustomApi {
     @POST("settings")

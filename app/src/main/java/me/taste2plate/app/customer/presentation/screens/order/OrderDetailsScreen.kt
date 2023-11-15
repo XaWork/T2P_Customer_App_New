@@ -213,7 +213,8 @@ fun SingleOrderItem() {
                 flatOff = "${rupeeSign}345 x 3",
                 rating = "$rupeeSign 983",
                 showIcon = false,
-                modifier = Modifier.padding(ScreenPadding)
+                modifier = Modifier.padding(ScreenPadding),
+                weight = ""
             )
         }
     }

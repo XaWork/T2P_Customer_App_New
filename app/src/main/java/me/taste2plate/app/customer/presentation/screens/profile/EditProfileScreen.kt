@@ -14,6 +14,7 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -33,10 +34,30 @@ import me.taste2plate.app.customer.presentation.widgets.AppTextField
 import me.taste2plate.app.customer.presentation.widgets.AppTopBar
 import me.taste2plate.app.customer.presentation.widgets.MaterialIcon
 import me.taste2plate.app.customer.presentation.widgets.RoundedCornerCard
+import me.taste2plate.app.customer.presentation.widgets.ShowLoading
 import me.taste2plate.app.customer.presentation.widgets.VerticalSpace
+import me.taste2plate.app.customer.presentation.widgets.showToast
 
 @Composable
-fun EditProfileScreen() {
+fun EditProfileScreen(
+    viewModel: ProfileViewModel,
+    onNavigateToHomeScreen: () -> Unit
+) {
+
+    val state = viewModel.state
+    LaunchedEffect(state) {
+        when {
+            state.isError && state.message != null -> {
+                showToast(state.message)
+            }
+
+            state.message != null && state.editProfileResponse != null -> {
+               // showToast(state.message)
+                onNavigateToHomeScreen()
+            }
+        }
+    }
+
     AppScaffold(
         topBar = {
             AppTopBar(
@@ -44,16 +65,14 @@ fun EditProfileScreen() {
             ) {}
         }
     ) {
-        ContentEditProfileScreen()
+        ContentEditProfileScreen(viewModel)
     }
 }
 
 @Composable
-fun ContentEditProfileScreen() {
-    var fullName by remember {
-        mutableStateOf("")
-    }
-
+fun ContentEditProfileScreen(
+    viewModel: ProfileViewModel
+) {
     Box(
         modifier = Modifier.fillMaxSize()
     ) {
@@ -80,8 +99,8 @@ fun ContentEditProfileScreen() {
                     modifier = Modifier.padding(ScreenPadding)
                 ) {
                     AppTextField(
-                        value = fullName,
-                        onValueChanged = { fullName = it },
+                        value = viewModel.fullName,
+                        onValueChanged = { viewModel.fullName = it },
                         hint = "Full Name"
                     ) {
                         MaterialIcon(
@@ -92,8 +111,8 @@ fun ContentEditProfileScreen() {
                     VerticalSpace(space = SpaceBetweenViews)
 
                     AppTextField(
-                        value = fullName,
-                        onValueChanged = { fullName = it },
+                        value = viewModel.email,
+                        onValueChanged = { viewModel.email = it },
                         hint = "Email"
                     ) {
                         MaterialIcon(
@@ -104,8 +123,8 @@ fun ContentEditProfileScreen() {
                     VerticalSpace(space = SpaceBetweenViews)
 
                     AppTextField(
-                        value = fullName,
-                        onValueChanged = { fullName = it },
+                        value = viewModel.mobile,
+                        onValueChanged = { viewModel.mobile = it },
                         hint = "Mobile"
                     ) {
                         MaterialIcon(
@@ -116,11 +135,16 @@ fun ContentEditProfileScreen() {
             }
         }
 
-        AppButton(
-            text = "Save Details", modifier = Modifier.align(
-                Alignment.BottomCenter
-            )
-        ) {}
+        if (viewModel.state.isLoading)
+            ShowLoading()
+        else
+            AppButton(
+                text = "Save Details", modifier = Modifier.align(
+                    Alignment.BottomCenter
+                )
+            ) {
+                viewModel.onEvent(ProfileEvents.EditProfile)
+            }
     }
 }
 
@@ -130,6 +154,6 @@ fun ContentEditProfileScreen() {
 @Composable
 fun EditProfileScreenPreview() {
     T2PCustomerAppTheme {
-        EditProfileScreen()
+        // EditProfileScreen()
     }
 }

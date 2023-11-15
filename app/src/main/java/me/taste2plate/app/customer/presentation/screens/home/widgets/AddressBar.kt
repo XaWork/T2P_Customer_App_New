@@ -27,6 +27,8 @@ import me.taste2plate.app.customer.presentation.widgets.VegNonVegFilter
 @Composable
 fun AddressBar(
     address: String,
+    checked: Boolean = false,
+    onCheckChange: () -> Unit = {},
     showAddressSheet: () -> Unit
 ) {
     Row(
@@ -59,7 +61,9 @@ fun AddressBar(
         VegNonVegFilter(
             modifier = Modifier
                 .fillMaxWidth(1f)
-                .weight(1f)
+                .weight(1f),
+            checked = checked,
+            onCheckChange = onCheckChange
         )
     }
 }
@@ -68,6 +72,6 @@ fun AddressBar(
 @Composable
 fun AddressBarPreview() {
     T2PCustomerAppTheme {
-        AddressBar("JhunJhunu, Rajasthan", {})
+        //  AddressBar("JhunJhunu, Rajasthan", {})
     }
 }

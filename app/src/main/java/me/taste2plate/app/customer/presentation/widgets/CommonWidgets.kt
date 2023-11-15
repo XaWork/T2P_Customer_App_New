@@ -113,6 +113,7 @@ fun RatingInfoRow(
     modifier: Modifier = Modifier,
     flatOff: String,
     rating: String,
+    weight: String,
     showIcon: Boolean = true
 ) {
     Row(
@@ -123,6 +124,11 @@ fun RatingInfoRow(
     ) {
         Text(
             flatOff,
+            color = MaterialTheme.colorScheme.tertiary
+        )
+
+        Text(
+            "$weight Kg",
             color = MaterialTheme.colorScheme.tertiary
         )
 

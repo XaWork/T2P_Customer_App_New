@@ -16,6 +16,7 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
@@ -38,7 +39,9 @@ import me.taste2plate.app.customer.presentation.widgets.HorizontalSpace
 import me.taste2plate.app.customer.presentation.widgets.ImageWithWishlistButton
 import me.taste2plate.app.customer.presentation.widgets.InfoWithIcon
 import me.taste2plate.app.customer.presentation.widgets.MaterialIcon
+import me.taste2plate.app.customer.presentation.widgets.MaterialIconButton
 import me.taste2plate.app.customer.presentation.widgets.RatingInfoRow
+import me.taste2plate.app.customer.presentation.widgets.ShowLoading
 import me.taste2plate.app.customer.presentation.widgets.VerticalSpace
 
 
@@ -49,6 +52,7 @@ fun SingleFeaturedItem(
     alreadyWishListed: Boolean = false,
     foodItemUpdateInfo: FoodItemUpdateInfo? = null,
     addToWishlist: () -> Unit,
+    addToCart: () -> Unit
 ) {
     BlackBorderCard(
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.background),
@@ -69,8 +73,11 @@ fun SingleFeaturedItem(
                 modifier = Modifier.padding(ScreenPadding)
             ) {
                 RatingInfoRow(
-                    flatOff = "Flat $rupeeSign${product.discountedPrice} OFF",
-                    rating = ""
+                    flatOff = if (product.sellingPrice != null && product.sellingPrice.isNotEmpty())
+                        "Flat $rupeeSign${(product.sellingPrice.toInt() - product.price.toInt())} OFF"
+                    else "",
+                    rating = "",
+                    weight = product.weight
                 )
 
                 VerticalSpace(space = SpaceBetweenViews)
@@ -88,7 +95,7 @@ fun SingleFeaturedItem(
                         )
 
                         Text(
-                            text = product.brand,
+                            text = product.brand.name,
                             style = MaterialTheme.typography.titleMedium,
                             fontWeight = FontWeight.Light
                         )
@@ -98,7 +105,7 @@ fun SingleFeaturedItem(
                         InfoWithIcon(
                             icon = true,
                             imageVector = Icons.Outlined.LocationOn,
-                            info = product.city
+                            info = product.city.name
                         )
 
                         VerticalSpace(space = SpaceBetweenViewsAndSubViews)
@@ -112,7 +119,10 @@ fun SingleFeaturedItem(
                             )
                         )
                     }
-                    DealsPriceCard(product.price, showAddToCartButton = false)
+                    DealsPriceCard(
+                        product.price,
+                        showAddToCartButton = false
+                    ) {}
                 }
 
                 VerticalSpace(space = SpaceBetweenViews)
@@ -135,7 +145,8 @@ fun SingleFeaturedItem(
 
                 Row(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.Center
+                    horizontalArrangement = Arrangement.Center,
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
                         text = addToCartString,
@@ -144,10 +155,15 @@ fun SingleFeaturedItem(
 
                     HorizontalSpace(space = SpaceBetweenViewsAndSubViews)
 
-                    MaterialIcon(
-                        imageVector = Icons.Outlined.ShoppingCart,
-                        tint = MaterialTheme.colorScheme.primary
-                    )
+                    /*if (foodItemUpdateInfo != null && !foodItemUpdateInfo.wishlistItem && foodItemUpdateInfo.isLoading)
+                        ShowLoading()
+                    else*/
+                        MaterialIconButton(
+                            imageVector = Icons.Outlined.ShoppingCart,
+                            tint = MaterialTheme.colorScheme.primary
+                        ) {
+                            addToCart()
+                        }
                 }
             }
         }

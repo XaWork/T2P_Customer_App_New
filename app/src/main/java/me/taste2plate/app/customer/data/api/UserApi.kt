@@ -5,11 +5,13 @@ import me.taste2plate.app.customer.domain.model.auth.VerifyOTPModel
 import me.taste2plate.app.customer.domain.model.user.CartModel
 import me.taste2plate.app.customer.domain.model.user.CommonResponse
 import me.taste2plate.app.customer.domain.model.user.DeleteFromWishlistModel
+import me.taste2plate.app.customer.domain.model.user.GetProfileModel
 import me.taste2plate.app.customer.domain.model.user.OrderListModel
 import me.taste2plate.app.customer.domain.model.user.WishListModel
 import me.taste2plate.app.customer.domain.model.user.address.AddressListModel
 import retrofit2.Call
 import retrofit2.http.Field
+import retrofit2.http.FieldMap
 import retrofit2.http.FormUrlEncoded
 import retrofit2.http.GET
 import retrofit2.http.POST
@@ -35,6 +37,21 @@ interface UserApi {
     ): VerifyOTPModel
 
 
+    @FormUrlEncoded
+    @POST("edit-profile")
+    suspend fun editProfile(
+        @Field("id") id: String,
+        @Field("full_name") fullName: String,
+        @Field("mobile") mobile: String,
+    ): CommonResponse
+
+
+    @GET("get-profile")
+    suspend fun getProfile(
+        @Query("id") id: String,
+    ): GetProfileModel
+
+
     // ------------------------- Wishlist -------------------------
     @GET("get-wish")
     suspend fun getWishlist(
@@ -47,6 +64,16 @@ interface UserApi {
     suspend fun addToWishlist(
         @Field("id") userId: String,
         @Field("productid") productId: String
+    ): CommonResponse
+
+
+
+    @FormUrlEncoded
+    @POST("add-to-cart")
+    suspend fun addToCart(
+        @Field("id") userId: String,
+        @Field("productid") pId: String,
+        @Field("quantity") quantity: Int
     ): CommonResponse
 
     @GET("delete-wish")
@@ -127,4 +154,15 @@ interface UserApi {
     //----------------- Order ---------------------
     @GET("my-orders")
     suspend fun getOrders(@Query("id") userId:String): OrderListModel
+
+    @POST("bulk-order")
+    @FormUrlEncoded
+    suspend fun createBulkOrder(
+        @Field("name") name:String,
+        @Field("email") email:String,
+        @Field("mobile") mobile:String,
+        @Field("city") city:String,
+        @Field("address") address:String,
+        @Field("msg") msg:String,
+    ): CommonResponse
 }

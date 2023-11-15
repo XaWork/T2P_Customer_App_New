@@ -14,22 +14,17 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.layout.ScaleFactor
-import androidx.compose.ui.layout.lerp
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import me.taste2plate.app.customer.domain.model.HomeModel
-import me.taste2plate.app.customer.presentation.screens.productList
 import me.taste2plate.app.customer.presentation.theme.ExtraHighPadding
 import me.taste2plate.app.customer.presentation.theme.ScreenPadding
 import me.taste2plate.app.customer.presentation.theme.T2PCustomerAppTheme
 import me.taste2plate.app.customer.presentation.widgets.BlackBorderCard
 import me.taste2plate.app.customer.presentation.widgets.ImageWithWishlistButton
 import me.taste2plate.app.customer.presentation.widgets.simpleAnimation
-import kotlin.math.absoluteValue
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable

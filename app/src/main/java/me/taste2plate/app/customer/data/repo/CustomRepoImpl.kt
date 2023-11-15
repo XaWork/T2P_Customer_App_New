@@ -1,11 +1,6 @@
 package me.taste2plate.app.customer.data.repo
 
-import android.util.Log
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flow
-import me.taste2plate.app.customer.data.ApiErrorMessages
 import me.taste2plate.app.customer.data.api.CustomApi
-import me.taste2plate.app.customer.data.Resource
 import me.taste2plate.app.customer.domain.model.CategoryModel
 import me.taste2plate.app.customer.domain.model.CityBrandModel
 import me.taste2plate.app.customer.domain.model.CityListModel
@@ -15,8 +10,6 @@ import me.taste2plate.app.customer.domain.model.StateListModel
 import me.taste2plate.app.customer.domain.model.SubCategoryModel
 import me.taste2plate.app.customer.domain.model.ZipListModel
 import me.taste2plate.app.customer.domain.repo.CustomRepo
-import retrofit2.HttpException
-import java.io.IOException
 import javax.inject.Inject
 
 class CustomRepoImpl @Inject constructor(

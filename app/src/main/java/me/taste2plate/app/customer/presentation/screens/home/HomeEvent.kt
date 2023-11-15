@@ -6,7 +6,11 @@ import me.taste2plate.app.customer.domain.model.user.address.AddressListModel
 sealed class HomeEvent {
     object GetHome : HomeEvent()
     object GetAddress : HomeEvent()
+    object ChangeTaste : HomeEvent()
     data class AddToWishlist(
+        val productId: String,
+    ) : HomeEvent()
+    data class AddToCart(
         val productId: String,
     ) : HomeEvent()
 

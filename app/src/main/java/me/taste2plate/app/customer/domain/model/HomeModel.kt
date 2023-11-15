@@ -37,16 +37,50 @@ data class HomeModel(
     @SerializedName("top_most_ordered_products")
     val topMostOrderedProducts: List<TopMostOrderedProduct>
 ) {
+    data class Category(
+        @SerializedName("active")
+        val active: Int,
+        @SerializedName("created_date")
+        val createdDate: String,
+        @SerializedName("deleted")
+        val deleted: Int,
+        @SerializedName("description")
+        val description: String,
+        @SerializedName("description_after_content")
+        val descriptionAfterContent: String,
+        @SerializedName("file")
+        val `file`: String,
+        @SerializedName("_id")
+        val id: String,
+        @SerializedName("name")
+        val name: String,
+        @SerializedName("parent")
+        val parent: Any,
+        @SerializedName("seo_description")
+        val seoDescription: String,
+        @SerializedName("seo_keywords")
+        val seoKeywords: String,
+        @SerializedName("seo_title")
+        val seoTitle: String,
+        @SerializedName("slug")
+        val slug: String,
+        @SerializedName("slug_history")
+        val slugHistory: List<String>,
+        @SerializedName("update_date")
+        val updateDate: String,
+        @SerializedName("__v")
+        val v: Int
+    )
 
     data class City(
         @SerializedName("active")
-        val active: String,
+        val active: Int,
         @SerializedName("cod")
         val cod: Boolean,
         @SerializedName("created_date")
         val createdDate: String,
         @SerializedName("deleted")
-        val deleted: String,
+        val deleted: Int,
         @SerializedName("description")
         val description: String,
         @SerializedName("description_after_content")
@@ -56,7 +90,7 @@ data class HomeModel(
         @SerializedName("file2")
         val file2: String,
         @SerializedName("footer")
-        val footer: String,
+        val footer: Int,
         @SerializedName("footer_content")
         val footerContent: String,
         @SerializedName("heading")
@@ -84,16 +118,16 @@ data class HomeModel(
         @SerializedName("update_date")
         val updateDate: String,
         @SerializedName("__v")
-        val v: String
+        val v: Int
     )
 
     data class Cuisine(
         @SerializedName("active")
-        val active: String,
+        val active: Int,
         @SerializedName("created_date")
         val createdDate: String,
         @SerializedName("deleted")
-        val deleted: String,
+        val deleted: Int,
         @SerializedName("description")
         val description: String,
         @SerializedName("description_after_content")
@@ -117,12 +151,12 @@ data class HomeModel(
         @SerializedName("update_date")
         val updateDate: String,
         @SerializedName("__v")
-        val v: String
+        val v: Int
     )
 
     data class Featured(
         @SerializedName("active")
-        val active: String,
+        val active: Int,
         @SerializedName("added_by")
         val addedBy: String,
         @SerializedName("attribute")
@@ -132,27 +166,27 @@ data class HomeModel(
         @SerializedName("batchno")
         val batchno: String,
         @SerializedName("brand")
-        val brand: String,
+        val brand: Brand,
         @SerializedName("category")
-        val category: String,
+        val category: Category,
         @SerializedName("cgst")
         val cgst: String,
         @SerializedName("city")
-        val city: String,
+        val city: City,
         @SerializedName("combo_products")
         val comboProducts: Any,
         @SerializedName("commission")
         val commission: String,
         @SerializedName("consumable")
-        val consumable: String,
+        val consumable: Int,
         @SerializedName("created_date")
         val createdDate: String,
         @SerializedName("cuisine")
-        val cuisine: String,
+        val cuisine: Cuisine,
         @SerializedName("deal")
-        val deal: String,
+        val deal: Int,
         @SerializedName("deleted")
-        val deleted: String,
+        val deleted: Int,
         @SerializedName("desc")
         val desc: String,
         @SerializedName("discounted_price")
@@ -162,7 +196,7 @@ data class HomeModel(
         @SerializedName("express")
         val express: Boolean,
         @SerializedName("featured")
-        val featured: String,
+        val featured: Int,
         @SerializedName("file")
         val `file`: List<File>,
         @SerializedName("height")
@@ -174,13 +208,13 @@ data class HomeModel(
         @SerializedName("length")
         val length: String,
         @SerializedName("manage_stock")
-        val manageStock: String,
+        val manageStock: Int,
         @SerializedName("name")
         val name: String,
         @SerializedName("packaging_charge")
         val packagingCharge: String,
         @SerializedName("point")
-        val point: String,
+        val point: Int,
         @SerializedName("point_exp_date")
         val pointExpDate: String,
         @SerializedName("price")
@@ -212,21 +246,21 @@ data class HomeModel(
         @SerializedName("stock_qty")
         val stockQty: String,
         @SerializedName("sub_category")
-        val subCategory: String,
+        val subCategory: SubCategory,
         @SerializedName("tags")
         val tags: String,
         @SerializedName("taste")
-        val taste: String,
+        val taste: Int,
         @SerializedName("tax_status")
         val taxStatus: String,
         @SerializedName("threshold")
         val threshold: String,
         @SerializedName("top")
-        val top: String,
+        val top: Int,
         @SerializedName("update_date")
         val updateDate: String,
         @SerializedName("__v")
-        val v: String,
+        val v: Int,
         @SerializedName("vendor")
         val vendor: String,
         @SerializedName("weight")
@@ -234,6 +268,34 @@ data class HomeModel(
         @SerializedName("width")
         val width: String
     ) {
+        data class Brand(
+            @SerializedName("_id")
+            val id: String,
+            @SerializedName("name")
+            val name: String
+        )
+
+        data class Category(
+            @SerializedName("_id")
+            val id: String,
+            @SerializedName("name")
+            val name: String
+        )
+
+        data class City(
+            @SerializedName("_id")
+            val id: String,
+            @SerializedName("name")
+            val name: String
+        )
+
+        data class Cuisine(
+            @SerializedName("_id")
+            val id: String,
+            @SerializedName("name")
+            val name: String
+        )
+
         data class File(
             @SerializedName("acl")
             val acl: String,
@@ -264,17 +326,24 @@ data class HomeModel(
             @SerializedName("serverSideEncryption")
             val serverSideEncryption: Any,
             @SerializedName("size")
-            val size: String,
+            val size: Int,
             @SerializedName("storageClass")
             val storageClass: String,
             @SerializedName("versionId")
             val versionId: Any
+        )
+
+        data class SubCategory(
+            @SerializedName("_id")
+            val id: String,
+            @SerializedName("name")
+            val name: String
         )
     }
 
     data class MostOrderdItem(
         @SerializedName("active")
-        val active: String,
+        val active: Int,
         @SerializedName("added_by")
         val addedBy: String,
         @SerializedName("attribute")
@@ -284,27 +353,27 @@ data class HomeModel(
         @SerializedName("batchno")
         val batchno: String,
         @SerializedName("brand")
-        val brand: String,
+        val brand: Brand,
         @SerializedName("category")
-        val category: String,
+        val category: Category,
         @SerializedName("cgst")
         val cgst: String,
         @SerializedName("city")
-        val city: String,
+        val city: City,
         @SerializedName("combo_products")
         val comboProducts: Any,
         @SerializedName("commission")
         val commission: String,
         @SerializedName("consumable")
-        val consumable: String,
+        val consumable: Int,
         @SerializedName("created_date")
         val createdDate: String,
         @SerializedName("cuisine")
-        val cuisine: String,
+        val cuisine: Cuisine,
         @SerializedName("deal")
-        val deal: String,
+        val deal: Int,
         @SerializedName("deleted")
-        val deleted: String,
+        val deleted: Int,
         @SerializedName("desc")
         val desc: String,
         @SerializedName("discounted_price")
@@ -314,7 +383,7 @@ data class HomeModel(
         @SerializedName("express")
         val express: Boolean,
         @SerializedName("featured")
-        val featured: String,
+        val featured: Int,
         @SerializedName("file")
         val `file`: List<File>,
         @SerializedName("height")
@@ -326,165 +395,13 @@ data class HomeModel(
         @SerializedName("length")
         val length: String,
         @SerializedName("manage_stock")
-        val manageStock: String,
+        val manageStock: Int,
         @SerializedName("name")
         val name: String,
         @SerializedName("packaging_charge")
         val packagingCharge: String,
         @SerializedName("point")
-        val point: String,
-        @SerializedName("point_exp_date")
-        val pointExpDate: String,
-        @SerializedName("price")
-        val price: String,
-        @SerializedName("purchase_price")
-        val purchasePrice: String,
-        @SerializedName("selling_price")
-        val sellingPrice: Any,
-        @SerializedName("seo_description")
-        val seoDescription: String,
-        @SerializedName("seo_keywords")
-        val seoKeywords: String,
-        @SerializedName("seo_title")
-        val seoTitle: String,
-        @SerializedName("sgst")
-        val sgst: String,
-        @SerializedName("short_desc")
-        val shortDesc: String,
-        @SerializedName("sku")
-        val sku: String,
-        @SerializedName("slug")
-        val slug: String,
-        @SerializedName("slug_history")
-        val slugHistory: List<String>,
-        @SerializedName("start_date")
-        val startDate: String,
-        @SerializedName("stock_product")
-        val stockProduct: String,
-        @SerializedName("stock_qty")
-        val stockQty: String,
-        @SerializedName("sub_category")
-        val subCategory: String,
-        @SerializedName("tags")
-        val tags: String,
-        @SerializedName("taste")
-        val taste: String,
-        @SerializedName("tax_status")
-        val taxStatus: String,
-        @SerializedName("threshold")
-        val threshold: String,
-        @SerializedName("top")
-        val top: String,
-        @SerializedName("update_date")
-        val updateDate: String,
-        @SerializedName("__v")
-        val v: String,
-        @SerializedName("vendor")
-        val vendor: String,
-        @SerializedName("weight")
-        val weight: String,
-        @SerializedName("width")
-        val width: String
-    ) {
-        data class File(
-            @SerializedName("acl")
-            val acl: String,
-            @SerializedName("bucket")
-            val bucket: String,
-            @SerializedName("contentDisposition")
-            val contentDisposition: Any,
-            @SerializedName("contentEncoding")
-            val contentEncoding: Any,
-            @SerializedName("contentType")
-            val contentType: String,
-            @SerializedName("encoding")
-            val encoding: String,
-            @SerializedName("etag")
-            val etag: String,
-            @SerializedName("fieldname")
-            val fieldname: String,
-            @SerializedName("key")
-            val key: String,
-            @SerializedName("location")
-            val location: String,
-            @SerializedName("metadata")
-            val metadata: Any,
-            @SerializedName("mimetype")
-            val mimetype: String,
-            @SerializedName("originalname")
-            val originalname: String,
-            @SerializedName("serverSideEncryption")
-            val serverSideEncryption: Any,
-            @SerializedName("size")
-            val size: String,
-            @SerializedName("storageClass")
-            val storageClass: String,
-            @SerializedName("versionId")
-            val versionId: Any
-        )
-    }
-
-    data class ProductDeal(
-        @SerializedName("active")
-        val active: String,
-        @SerializedName("added_by")
-        val addedBy: String,
-        @SerializedName("attribute")
-        val attribute: String,
-        @SerializedName("backorders")
-        val backorders: String,
-        @SerializedName("batchno")
-        val batchno: String,
-        @SerializedName("brand")
-        val brand: String,
-        @SerializedName("category")
-        val category: String,
-        @SerializedName("cgst")
-        val cgst: String,
-        @SerializedName("city")
-        val city: String,
-        @SerializedName("combo_products")
-        val comboProducts: Any,
-        @SerializedName("commission")
-        val commission: String,
-        @SerializedName("consumable")
-        val consumable: String,
-        @SerializedName("created_date")
-        val createdDate: String,
-        @SerializedName("cuisine")
-        val cuisine: String,
-        @SerializedName("deal")
-        val deal: String,
-        @SerializedName("deleted")
-        val deleted: String,
-        @SerializedName("desc")
-        val desc: String,
-        @SerializedName("discounted_price")
-        val discountedPrice: String,
-        @SerializedName("end_date")
-        val endDate: String,
-        @SerializedName("express")
-        val express: Boolean,
-        @SerializedName("featured")
-        val featured: String,
-        @SerializedName("file")
-        val `file`: List<File>,
-        @SerializedName("height")
-        val height: String,
-        @SerializedName("_id")
-        val id: String,
-        @SerializedName("igst")
-        val igst: String,
-        @SerializedName("length")
-        val length: String,
-        @SerializedName("manage_stock")
-        val manageStock: String,
-        @SerializedName("name")
-        val name: String,
-        @SerializedName("packaging_charge")
-        val packagingCharge: String,
-        @SerializedName("point")
-        val point: String,
+        val point: Int,
         @SerializedName("point_exp_date")
         val pointExpDate: String,
         @SerializedName("price")
@@ -516,21 +433,21 @@ data class HomeModel(
         @SerializedName("stock_qty")
         val stockQty: String,
         @SerializedName("sub_category")
-        val subCategory: String,
+        val subCategory: SubCategory,
         @SerializedName("tags")
         val tags: String,
         @SerializedName("taste")
-        val taste: String,
+        val taste: Int,
         @SerializedName("tax_status")
         val taxStatus: String,
         @SerializedName("threshold")
         val threshold: String,
         @SerializedName("top")
-        val top: String,
+        val top: Int,
         @SerializedName("update_date")
         val updateDate: String,
         @SerializedName("__v")
-        val v: String,
+        val v: Int,
         @SerializedName("vendor")
         val vendor: String,
         @SerializedName("weight")
@@ -538,6 +455,221 @@ data class HomeModel(
         @SerializedName("width")
         val width: String
     ) {
+        data class Brand(
+            @SerializedName("_id")
+            val id: String,
+            @SerializedName("name")
+            val name: String
+        )
+
+        data class Category(
+            @SerializedName("_id")
+            val id: String,
+            @SerializedName("name")
+            val name: String
+        )
+
+        data class City(
+            @SerializedName("_id")
+            val id: String,
+            @SerializedName("name")
+            val name: String
+        )
+
+        data class Cuisine(
+            @SerializedName("_id")
+            val id: String,
+            @SerializedName("name")
+            val name: String
+        )
+
+        data class File(
+            @SerializedName("acl")
+            val acl: String,
+            @SerializedName("bucket")
+            val bucket: String,
+            @SerializedName("contentDisposition")
+            val contentDisposition: Any,
+            @SerializedName("contentEncoding")
+            val contentEncoding: Any,
+            @SerializedName("contentType")
+            val contentType: String,
+            @SerializedName("encoding")
+            val encoding: String,
+            @SerializedName("etag")
+            val etag: String,
+            @SerializedName("fieldname")
+            val fieldname: String,
+            @SerializedName("key")
+            val key: String,
+            @SerializedName("location")
+            val location: String,
+            @SerializedName("metadata")
+            val metadata: Any,
+            @SerializedName("mimetype")
+            val mimetype: String,
+            @SerializedName("originalname")
+            val originalname: String,
+            @SerializedName("serverSideEncryption")
+            val serverSideEncryption: Any,
+            @SerializedName("size")
+            val size: Int,
+            @SerializedName("storageClass")
+            val storageClass: String,
+            @SerializedName("versionId")
+            val versionId: Any
+        )
+
+        data class SubCategory(
+            @SerializedName("_id")
+            val id: String,
+            @SerializedName("name")
+            val name: String
+        )
+    }
+
+    data class ProductDeal(
+        @SerializedName("active")
+        val active: Int,
+        @SerializedName("added_by")
+        val addedBy: String,
+        @SerializedName("attribute")
+        val attribute: String,
+        @SerializedName("backorders")
+        val backorders: String,
+        @SerializedName("batchno")
+        val batchno: String,
+        @SerializedName("brand")
+        val brand: Brand,
+        @SerializedName("category")
+        val category: Category,
+        @SerializedName("cgst")
+        val cgst: String,
+        @SerializedName("city")
+        val city: City,
+        @SerializedName("combo_products")
+        val comboProducts: Any,
+        @SerializedName("commission")
+        val commission: String,
+        @SerializedName("consumable")
+        val consumable: Int,
+        @SerializedName("created_date")
+        val createdDate: String,
+        @SerializedName("cuisine")
+        val cuisine: Cuisine,
+        @SerializedName("deal")
+        val deal: Int,
+        @SerializedName("deleted")
+        val deleted: Int,
+        @SerializedName("desc")
+        val desc: String,
+        @SerializedName("discounted_price")
+        val discountedPrice: String,
+        @SerializedName("end_date")
+        val endDate: String,
+        @SerializedName("express")
+        val express: Boolean,
+        @SerializedName("featured")
+        val featured: Int,
+        @SerializedName("file")
+        val `file`: List<File>,
+        @SerializedName("height")
+        val height: String,
+        @SerializedName("_id")
+        val id: String,
+        @SerializedName("igst")
+        val igst: String,
+        @SerializedName("length")
+        val length: String,
+        @SerializedName("manage_stock")
+        val manageStock: Int,
+        @SerializedName("name")
+        val name: String,
+        @SerializedName("packaging_charge")
+        val packagingCharge: String,
+        @SerializedName("point")
+        val point: Int,
+        @SerializedName("point_exp_date")
+        val pointExpDate: String,
+        @SerializedName("price")
+        val price: String,
+        @SerializedName("purchase_price")
+        val purchasePrice: String,
+        @SerializedName("selling_price")
+        val sellingPrice: String,
+        @SerializedName("seo_description")
+        val seoDescription: String,
+        @SerializedName("seo_keywords")
+        val seoKeywords: String,
+        @SerializedName("seo_title")
+        val seoTitle: String,
+        @SerializedName("sgst")
+        val sgst: String,
+        @SerializedName("short_desc")
+        val shortDesc: String,
+        @SerializedName("sku")
+        val sku: String,
+        @SerializedName("slug")
+        val slug: String,
+        @SerializedName("slug_history")
+        val slugHistory: List<String>,
+        @SerializedName("start_date")
+        val startDate: String,
+        @SerializedName("stock_product")
+        val stockProduct: String,
+        @SerializedName("stock_qty")
+        val stockQty: String,
+        @SerializedName("sub_category")
+        val subCategory: SubCategory,
+        @SerializedName("tags")
+        val tags: String,
+        @SerializedName("taste")
+        val taste: Int,
+        @SerializedName("tax_status")
+        val taxStatus: String,
+        @SerializedName("threshold")
+        val threshold: String,
+        @SerializedName("top")
+        val top: Int,
+        @SerializedName("update_date")
+        val updateDate: String,
+        @SerializedName("__v")
+        val v: Int,
+        @SerializedName("vendor")
+        val vendor: String,
+        @SerializedName("weight")
+        val weight: String,
+        @SerializedName("width")
+        val width: String
+    ) {
+        data class Brand(
+            @SerializedName("_id")
+            val id: String,
+            @SerializedName("name")
+            val name: String
+        )
+
+        data class Category(
+            @SerializedName("_id")
+            val id: String,
+            @SerializedName("name")
+            val name: String
+        )
+
+        data class City(
+            @SerializedName("_id")
+            val id: String,
+            @SerializedName("name")
+            val name: String
+        )
+
+        data class Cuisine(
+            @SerializedName("_id")
+            val id: String,
+            @SerializedName("name")
+            val name: String
+        )
+
         data class File(
             @SerializedName("acl")
             val acl: String,
@@ -566,21 +698,28 @@ data class HomeModel(
             @SerializedName("serverSideEncryption")
             val serverSideEncryption: Any,
             @SerializedName("size")
-            val size: String,
+            val size: Int,
             @SerializedName("storageClass")
             val storageClass: String
+        )
+
+        data class SubCategory(
+            @SerializedName("_id")
+            val id: String,
+            @SerializedName("name")
+            val name: String
         )
     }
 
     data class ServiceCity(
         @SerializedName("active")
-        val active: String,
+        val active: Int,
         @SerializedName("cod")
         val cod: Boolean,
         @SerializedName("created_date")
         val createdDate: String,
         @SerializedName("deleted")
-        val deleted: String,
+        val deleted: Int,
         @SerializedName("description")
         val description: String,
         @SerializedName("description_after_content")
@@ -590,7 +729,7 @@ data class HomeModel(
         @SerializedName("file2")
         val file2: String,
         @SerializedName("footer")
-        val footer: String,
+        val footer: Int,
         @SerializedName("footer_content")
         val footerContent: String,
         @SerializedName("heading")
@@ -618,18 +757,18 @@ data class HomeModel(
         @SerializedName("update_date")
         val updateDate: String,
         @SerializedName("__v")
-        val v: String
+        val v: Int
     )
 
     data class Slider(
         @SerializedName("active")
-        val active: String,
+        val active: Int,
         @SerializedName("city")
         val city: City,
         @SerializedName("created_date")
         val createdDate: String,
         @SerializedName("deleted")
-        val deleted: String,
+        val deleted: Int,
         @SerializedName("file")
         val `file`: String,
         @SerializedName("_id")
@@ -639,7 +778,7 @@ data class HomeModel(
         @SerializedName("update_date")
         val updateDate: String,
         @SerializedName("__v")
-        val v: String
+        val v: Int
     ) {
         data class City(
             @SerializedName("_id")
@@ -651,7 +790,7 @@ data class HomeModel(
 
     data class Special(
         @SerializedName("active")
-        val active: String,
+        val active: Int,
         @SerializedName("amount")
         val amount: String,
         @SerializedName("brand")
@@ -665,7 +804,7 @@ data class HomeModel(
         @SerializedName("customer")
         val customer: List<String>,
         @SerializedName("deleted")
-        val deleted: String,
+        val deleted: Int,
         @SerializedName("desc")
         val desc: String,
         @SerializedName("exclusive")
@@ -675,9 +814,9 @@ data class HomeModel(
         @SerializedName("_id")
         val id: String,
         @SerializedName("max_usage_limit")
-        val maxUsageLimit: String,
+        val maxUsageLimit: Int,
         @SerializedName("max_usage_limit_user")
-        val maxUsageLimitUser: String,
+        val maxUsageLimitUser: Int,
         @SerializedName("maximum_amount")
         val maximumAmount: String,
         @SerializedName("minimum_amount")
@@ -691,22 +830,22 @@ data class HomeModel(
         @SerializedName("update_date")
         val updateDate: String,
         @SerializedName("__v")
-        val v: String
+        val v: Int
     )
 
     data class TopBrand(
         @SerializedName("active")
-        val active: String,
+        val active: Int,
         @SerializedName("created_date")
         val createdDate: String,
         @SerializedName("deleted")
-        val deleted: String,
+        val deleted: Int,
         @SerializedName("desc")
         val desc: String,
         @SerializedName("file")
         val `file`: String,
         @SerializedName("gem")
-        val gem: String,
+        val gem: Int,
         @SerializedName("_id")
         val id: String,
         @SerializedName("name")
@@ -724,20 +863,20 @@ data class HomeModel(
         @SerializedName("slug_history")
         val slugHistory: List<String>,
         @SerializedName("top")
-        val top: String,
+        val top: Int,
         @SerializedName("update_date")
         val updateDate: String,
         @SerializedName("__v")
-        val v: String
+        val v: Int
     )
 
     data class TopMostOrderedProduct(
         @SerializedName("active")
-        val active: String,
+        val active: Int,
         @SerializedName("createdAt")
         val createdAt: String,
         @SerializedName("deleted")
-        val deleted: String,
+        val deleted: Int,
         @SerializedName("_id")
         val id: String,
         @SerializedName("image")
@@ -749,11 +888,11 @@ data class HomeModel(
         @SerializedName("updatedAt")
         val updatedAt: String,
         @SerializedName("__v")
-        val v: String
+        val v: Int
     ) {
         data class Product(
             @SerializedName("active")
-            val active: String,
+            val active: Int,
             @SerializedName("added_by")
             val addedBy: String,
             @SerializedName("attribute")
@@ -775,15 +914,15 @@ data class HomeModel(
             @SerializedName("commission")
             val commission: String,
             @SerializedName("consumable")
-            val consumable: String,
+            val consumable: Int,
             @SerializedName("created_date")
             val createdDate: String,
             @SerializedName("cuisine")
             val cuisine: String,
             @SerializedName("deal")
-            val deal: String,
+            val deal: Int,
             @SerializedName("deleted")
-            val deleted: String,
+            val deleted: Int,
             @SerializedName("desc")
             val desc: String,
             @SerializedName("discounted_price")
@@ -793,7 +932,7 @@ data class HomeModel(
             @SerializedName("express")
             val express: Boolean,
             @SerializedName("featured")
-            val featured: String,
+            val featured: Int,
             @SerializedName("file")
             val `file`: List<File>,
             @SerializedName("height")
@@ -805,21 +944,21 @@ data class HomeModel(
             @SerializedName("length")
             val length: String,
             @SerializedName("manage_stock")
-            val manageStock: String,
+            val manageStock: Int,
             @SerializedName("name")
             val name: String,
             @SerializedName("packaging_charge")
             val packagingCharge: String,
             @SerializedName("point")
-            val point: String,
+            val point: Int,
             @SerializedName("point_exp_date")
             val pointExpDate: String,
             @SerializedName("price")
-            val price: String,
+            val price: Int,
             @SerializedName("purchase_price")
             val purchasePrice: String,
             @SerializedName("selling_price")
-            val sellingPrice: String,
+            val sellingPrice: Int,
             @SerializedName("seo_description")
             val seoDescription: String,
             @SerializedName("seo_keywords")
@@ -847,17 +986,17 @@ data class HomeModel(
             @SerializedName("tags")
             val tags: String,
             @SerializedName("taste")
-            val taste: String,
+            val taste: Int,
             @SerializedName("tax_status")
             val taxStatus: String,
             @SerializedName("threshold")
             val threshold: String,
             @SerializedName("top")
-            val top: String,
+            val top: Int,
             @SerializedName("update_date")
             val updateDate: String,
             @SerializedName("__v")
-            val v: String,
+            val v: Int,
             @SerializedName("vendor")
             val vendor: String,
             @SerializedName("weight")
@@ -895,7 +1034,7 @@ data class HomeModel(
                 @SerializedName("serverSideEncryption")
                 val serverSideEncryption: Any,
                 @SerializedName("size")
-                val size: String,
+                val size: Int,
                 @SerializedName("storageClass")
                 val storageClass: String,
                 @SerializedName("versionId")

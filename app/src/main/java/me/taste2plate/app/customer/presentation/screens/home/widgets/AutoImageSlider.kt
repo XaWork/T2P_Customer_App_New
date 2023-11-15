@@ -18,7 +18,6 @@ import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Card
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
@@ -36,7 +35,6 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.yield
-import me.taste2plate.app.customer.R
 import me.taste2plate.app.customer.domain.model.HomeModel
 import me.taste2plate.app.customer.presentation.theme.ScreenPadding
 import me.taste2plate.app.customer.presentation.widgets.DrawableImage

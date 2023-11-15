@@ -2,9 +2,11 @@ package me.taste2plate.app.customer.data.repo
 
 import me.taste2plate.app.customer.data.api.UserApi
 import me.taste2plate.app.customer.domain.model.auth.LoginModel
+import me.taste2plate.app.customer.domain.model.auth.VerifyOTPModel
 import me.taste2plate.app.customer.domain.model.user.CartModel
 import me.taste2plate.app.customer.domain.model.user.CommonResponse
 import me.taste2plate.app.customer.domain.model.user.DeleteFromWishlistModel
+import me.taste2plate.app.customer.domain.model.user.GetProfileModel
 import me.taste2plate.app.customer.domain.model.user.OrderListModel
 import me.taste2plate.app.customer.domain.model.user.WishListModel
 import me.taste2plate.app.customer.domain.model.user.address.AddressListModel
@@ -35,10 +37,22 @@ class UserRepoImpl @Inject constructor(
             otp = otp
         )
 
+    override suspend fun getProfile(id: String): GetProfileModel {
+        return api.getProfile(id)
+    }
+
+    override suspend fun editProfile(id: String, fullName: String, mobile: String): CommonResponse {
+        return api.editProfile(id, fullName, mobile)
+    }
+
     override suspend fun getWishlist(userId: String) = api.getWishlist(userId)
 
     override suspend fun addToWishlist(userId: String, productId: String) =
         api.addToWishlist(userId, productId)
+
+    override suspend fun addToCart(userId: String, pId: String, quantity: Int): CommonResponse {
+        return api.addToCart(userId, pId, quantity)
+    }
 
     override suspend fun deleteFromWishlist(
         userId: String,
@@ -109,7 +123,7 @@ class UserRepoImpl @Inject constructor(
         lng: Double,
         type: String
     ): CommonResponse {
-       return api.editAddress(
+        return api.editAddress(
             addressId,
             name,
             phone,
@@ -127,5 +141,16 @@ class UserRepoImpl @Inject constructor(
 
     override suspend fun getOrders(userId: String): OrderListModel {
         return api.getOrders(userId)
+    }
+
+    override suspend fun createBulkOrder(
+        name: String,
+        email: String,
+        mobile: String,
+        city: String,
+        address: String,
+        msg: String
+    ): CommonResponse {
+        return api.createBulkOrder(name, email, mobile, city, address, msg)
     }
 }

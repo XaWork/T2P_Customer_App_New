@@ -5,7 +5,6 @@ import kotlinx.coroutines.flow.flow
 import me.taste2plate.app.customer.data.ApiErrorMessages
 import me.taste2plate.app.customer.data.Resource
 import me.taste2plate.app.customer.domain.model.HomeModel
-import me.taste2plate.app.customer.domain.model.SettingsModel
 import me.taste2plate.app.customer.domain.repo.CustomRepo
 import retrofit2.HttpException
 import java.io.IOException

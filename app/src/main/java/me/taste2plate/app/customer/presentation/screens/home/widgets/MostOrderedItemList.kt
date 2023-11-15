@@ -56,14 +56,14 @@ import me.taste2plate.app.customer.presentation.widgets.InfoWithIcon
 import me.taste2plate.app.customer.presentation.widgets.MaterialIcon
 import me.taste2plate.app.customer.presentation.widgets.RedBorderCard
 import me.taste2plate.app.customer.presentation.widgets.RoundedCornerIconButton
+import me.taste2plate.app.customer.presentation.widgets.ShowLoading
 import me.taste2plate.app.customer.presentation.widgets.VerticalSpace
 import me.taste2plate.app.customer.presentation.widgets.simpleAnimation
-import timber.log.Timber
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun MostOrderedItemList(
-    onNavigateToProductDetailsScreen: () -> Unit,
+    onNavigateToProductDetailsScreen: (productId: String) -> Unit,
     viewModel: HomeViewModel
 ) {
     val state = viewModel.state
@@ -104,15 +104,19 @@ fun MostOrderedItemList(
             SingleMostOrderedItem(
                 page,
                 pagerState = pagerState,
-                modifier = Modifier.clickable { onNavigateToProductDetailsScreen() },
+                modifier = Modifier.clickable { onNavigateToProductDetailsScreen(foodItems[page].id) },
                 product = foodItems[page],
                 alreadyWishListed = alreadyInWishlist,
                 foodItemUpdateInfo = if (state.foodItemUpdateInfo != null && state.foodItemUpdateInfo.id == foodItems[page].id)
                     state.foodItemUpdateInfo
-                else null
-            ) {
-                viewModel.onEvent(HomeEvent.AddToWishlist(foodItems[page].id))
-            }
+                else null,
+                addToWishlist = {
+                    viewModel.onEvent(HomeEvent.AddToWishlist(foodItems[page].id))
+                },
+                addToCart = {
+                    viewModel.onEvent(HomeEvent.AddToCart(foodItems[page].id))
+                }
+            )
         }
     }
 }
@@ -127,6 +131,7 @@ fun SingleMostOrderedItem(
     alreadyWishListed: Boolean = false,
     foodItemUpdateInfo: FoodItemUpdateInfo? = null,
     addToWishlist: () -> Unit,
+    addToCart: () -> Unit,
 ) {
     RedBorderCard(
         modifier = modifier.simpleAnimation(pagerState, page)
@@ -151,10 +156,19 @@ fun SingleMostOrderedItem(
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Text(
-                        "Flat $rupeeSign${product.discountedPrice} OFF",
-                        color = MaterialTheme.colorScheme.tertiary
-                    )
+                    if (product.sellingPrice != null && product.sellingPrice.isNotEmpty()) {
+                        val flatOff = product.sellingPrice.toInt() - product.price.toInt()
+                        Text(
+                            "Flat $rupeeSign$flatOff OFF",
+                            color = MaterialTheme.colorScheme.tertiary
+                        )
+                    }
+
+                    if (product.weight != null && product.weight.isNotEmpty())
+                        Text(
+                            "${product.weight} Kg",
+                            color = MaterialTheme.colorScheme.tertiary
+                        )
 
                     Row(
                         modifier = Modifier
@@ -188,15 +202,13 @@ fun SingleMostOrderedItem(
                     text = product.name,
                     style = MaterialTheme.typography.titleMedium,
                     maxLines = 2,
-                    minLines = 2
                 )
 
                 Text(
-                    text = product.brand,
+                    text = product.brand.name,
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Light,
                     maxLines = 2,
-                    minLines = 2
                 )
 
                 VerticalSpace(space = SpaceBetweenViewsAndSubViews)
@@ -204,7 +216,7 @@ fun SingleMostOrderedItem(
                 InfoWithIcon(
                     icon = true,
                     imageVector = Icons.Outlined.LocationOn,
-                    info = product.city
+                    info = product.city.name
                 )
 
                 VerticalSpace(space = SpaceBetweenViewsAndSubViews)
@@ -220,7 +232,7 @@ fun SingleMostOrderedItem(
 
                 VerticalSpace(space = SpaceBetweenViews)
 
-                MostOrderedPriceCard(product.price)
+                MostOrderedPriceCard(product.price) { addToCart() }
             }
         }
     }
@@ -228,7 +240,9 @@ fun SingleMostOrderedItem(
 
 @Composable
 fun MostOrderedPriceCard(
-    price: String
+    price: String,
+    foodItemUpdateInfo: FoodItemUpdateInfo? = null,
+    addToCart: () -> Unit
 ) {
     Row(
         modifier = Modifier.fillMaxWidth(),
@@ -265,14 +279,17 @@ fun MostOrderedPriceCard(
                     modifier = Modifier.padding(horizontal = 20.dp)
                 )
 
-                RoundedCornerIconButton(
-                    isMaterialIcon = true,
-                    icon = Icons.Outlined.ShoppingCart,
-                    cornerRadius = LowRoundedCorners,
-                    cardColors = CardDefaults.cardColors(
-                        containerColor = MaterialTheme.colorScheme.primary
-                    )
-                ) {}
+                /*if (foodItemUpdateInfo != null && !foodItemUpdateInfo.wishlistItem && foodItemUpdateInfo.isLoading)
+                    ShowLoading()
+                else*/
+                    RoundedCornerIconButton(
+                        isMaterialIcon = true,
+                        icon = Icons.Outlined.ShoppingCart,
+                        cornerRadius = LowRoundedCorners,
+                        cardColors = CardDefaults.cardColors(
+                            containerColor = MaterialTheme.colorScheme.primary
+                        )
+                    ) { addToCart() }
             }
         }
     }

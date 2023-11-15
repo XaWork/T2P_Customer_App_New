@@ -47,6 +47,7 @@ import me.taste2plate.app.customer.presentation.screens.product.ProductViewModel
 import me.taste2plate.app.customer.presentation.screens.product.list.ProductListScreen
 import me.taste2plate.app.customer.presentation.screens.profile.EditProfileScreen
 import me.taste2plate.app.customer.presentation.screens.profile.ProfileScreen
+import me.taste2plate.app.customer.presentation.screens.profile.ProfileViewModel
 import me.taste2plate.app.customer.presentation.screens.splash.SplashScreen
 import me.taste2plate.app.customer.presentation.screens.wallet.WalletScreen
 import me.taste2plate.app.customer.presentation.screens.wishlist.WishlistScreen
@@ -213,7 +214,7 @@ fun Navigation() {
         }
 
 
-        navigation(startDestination = Screens.CartScreen.route, route = "order") {
+        navigation(startDestination = Screens.OrderListScreen.route, route = "order") {
             // ----------------------------> Order List <--------------------------------------
             composable(route = Screens.OrderListScreen.route) { entry ->
                 val viewModel =
@@ -279,7 +280,7 @@ fun Navigation() {
         }
 
 
-        navigation(startDestination = Screens.CartScreen.route, route = "product") {
+        navigation(startDestination = Screens.ProductListScreen.route, route = "product") {
 
             // ----------------------------> Product List <--------------------------------------
             composable(route = Screens.ProductListScreen.route + "?categoryInfo={categoryInfo}",
@@ -323,7 +324,7 @@ fun Navigation() {
 
         }
 
-        navigation(startDestination = Screens.CartScreen.route, route = "citybrand") {
+        navigation(startDestination = Screens.CityBrandScreen.route, route = "citybrand") {
 
             // ----------------------------> City brand <--------------------------------------
             composable(route = Screens.CityBrandScreen.route + "/{screen}", arguments = listOf(
@@ -425,26 +426,41 @@ fun Navigation() {
         }
 
 
-        // ----------------------------> Profile <--------------------------------------
-        composable(route = Screens.ProfileScreen.route) {
-            ProfileScreen(
-                onNavigateToEditProfileScreen = {
-                    navController.navigate(Screens.EditProfileScreen.route)
-                },
-                onNavigateToAddressListScreen = {
-                    navController.navigate(Screens.AddressListScreen.route)
+
+        navigation(startDestination = Screens.ProfileScreen.route, route = "profilenav") {
+            // ----------------------------> Profile <--------------------------------------
+            composable(route = Screens.ProfileScreen.route) { entry ->
+                val viewModel =
+                    entry.sharedViewModel<ProfileViewModel>(navHostController = navController)
+                ProfileScreen(
+                    viewModel = viewModel,
+                    onNavigateToEditProfileScreen = {
+                        navController.navigate(Screens.EditProfileScreen.route)
+                    },
+                    onNavigateToAddressListScreen = {
+                        navController.navigate(Screens.AddressListScreen.route)
+                    }
+                )
+            }
+
+            // ----------------------------> Edit Profile <--------------------------------------
+            composable(route = Screens.EditProfileScreen.route) { entry ->
+                val viewModel =
+                    entry.sharedViewModel<ProfileViewModel>(navHostController = navController)
+                EditProfileScreen(
+                    viewModel = viewModel,
+                ) {
+                    navController.navigate(Screens.HomeScreen.route) {
+                        popUpTo(0)
+                    }
                 }
-            )
-        }
-
-        // ----------------------------> Edit Profile <--------------------------------------
-        composable(route = Screens.EditProfileScreen.route) {
-            EditProfileScreen()
+            }
         }
 
 
 
-        navigation(startDestination = Screens.CartScreen.route, route = "address") {
+
+        navigation(startDestination = Screens.AddressListScreen.route, route = "address") {
             // ----------------------------> Address List <--------------------------------------
             composable(route = Screens.AddressListScreen.route) { entry ->
                 val viewModel =

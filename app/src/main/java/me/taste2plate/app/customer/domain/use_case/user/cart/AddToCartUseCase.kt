@@ -1,4 +1,4 @@
-package me.taste2plate.app.customer.domain.use_case.user.address
+package me.taste2plate.app.customer.domain.use_case.user.cart
 
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
@@ -11,40 +11,21 @@ import retrofit2.HttpException
 import java.io.IOException
 import javax.inject.Inject
 
-class AddAddressUseCase @Inject constructor(
+class AddToCartUseCase @Inject constructor(
     private val repo: UserRepo,
-    private val userPref: UserPref,
+    private val userPref: UserPref
 ) {
     suspend fun execute(
-        name: String,
-        phone: String,
-        city: String,
-        state: String,
-        pincode: String,
-        postOffice: String,
-        addressLine: String,
-        secondary: String,
-        lat: Double,
-        lng: Double,
-        type: String
+        productId: String
     ): Flow<Resource<CommonResponse>> {
         return flow {
             emit(Resource.Loading(true))
             try {
-                val userId = userPref.getUser().id
-                val response = repo.addAddress(
-                    userId,
-                    name,
-                    phone,
-                    city,
-                    state,
-                    pincode,
-                    postOffice,
-                    addressLine,
-                    secondary,
-                    lat,
-                    lng,
-                    type
+                val response = repo.addToCart(
+                    userId = userPref.getUser().id,
+                    pId = productId,
+                    quantity = 1
+
                 )
                 emit(Resource.Success(response))
             } catch (io: IOException) {

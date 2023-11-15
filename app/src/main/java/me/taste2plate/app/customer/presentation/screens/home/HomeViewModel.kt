@@ -1,6 +1,5 @@
 package me.taste2plate.app.customer.presentation.screens.home
 
-import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -11,13 +10,16 @@ import kotlinx.coroutines.launch
 import me.taste2plate.app.customer.T2PApp
 import me.taste2plate.app.customer.data.Resource
 import me.taste2plate.app.customer.data.Status
+import me.taste2plate.app.customer.data.Taste
 import me.taste2plate.app.customer.data.UserPref
 import me.taste2plate.app.customer.domain.model.user.address.AddressListModel
-import me.taste2plate.app.customer.domain.use_case.user.cart.CartUseCase
 import me.taste2plate.app.customer.domain.use_case.HomeUseCase
 import me.taste2plate.app.customer.domain.use_case.user.address.AllAddressUseCase
+import me.taste2plate.app.customer.domain.use_case.user.cart.AddToCartUseCase
+import me.taste2plate.app.customer.domain.use_case.user.cart.CartUseCase
 import me.taste2plate.app.customer.domain.use_case.user.wishlist.AddToWishlistUseCase
 import me.taste2plate.app.customer.domain.use_case.user.wishlist.WishlistUseCase
+import me.taste2plate.app.customer.presentation.screens.product.list.ProductEvents
 import javax.inject.Inject
 
 @HiltViewModel
@@ -28,11 +30,13 @@ class HomeViewModel @Inject constructor(
     private val cartUseCase: CartUseCase,
     private val addToWishlistUseCase: AddToWishlistUseCase,
     private val allAddressUseCase: AllAddressUseCase,
+    private val addToCartUseCase: AddToCartUseCase
 ) : ViewModel() {
 
     var state by mutableStateOf(HomeState())
 
     init {
+        getTaste()
         getHomeData()
     }
 
@@ -40,6 +44,9 @@ class HomeViewModel @Inject constructor(
         when (event) {
             is HomeEvent.GetHome -> {
                 getHomeData()
+            }
+            is HomeEvent.ChangeTaste -> {
+                setTaste()
             }
 
             is HomeEvent.GetAddress -> {
@@ -50,6 +57,10 @@ class HomeViewModel @Inject constructor(
                 addToWishlist(event.productId)
             }
 
+            is HomeEvent.AddToCart -> {
+                addToCart(event.productId)
+            }
+
             is HomeEvent.SetDefaultAddress -> {
                 setDefaultAddress(event.address)
             }
@@ -57,10 +68,25 @@ class HomeViewModel @Inject constructor(
             is HomeEvent.UpdateState -> {
                 when {
                     event.changeAddToWishlistResponse -> {
-                        state = state.copy(message = null, addToWishlistResponse = null)
+                        state = state.copy(message = null, addToWishlistResponse = null, addToCartResponse = null)
                     }
                 }
             }
+        }
+    }
+
+    private fun setTaste() {
+        viewModelScope.launch {
+            userPref.setTaste()
+            getTaste()
+            onEvent(HomeEvent.GetHome)
+        }
+    }
+
+    private fun getTaste() {
+        viewModelScope.launch {
+            val taste = userPref.getTaste()
+            state = state.copy(checked = taste == Taste.nonVeg)
         }
     }
 
@@ -267,6 +293,55 @@ class HomeViewModel @Inject constructor(
                             state.copy(
                                 isLoading = false,
                                 addToWishlistResponse = result.data,
+                                message = result.data?.message,
+                                isError = result.data?.status == Status.error.name,
+                                errorMessage = result.data?.message,
+                                foodItemUpdateInfo = state.foodItemUpdateInfo?.copy(
+                                    isLoading = false,
+                                    added = result.data?.status == Status.success.name
+                                )
+                            )
+                    }
+
+                    is Resource.Error -> {
+                        state = state.copy(
+                            isLoading = false,
+                            isError = true,
+                            errorMessage = result.message,
+                            foodItemUpdateInfo = state.foodItemUpdateInfo?.copy(
+                                isLoading = false,
+                                added = false
+                            )
+                        )
+                    }
+                }
+
+            }
+        }
+    }
+
+    private fun addToCart(productId: String) {
+        viewModelScope.launch {
+            addToCartUseCase.execute(
+                productId
+            ).collect { result ->
+                when (result) {
+                    is Resource.Loading -> {
+                        state = state.copy(
+                            foodItemUpdateInfo = FoodItemUpdateInfo(
+                                id = productId,
+                                isLoading = true,
+                                wishlistItem = false
+                            )
+                        )
+                    }
+
+                    is Resource.Success -> {
+                        getCart()
+                        state =
+                            state.copy(
+                                isLoading = false,
+                                addToCartResponse = result.data,
                                 message = result.data?.message,
                                 isError = result.data?.status == Status.error.name,
                                 errorMessage = result.data?.message,

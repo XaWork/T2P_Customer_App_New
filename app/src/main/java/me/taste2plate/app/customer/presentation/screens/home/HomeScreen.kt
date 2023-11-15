@@ -1,6 +1,9 @@
 package me.taste2plate.app.customer.presentation.screens.home
 
+import android.content.Context
+import android.content.Intent
 import android.content.res.Configuration
+import android.net.Uri
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -24,8 +27,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.core.content.ContextCompat.startActivity
 import androidx.hilt.navigation.compose.hiltViewModel
 import kotlinx.coroutines.launch
 import me.taste2plate.app.customer.R
@@ -61,7 +66,7 @@ fun HomeScreen(
     onNavigateToProfileScreen: () -> Unit,
     onNavigateToAddressListScreen: () -> Unit,
     onNavigateToProductListScreen: () -> Unit,
-    onNavigateToProductDetailsScreen: () -> Unit,
+    onNavigateToProductDetailsScreen: (productId: String) -> Unit,
     onNavigateToBulkOrdersScreen: () -> Unit,
     onNavigateToWalletScreen: () -> Unit,
     onNavigateToMembershipPlanScreen: () -> Unit,
@@ -76,17 +81,17 @@ fun HomeScreen(
     val state = viewModel.state
     LaunchedEffect(state) {
         when {
-            state.message != null && state.addToWishlistResponse != null -> {
-                showToast(message = state.message)
+            state.message != null && state.addToWishlistResponse != null || state.addToCartResponse != null -> {
+                showToast(message = state.message!!)
                 viewModel.onEvent(HomeEvent.UpdateState(changeAddToWishlistResponse = true))
+            }
+
+            state.addressListModel != null && state.addressListModel.result.isEmpty() -> {
+
             }
         }
     }
-
-    LaunchedEffect(key1 = Unit){
-
-    }
-
+    val context = LocalContext.current
     val scrollState = rememberLazyListState()
 
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
@@ -166,7 +171,7 @@ fun HomeScreen(
                 HomeAppBar(
                     onNavigateToWishlistScreen = onNavigateToWishlistScreen,
                     onNavigateToCartScreen = onNavigateToCartScreen,
-                    onNavigateToSearchScreen = {  },
+                    onNavigateToSearchScreen = { },
                     onNavigationIconClick = {
                         scope.launch {
                             drawerState.open()
@@ -177,7 +182,7 @@ fun HomeScreen(
 
             floatingActionButton = {
                 FloatingActionButton(
-                    onClick = { /*TODO*/ },
+                    onClick = { openWhatsApp(context) },
                     containerColor = Color.Transparent,
                     elevation = FloatingActionButtonDefaults.elevation(0.dp)
                 ) {
@@ -191,10 +196,13 @@ fun HomeScreen(
                 )
             else
                 Column {
-                    /*AddressBar(state.defaultAddress!!.address) {
+                    AddressBar(state.defaultAddress!!.address,
+                        checked = state.checked,
+                        onCheckChange = { viewModel.onEvent(HomeEvent.ChangeTaste) }) {
                         viewModel.onEvent(HomeEvent.GetAddress)
                         showBottomSheet = true
-                    }*/
+
+                    }
                     LazyColumn(
                         state = scrollState,
                         horizontalAlignment = Alignment.CenterHorizontally
@@ -202,9 +210,7 @@ fun HomeScreen(
                         val home = state.homeData
                         item {
                             TopList(
-                                onNavigateToCityBrandScreen = {screen ->
-                                    //if(screen == CityBrandScreens.Category)
-
+                                onNavigateToCityBrandScreen = { screen ->
                                     onNavigateToCityBrandScreen(screen)
                                 }
                             )
@@ -236,7 +242,9 @@ fun HomeScreen(
                             if (home?.mostOrderdItem != null)
                                 CenterColumn {
                                     MostOrderedItemList(
-                                        onNavigateToProductDetailsScreen = onNavigateToProductDetailsScreen,
+                                        onNavigateToProductDetailsScreen = {
+                                            onNavigateToProductDetailsScreen(it)
+                                        },
                                         viewModel = viewModel
                                     )
                                     VerticalSpace(space = SpaceBetweenViews)
@@ -255,10 +263,12 @@ fun HomeScreen(
                                 }
 
                             //Deals
-                            if (home?.productDeal != null)
+                            if (home?.productDeal != null && home.productDeal.isNotEmpty())
                                 CenterColumn {
                                     Deals(
-                                        onNavigateToProductDetailsScreen = onNavigateToProductDetailsScreen,
+                                        onNavigateToProductDetailsScreen = {
+                                            onNavigateToProductDetailsScreen(it)
+                                        },
                                         viewModel = viewModel
                                     )
                                     VerticalSpace(space = SpaceBetweenViews)
@@ -282,10 +292,16 @@ fun HomeScreen(
                                     foodItemUpdateInfo = if (state.foodItemUpdateInfo != null && state.foodItemUpdateInfo.id == product.id)
                                         state.foodItemUpdateInfo
                                     else null,
-                                    onNavigateToProductDetailsScreen = onNavigateToProductDetailsScreen
-                                ) {
-                                    viewModel.onEvent(HomeEvent.AddToWishlist(product.id))
-                                }
+                                    onNavigateToProductDetailsScreen = {
+                                        onNavigateToProductDetailsScreen(product.id)
+                                    },
+                                    addToWishlist = {
+                                        viewModel.onEvent(HomeEvent.AddToWishlist(product.id))
+                                    },
+                                    addToCart = {
+                                        viewModel.onEvent(HomeEvent.AddToCart(product.id))
+                                    }
+                                )
                             }
                     }
                 }
@@ -306,6 +322,15 @@ fun CenterColumn(
     ) {
         content()
     }
+}
+
+private fun openWhatsApp(context: Context) {
+    val intent = Intent(
+        Intent.ACTION_VIEW, Uri.parse(
+            "https://api.whatsapp.com/send?phone=$+91 8100709627"
+        )
+    )
+    context.startActivity(intent)
 }
 
 @Preview
