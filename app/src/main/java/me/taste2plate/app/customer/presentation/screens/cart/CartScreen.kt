@@ -139,8 +139,8 @@ fun ContentCartAndWishlist(
 fun SingleCartAndWishlistItem(
     isWishList: Boolean,
     item: CommonForItem,
-    removeFromWishlist: () -> Unit,
-    updateCart: (quantity: Int) -> Unit
+    removeFromWishlist: () -> Unit = {},
+    updateCart: (quantity: Int) -> Unit = {}
 ) {
     val items = listOf<@Composable RowScope.() -> Unit> {
         NetworkImage(

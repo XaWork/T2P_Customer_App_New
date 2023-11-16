@@ -1,6 +1,7 @@
 package me.taste2plate.app.customer.data.repo
 
 import me.taste2plate.app.customer.data.api.ProductApi
+import me.taste2plate.app.customer.domain.model.CouponModel
 import me.taste2plate.app.customer.domain.model.product.ProductDetailsModel
 import me.taste2plate.app.customer.domain.model.product.ProductListModel
 import me.taste2plate.app.customer.domain.repo.ProductRepo
@@ -27,5 +28,9 @@ class ProductRepoImpl @Inject constructor(
 
     override suspend fun productDetails(id: String): ProductDetailsModel {
         return api.productDetails(id)
+    }
+
+    override suspend fun getOfferByCity(id: String): CouponModel {
+        return api.getOfferByCity(id)
     }
 }

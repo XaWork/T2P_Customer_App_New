@@ -2,6 +2,7 @@ package me.taste2plate.app.customer.presentation.screens.checkout
 
 import android.content.res.Configuration
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -14,22 +15,26 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.DatePicker
+import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
@@ -38,21 +43,22 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.DialogProperties
 import me.taste2plate.app.customer.R
+import me.taste2plate.app.customer.domain.mapper.toCommonForWishAndCartItem
+import me.taste2plate.app.customer.domain.model.auth.User
+import me.taste2plate.app.customer.domain.model.user.address.AddressListModel
 import me.taste2plate.app.customer.presentation.screens.address.AddressBottomSheet
+import me.taste2plate.app.customer.presentation.screens.cart.CheckOutViewModel
+import me.taste2plate.app.customer.presentation.screens.cart.CheckoutEvents
 import me.taste2plate.app.customer.presentation.screens.cart.SingleCartAndWishlistItem
-import me.taste2plate.app.customer.presentation.screens.productList
-import me.taste2plate.app.customer.presentation.theme.LowElevation
 import me.taste2plate.app.customer.presentation.theme.LowPadding
 import me.taste2plate.app.customer.presentation.theme.LowRoundedCorners
 import me.taste2plate.app.customer.presentation.theme.MediumPadding
-import me.taste2plate.app.customer.presentation.theme.MediumRoundedCorners
 import me.taste2plate.app.customer.presentation.theme.ScreenPadding
 import me.taste2plate.app.customer.presentation.theme.SpaceBetweenViews
 import me.taste2plate.app.customer.presentation.theme.SpaceBetweenViewsAndSubViews
 import me.taste2plate.app.customer.presentation.theme.T2PCustomerAppTheme
-import me.taste2plate.app.customer.presentation.theme.backgroundColor
-import me.taste2plate.app.customer.presentation.theme.cardContainerOnSecondaryColor
 import me.taste2plate.app.customer.presentation.theme.primaryColor
 import me.taste2plate.app.customer.presentation.utils.rupeeSign
 import me.taste2plate.app.customer.presentation.widgets.AppButton
@@ -65,9 +71,7 @@ import me.taste2plate.app.customer.presentation.widgets.AppTopBar
 import me.taste2plate.app.customer.presentation.widgets.DrawableImage
 import me.taste2plate.app.customer.presentation.widgets.HeadingText
 import me.taste2plate.app.customer.presentation.widgets.InfoWithIcon
-import me.taste2plate.app.customer.presentation.widgets.NetworkImage
 import me.taste2plate.app.customer.presentation.widgets.RadioButtonInfo
-import me.taste2plate.app.customer.presentation.widgets.RoundedCornerCard
 import me.taste2plate.app.customer.presentation.widgets.SpaceBetweenRow
 import me.taste2plate.app.customer.presentation.widgets.TextInCircle
 import me.taste2plate.app.customer.presentation.widgets.VerticalSpace
@@ -75,81 +79,164 @@ import me.taste2plate.app.customer.presentation.widgets.VerticalSpace
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CheckoutScreen(
-    onNavigateToOrderConfirmScreen: () -> Unit
+    viewModel: CheckOutViewModel,
+    onNavigateToOrderConfirmScreen: () -> Unit,
+    onNavigateToAddressListScreen: () -> Unit,
 ) {
-    var showBottomSheet by remember {
+    val state = viewModel.state
+    var showAddressBottomSheet by remember {
         mutableStateOf(false)
+    }
+    var showCouponBottomSheet by remember {
+        mutableStateOf(false)
+    }
+
+    LaunchedEffect(state.defaultAddress == null) {
+        viewModel.onEvent(CheckoutEvents.GetDefaultAddress)
     }
 
     val sheetState = rememberModalBottomSheetState()
     val scope = rememberCoroutineScope()
 
+    //address bottom sheet
+    if (showAddressBottomSheet) {
+        ModalBottomSheet(
+            onDismissRequest = {
+                showAddressBottomSheet = false
+            },
+            sheetState = sheetState
+        ) {
+            AddressBottomSheet(
+                isLoading = false,
+                addressList = state.addressList,
+                onNavigateToAddressListScreen = {
+                    showAddressBottomSheet = false
+                    onNavigateToAddressListScreen()
+                },
+                setDefaultAddress = {
+                    viewModel.onEvent(CheckoutEvents.SetDefaultAddress(it))
+                    showAddressBottomSheet = false
+                }
+            )
+        }
+    }
+
+    //coupon bottom sheet
+    if (showCouponBottomSheet) {
+        ModalBottomSheet(
+            onDismissRequest = {
+                showCouponBottomSheet = false
+            },
+            sheetState = sheetState
+        ) {
+            CouponBottomSheet(
+                state.couponList,
+                applyCoupon = {
+                    showCouponBottomSheet = false
+                },
+                onItemSelected = {
+                    showCouponBottomSheet = false
+                }
+            )
+        }
+    }
+
+    //date picker dialog
+    val datePickerState = rememberDatePickerState()
+    var showDatePickerDialog by rememberSaveable { mutableStateOf(false) }
+    if (showDatePickerDialog) {
+        DatePickerDialog(
+            onDismissRequest = { showDatePickerDialog = false },
+            confirmButton = {
+                TextButton(onClick = { showDatePickerDialog = false }) {
+                    Text("Ok")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showDatePickerDialog = false }) {
+                    Text("Cancel")
+                }
+            }
+        ) {
+            DatePicker(state = datePickerState)
+        }
+    }
+
     AppScaffold(
         topBar = {
-            AppTopBar {}
+            AppTopBar(
+                title = "Checkout"
+            ) {}
         },
     ) {
         CheckoutScreenContent(
+            viewModel = viewModel,
             openAddressSheet = {
-                showBottomSheet = true
+                viewModel.onEvent(CheckoutEvents.GetAddressList)
+                showAddressBottomSheet = true
             },
-            onNavigateToOrderConfirmScreen  = onNavigateToOrderConfirmScreen
-        )
-
-        if (showBottomSheet) {
-            ModalBottomSheet(
-                onDismissRequest = {
-                    showBottomSheet = false
-                },
-                sheetState = sheetState
-            ) {
-                //AddressBottomSheet()
+            onNavigateToOrderConfirmScreen = onNavigateToOrderConfirmScreen,
+            updateCart = { id, quantity ->
+                viewModel.onEvent(CheckoutEvents.UpdateCart(id, quantity))
+            },
+            showCoupons = {
+                viewModel.onEvent(CheckoutEvents.GetCoupons)
+                showCouponBottomSheet = true
+            },
+            showDatePicker = {
+                showDatePickerDialog = true
             }
-        }
+        )
     }
 }
 
 @Composable
 fun CheckoutScreenContent(
+    viewModel: CheckOutViewModel,
     openAddressSheet: () -> Unit,
-    onNavigateToOrderConfirmScreen: () -> Unit
+    updateCart: (productId: String, quantity: Int) -> Unit,
+    onNavigateToOrderConfirmScreen: () -> Unit,
+    showCoupons: () -> Unit,
+    showDatePicker: () -> Unit,
 ) {
+    val state = viewModel.state
+
     val priceList = listOf(
         PriceData(
             title = "Price",
-            price = "1300"
+            price = viewModel.price.toString()
         ),
         PriceData(
             title = "Delivery Charge",
-            price = "130"
+            price = viewModel.deliveryCharge.toString()
         ),
         PriceData(
             title = "Packaging Fee",
-            price = "10"
+            price = viewModel.packagingFee.toString()
         ),
         PriceData(
             title = "CGST",
-            price = "1300"
+            price = viewModel.cgst.toString()
         ),
         PriceData(
             title = "SGST",
-            price = "1300"
+            price = viewModel.sgst.toString()
         ),
         PriceData(
             title = "IGST",
-            price = "1300"
+            price = viewModel.igst.toString()
         ),
         PriceData(
-            title = "Discount",
-            price = "1300"
+            title = "Coupon Discount",
+            price = viewModel.discount.toString()
         ),
         PriceData(
             title = "Subscription Discount",
-            price = "1300"
+            price = viewModel.subscriptionDiscount.toString()
         ),
         PriceData(
             title = "Wallet Discount",
-            price = "1300"
+            price = viewModel.walletDiscount.toString()
         ),
     )
 
@@ -157,14 +244,25 @@ fun CheckoutScreenContent(
         contentPadding = PaddingValues(ScreenPadding),
         verticalArrangement = Arrangement.spacedBy(SpaceBetweenViewsAndSubViews)
     ) {
+        //user info
         item {
-            AddressBar(
-                openAddressSheet = openAddressSheet
-            )
+            if (state.defaultAddress != null && state.user != null)
+                AddressBar(
+                    address = state.defaultAddress,
+                    user = state.user,
+                    openAddressSheet = openAddressSheet
+                )
         }
 
-        items(2) {
-           // SingleCartAndWishlistItem(isWishList = false)
+        //cart items
+        val items = state.cart!!.result.map { it.toCommonForWishAndCartItem() }.toList()
+        items(items) { item ->
+            SingleCartAndWishlistItem(isWishList = false, item, updateCart = {
+                updateCart(
+                    item.id,
+                    it
+                )
+            })
         }
 
         item {
@@ -181,7 +279,9 @@ fun CheckoutScreenContent(
 
             )
 
-            CouponInfo()
+            CouponInfo {
+                showCoupons()
+            }
 
             TipInfo({})
 
@@ -223,14 +323,17 @@ fun CheckoutScreenContent(
 
             }, item2 = {
                 Text(
-                    text = "${rupeeSign}1819",
+                    text = "${rupeeSign}${viewModel.totalPrice}",
                     color = primaryColor.invoke()
                 )
             })
 
             VerticalSpace(space = SpaceBetweenViewsAndSubViews)
 
-            DeliveryInfo()
+            DeliveryInfo(
+                date = viewModel.date,
+                showDatePicker = { showDatePicker() }
+            )
 
             VerticalSpace(space = SpaceBetweenViews)
 
@@ -247,13 +350,15 @@ fun CheckoutScreenContent(
 
 @Composable
 fun AddressBar(
+    address: AddressListModel.Result,
+    user: User,
     openAddressSheet: () -> Unit
 ) {
     Column(
         modifier = Modifier.fillMaxWidth()
     ) {
         Text(
-            text = "Xa Kaler |  Home\n\n Address here",
+            text = "${user.fullName} |  ${address.title}\n\n ${address.address}",
             fontWeight = FontWeight.Light
         )
 
@@ -271,75 +376,17 @@ fun AddressBar(
     }
 }
 
-
 @Composable
-fun SingleCartItem() {
-    RoundedCornerCard(
-        cardColor = cardContainerOnSecondaryColor.invoke(),
-        elevation = LowElevation
-    ) {
-        var items = listOf<@Composable RowScope.() -> Unit> {
-            NetworkImage(
-                image = productList[0].image,
-                modifier = Modifier
-                    .clip(RoundedCornerShape(MediumRoundedCorners))
-                    .size(70.dp)
-                    .weight(1f),
-                contentScale = ContentScale.Crop
-            )
-
-            val productInfo = buildAnnotatedString {
-                withStyle(
-                    SpanStyle(
-                        fontWeight = FontWeight.W400
-                    )
-                ) {
-                    append("Product name")
-                }
-
-                withStyle(
-                    SpanStyle(
-                        fontWeight = FontWeight.Light,
-                        color = primaryColor.invoke()
-                    )
-                ) {
-                    append("\n${rupeeSign}238")
-                }
-            }
-
-            Text(
-                text = productInfo,
-                maxLines = 3,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(SpaceBetweenViewsAndSubViews)
-                    .weight(3f)
-            )
-
-            Text(
-                "2",
-                modifier = Modifier
-                    .background(primaryColor.invoke())
-                    .padding(MediumPadding),
-                color = backgroundColor.invoke()
-            )
-        }
-
-        SpaceBetweenRow(
-            items = items,
-            modifier = Modifier.padding(MediumPadding)
-        )
-    }
-}
-
-@Composable
-fun CouponInfo() {
+fun CouponInfo(
+    showCoupons: () -> Unit
+) {
     Column {
         AppDivider()
 
         AppOutlineButton(
             text = "Apply Coupon"
         ) {
+            showCoupons()
         }
 
         AppDivider()
@@ -447,7 +494,10 @@ fun TipInfo(
 }
 
 @Composable
-fun DeliveryInfo() {
+fun DeliveryInfo(
+    date: String,
+    showDatePicker: () -> Unit
+) {
     Column {
         HeadingText("Delivery Options")
 
@@ -456,11 +506,11 @@ fun DeliveryInfo() {
         val radioOptions = listOf(
             RadioButtonInfo(
                 id = 1,
-                text = "Express Delivery"
+                text = "Express\nDelivery"
             ),
             RadioButtonInfo(
                 id = 1,
-                text = "Standard Delivery"
+                text = "Standard\nDelivery"
             )
         )
         val (selectedOption, onOptionSelected) = remember { mutableStateOf(radioOptions[0]) }
@@ -485,11 +535,14 @@ fun DeliveryInfo() {
 
         SpaceBetweenRow(item1 = {
             TextInCircle(
-                text = "Date",
+                text = date.ifEmpty { "Date" },
                 modifier = Modifier
                     .fillMaxWidth()
                     .weight(1f)
                     .padding(end = LowPadding)
+                    .clickable {
+                        showDatePicker()
+                    }
             )
         }) {
             TextInCircle(
@@ -498,6 +551,7 @@ fun DeliveryInfo() {
                     .fillMaxWidth()
                     .weight(1f)
                     .padding(start = LowPadding)
+                    .clickable { }
             )
         }
     }
@@ -540,6 +594,6 @@ fun PaymentInfo() {
 @Composable
 fun CheckoutScreenPreview() {
     T2PCustomerAppTheme {
-        CheckoutScreen({})
+        //CheckoutScreen({})
     }
 }

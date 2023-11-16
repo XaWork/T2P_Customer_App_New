@@ -271,7 +271,9 @@ fun Navigation() {
 
         // ----------------------------> Bulk Order <--------------------------------------
         composable(route = Screens.BulkOrderScreen.route) {
-            BulkOrderScreen()
+            BulkOrderScreen {
+                navController.popBackStack()
+            }
         }
 
         // ----------------------------> Membership <--------------------------------------
@@ -407,10 +409,17 @@ fun Navigation() {
 
 
             // ----------------------------> Checkout <--------------------------------------
-            composable(route = Screens.CheckoutScreen.route) {
-                CheckoutScreen(onNavigateToOrderConfirmScreen = {
-                    navController.navigate(Screens.OrderConfirmScreen.route)
-                })
+            composable(route = Screens.CheckoutScreen.route) { entry ->
+                val viewModel =
+                    entry.sharedViewModel<CheckOutViewModel>(navHostController = navController)
+                CheckoutScreen(
+                    viewModel = viewModel,
+                    onNavigateToOrderConfirmScreen = {
+                        navController.navigate(Screens.OrderConfirmScreen.route)
+                    },
+                    onNavigateToAddressListScreen = {
+                        navController.navigate(Screens.AddressListScreen.route)
+                    })
             }
 
             // ----------------------------> Order Confirmed <--------------------------------------

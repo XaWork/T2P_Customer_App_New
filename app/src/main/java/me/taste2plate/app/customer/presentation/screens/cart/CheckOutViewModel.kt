@@ -1,6 +1,8 @@
 package me.taste2plate.app.customer.presentation.screens.cart
 
+import android.icu.text.DecimalFormat
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableDoubleStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
@@ -10,6 +12,10 @@ import kotlinx.coroutines.launch
 import me.taste2plate.app.customer.T2PApp
 import me.taste2plate.app.customer.data.Resource
 import me.taste2plate.app.customer.data.Status
+import me.taste2plate.app.customer.data.UserPref
+import me.taste2plate.app.customer.domain.model.user.address.AddressListModel
+import me.taste2plate.app.customer.domain.use_case.CouponByCityUseCase
+import me.taste2plate.app.customer.domain.use_case.user.address.AllAddressUseCase
 import me.taste2plate.app.customer.domain.use_case.user.cart.CartUseCase
 import me.taste2plate.app.customer.domain.use_case.user.cart.DeleteCartUseCase
 import me.taste2plate.app.customer.domain.use_case.user.cart.UpdateCartUseCase
@@ -17,12 +23,26 @@ import javax.inject.Inject
 
 @HiltViewModel
 class CheckOutViewModel @Inject constructor(
+    private val userPref: UserPref,
     private val cartUseCase: CartUseCase,
     private val updateCartUseCase: UpdateCartUseCase,
     private val deleteCartUseCase: DeleteCartUseCase,
+    private val allAddressUseCase: AllAddressUseCase,
+    private val couponByCityUseCase: CouponByCityUseCase,
 ) : ViewModel() {
 
     var state by mutableStateOf(CheckoutState())
+    var date by mutableStateOf("")
+    var price by mutableDoubleStateOf(0.0)
+    var deliveryCharge by mutableDoubleStateOf(0.0)
+    var packagingFee by mutableDoubleStateOf(0.0)
+    var cgst by mutableDoubleStateOf(0.0)
+    var sgst by mutableDoubleStateOf(0.0)
+    var igst by mutableDoubleStateOf(0.0)
+    var discount by mutableDoubleStateOf(0.0)
+    var subscriptionDiscount by mutableDoubleStateOf(0.0)
+    var walletDiscount by mutableDoubleStateOf(0.0)
+    var totalPrice by mutableDoubleStateOf(0.0)
 
     init {
         getCart()
@@ -31,6 +51,24 @@ class CheckOutViewModel @Inject constructor(
     fun onEvent(event: CheckoutEvents) {
         when (event) {
             is CheckoutEvents.GetCart -> {}
+            is CheckoutEvents.GetUser -> {}
+            is CheckoutEvents.GetCoupons -> {
+                getCoupons()
+            }
+
+            is CheckoutEvents.SetDefaultAddress -> {
+                setDefaultAddress(event.address)
+            }
+
+            is CheckoutEvents.GetAddressList -> {
+                getAddressList()
+            }
+
+            is CheckoutEvents.GetDefaultAddress -> {
+                setPrice()
+                getDefaultAddress()
+            }
+
             is CheckoutEvents.UpdateState -> {
                 state = state.copy(
                     normalMessage = null,
@@ -61,11 +99,9 @@ class CheckOutViewModel @Inject constructor(
                     is Resource.Success -> {
                         val data = result.data
 
-                        T2PApp.cartCount = if(data!!.result.isEmpty()) 0 else data.result.size
+                        T2PApp.cartCount = if (data!!.result.isEmpty()) 0 else data.result.size
                         state.copy(
                             isLoading = false,
-                            /*isError = data?.status == Status.error.name,
-                            errorMessage = "Something went Wrong"*/
                             cart = data
                         )
                     }
@@ -79,6 +115,26 @@ class CheckOutViewModel @Inject constructor(
                 }
 
             }
+        }
+    }
+
+    private fun setPrice() {
+        state.cart!!.apply {
+            price = cartprice.toDouble()
+            deliveryCharge = shipping.expressShipping.toDouble()
+            packagingFee = totalPackingPrice.toDouble()
+            cgst = gst.express.totalCgst.toDouble()
+            igst = gst.express.totalIgst.toDouble()
+            sgst = gst.express.totalSgst.toDouble()
+            discount = 0.0
+            subscriptionDiscount = planDiscount.toDouble()
+            walletDiscount = walletDiscount
+
+            //total
+            val decimalFormat = DecimalFormat("#.##")
+            totalPrice =
+                decimalFormat.format(price + deliveryCharge + packagingFee + cgst + sgst + igst + discount + subscriptionDiscount + walletDiscount)
+                    .toDouble()
         }
     }
 
@@ -143,6 +199,91 @@ class CheckOutViewModel @Inject constructor(
                             errorMessage = "Something went Wrong",
                             normalMessage = data?.message,
                             updateCartResponse = data
+                        )
+                    }
+
+                    is Resource.Error ->
+                        state.copy(
+                            isLoading = false,
+                            isError = true,
+                            errorMessage = result.message
+                        )
+                }
+
+            }
+        }
+    }
+
+    private fun getDefaultAddress() {
+        viewModelScope.launch {
+            state = state.copy(defaultAddress = userPref.getDefaultAddress())
+            getUser()
+        }
+    }
+
+    private fun setDefaultAddress(address: AddressListModel.Result) {
+        viewModelScope.launch {
+            state = state.copy(defaultAddress = address)
+            getUser()
+        }
+    }
+
+    private fun getUser() {
+        viewModelScope.launch {
+            state = state.copy(user = userPref.getUser())
+        }
+    }
+
+    private fun getAddressList() {
+        viewModelScope.launch {
+            allAddressUseCase.execute(
+            ).collect { result ->
+                state = when (result) {
+                    is Resource.Loading -> state.copy(isLoading = false)
+                    is Resource.Success -> {
+                        val data = result.data
+                        val isError = data?.status == Status.error.name
+
+                        state.copy(
+                            isLoading = false,
+                            isError = isError,
+                            errorMessage = "Something went Wrong",
+                            normalMessage = data?.message,
+                            addressList = data?.result ?: emptyList(),
+                        )
+                    }
+
+                    is Resource.Error ->
+                        state.copy(
+                            isLoading = false,
+                            isError = true,
+                            errorMessage = result.message
+                        )
+                }
+
+            }
+        }
+    }
+
+    private fun getCoupons() {
+        viewModelScope.launch {
+            couponByCityUseCase.execute(
+                state.defaultAddress!!.city.id
+            ).collect { result ->
+                state = when (result) {
+                    is Resource.Loading -> state.copy(isLoading = false)
+                    is Resource.Success -> {
+                        val data = result.data
+                        val isError = data?.status == Status.error.name
+
+                        state.copy(
+                            isLoading = false,
+                            isError = isError,
+                            errorMessage =
+                            if (isError) "Something went Wrong"
+                            else if (data!!.coupon.isEmpty()) "No coupon found"
+                            else null,
+                            couponList = data?.coupon ?: emptyList(),
                         )
                     }
 

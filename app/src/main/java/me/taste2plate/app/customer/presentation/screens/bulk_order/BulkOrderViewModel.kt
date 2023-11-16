@@ -36,6 +36,12 @@ class BulkOrderViewModel @Inject constructor(
             is BulkOrderEvents.Save -> {
                 if (validateForm())
                     save()
+                else
+                    state = state.copy(isError = true, message = "Fill all Fields")
+            }
+
+            is BulkOrderEvents.UpdateState -> {
+                state = state.copy(isError = false, message = null)
             }
         }
     }

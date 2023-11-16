@@ -1,5 +1,6 @@
 package me.taste2plate.app.customer.domain.repo
 
+import me.taste2plate.app.customer.domain.model.CouponModel
 import me.taste2plate.app.customer.domain.model.product.ProductDetailsModel
 import me.taste2plate.app.customer.domain.model.product.ProductListModel
 
@@ -27,4 +28,8 @@ interface ProductRepo {
     suspend fun productDetails(
         id: String,
     ): ProductDetailsModel
+
+    suspend fun getOfferByCity(
+        id: String,
+    ): CouponModel
 }

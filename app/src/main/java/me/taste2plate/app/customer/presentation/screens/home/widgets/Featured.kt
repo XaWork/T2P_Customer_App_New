@@ -144,7 +144,11 @@ fun SingleFeaturedItem(
                 VerticalSpace(space = SpaceBetweenViews)
 
                 Row(
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable {
+                            addToCart()
+                        },
                     horizontalArrangement = Arrangement.Center,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
@@ -158,12 +162,10 @@ fun SingleFeaturedItem(
                     /*if (foodItemUpdateInfo != null && !foodItemUpdateInfo.wishlistItem && foodItemUpdateInfo.isLoading)
                         ShowLoading()
                     else*/
-                        MaterialIconButton(
-                            imageVector = Icons.Outlined.ShoppingCart,
-                            tint = MaterialTheme.colorScheme.primary
-                        ) {
-                            addToCart()
-                        }
+                    MaterialIcon(
+                        imageVector = Icons.Outlined.ShoppingCart,
+                        tint = MaterialTheme.colorScheme.primary,
+                    )
                 }
             }
         }
