@@ -1,6 +1,7 @@
 package me.taste2plate.app.customer.data
 
 import android.content.Context
+import android.util.Log
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
@@ -46,7 +47,7 @@ class UserPref @Inject constructor(
         val tokenFlow = dataStore.data.map { preferences ->
             preferences[KEY_TOKEN]
         }
-        Timber.e("Token is ${tokenFlow.first()}")
+        Log.e("token","Token is ${tokenFlow.first()}")
         return tokenFlow.first() ?: ""
     }
 
@@ -66,7 +67,7 @@ class UserPref @Inject constructor(
         val taste = dataStore.data.map { preferences ->
             preferences[KEY_TASTE]
         }
-        Timber.e("Taste is ${taste.first()}")
+        Log.e("taste","Taste is ${taste.first()}")
         return taste.first() ?: Taste.veg
     }
 
@@ -83,7 +84,7 @@ class UserPref @Inject constructor(
         val isLogin = dataStore.data.map { preferences ->
             preferences[KEY_IS_LOGIN]
         }
-        Timber.e("User is Login${isLogin.first()}")
+        Log.e("user","User is Login${isLogin.first()}")
         return isLogin.first() ?: false
     }
 
@@ -103,7 +104,7 @@ class UserPref @Inject constructor(
         }
 
         val user: User = Gson().fromJson(userFlow.first(), User::class.java)
-        Timber.e("User is ${userFlow.first()}")
+        Log.e("user","User is ${userFlow.first()}")
 
         return user
     }
@@ -125,7 +126,7 @@ class UserPref @Inject constructor(
 
         val setting: SettingsModel.Result =
             Gson().fromJson(flow.first(), SettingsModel.Result::class.java)
-        Timber.e("Setting is ${flow.first()}")
+        Log.e("setting","Setting is ${flow.first()}")
 
         return setting
     }
@@ -150,7 +151,7 @@ class UserPref @Inject constructor(
         else {
             val address: AddressListModel.Result =
                 Gson().fromJson(addressFlow.first(), AddressListModel.Result::class.java)
-            Timber.e("address is ${addressFlow.first()}")
+            Log.e("address","address is ${addressFlow.first()}")
 
             address
         }

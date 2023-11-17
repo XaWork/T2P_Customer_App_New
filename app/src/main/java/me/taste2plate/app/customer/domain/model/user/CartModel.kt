@@ -47,71 +47,6 @@ data class CartModel(
     @SerializedName("total_sgst")
     val totalSgst: String
 ) {
-    data class Gst(
-        @SerializedName("express")
-        val express: Express,
-        @SerializedName("normal")
-        val normal: Normal
-    ) {
-        data class Express(
-            @SerializedName("total_cgst")
-            val totalCgst: String,
-            @SerializedName("total_igst")
-            val totalIgst: String,
-            @SerializedName("total_sgst")
-            val totalSgst: String
-        )
-
-        data class Normal(
-            @SerializedName("total_cgst")
-            val totalCgst: String,
-            @SerializedName("total_igst")
-            val totalIgst: String,
-            @SerializedName("total_sgst")
-            val totalSgst: String
-        )
-    }
-
-    data class GstWithPoint(
-        @SerializedName("express")
-        val express: Express,
-        @SerializedName("normal")
-        val normal: Normal
-    ) {
-        data class Express(
-            @SerializedName("total_cgst")
-            val totalCgst: String,
-            @SerializedName("total_igst")
-            val totalIgst: String,
-            @SerializedName("total_sgst")
-            val totalSgst: String
-        )
-
-        data class Normal(
-            @SerializedName("total_cgst")
-            val totalCgst: String,
-            @SerializedName("total_igst")
-            val totalIgst: String,
-            @SerializedName("total_sgst")
-            val totalSgst: String
-        )
-    }
-
-    data class NewFinalPrice(
-        @SerializedName("express")
-        val express: String,
-        @SerializedName("normal")
-        val normal: String,
-        @SerializedName("with_wallet")
-        val withWallet: WithWallet
-    ) {
-        data class WithWallet(
-            @SerializedName("express")
-            val express: String,
-            @SerializedName("normal")
-            val normal: String
-        )
-    }
 
     data class Result(
         @SerializedName("brand")
@@ -533,10 +468,84 @@ data class CartModel(
         }
     }
 
-    data class Shipping(
-        @SerializedName("express_shipping")
-        val expressShipping: String,
-        @SerializedName("normal_shipping")
-        val normalShipping: String
+
+}
+
+data class Gst(
+    @SerializedName("express")
+    val express: Express,
+    @SerializedName("normal")
+    val normal: Normal
+)
+{
+    data class Express(
+        @SerializedName("total_cgst")
+        val totalCgst: String,
+        @SerializedName("total_igst")
+        val totalIgst: String,
+        @SerializedName("total_sgst")
+        val totalSgst: String
+    )
+
+    data class Normal(
+        @SerializedName("total_cgst")
+        val totalCgst: String,
+        @SerializedName("total_igst")
+        val totalIgst: String,
+        @SerializedName("total_sgst")
+        val totalSgst: String
+    )
+}
+
+
+
+data class GstWithPoint(
+    @SerializedName("express")
+    val express: Express,
+    @SerializedName("normal")
+    val normal: Normal
+)
+{
+    data class Express(
+        @SerializedName("total_cgst")
+        val totalCgst: String,
+        @SerializedName("total_igst")
+        val totalIgst: String,
+        @SerializedName("total_sgst")
+        val totalSgst: String
+    )
+
+    data class Normal(
+        @SerializedName("total_cgst")
+        val totalCgst: String,
+        @SerializedName("total_igst")
+        val totalIgst: String,
+        @SerializedName("total_sgst")
+        val totalSgst: String
+    )
+}
+
+data class Shipping(
+    @SerializedName("express_shipping")
+    val expressShipping: String,
+    @SerializedName("normal_shipping")
+    val normalShipping: String
+)
+
+
+data class NewFinalPrice(
+    @SerializedName("express")
+    val express: String,
+    @SerializedName("normal")
+    val normal: String,
+    @SerializedName("with_wallet")
+    val withWallet: WithWallet
+)
+{
+    data class WithWallet(
+        @SerializedName("express")
+        val express: String,
+        @SerializedName("normal")
+        val normal: String
     )
 }

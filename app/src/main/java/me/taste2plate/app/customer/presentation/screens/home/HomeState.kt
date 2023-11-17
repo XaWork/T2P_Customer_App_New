@@ -1,6 +1,7 @@
 package me.taste2plate.app.customer.presentation.screens.home
 
 import me.taste2plate.app.customer.domain.model.HomeModel
+import me.taste2plate.app.customer.domain.model.auth.User
 import me.taste2plate.app.customer.domain.model.user.CartModel
 import me.taste2plate.app.customer.domain.model.user.CommonResponse
 import me.taste2plate.app.customer.domain.model.user.WishListModel
@@ -10,6 +11,7 @@ data class HomeState(
     val isLoading: Boolean = false,
     val addressLoader: Boolean = false,
     val checked: Boolean = false,
+    val user: User? = null,
     val errorMessage: String? = null,
     val message: String? = null,
     val isError: Boolean = false,

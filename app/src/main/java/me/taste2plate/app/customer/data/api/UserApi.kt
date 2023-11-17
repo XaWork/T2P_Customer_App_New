@@ -1,11 +1,13 @@
 package me.taste2plate.app.customer.data.api
 
+import me.taste2plate.app.customer.domain.model.ApplyCouponModel
 import me.taste2plate.app.customer.domain.model.auth.LoginModel
 import me.taste2plate.app.customer.domain.model.auth.VerifyOTPModel
 import me.taste2plate.app.customer.domain.model.user.CartModel
 import me.taste2plate.app.customer.domain.model.user.CommonResponse
 import me.taste2plate.app.customer.domain.model.user.DeleteFromWishlistModel
 import me.taste2plate.app.customer.domain.model.user.GetProfileModel
+import me.taste2plate.app.customer.domain.model.user.MyPlanModel
 import me.taste2plate.app.customer.domain.model.user.OrderListModel
 import me.taste2plate.app.customer.domain.model.user.WishListModel
 import me.taste2plate.app.customer.domain.model.user.address.AddressListModel
@@ -52,6 +54,10 @@ interface UserApi {
     ): GetProfileModel
 
 
+    @GET("get-wallet-data")
+    suspend fun getMyPlan(@Query("id") userId: String): MyPlanModel
+
+
     // ------------------------- Wishlist -------------------------
     @GET("get-wish")
     suspend fun getWishlist(
@@ -65,7 +71,6 @@ interface UserApi {
         @Field("id") userId: String,
         @Field("productid") productId: String
     ): CommonResponse
-
 
 
     @FormUrlEncoded
@@ -91,7 +96,6 @@ interface UserApi {
         @Query("customer_city") cityId: String,
         @Query("customer_zip") zipCode: String
     ): CartModel
-
 
 
     @FormUrlEncoded
@@ -153,16 +157,26 @@ interface UserApi {
 
     //----------------- Order ---------------------
     @GET("my-orders")
-    suspend fun getOrders(@Query("id") userId:String): OrderListModel
+    suspend fun getOrders(@Query("id") userId: String): OrderListModel
 
     @POST("bulk-order")
     @FormUrlEncoded
     suspend fun createBulkOrder(
-        @Field("name") name:String,
-        @Field("email") email:String,
-        @Field("mobile") mobile:String,
-        @Field("city") city:String,
-        @Field("address") address:String,
-        @Field("msg") msg:String,
+        @Field("name") name: String,
+        @Field("email") email: String,
+        @Field("mobile") mobile: String,
+        @Field("city") city: String,
+        @Field("address") address: String,
+        @Field("msg") msg: String,
     ): CommonResponse
+
+    //------------------ Checkout ---------------------
+    @FormUrlEncoded
+    @POST("apply-coupon")
+    suspend fun applyCoupon(
+        @Field("coupon") coupon: String,
+        @Field("userid") userid: String,
+        @Field("customer_city") cityId: String,
+        @Field("1") zipCode: String,
+    ): ApplyCouponModel
 }

@@ -1,11 +1,13 @@
 package me.taste2plate.app.customer.domain.repo
 
+import me.taste2plate.app.customer.domain.model.ApplyCouponModel
 import me.taste2plate.app.customer.domain.model.auth.LoginModel
 import me.taste2plate.app.customer.domain.model.auth.VerifyOTPModel
 import me.taste2plate.app.customer.domain.model.user.CartModel
 import me.taste2plate.app.customer.domain.model.user.CommonResponse
 import me.taste2plate.app.customer.domain.model.user.DeleteFromWishlistModel
 import me.taste2plate.app.customer.domain.model.user.GetProfileModel
+import me.taste2plate.app.customer.domain.model.user.MyPlanModel
 import me.taste2plate.app.customer.domain.model.user.OrderListModel
 import me.taste2plate.app.customer.domain.model.user.WishListModel
 import me.taste2plate.app.customer.domain.model.user.address.AddressListModel
@@ -26,6 +28,10 @@ interface UserRepo {
     suspend fun getProfile(
         id: String,
     ): GetProfileModel
+
+    suspend fun getMyPlan(
+        id: String,
+    ): MyPlanModel
 
     suspend fun editProfile(
         id: String,
@@ -118,4 +124,11 @@ interface UserRepo {
         address:String,
         msg:String,
     ): CommonResponse
+
+    suspend fun applyCoupon(
+        coupon: String,
+        userid: String,
+        cityId: String,
+        zipCode: String,
+    ): ApplyCouponModel
 }

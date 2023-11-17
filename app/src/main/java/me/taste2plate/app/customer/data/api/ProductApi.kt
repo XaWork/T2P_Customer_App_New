@@ -40,7 +40,6 @@ interface ProductApi {
     @GET("product-details")
     suspend fun productDetails(@Query("id") id: String): ProductDetailsModel
 
-
     @GET("offer-deal")
     suspend fun getOfferByCity(@Query("city") cityId: String): CouponModel
 }

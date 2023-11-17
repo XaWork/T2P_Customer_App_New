@@ -14,6 +14,7 @@ import me.taste2plate.app.customer.data.Resource
 import me.taste2plate.app.customer.data.Status
 import me.taste2plate.app.customer.data.UserPref
 import me.taste2plate.app.customer.domain.model.user.address.AddressListModel
+import me.taste2plate.app.customer.domain.use_case.ApplyCouponUseCase
 import me.taste2plate.app.customer.domain.use_case.CouponByCityUseCase
 import me.taste2plate.app.customer.domain.use_case.user.address.AllAddressUseCase
 import me.taste2plate.app.customer.domain.use_case.user.cart.CartUseCase
@@ -29,10 +30,13 @@ class CheckOutViewModel @Inject constructor(
     private val deleteCartUseCase: DeleteCartUseCase,
     private val allAddressUseCase: AllAddressUseCase,
     private val couponByCityUseCase: CouponByCityUseCase,
+    private val applyCouponUseCase: ApplyCouponUseCase
 ) : ViewModel() {
 
     var state by mutableStateOf(CheckoutState())
+
     var date by mutableStateOf("")
+    var timeSlot by mutableStateOf("")
     var price by mutableDoubleStateOf(0.0)
     var deliveryCharge by mutableDoubleStateOf(0.0)
     var packagingFee by mutableDoubleStateOf(0.0)
@@ -51,6 +55,14 @@ class CheckOutViewModel @Inject constructor(
     fun onEvent(event: CheckoutEvents) {
         when (event) {
             is CheckoutEvents.GetCart -> {}
+            is CheckoutEvents.ChangeDeliveryType -> {
+                state = state.copy(deliveryType = event.deliveryType)
+            }
+
+            is CheckoutEvents.ChangePaymentType -> {
+                state = state.copy(paymentType = event.paymentType)
+            }
+
             is CheckoutEvents.GetUser -> {}
             is CheckoutEvents.GetCoupons -> {
                 getCoupons()
@@ -219,6 +231,7 @@ class CheckOutViewModel @Inject constructor(
             state = state.copy(defaultAddress = userPref.getDefaultAddress())
             getUser()
         }
+        getCoupons()
     }
 
     private fun setDefaultAddress(address: AddressListModel.Result) {
@@ -276,6 +289,9 @@ class CheckOutViewModel @Inject constructor(
                         val data = result.data
                         val isError = data?.status == Status.error.name
 
+                        if (data != null && data.coupon.isNotEmpty())
+                            applyCoupon(data.coupon[0].coupon)
+
                         state.copy(
                             isLoading = false,
                             isError = isError,
@@ -284,6 +300,37 @@ class CheckOutViewModel @Inject constructor(
                             else if (data!!.coupon.isEmpty()) "No coupon found"
                             else null,
                             couponList = data?.coupon ?: emptyList(),
+                        )
+                    }
+
+                    is Resource.Error ->
+                        state.copy(
+                            isLoading = false,
+                            isError = true,
+                            errorMessage = result.message
+                        )
+                }
+
+            }
+        }
+    }
+
+    private fun applyCoupon(couponCode: String) {
+        viewModelScope.launch {
+            applyCouponUseCase.execute(
+                couponCode
+            ).collect { result ->
+                state = when (result) {
+                    is Resource.Loading -> state.copy(isLoading = false)
+                    is Resource.Success -> {
+                        val data = result.data
+                        val isError = data?.status == Status.error.name
+
+                        state.copy(
+                            isLoading = false,
+                            isError = isError,
+                            errorMessage = if (isError) data?.message else null,
+                            applyCouponResponse = data,
                         )
                     }
 

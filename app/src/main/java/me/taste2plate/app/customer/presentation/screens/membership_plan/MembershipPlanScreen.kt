@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Divider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -22,6 +23,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
+import me.taste2plate.app.customer.domain.model.custom.Plan
 import me.taste2plate.app.customer.presentation.theme.LowElevation
 import me.taste2plate.app.customer.presentation.theme.LowPadding
 import me.taste2plate.app.customer.presentation.theme.MediumPadding
@@ -36,37 +39,51 @@ import me.taste2plate.app.customer.presentation.theme.secondaryColor
 import me.taste2plate.app.customer.presentation.theme.yellowBannerColor
 import me.taste2plate.app.customer.presentation.utils.loremIpsum
 import me.taste2plate.app.customer.presentation.widgets.AppButton
+import me.taste2plate.app.customer.presentation.widgets.AppEmptyView
 import me.taste2plate.app.customer.presentation.widgets.AppScaffold
 import me.taste2plate.app.customer.presentation.widgets.AppTopBar
 import me.taste2plate.app.customer.presentation.widgets.RoundedCornerCard
+import me.taste2plate.app.customer.presentation.widgets.ShowLoading
 import me.taste2plate.app.customer.presentation.widgets.SpaceBetweenRow
 import me.taste2plate.app.customer.presentation.widgets.VerticalSpace
 
 @Composable
-fun MembershipPlanScreen() {
+fun MembershipPlanScreen(
+    viewModel: MembershipPlanViewModel = hiltViewModel()
+) {
+    val state = viewModel.state
     AppScaffold(
         topBar = {
             AppTopBar {}
         },
     ) {
-        ContentMembershipPlanScreen()
+        if (state.isLoading)
+            ShowLoading(isButton = false)
+        else if (state.plans.isEmpty())
+            AppEmptyView()
+        else
+            ContentMembershipPlanScreen(state.plans)
     }
 }
 
 @Composable
-fun ContentMembershipPlanScreen() {
+fun ContentMembershipPlanScreen(
+    plans: List<Plan>
+) {
     LazyColumn(
         contentPadding = PaddingValues(ScreenPadding),
         verticalArrangement = Arrangement.spacedBy(SpaceBetweenViewsAndSubViews)
     ) {
-        items(10) {
-            SingleMembershipPlanItem()
+        items(plans) { plan ->
+            SingleMembershipPlanItem(plan)
         }
     }
 }
 
 @Composable
-fun SingleMembershipPlanItem() {
+fun SingleMembershipPlanItem(
+    plan: Plan
+) {
     val items = listOf<@Composable RowScope.() -> Unit> {
 
         Row(
@@ -81,7 +98,7 @@ fun SingleMembershipPlanItem() {
                 .weight(1f),
         ) {
             Text(
-                "Silver".uppercase(),
+                plan.name.uppercase(),
                 color = onBackgroundColor.invoke(),
                 textAlign = TextAlign.Center,
                 fontSize = 18.sp
@@ -104,7 +121,7 @@ fun SingleMembershipPlanItem() {
             VerticalSpace(space = SpaceBetweenViewsAndSubViews)
 
             Text(
-                text = loremIpsum,
+                text = plan.description,
                 maxLines = 5,
                 fontSize = 12.sp,
                 lineHeight = 15.sp
@@ -121,7 +138,7 @@ fun SingleMembershipPlanItem() {
             VerticalSpace(space = SpaceBetweenViewsAndSubViews)
 
             Text(
-                text = loremIpsum,
+                text = plan.benefits,
                 maxLines = 5,
                 fontSize = 12.sp,
                 lineHeight = 15.sp
@@ -138,7 +155,7 @@ fun SingleMembershipPlanItem() {
             verticalArrangement = Arrangement.Center
         ) {
             Text(
-                "Plan\nRs 2000",
+                "Plan\nRs ${plan.price}",
                 color = backgroundColor.invoke(),
                 textAlign = TextAlign.Center
             )
@@ -155,7 +172,7 @@ fun SingleMembershipPlanItem() {
             VerticalSpace(space = SpaceBetweenViewsAndSubViews)
 
             Text(
-                "Validity\n365 days",
+                "Validity\n${plan.validityText} days",
                 color = backgroundColor.invoke(),
                 textAlign = TextAlign.Center
             )

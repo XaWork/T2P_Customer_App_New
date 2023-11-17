@@ -8,6 +8,7 @@ import me.taste2plate.app.customer.domain.model.SettingsModel
 import me.taste2plate.app.customer.domain.model.StateListModel
 import me.taste2plate.app.customer.domain.model.SubCategoryModel
 import me.taste2plate.app.customer.domain.model.ZipListModel
+import me.taste2plate.app.customer.domain.model.custom.AllPlanListModel
 
 interface CustomRepo {
     suspend fun settings(): SettingsModel
@@ -38,4 +39,8 @@ interface CustomRepo {
     suspend fun allSubCategories(
         categoryId: String
     ): SubCategoryModel
+
+    suspend fun getPlans(
+        cityId: String
+    ): AllPlanListModel
 }

@@ -127,45 +127,47 @@ fun HomeScreen(
     }
 
 //Navigation Drawer
-    NavigationDrawer(drawerState = drawerState, onItemClick = { id ->
-        when (id) {
-            DrawerAppScreen.Home.name -> {}
-            DrawerAppScreen.Orders.name -> {
-                onNavigateToOrderScreen()
-            }
+    NavigationDrawer(
+        userName = state.user?.fullName ?: "",
+        drawerState = drawerState, onItemClick = { id ->
+            when (id) {
+                DrawerAppScreen.Home.name -> {}
+                DrawerAppScreen.Orders.name -> {
+                    onNavigateToOrderScreen()
+                }
 
-            DrawerAppScreen.Profile.name -> {
-                onNavigateToProfileScreen()
-            }
+                DrawerAppScreen.Profile.name -> {
+                    onNavigateToProfileScreen()
+                }
 
-            DrawerAppScreen.BulkOrders.name -> {
-                onNavigateToBulkOrdersScreen()
-            }
+                DrawerAppScreen.BulkOrders.name -> {
+                    onNavigateToBulkOrdersScreen()
+                }
 
-            DrawerAppScreen.Wallet.name -> {
-                onNavigateToWalletScreen()
-            }
+                DrawerAppScreen.Wallet.name -> {
+                    onNavigateToWalletScreen()
+                }
 
-            DrawerAppScreen.MembershipPlan.name -> {
-                onNavigateToMembershipPlanScreen()
-            }
+                DrawerAppScreen.MembershipPlan.name -> {
+                    onNavigateToMembershipPlanScreen()
+                }
 
-            DrawerAppScreen.MyPlan.name -> {
-                onNavigateToMyPlanScreen()
-            }
+                DrawerAppScreen.MyPlan.name -> {
+                    onNavigateToMyPlanScreen()
+                }
 
-            DrawerAppScreen.RateApp.name -> {}
-            DrawerAppScreen.ReferAndEarn.name -> {}
-            DrawerAppScreen.ShareApp.name -> {}
-            DrawerAppScreen.ContactUs.name -> {
-                onNavigateContactUsScreen()
-            }
+                DrawerAppScreen.RateApp.name -> {}
+                DrawerAppScreen.ReferAndEarn.name -> {}
+                DrawerAppScreen.ShareApp.name -> {}
+                DrawerAppScreen.ContactUs.name -> {
+                    onNavigateContactUsScreen()
+                }
 
-            DrawerAppScreen.LogOut.name -> {
-                onNavigateLogoutScreen()
+                DrawerAppScreen.LogOut.name -> {
+                    onNavigateLogoutScreen()
+                }
             }
-        }
-    }) {
+        }) {
         AppScaffold(
             topBar = {
                 HomeAppBar(

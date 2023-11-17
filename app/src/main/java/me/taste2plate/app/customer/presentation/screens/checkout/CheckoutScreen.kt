@@ -1,11 +1,14 @@
 package me.taste2plate.app.customer.presentation.screens.checkout
 
 import android.content.res.Configuration
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -16,7 +19,6 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.DatePicker
-import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.ModalBottomSheet
@@ -43,7 +45,6 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.window.DialogProperties
 import me.taste2plate.app.customer.R
 import me.taste2plate.app.customer.domain.mapper.toCommonForWishAndCartItem
 import me.taste2plate.app.customer.domain.model.auth.User
@@ -51,6 +52,7 @@ import me.taste2plate.app.customer.domain.model.user.address.AddressListModel
 import me.taste2plate.app.customer.presentation.screens.address.AddressBottomSheet
 import me.taste2plate.app.customer.presentation.screens.cart.CheckOutViewModel
 import me.taste2plate.app.customer.presentation.screens.cart.CheckoutEvents
+import me.taste2plate.app.customer.presentation.screens.cart.CheckoutState
 import me.taste2plate.app.customer.presentation.screens.cart.SingleCartAndWishlistItem
 import me.taste2plate.app.customer.presentation.theme.LowPadding
 import me.taste2plate.app.customer.presentation.theme.LowRoundedCorners
@@ -70,12 +72,19 @@ import me.taste2plate.app.customer.presentation.widgets.AppScaffold
 import me.taste2plate.app.customer.presentation.widgets.AppTopBar
 import me.taste2plate.app.customer.presentation.widgets.DrawableImage
 import me.taste2plate.app.customer.presentation.widgets.HeadingText
+import me.taste2plate.app.customer.presentation.widgets.HorizontalSpace
 import me.taste2plate.app.customer.presentation.widgets.InfoWithIcon
 import me.taste2plate.app.customer.presentation.widgets.RadioButtonInfo
 import me.taste2plate.app.customer.presentation.widgets.SpaceBetweenRow
 import me.taste2plate.app.customer.presentation.widgets.TextInCircle
 import me.taste2plate.app.customer.presentation.widgets.VerticalSpace
+import me.taste2plate.app.customer.presentation.widgets.showToast
+import java.time.Instant
+import java.time.ZoneOffset
+import java.time.format.DateTimeFormatter
+import java.time.temporal.ChronoUnit
 
+@RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CheckoutScreen(
@@ -91,8 +100,17 @@ fun CheckoutScreen(
         mutableStateOf(false)
     }
 
-    LaunchedEffect(state.defaultAddress == null) {
-        viewModel.onEvent(CheckoutEvents.GetDefaultAddress)
+    LaunchedEffect(state) {
+        when {
+            state.defaultAddress == null -> {
+                viewModel.onEvent(CheckoutEvents.GetDefaultAddress)
+            }
+
+            state.isError && state.errorMessage != null -> {
+                showToast(state.errorMessage)
+                viewModel.onEvent(CheckoutEvents.UpdateState)
+            }
+        }
     }
 
     val sheetState = rememberModalBottomSheetState()
@@ -141,24 +159,76 @@ fun CheckoutScreen(
         }
     }
 
+    //timeslot bottom sheet
+    var showTimeSlotBottomSheet by remember {
+        mutableStateOf(false)
+    }
+    val timeslots = listOf("Afternoon", "Morning")
+    if (showTimeSlotBottomSheet) {
+        ModalBottomSheet(
+            onDismissRequest = {
+                showTimeSlotBottomSheet = false
+            },
+            sheetState = sheetState
+        ) {
+            TimePickerBottomSheet(
+                timeslots,
+                onItemSelected = {
+                    viewModel.timeSlot = timeslots[it]
+                    showTimeSlotBottomSheet = false
+                }
+            )
+        }
+    }
+
     //date picker dialog
-    val datePickerState = rememberDatePickerState()
+    val todayDate = Instant.now().toEpochMilli()
+    val datePickerState =
+        rememberDatePickerState(initialSelectedDateMillis = todayDate)
     var showDatePickerDialog by rememberSaveable { mutableStateOf(false) }
     if (showDatePickerDialog) {
-        DatePickerDialog(
-            onDismissRequest = { showDatePickerDialog = false },
-            confirmButton = {
-                TextButton(onClick = { showDatePickerDialog = false }) {
-                    Text("Ok")
-                }
+        ModalBottomSheet(
+            onDismissRequest = {
+                showDatePickerDialog = false
             },
-            dismissButton = {
-                TextButton(onClick = { showDatePickerDialog = false }) {
-                    Text("Cancel")
-                }
-            }
+            sheetState = sheetState
         ) {
-            DatePicker(state = datePickerState)
+            DatePicker(state = datePickerState, dateValidator = {
+                val instant = Instant.ofEpochMilli(todayDate)
+                val newInstant = instant.minus(1, ChronoUnit.DAYS)
+                it >= newInstant.toEpochMilli()
+            })
+
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = ScreenPadding)
+                    .align(Alignment.End),
+                horizontalArrangement = Arrangement.End
+            ) {
+                TextButton(onClick = {
+                    val selectedDate = datePickerState.selectedDateMillis?.let {
+                        Instant.ofEpochMilli(it).atOffset(ZoneOffset.UTC)
+                    }
+                    viewModel.date =
+                        selectedDate?.format(DateTimeFormatter.ISO_LOCAL_DATE).toString()
+                    showDatePickerDialog = false
+                }) {
+                    Text("OK")
+                }
+
+                HorizontalSpace(space = SpaceBetweenViewsAndSubViews)
+
+                TextButton(onClick = {
+                    showDatePickerDialog = false
+                }) {
+                    Text("CANCEL")
+                }
+
+
+            }
+
+            AppDivider()
         }
     }
 
@@ -180,11 +250,16 @@ fun CheckoutScreen(
                 viewModel.onEvent(CheckoutEvents.UpdateCart(id, quantity))
             },
             showCoupons = {
-                viewModel.onEvent(CheckoutEvents.GetCoupons)
                 showCouponBottomSheet = true
             },
             showDatePicker = {
                 showDatePickerDialog = true
+            },
+            showTimeSlots = {
+                showTimeSlotBottomSheet = true
+            },
+            changeDeliveryType = {
+                viewModel.onEvent(CheckoutEvents.ChangeDeliveryType(it))
             }
         )
     }
@@ -198,6 +273,8 @@ fun CheckoutScreenContent(
     onNavigateToOrderConfirmScreen: () -> Unit,
     showCoupons: () -> Unit,
     showDatePicker: () -> Unit,
+    showTimeSlots: () -> Unit,
+    changeDeliveryType: (DeliveryType) -> Unit,
 ) {
     val state = viewModel.state
 
@@ -279,6 +356,7 @@ fun CheckoutScreenContent(
 
             )
 
+
             CouponInfo {
                 showCoupons()
             }
@@ -332,12 +410,18 @@ fun CheckoutScreenContent(
 
             DeliveryInfo(
                 date = viewModel.date,
-                showDatePicker = { showDatePicker() }
+                timeSlot = viewModel.timeSlot,
+                deliveryType = state.deliveryType,
+                showDatePicker = { showDatePicker() },
+                showTimeSlots = { showTimeSlots() },
+                changeDeliveryType = changeDeliveryType
             )
 
             VerticalSpace(space = SpaceBetweenViews)
 
-            PaymentInfo()
+            PaymentInfo(state, changePaymentType = {
+                viewModel.onEvent(CheckoutEvents.ChangePaymentType(it))
+            })
 
             AppButton(
                 text = "Continue"
@@ -496,7 +580,11 @@ fun TipInfo(
 @Composable
 fun DeliveryInfo(
     date: String,
-    showDatePicker: () -> Unit
+    timeSlot: String,
+    deliveryType: DeliveryType,
+    changeDeliveryType: (DeliveryType) -> Unit,
+    showDatePicker: () -> Unit,
+    showTimeSlots: () -> Unit
 ) {
     Column {
         HeadingText("Delivery Options")
@@ -509,15 +597,25 @@ fun DeliveryInfo(
                 text = "Express\nDelivery"
             ),
             RadioButtonInfo(
-                id = 1,
+                id = 2,
                 text = "Standard\nDelivery"
             )
         )
-        val (selectedOption, onOptionSelected) = remember { mutableStateOf(radioOptions[0]) }
+
         AppRadioButton(
             radioOptions,
-            selectedOption.text,
-            onOptionSelected
+            if (deliveryType == DeliveryType.Express) radioOptions[0].text else radioOptions[1].text,
+            onOptionSelected = {
+                when (it.id) {
+                    1 -> {
+                        changeDeliveryType(DeliveryType.Express)
+                    }
+
+                    2 -> {
+                        changeDeliveryType(DeliveryType.Standard)
+                    }
+                }
+            }
         )
 
         VerticalSpace(space = SpaceBetweenViews)
@@ -546,19 +644,22 @@ fun DeliveryInfo(
             )
         }) {
             TextInCircle(
-                text = "Time",
+                text = timeSlot.ifEmpty { "Time" },
                 modifier = Modifier
                     .fillMaxWidth()
                     .weight(1f)
                     .padding(start = LowPadding)
-                    .clickable { }
+                    .clickable { showTimeSlots() }
             )
         }
     }
 }
 
 @Composable
-fun PaymentInfo() {
+fun PaymentInfo(
+    state: CheckoutState,
+    changePaymentType: (PaymentType) -> Unit
+) {
     val radioOptions = listOf(
         RadioButtonInfo(
             id = 1,
@@ -567,13 +668,15 @@ fun PaymentInfo() {
             icon = R.drawable.online_payment
         ),
         RadioButtonInfo(
-            id = 1,
+            id = 2,
             text = "COD",
             isIcon = true,
-            icon = R.drawable.cod_icon
+            icon = R.drawable.cod_icon,
+            enable = state.deliveryType == DeliveryType.Standard
         )
     )
-    val (selectedOption, onOptionSelected) = remember { mutableStateOf(radioOptions[0]) }
+    val selectedOption =
+        if (state.paymentType == PaymentType.Online) radioOptions[0].text else radioOptions[1].text
 
     Column {
         HeadingText("Payment")
@@ -582,8 +685,13 @@ fun PaymentInfo() {
 
         AppRadioButton(
             radioOptions,
-            selectedOption.text,
-            onOptionSelected,
+            selectedOption,
+            onOptionSelected = {
+                when (it.id) {
+                    1 -> changePaymentType(PaymentType.Online)
+                    2 -> changePaymentType(PaymentType.COD)
+                }
+            },
             isIcon = true
         )
     }

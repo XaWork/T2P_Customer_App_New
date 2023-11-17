@@ -1,12 +1,14 @@
 package me.taste2plate.app.customer.data.repo
 
 import me.taste2plate.app.customer.data.api.UserApi
+import me.taste2plate.app.customer.domain.model.ApplyCouponModel
 import me.taste2plate.app.customer.domain.model.auth.LoginModel
 import me.taste2plate.app.customer.domain.model.auth.VerifyOTPModel
 import me.taste2plate.app.customer.domain.model.user.CartModel
 import me.taste2plate.app.customer.domain.model.user.CommonResponse
 import me.taste2plate.app.customer.domain.model.user.DeleteFromWishlistModel
 import me.taste2plate.app.customer.domain.model.user.GetProfileModel
+import me.taste2plate.app.customer.domain.model.user.MyPlanModel
 import me.taste2plate.app.customer.domain.model.user.OrderListModel
 import me.taste2plate.app.customer.domain.model.user.WishListModel
 import me.taste2plate.app.customer.domain.model.user.address.AddressListModel
@@ -39,6 +41,10 @@ class UserRepoImpl @Inject constructor(
 
     override suspend fun getProfile(id: String): GetProfileModel {
         return api.getProfile(id)
+    }
+
+    override suspend fun getMyPlan(id: String): MyPlanModel {
+        return api.getMyPlan(id)
     }
 
     override suspend fun editProfile(id: String, fullName: String, mobile: String): CommonResponse {
@@ -152,5 +158,14 @@ class UserRepoImpl @Inject constructor(
         msg: String
     ): CommonResponse {
         return api.createBulkOrder(name, email, mobile, city, address, msg)
+    }
+
+    override suspend fun applyCoupon(
+        coupon: String,
+        userid: String,
+        cityId: String,
+        zipCode: String
+    ): ApplyCouponModel {
+        return api.applyCoupon(coupon, userid, cityId, zipCode)
     }
 }

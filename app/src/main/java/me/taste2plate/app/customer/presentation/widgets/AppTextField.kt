@@ -151,8 +151,7 @@ fun AppDropDown(
     selectedText: String,
     hint: String = "",
     items: List<String> = emptyList(),
-    onTextChanged: (String) -> Unit
-
+    onTextChanged: (String) -> Unit,
 ) {
     ExposedDropdownMenuBox(
         modifier = modifier,

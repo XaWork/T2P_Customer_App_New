@@ -24,7 +24,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
-    private val userPref: UserPref,
+    val userPref: UserPref,
     private val homeUseCase: HomeUseCase,
     private val wishlistUseCase: WishlistUseCase,
     private val cartUseCase: CartUseCase,
@@ -86,7 +86,8 @@ class HomeViewModel @Inject constructor(
     private fun getTaste() {
         viewModelScope.launch {
             val taste = userPref.getTaste()
-            state = state.copy(checked = taste == Taste.nonVeg)
+            val user = userPref.getUser()
+            state = state.copy(checked = taste == Taste.nonVeg, user = user)
         }
     }
 

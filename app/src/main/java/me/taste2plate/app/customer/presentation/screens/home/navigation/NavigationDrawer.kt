@@ -45,9 +45,9 @@ import me.taste2plate.app.customer.presentation.widgets.HorizontalSpace
 import me.taste2plate.app.customer.presentation.widgets.InfoWithIcon
 import me.taste2plate.app.customer.presentation.widgets.VerticalSpace
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun NavigationDrawer(
+    userName: String = "",
     drawerState: DrawerState,
     onItemClick : (String) -> Unit,
     content: @Composable () -> Unit
@@ -89,7 +89,7 @@ fun NavigationDrawer(
                             HorizontalSpace(space = SpaceBetweenViewsAndSubViews)
 
                             Text(
-                                text = "Hey user",
+                                text = "Hey $userName",
                                 color = MaterialTheme.colorScheme.background
                             )
                         }

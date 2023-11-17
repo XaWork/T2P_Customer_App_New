@@ -191,7 +191,7 @@ fun LocationScreenContent(
                     }
                 },
                 onMyLocationClick = { location ->
-                    Timber.e("Current Location is $location")
+                    Log.e("location","Current Location is $location")
                     val latLng = LatLng(location.latitude, location.longitude)
                     viewModel.currentLatLong = latLng
                 }

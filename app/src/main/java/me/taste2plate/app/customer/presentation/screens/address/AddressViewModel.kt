@@ -12,6 +12,7 @@ import me.taste2plate.app.customer.data.Resource
 import me.taste2plate.app.customer.data.Status
 import me.taste2plate.app.customer.domain.model.CityListModel
 import me.taste2plate.app.customer.domain.model.StateListModel
+import me.taste2plate.app.customer.domain.model.custom.City
 import me.taste2plate.app.customer.domain.use_case.CityListByStateUseCase
 import me.taste2plate.app.customer.domain.use_case.StateListUseCase
 import me.taste2plate.app.customer.domain.use_case.ZipListUseCase
@@ -172,7 +173,7 @@ class AddressViewModel @Inject constructor(
 
     private fun getItemId(
         city: Boolean = false,
-        cityList: List<CityListModel.Result>? = null,
+        cityList: List<City>? = null,
         stateList: List<StateListModel.Result>? = null,
     ): String {
         return if (city && state.cityList.isEmpty()) state.addressList[addressIndex].city.id

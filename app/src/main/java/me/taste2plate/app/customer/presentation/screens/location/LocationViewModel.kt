@@ -77,7 +77,7 @@ class LocationViewModel @Inject constructor(
                         override fun isCancellationRequested() = false
                     })
                     .addOnSuccessListener {
-                        Timber.e("success to get location $it")
+                        Log.e("location","success to get location $it")
 
                         state = if (it != null) {
                             state.copy(isLoading = false, location = it)
@@ -89,7 +89,7 @@ class LocationViewModel @Inject constructor(
                         }
                     }
                     .addOnFailureListener {
-                        Timber.e("Failed to get location $it")
+                        Log.e("location","Failed to get location $it")
                         state = state.copy(isLoading = false, location = null)
                     }
             } else {

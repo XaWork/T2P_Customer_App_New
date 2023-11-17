@@ -9,6 +9,7 @@ import me.taste2plate.app.customer.domain.model.SettingsModel
 import me.taste2plate.app.customer.domain.model.StateListModel
 import me.taste2plate.app.customer.domain.model.SubCategoryModel
 import me.taste2plate.app.customer.domain.model.ZipListModel
+import me.taste2plate.app.customer.domain.model.custom.AllPlanListModel
 import me.taste2plate.app.customer.domain.repo.CustomRepo
 import javax.inject.Inject
 
@@ -55,5 +56,9 @@ class CustomRepoImpl @Inject constructor(
 
     override suspend fun allSubCategories(categoryId: String): SubCategoryModel {
         return api.subCategories(categoryId)
+    }
+
+    override suspend fun getPlans(cityId: String): AllPlanListModel {
+        return api.getPlans(cityId)
     }
 }

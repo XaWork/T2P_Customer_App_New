@@ -18,6 +18,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
+import me.taste2plate.app.customer.domain.model.user.MyPlanModel
 import me.taste2plate.app.customer.presentation.theme.LowPadding
 import me.taste2plate.app.customer.presentation.theme.MediumPadding
 import me.taste2plate.app.customer.presentation.theme.ScreenPadding
@@ -30,25 +32,37 @@ import me.taste2plate.app.customer.presentation.theme.whiteBackgroundButtonColor
 import me.taste2plate.app.customer.presentation.theme.yellowBannerColor
 import me.taste2plate.app.customer.presentation.utils.loremIpsum
 import me.taste2plate.app.customer.presentation.widgets.AppButton
+import me.taste2plate.app.customer.presentation.widgets.AppEmptyView
 import me.taste2plate.app.customer.presentation.widgets.AppScaffold
 import me.taste2plate.app.customer.presentation.widgets.AppTopBar
 import me.taste2plate.app.customer.presentation.widgets.BlackBorderCard
+import me.taste2plate.app.customer.presentation.widgets.ShowLoading
 import me.taste2plate.app.customer.presentation.widgets.SpaceBetweenRow
 import me.taste2plate.app.customer.presentation.widgets.VerticalSpace
 
 @Composable
-fun MyPlanScreen() {
+fun MyPlanScreen(
+    viewModel: MyPlanViewModel = hiltViewModel()
+) {
+    val state = viewModel.state
     AppScaffold(
         topBar = {
             AppTopBar {}
         },
     ) {
-        ContentMyPlanScreen()
+        if (state.isLoading)
+            ShowLoading(isButton = false)
+        else if (state.myPlan == null || state.myPlan.plan.planName == "")
+            AppEmptyView()
+        else
+            ContentMyPlanScreen(state.myPlan)
     }
 }
 
 @Composable
-fun ContentMyPlanScreen() {
+fun ContentMyPlanScreen(
+    plan: MyPlanModel
+) {
     val items = listOf<@Composable RowScope.() -> Unit> {
         Column(
             modifier = Modifier
@@ -67,7 +81,7 @@ fun ContentMyPlanScreen() {
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = "Silver",
+                    text = plan.plan.planName,
                     color = backgroundColor.invoke(),
                     fontSize = 18.sp,
                     fontWeight = FontWeight.Bold
@@ -109,17 +123,17 @@ fun ContentMyPlanScreen() {
         ) {
             MyPlanInfoCard(
                 title = "usages",
-                info = "200"
+                info = plan.plan.planPrice
             )
 
             MyPlanInfoCard(
                 title = "expiry date",
-                info = "23-23-23"
+                info = plan.plan.expDate
             )
 
             MyPlanInfoCard(
                 title = "benefits",
-                info = loremIpsum
+                info = ""
             )
         }
     }
