@@ -9,6 +9,7 @@ import me.taste2plate.app.customer.domain.model.user.DeleteFromWishlistModel
 import me.taste2plate.app.customer.domain.model.user.GetProfileModel
 import me.taste2plate.app.customer.domain.model.user.MyPlanModel
 import me.taste2plate.app.customer.domain.model.user.OrderListModel
+import me.taste2plate.app.customer.domain.model.user.WalletTransactionModel
 import me.taste2plate.app.customer.domain.model.user.WishListModel
 import me.taste2plate.app.customer.domain.model.user.address.AddressListModel
 import retrofit2.Call
@@ -56,6 +57,10 @@ interface UserApi {
 
     @GET("get-wallet-data")
     suspend fun getMyPlan(@Query("id") userId: String): MyPlanModel
+
+
+    @POST("wallet-transactions")
+    suspend fun getWalletTransactions(@Query("id") userId: String): WalletTransactionModel
 
 
     // ------------------------- Wishlist -------------------------

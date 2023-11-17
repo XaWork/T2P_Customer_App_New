@@ -38,4 +38,7 @@ data class MyPlanModel(
         @SerializedName("point_redeem_minimum_order_value")
         val pointRedeemMinimumOrderValue: String
     )
+
+    val walletBalance:String
+        get() = "₹ ${customerPoint * pointSettings.onePointValueInRupess.toFloat()}"
 }

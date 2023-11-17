@@ -45,6 +45,13 @@ class HomeViewModel @Inject constructor(
             is HomeEvent.GetHome -> {
                 getHomeData()
             }
+
+            is HomeEvent.LogOut -> {
+                viewModelScope.launch {
+                    userPref.logOut()
+                }
+            }
+
             is HomeEvent.ChangeTaste -> {
                 setTaste()
             }
@@ -68,7 +75,11 @@ class HomeViewModel @Inject constructor(
             is HomeEvent.UpdateState -> {
                 when {
                     event.changeAddToWishlistResponse -> {
-                        state = state.copy(message = null, addToWishlistResponse = null, addToCartResponse = null)
+                        state = state.copy(
+                            message = null,
+                            addToWishlistResponse = null,
+                            addToCartResponse = null
+                        )
                     }
                 }
             }
@@ -87,7 +98,8 @@ class HomeViewModel @Inject constructor(
         viewModelScope.launch {
             val taste = userPref.getTaste()
             val user = userPref.getUser()
-            state = state.copy(checked = taste == Taste.nonVeg, user = user)
+            val setting = userPref.getSettings()
+            state = state.copy(checked = taste == Taste.nonVeg, user = user, setting = setting)
         }
     }
 
@@ -97,7 +109,7 @@ class HomeViewModel @Inject constructor(
     ) {
         viewModelScope.launch {
             userPref.saveDefaultAddress(address)
-            state = state.copy(isLoading = isLoading,defaultAddress = address)
+            state = state.copy(isLoading = isLoading, defaultAddress = address)
             getCart()
         }
     }

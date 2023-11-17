@@ -10,6 +10,7 @@ import me.taste2plate.app.customer.domain.model.user.DeleteFromWishlistModel
 import me.taste2plate.app.customer.domain.model.user.GetProfileModel
 import me.taste2plate.app.customer.domain.model.user.MyPlanModel
 import me.taste2plate.app.customer.domain.model.user.OrderListModel
+import me.taste2plate.app.customer.domain.model.user.WalletTransactionModel
 import me.taste2plate.app.customer.domain.model.user.WishListModel
 import me.taste2plate.app.customer.domain.model.user.address.AddressListModel
 import me.taste2plate.app.customer.domain.repo.UserRepo
@@ -45,6 +46,10 @@ class UserRepoImpl @Inject constructor(
 
     override suspend fun getMyPlan(id: String): MyPlanModel {
         return api.getMyPlan(id)
+    }
+
+    override suspend fun getWalletTransaction(id: String): WalletTransactionModel {
+        return api.getWalletTransactions(id)
     }
 
     override suspend fun editProfile(id: String, fullName: String, mobile: String): CommonResponse {

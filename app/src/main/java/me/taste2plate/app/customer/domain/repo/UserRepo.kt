@@ -9,6 +9,7 @@ import me.taste2plate.app.customer.domain.model.user.DeleteFromWishlistModel
 import me.taste2plate.app.customer.domain.model.user.GetProfileModel
 import me.taste2plate.app.customer.domain.model.user.MyPlanModel
 import me.taste2plate.app.customer.domain.model.user.OrderListModel
+import me.taste2plate.app.customer.domain.model.user.WalletTransactionModel
 import me.taste2plate.app.customer.domain.model.user.WishListModel
 import me.taste2plate.app.customer.domain.model.user.address.AddressListModel
 
@@ -32,6 +33,10 @@ interface UserRepo {
     suspend fun getMyPlan(
         id: String,
     ): MyPlanModel
+
+    suspend fun getWalletTransaction(
+        id: String,
+    ): WalletTransactionModel
 
     suspend fun editProfile(
         id: String,

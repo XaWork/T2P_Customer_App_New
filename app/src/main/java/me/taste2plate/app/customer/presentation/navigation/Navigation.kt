@@ -1,6 +1,5 @@
 package me.taste2plate.app.customer.presentation.navigation
 
-import android.util.Log
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -22,7 +21,6 @@ import me.taste2plate.app.customer.presentation.screens.address.AddressViewModel
 import me.taste2plate.app.customer.presentation.screens.auth.AuthViewModel
 import me.taste2plate.app.customer.presentation.screens.auth.onboarding.OnBoardingScreen
 import me.taste2plate.app.customer.presentation.screens.auth.otp.OTPScreen
-import me.taste2plate.app.customer.presentation.screens.permissions.NotificationPermissionScreen
 import me.taste2plate.app.customer.presentation.screens.auth.signup.SignUpScreen
 import me.taste2plate.app.customer.presentation.screens.bulk_order.BulkOrderScreen
 import me.taste2plate.app.customer.presentation.screens.cart.CartScreen
@@ -42,6 +40,7 @@ import me.taste2plate.app.customer.presentation.screens.my_plan.MyPlanScreen
 import me.taste2plate.app.customer.presentation.screens.order.OrderDetailsScreen
 import me.taste2plate.app.customer.presentation.screens.order.OrderListScreen
 import me.taste2plate.app.customer.presentation.screens.order.OrderViewModel
+import me.taste2plate.app.customer.presentation.screens.permissions.NotificationPermissionScreen
 import me.taste2plate.app.customer.presentation.screens.product.ProductDetailsScreen
 import me.taste2plate.app.customer.presentation.screens.product.ProductViewModel
 import me.taste2plate.app.customer.presentation.screens.product.list.ProductListScreen
@@ -175,7 +174,9 @@ fun Navigation() {
                     navController.navigate(Screens.ProfileScreen.route)
                 },
                 onNavigateLogoutScreen = {
-                    navController.navigate(Screens.OnBoardingScreen.route)
+                    navController.navigate(Screens.OnBoardingScreen.route) {
+                        popUpTo(0)
+                    }
                 },
                 onNavigateToCartScreen = {
                     navController.navigate(Screens.CartScreen.route)

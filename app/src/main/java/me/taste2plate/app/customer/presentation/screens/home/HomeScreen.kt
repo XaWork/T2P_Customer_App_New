@@ -1,5 +1,6 @@
 package me.taste2plate.app.customer.presentation.screens.home
 
+import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
 import android.content.res.Configuration
@@ -34,6 +35,9 @@ import androidx.core.content.ContextCompat.startActivity
 import androidx.hilt.navigation.compose.hiltViewModel
 import kotlinx.coroutines.launch
 import me.taste2plate.app.customer.R
+import me.taste2plate.app.customer.T2PApp
+import me.taste2plate.app.customer.domain.model.SettingsModel
+import me.taste2plate.app.customer.domain.model.auth.User
 import me.taste2plate.app.customer.presentation.screens.address.AddressBottomSheet
 import me.taste2plate.app.customer.presentation.screens.home.navigation.DrawerAppScreen
 import me.taste2plate.app.customer.presentation.screens.home.navigation.NavigationDrawer
@@ -156,14 +160,23 @@ fun HomeScreen(
                     onNavigateToMyPlanScreen()
                 }
 
-                DrawerAppScreen.RateApp.name -> {}
-                DrawerAppScreen.ReferAndEarn.name -> {}
+                DrawerAppScreen.RateApp.name -> {
+                    rateApp(context)
+                }
+
+                DrawerAppScreen.ReferAndEarn.name -> {
+                    if (state.setting != null && state.user != null) {
+                        referAndEarn(context, state.setting, state.user)
+                    }
+                }
+
                 DrawerAppScreen.ShareApp.name -> {}
                 DrawerAppScreen.ContactUs.name -> {
                     onNavigateContactUsScreen()
                 }
 
                 DrawerAppScreen.LogOut.name -> {
+                    viewModel.onEvent(HomeEvent.LogOut)
                     onNavigateLogoutScreen()
                 }
             }
@@ -311,6 +324,50 @@ fun HomeScreen(
         }
     }
 
+}
+
+fun rateApp(context: Context) {
+    val applicationContext = T2PApp.applicationContext()
+    val uri = Uri.parse("market://details?id=" + applicationContext.packageName)
+    val goToMarket = Intent(Intent.ACTION_VIEW, uri)
+    goToMarket.addFlags(
+        Intent.FLAG_ACTIVITY_NO_HISTORY or
+                Intent.FLAG_ACTIVITY_NEW_DOCUMENT or
+                Intent.FLAG_ACTIVITY_MULTIPLE_TASK
+    )
+    try {
+        context.startActivity(goToMarket)
+    } catch (e: ActivityNotFoundException) {
+        context.startActivity(
+            Intent(
+                Intent.ACTION_VIEW,
+                Uri.parse("http://play.google.com/store/apps/details?id=" + applicationContext.packageName)
+            )
+        )
+    }
+}
+
+fun referAndEarn(context: Context, setting: SettingsModel.Result, user: User) {
+    val pointSettings = setting.point
+    val applicationContext = T2PApp.applicationContext()
+
+    val sharingIntent = Intent(Intent.ACTION_SEND)
+    sharingIntent.type = "text/plain"
+    val shareBody = buildString {
+        appendLine("http://play.google.com/store/apps/details?id=" + applicationContext.packageName)
+        append(
+            "Register with Refer code: ${user.mobile}\n" +
+                    "Earn Reward Point: ${pointSettings.signupBonusSender}"
+        )
+    }
+    sharingIntent.putExtra(Intent.EXTRA_SUBJECT, "Subject Here")
+    sharingIntent.putExtra(Intent.EXTRA_TEXT, shareBody)
+    context.startActivity(
+        Intent.createChooser(
+            sharingIntent,
+            "Share via"
+        )
+    )
 }
 
 @Composable

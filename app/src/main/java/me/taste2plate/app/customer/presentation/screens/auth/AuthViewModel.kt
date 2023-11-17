@@ -151,7 +151,6 @@ class AuthViewModel @Inject constructor(
 
     private fun saveUser(user: User) {
         viewModelScope.launch {
-            userPref.setLogin(true)
             userPref.saveUser(user)
         }
     }

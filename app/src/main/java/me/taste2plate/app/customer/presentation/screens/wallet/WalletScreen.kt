@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Text
@@ -25,6 +26,9 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
+import me.taste2plate.app.customer.domain.model.user.MyPlanModel
+import me.taste2plate.app.customer.domain.model.user.WalletTransactionModel
 import me.taste2plate.app.customer.presentation.theme.ScreenPadding
 import me.taste2plate.app.customer.presentation.theme.SpaceBetweenViewsAndSubViews
 import me.taste2plate.app.customer.presentation.theme.T2PCustomerAppTheme
@@ -33,45 +37,61 @@ import me.taste2plate.app.customer.presentation.theme.secondaryColor
 import me.taste2plate.app.customer.presentation.theme.yellowBannerColor
 import me.taste2plate.app.customer.presentation.utils.rupeeSign
 import me.taste2plate.app.customer.presentation.widgets.AppDivider
+import me.taste2plate.app.customer.presentation.widgets.AppEmptyView
 import me.taste2plate.app.customer.presentation.widgets.AppScaffold
 import me.taste2plate.app.customer.presentation.widgets.AppTopBar
 import me.taste2plate.app.customer.presentation.widgets.InfoWithIcon
 import me.taste2plate.app.customer.presentation.widgets.RoundedCornerCard
+import me.taste2plate.app.customer.presentation.widgets.ShowLoading
 import me.taste2plate.app.customer.presentation.widgets.SpaceBetweenRow
 
 @Composable
-fun WalletScreen() {
+fun WalletScreen(
+    viewModel: WalletViewModel = hiltViewModel()
+) {
+    val state = viewModel.state
+
     AppScaffold(
         topBar = {
             AppTopBar {}
         },
     ) {
-        ContentWalletScreen()
+        if (state.isLoading)
+            ShowLoading(isButton = false)
+        else if (state.myPlan == null && state.transactions.isEmpty())
+            AppEmptyView()
+        else
+            ContentWalletScreen(state)
     }
 }
 
 @Composable
-fun ContentWalletScreen() {
+fun ContentWalletScreen(
+    state: WalletState
+) {
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
         contentPadding = PaddingValues(ScreenPadding),
         verticalArrangement = Arrangement.spacedBy(SpaceBetweenViewsAndSubViews)
     ) {
         item {
-            WalletBalanceInfo()
+            if (state.myPlan != null)
+                WalletBalanceInfo(state.myPlan)
         }
 
-        items(10) {
-            SingleWalletTransaction()
+        itemsIndexed(state.transactions) { index, transaction ->
+            SingleWalletTransaction(transaction)
 
-            if (it != 10)
+            if (index != state.transactions.size - 1)
                 AppDivider()
         }
     }
 }
 
 @Composable
-fun WalletBalanceInfo() {
+fun WalletBalanceInfo(
+    plan: MyPlanModel
+) {
     RoundedCornerCard {
         Column(
             verticalArrangement = Arrangement.SpaceBetween,
@@ -90,7 +110,7 @@ fun WalletBalanceInfo() {
                 Text(
                     text = walletInfoText(
                         title = "Total Balance",
-                        info = "\n${rupeeSign}234"
+                        info = "\n${plan.walletBalance}"
                     ),
                     color = backgroundColor.invoke(),
                     lineHeight = 35.sp
@@ -108,7 +128,7 @@ fun WalletBalanceInfo() {
                 Text(
                     text = walletInfoText(
                         title = "Total Point Earned",
-                        info = "\n234"
+                        info = "\n${plan.customerPoint}"
                     ),
                     lineHeight = 35.sp
                 )
@@ -143,7 +163,9 @@ fun walletInfoText(
 }
 
 @Composable
-fun SingleWalletTransaction() {
+fun SingleWalletTransaction(
+    transaction: WalletTransactionModel.Result
+) {
     val items = listOf<@Composable RowScope.() -> Unit> {
         val info = buildAnnotatedString {
             withStyle(
@@ -170,7 +192,7 @@ fun SingleWalletTransaction() {
         )
 
         Text(
-            text = "10 Points",
+            text = "${transaction.point} Points",
             fontWeight = FontWeight.Bold
         )
     }
@@ -183,6 +205,6 @@ fun SingleWalletTransaction() {
 @Composable
 fun WalletScreenPreview() {
     T2PCustomerAppTheme {
-        WalletScreen()
+        // WalletScreen()
     }
 }

@@ -15,7 +15,6 @@ import kotlinx.coroutines.flow.map
 import me.taste2plate.app.customer.domain.model.SettingsModel
 import me.taste2plate.app.customer.domain.model.auth.User
 import me.taste2plate.app.customer.domain.model.user.address.AddressListModel
-import timber.log.Timber
 import javax.inject.Inject
 
 private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "my_datastore")
@@ -47,7 +46,7 @@ class UserPref @Inject constructor(
         val tokenFlow = dataStore.data.map { preferences ->
             preferences[KEY_TOKEN]
         }
-        Log.e("token","Token is ${tokenFlow.first()}")
+        Log.e("token", "Token is ${tokenFlow.first()}")
         return tokenFlow.first() ?: ""
     }
 
@@ -67,7 +66,7 @@ class UserPref @Inject constructor(
         val taste = dataStore.data.map { preferences ->
             preferences[KEY_TASTE]
         }
-        Log.e("taste","Taste is ${taste.first()}")
+        // Log.e("taste","Taste is ${taste.first()}")
         return taste.first() ?: Taste.veg
     }
 
@@ -84,17 +83,19 @@ class UserPref @Inject constructor(
         val isLogin = dataStore.data.map { preferences ->
             preferences[KEY_IS_LOGIN]
         }
-        Log.e("user","User is Login${isLogin.first()}")
+        // Log.e("user","User is Login${isLogin.first()}")
         return isLogin.first() ?: false
     }
 
 
     //=====================> User <=================
     suspend fun saveUser(user: User) {
+        Log.e("user", "User is ${user}")
         val stringUser = Gson().toJson(user)
         dataStore.edit { preferences ->
             preferences[KEY_USER] = stringUser
         }
+        setLogin(true)
         getUser()
     }
 
@@ -104,7 +105,7 @@ class UserPref @Inject constructor(
         }
 
         val user: User = Gson().fromJson(userFlow.first(), User::class.java)
-        Log.e("user","User is ${userFlow.first()}")
+        //Log.e("user","User is ${userFlow.first()}")
 
         return user
     }
@@ -126,7 +127,7 @@ class UserPref @Inject constructor(
 
         val setting: SettingsModel.Result =
             Gson().fromJson(flow.first(), SettingsModel.Result::class.java)
-        Log.e("setting","Setting is ${flow.first()}")
+        //Log.e("setting","Setting is ${flow.first()}")
 
         return setting
     }
@@ -151,10 +152,21 @@ class UserPref @Inject constructor(
         else {
             val address: AddressListModel.Result =
                 Gson().fromJson(addressFlow.first(), AddressListModel.Result::class.java)
-            Log.e("address","address is ${addressFlow.first()}")
-
+            //Log.e("address","address is ${addressFlow.first()}")
             address
         }
+    }
+
+    suspend fun logOut() {
+        val setting = getSettings()
+        val token = getToken()
+
+        dataStore.edit {
+            it.clear()
+        }
+
+        saveSettings(setting)
+        saveToken(token)
     }
 
 }
