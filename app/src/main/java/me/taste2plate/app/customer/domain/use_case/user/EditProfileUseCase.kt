@@ -18,12 +18,13 @@ class EditProfileUseCase @Inject constructor(
     suspend fun execute(
         fullName: String,
         mobile: String,
+        email: String,
     ): Flow<Resource<CommonResponse>> {
         return flow {
             emit(Resource.Loading(true))
             try {
                 val userId = userPref.getUser().id
-                val response = repo.editProfile(userId, fullName, mobile)
+                val response = repo.editProfile(userId, fullName, mobile, email)
                 emit(Resource.Success(response))
             } catch (io: IOException) {
                 io.printStackTrace()

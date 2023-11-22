@@ -55,6 +55,8 @@ import me.taste2plate.app.customer.presentation.theme.SpaceBetweenViews
 import me.taste2plate.app.customer.presentation.theme.SpaceBetweenViewsAndSubViews
 import me.taste2plate.app.customer.presentation.theme.T2PCustomerAppTheme
 import me.taste2plate.app.customer.presentation.theme.VeryLowSpacing
+import me.taste2plate.app.customer.presentation.theme.backgroundColor
+import me.taste2plate.app.customer.presentation.theme.screenBackgroundColor
 import me.taste2plate.app.customer.presentation.widgets.AppScaffold
 import me.taste2plate.app.customer.presentation.widgets.DrawableImage
 import me.taste2plate.app.customer.presentation.widgets.ShowLoading
@@ -108,6 +110,7 @@ fun HomeScreen(
 
     if (showBottomSheet) {
         ModalBottomSheet(
+            containerColor = screenBackgroundColor.invoke(),
             onDismissRequest = {
                 showBottomSheet = false
             },
@@ -251,7 +254,7 @@ fun HomeScreen(
                                     VerticalSpace(space = VeryLowSpacing)
                                     TopOrderedFoodCityList(
                                         onNavigateToProductListScreen = {
-                                           // onNavigateToProductListScreen(it)
+                                            // onNavigateToProductListScreen(it)
                                         },
                                         foodItems = home.topMostOrderedProducts,
                                     )
@@ -276,7 +279,7 @@ fun HomeScreen(
                                     HeadingChip("Top Brands")
                                     VerticalSpace(space = VeryLowSpacing)
                                     TopBrands(
-                                        onNavigateToProductListScreen = {  },
+                                        onNavigateToProductListScreen = { },
                                         topBrands = home.topBrands
                                     )
                                 }

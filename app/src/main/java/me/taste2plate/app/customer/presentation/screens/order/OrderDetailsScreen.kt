@@ -89,8 +89,8 @@ fun OrderDetailsScreen(
             onConfirmation = { showOrderTrackDialog = false }
         )
 
-    LaunchedEffect(state) {
-        if (state.orderUpdates.isEmpty()) viewModel.onEvent(OrderEvent.GetOrderUpdate)
+    LaunchedEffect(Unit) {
+        viewModel.onEvent(OrderEvent.GetOrderUpdate)
     }
 
     AppScaffold(topBar = {

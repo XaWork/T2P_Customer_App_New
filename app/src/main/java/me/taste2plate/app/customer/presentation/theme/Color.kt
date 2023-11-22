@@ -86,14 +86,14 @@ val ForestGreen = Color(0xFF176d29)
 val ForestGreenDark = Color(0xFF86d988)
 
 
-val forestGreen : @Composable () -> Color = {
-    if(isSystemInDarkTheme())
+val forestGreen: @Composable () -> Color = {
+    if (isSystemInDarkTheme())
         ForestGreenDark
     else ForestGreen
 }
 
-val yellowBannerColor : @Composable () -> Color = {
-    if(isSystemInDarkTheme())
+val yellowBannerColor: @Composable () -> Color = {
+    if (isSystemInDarkTheme())
         YellowBannerDark
     else YellowBanner
 }
@@ -109,6 +109,12 @@ val onSecondaryColor: @Composable () -> Color = {
 
 val backgroundColor: @Composable () -> Color = {
     MaterialTheme.colorScheme.background
+}
+
+val screenBackgroundColor: @Composable () -> Color = {
+    if (isSystemInDarkTheme())
+        Color(0xFF383838)
+    else Color(0xFFFEFCFF)
 }
 
 val onBackgroundColor: @Composable () -> Color = {

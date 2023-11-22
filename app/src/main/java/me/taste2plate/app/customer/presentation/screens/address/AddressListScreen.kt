@@ -42,6 +42,7 @@ import me.taste2plate.app.customer.presentation.widgets.showToast
 @Composable
 fun AddressListScreen(
     onNavigateToEditAddEditScreen: () -> Unit,
+    onPopUpToAddEditScreen: () -> Unit,
     viewModel: AddressViewModel,
 ) {
     val state = viewModel.state
@@ -62,6 +63,10 @@ fun AddressListScreen(
             state.isError || state.message != null -> {
                 showToast(state.message!!)
                 viewModel.onEvent(AddressEvents.GetAddressList)
+            }
+
+            state.deleteAddressResponse != null && state.addressList.isEmpty() -> {
+                onPopUpToAddEditScreen()
             }
         }
     }
@@ -121,7 +126,7 @@ fun ContentAddressListScreen(
                     end = ScreenPadding
                 )
             ) {
-                itemsIndexed(addressList) {index, address ->
+                itemsIndexed(addressList) { index, address ->
                     SingleAddressItem(
                         address,
                         onEdit = { onEdit(index) }) {
@@ -136,7 +141,8 @@ fun ContentAddressListScreen(
                     Alignment.BottomCenter
                 )
             ) {
-                onNavigateToAddAddressScreen() }
+                onNavigateToAddAddressScreen()
+            }
         }
 }
 

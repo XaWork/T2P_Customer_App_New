@@ -78,7 +78,7 @@ data class User(
     @SerializedName("doc3_type")
     val doc3Type: String,
     @SerializedName("email")
-    val email: String,
+    val email: String?,
     @SerializedName("email_otp")
     val emailOtp: Int,
     @SerializedName("father_name")

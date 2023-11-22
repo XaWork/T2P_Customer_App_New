@@ -53,8 +53,8 @@ class UserRepoImpl @Inject constructor(
         return api.getWalletTransactions(id)
     }
 
-    override suspend fun editProfile(id: String, fullName: String, mobile: String): CommonResponse {
-        return api.editProfile(id, fullName, mobile)
+    override suspend fun editProfile(id: String, fullName: String, mobile: String, email: String): CommonResponse {
+        return api.editProfile(id, fullName, mobile, email)
     }
 
     override suspend fun getWishlist(userId: String) = api.getWishlist(userId)

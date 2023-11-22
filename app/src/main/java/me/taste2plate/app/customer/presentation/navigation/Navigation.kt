@@ -71,6 +71,16 @@ fun Navigation() {
                     navController.navigate(Screens.HomeScreen.route) {
                         popUpTo(0)
                     }
+                },
+                onNavigateToAddEditAddressScreenScreen = {
+                    navController.navigate(Screens.LocationScreen.route) {
+                        popUpTo(0)
+                    }
+                },
+                onNavigateToSignUpScreen = {
+                    navController.navigate(Screens.SignUpScreen.route) {
+                        popUpTo(0)
+                    }
                 }
             )
         }
@@ -90,22 +100,6 @@ fun Navigation() {
                 }
             }
 
-            // ----------------------------> Sign Up <--------------------------------------
-            composable(route = Screens.SignUpScreen.route) { entry ->
-                val viewModel =
-                    entry.sharedViewModel<AuthViewModel>(navHostController = navController)
-
-                SignUpScreen(
-                    viewModel = viewModel
-                ) {
-                    navController.navigate(Screens.LocationScreen.route) {/*
-                     popUpTo(Screens.HomeScreen.route) {
-                         inclusive = true
-                     }*/
-                    }
-                }
-            }
-
             // ----------------------------> OTP <--------------------------------------
             composable(route = Screens.OTPScreen.route) { entry ->
                 val viewModel =
@@ -114,12 +108,24 @@ fun Navigation() {
                 OTPScreen(
                     viewModel = viewModel,
                     onNavigateToSignUPScreen = {
-                        navController.navigate(Screens.SignUpScreen.route)
+                        navController.navigate(Screens.SignUpScreen.route) {
+                            popUpTo(0)
+                        }
                     }, onNavigateToHomeScreen = {
                         navController.navigate(Screens.HomeScreen.route) {
                             popUpTo(0)
                         }
                     })
+            }
+        }
+
+
+        // ----------------------------> Sign Up <--------------------------------------
+        composable(route = Screens.SignUpScreen.route) { entry ->
+            SignUpScreen {
+                navController.navigate(Screens.AddEditAddressScreen.route) {
+                    popUpTo(0)
+                }
             }
         }
 
@@ -490,6 +496,11 @@ fun Navigation() {
                     viewModel = viewModel,
                     onNavigateToEditAddEditScreen = {
                         navController.navigate(Screens.AddEditAddressScreen.route)
+                    },
+                    onPopUpToAddEditScreen = {
+                        navController.navigate(Screens.AddEditAddressScreen.route) {
+                            popUpTo(0)
+                        }
                     }
                 )
             }

@@ -1,6 +1,5 @@
 package me.taste2plate.app.customer.presentation.screens.profile
 
-import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -8,17 +7,11 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
-import me.taste2plate.app.customer.T2PApp
 import me.taste2plate.app.customer.data.Resource
 import me.taste2plate.app.customer.data.Status
 import me.taste2plate.app.customer.data.UserPref
-import me.taste2plate.app.customer.domain.model.user.DeleteFromWishlistModel
 import me.taste2plate.app.customer.domain.use_case.user.EditProfileUseCase
 import me.taste2plate.app.customer.domain.use_case.user.GetProfileUseCase
-import me.taste2plate.app.customer.domain.use_case.user.wishlist.RemoveFromWishlistUseCase
-import me.taste2plate.app.customer.domain.use_case.user.wishlist.WishlistUseCase
-import me.taste2plate.app.customer.presentation.screens.wishlist.WishlistEvents
-import me.taste2plate.app.customer.presentation.screens.wishlist.WishlistState
 import javax.inject.Inject
 
 @HiltViewModel
@@ -62,7 +55,7 @@ class ProfileViewModel @Inject constructor(
     private fun setData() {
         val user = state.user
         fullName = user!!.fullName
-        email = user.email
+        email = user.email!!
         mobile = user.mobile
     }
 
@@ -72,7 +65,7 @@ class ProfileViewModel @Inject constructor(
 
     private fun editProfile() {
         viewModelScope.launch {
-            editProfileUseCase.execute(fullName, mobile).collect { result ->
+            editProfileUseCase.execute(fullName, mobile, email).collect { result ->
                 when (result) {
                     is Resource.Loading -> {
                         state = state.copy(isLoading = true)

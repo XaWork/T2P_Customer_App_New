@@ -9,6 +9,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
 import me.taste2plate.app.customer.presentation.theme.primaryColor
+import me.taste2plate.app.customer.presentation.theme.screenBackgroundColor
 
 
 @Composable
@@ -17,6 +18,7 @@ fun DeleteAddressDialog(
     onConfirmation: () -> Unit,
 ) {
     AlertDialog(
+        containerColor = screenBackgroundColor.invoke(),
         icon = {
             Icon(
                 Icons.Default.Delete,

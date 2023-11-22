@@ -9,5 +9,7 @@ data class LoginModel(
     @SerializedName("OTP")
     val oTP: String,
     @SerializedName("status")
-    val status: String
+    val status: String,
+    @SerializedName("new_user")
+    val newUser: Boolean
 )

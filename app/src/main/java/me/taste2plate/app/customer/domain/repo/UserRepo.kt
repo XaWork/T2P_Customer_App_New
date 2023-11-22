@@ -43,6 +43,7 @@ interface UserRepo {
         id: String,
         fullName: String,
         mobile: String,
+        email: String,
     ): CommonResponse
 
     suspend fun getWishlist(

@@ -24,11 +24,12 @@ import retrofit2.http.Query
 interface UserApi {
 
     @FormUrlEncoded
-    @POST("login")
+    @POST("new-login")
     suspend fun login(
         @Field("mobile") mobile: String,
         @Field("device_token") token: String,
-        @Field("device_type") device: String
+        @Field("device_type") device: String,
+        @Field("reffer_by") referBy: String = "",
     ): LoginModel
 
 
@@ -47,6 +48,7 @@ interface UserApi {
         @Field("id") id: String,
         @Field("full_name") fullName: String,
         @Field("mobile") mobile: String,
+        @Field("email") email: String,
     ): CommonResponse
 
 

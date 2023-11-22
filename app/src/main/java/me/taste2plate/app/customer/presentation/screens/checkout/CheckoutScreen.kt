@@ -61,6 +61,7 @@ import me.taste2plate.app.customer.presentation.theme.ScreenPadding
 import me.taste2plate.app.customer.presentation.theme.SpaceBetweenViews
 import me.taste2plate.app.customer.presentation.theme.SpaceBetweenViewsAndSubViews
 import me.taste2plate.app.customer.presentation.theme.T2PCustomerAppTheme
+import me.taste2plate.app.customer.presentation.theme.backgroundColor
 import me.taste2plate.app.customer.presentation.theme.primaryColor
 import me.taste2plate.app.customer.presentation.utils.rupeeSign
 import me.taste2plate.app.customer.presentation.widgets.AppButton
@@ -122,6 +123,7 @@ fun CheckoutScreen(
     //address bottom sheet
     if (showAddressBottomSheet) {
         ModalBottomSheet(
+            containerColor = backgroundColor.invoke(),
             onDismissRequest = {
                 showAddressBottomSheet = false
             },
@@ -145,6 +147,7 @@ fun CheckoutScreen(
     //coupon bottom sheet
     if (showCouponBottomSheet) {
         ModalBottomSheet(
+            containerColor = backgroundColor.invoke(),
             onDismissRequest = {
                 showCouponBottomSheet = false
             },
@@ -169,6 +172,7 @@ fun CheckoutScreen(
     val timeslots = listOf("Afternoon", "Morning")
     if (showTimeSlotBottomSheet) {
         ModalBottomSheet(
+            containerColor = backgroundColor.invoke(),
             onDismissRequest = {
                 showTimeSlotBottomSheet = false
             },
@@ -604,14 +608,13 @@ fun CancellationPolicy(
         modifier = Modifier.fillMaxWidth()
     ) {
         Text(
-            text = "Cancellation Policy".uppercase(),
+            text = "Order cancellation".uppercase(),
             letterSpacing = 5.sp,
             modifier = Modifier.padding(vertical = LowPadding)
         )
 
         Text(
-            text = "100% cancellation fee will be applicable if you decide to cancel the order anytime after order placement." +
-                    " Avoid cancellation as it leads to food wastage.",
+            text = "Order can be cancelled only up-to 4hours of order confirmation or before the cutoff time, whichever will be earlier.",
             fontSize = 12.sp,
             fontWeight = FontWeight.Light
         )
