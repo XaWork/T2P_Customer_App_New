@@ -4,6 +4,8 @@ import me.taste2plate.app.customer.domain.model.Category
 import me.taste2plate.app.customer.domain.model.CityBrandModel
 import me.taste2plate.app.customer.domain.model.HomeModel
 import me.taste2plate.app.customer.domain.model.SubCategoryModel
+import me.taste2plate.app.customer.domain.model.product.ProductBySliderModel
+import me.taste2plate.app.customer.domain.model.product.ProductListModel
 import me.taste2plate.app.customer.domain.model.user.CartModel
 import me.taste2plate.app.customer.domain.model.user.WishListModel
 
@@ -59,6 +61,15 @@ fun CityBrandModel.Result.toCommonItem(): CommonForItem {
         description = if (description == null || description.isEmpty()) desc else description
     )
 }
+
+/*fun ProductBySliderModel.toProductListModel(): ProductListModel {
+    return ProductListModel(
+        count = result[0].products.size,
+        message = "",
+        result = result[0].products,
+        status = status
+    )
+}*/
 
 
 fun Category.toCommonItem(): CommonForItem {

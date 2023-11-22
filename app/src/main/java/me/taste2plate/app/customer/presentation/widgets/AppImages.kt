@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -192,7 +193,7 @@ fun CircleIconButton(
         modifier = modifier,
         shape = CircleShape,
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.outlineVariant
+            containerColor = backgroundColor.invoke()
         )
     ) {
         if (isDrawableIcon)
@@ -281,6 +282,7 @@ fun ImageWithWishlistButton(
         val modifier = Modifier
             .align(Alignment.TopEnd)
             .padding(LowPadding)
+            .size(30.dp)
 
         if (withButton)
             if (foodItemUpdateInfo != null && foodItemUpdateInfo.isLoading)

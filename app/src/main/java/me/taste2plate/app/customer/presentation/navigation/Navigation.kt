@@ -1,5 +1,6 @@
 package me.taste2plate.app.customer.presentation.navigation
 
+import android.util.Log
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -182,13 +183,13 @@ fun Navigation() {
                     navController.navigate(Screens.CartScreen.route)
                 },
                 onNavigateToProductListScreen = {
-                    navController.navigate(Screens.ProductListScreen.route)
+                    navController.navigate(Screens.ProductListScreen.route + "?categoryInfo=$it")
                 },
                 onNavigateContactUsScreen = {
                     navController.navigate(Screens.ContactUsScreen.route)
                 },
                 onNavigateReferAndEarnScreen = {
-                    navController.navigate(Screens.ProductListScreen.route)
+                    //navController.navigate(Screens.ProductListScreen.route)
                 },
                 onNavigateToBulkOrdersScreen = {
                     navController.navigate(Screens.BulkOrderScreen.route)
@@ -200,7 +201,8 @@ fun Navigation() {
                     navController.navigate(Screens.MyPlanScreen.route)
                 },
                 onNavigateToProductDetailsScreen = {
-                    navController.navigate(Screens.ProductDetailsScreen.route)
+                    Log.e("product", "product id is $it")
+                    navController.navigate(Screens.ProductDetailsScreen.route + "?id=$it")
                 },
                 onNavigateToWalletScreen = {
                     navController.navigate(Screens.WalletScreen.route)
@@ -228,14 +230,21 @@ fun Navigation() {
                 )
             }
 
-            // ----------------------------> Order List <--------------------------------------
-            composable(route = Screens.NotificationScreen.route) {
-                NotificationPermissionScreen(
-                    onNavigateToHomeScreen = {
-                        navController.navigate(Screens.HomeScreen.route)
-                    }
-                )
+            // ----------------------------> Order Details <--------------------------------------
+            composable(route = Screens.OrderDetailsScreen.route) { entry ->
+                val viewModel =
+                    entry.sharedViewModel<OrderViewModel>(navHostController = navController)
+                OrderDetailsScreen(viewModel)
             }
+        }
+
+        // ----------------------------> Notification <--------------------------------------
+        composable(route = Screens.NotificationScreen.route) {
+            NotificationPermissionScreen(
+                onNavigateToHomeScreen = {
+                    navController.navigate(Screens.HomeScreen.route)
+                }
+            )
         }
 
 
@@ -313,11 +322,19 @@ fun Navigation() {
 
 
             // ----------------------------> Product Details <--------------------------------------
-            composable(route = Screens.ProductDetailsScreen.route) { entry ->
+            composable(route = Screens.ProductDetailsScreen.route + "?id={id}", arguments = listOf(
+                navArgument(name = "id") {
+                    type = NavType.StringType
+                    defaultValue = ""
+                    nullable = true
+                }
+            )) { entry ->
 
                 val viewModel =
                     entry.sharedViewModel<ProductViewModel>(navHostController = navController)
+                val id = entry.arguments?.getString("id")
                 ProductDetailsScreen(
+                    productId = id,
                     viewModel = viewModel,
                     onNavigateToCartScreen = {
                         navController.navigate(Screens.CartScreen.route)
@@ -383,12 +400,6 @@ fun Navigation() {
                     navController.navigate(Screens.ProductListScreen.route + "?categoryInfo=$itemInfo")
                 }
             }
-        }
-
-
-        // ----------------------------> Order Details <--------------------------------------
-        composable(route = Screens.OrderDetailsScreen.route) {
-            OrderDetailsScreen()
         }
 
 

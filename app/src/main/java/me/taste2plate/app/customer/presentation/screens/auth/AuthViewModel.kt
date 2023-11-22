@@ -7,6 +7,7 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import me.taste2plate.app.customer.data.Resource
 import me.taste2plate.app.customer.data.Status
@@ -75,8 +76,8 @@ class AuthViewModel @Inject constructor(
                             state.copy(
                                 loading = false,
                                 loginModel = result.data,
-                                isError =  false,
-                                message =  ""
+                                isError = false,
+                                message = ""
                             )
                         else
                             state.copy(
@@ -125,6 +126,7 @@ class AuthViewModel @Inject constructor(
                     is Resource.Success -> {
                         state = if (result.data?.status == Status.success.name) {
                             saveUser(result.data.data)
+                            // delay(1000)
                             state.copy(
                                 loading = false,
                                 verifyOTPModel = result.data,
@@ -153,6 +155,7 @@ class AuthViewModel @Inject constructor(
         viewModelScope.launch {
             userPref.saveUser(user)
         }
+        state = state.copy(loginSuccess = true)
     }
 
 }

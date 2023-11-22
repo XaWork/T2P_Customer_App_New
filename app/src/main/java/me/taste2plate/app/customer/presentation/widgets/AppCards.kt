@@ -14,6 +14,8 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import me.taste2plate.app.customer.presentation.theme.MediumRoundedCorners
 import me.taste2plate.app.customer.presentation.theme.ScreenPadding
+import me.taste2plate.app.customer.presentation.theme.backgroundColor
+import me.taste2plate.app.customer.presentation.theme.cardContainerOnSecondaryColor
 
 @Composable
 fun RedBorderCard(
@@ -29,7 +31,7 @@ fun RedBorderCard(
                 end = ScreenPadding,
                 bottom = ScreenPadding
             ),
-        colors = cardColor,
+        colors = CardDefaults.cardColors(containerColor = backgroundColor.invoke()),
         shape = RoundedCornerShape(MediumRoundedCorners),
         border = BorderStroke(
             width = 0.5.dp,
@@ -71,7 +73,7 @@ fun RoundedCornerCard(
     modifier: Modifier = Modifier,
     cardCornerRadius: Dp = MediumRoundedCorners,
     elevation: Dp = 0.dp,
-    cardColor : CardColors = CardDefaults.cardColors(),
+    cardColor: CardColors = CardDefaults.cardColors(),
     content: @Composable () -> Unit
 ) {
     Card(

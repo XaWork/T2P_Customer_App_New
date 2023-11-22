@@ -21,10 +21,14 @@ class SplashViewModel @Inject constructor(
 
     var state by mutableStateOf(SplashState())
 
+    init {
+        getSettings()
+    }
+
     fun onEvent(event: SplashEvents) {
         when (event) {
             SplashEvents.GetSettings -> {
-                getSettings()
+                //  getSettings()
             }
 
             SplashEvents.IsUserLogin -> {
@@ -48,9 +52,8 @@ class SplashViewModel @Inject constructor(
                     }
 
                     is Resource.Success -> {
-                        isUserLogin()
                         saveSetting(result.data!!)
-                        state.copy(loading = false, settings = result.data)
+                        state.copy(loading = false)
                     }
 
                     is Resource.Error -> {
@@ -68,6 +71,8 @@ class SplashViewModel @Inject constructor(
     private fun saveSetting(setting: SettingsModel) {
         viewModelScope.launch {
             userPref.saveSettings(setting.result)
+            state = state.copy(settings = setting)
+            isUserLogin()
         }
     }
 

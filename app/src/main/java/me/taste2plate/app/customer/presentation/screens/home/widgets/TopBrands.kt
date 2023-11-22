@@ -18,7 +18,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import me.taste2plate.app.customer.domain.mapper.CommonForItem
 import me.taste2plate.app.customer.domain.model.HomeModel
+import me.taste2plate.app.customer.presentation.screens.home.CityBrandScreens
 import me.taste2plate.app.customer.presentation.theme.ExtraHighPadding
 import me.taste2plate.app.customer.presentation.theme.ScreenPadding
 import me.taste2plate.app.customer.presentation.theme.T2PCustomerAppTheme
@@ -29,7 +31,7 @@ import me.taste2plate.app.customer.presentation.widgets.simpleAnimation
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun TopBrands(
-    onNavigateToProductListScreen: () -> Unit,
+    onNavigateToProductListScreen: (item: CommonForItem) -> Unit,
     topBrands: List<HomeModel.TopBrand>
 ) {
     val pagerState = rememberPagerState(pageCount = { topBrands.size })
@@ -40,29 +42,30 @@ fun TopBrands(
         BlackBorderCard(
             colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.background),
             modifier = Modifier
-                .clickable { onNavigateToProductListScreen() }
+                .clickable {
+                    val item = CommonForItem(
+                        id = product.id,
+                        name = product.name,
+                        image = product.file,
+                        type = CityBrandScreens.Brand.name
+                    )
+                    onNavigateToProductListScreen(item)
+                }
                 .simpleAnimation(pagerState, page)) {
-            ImageWithWishlistButton(image = product.file, withButton = false){}
+            ImageWithWishlistButton(image = product.file, withButton = false) {}
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(
-                        vertical = ExtraHighPadding,
-                        horizontal = ScreenPadding
-                    ),
+                    .padding(ScreenPadding),
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center
             ) {
                 Text(
-                    product.name, style = MaterialTheme.typography.titleLarge,
+                    product.name,
                     fontWeight = FontWeight.Bold,
                     textAlign = TextAlign.Center,
                     maxLines = 2,
                     minLines = 2
-                )
-                Text(
-                    "City Name", style = MaterialTheme.typography.bodyLarge,
-                    maxLines = 1
                 )
             }
         }

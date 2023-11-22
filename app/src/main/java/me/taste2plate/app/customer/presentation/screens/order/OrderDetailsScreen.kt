@@ -1,24 +1,39 @@
 package me.taste2plate.app.customer.presentation.screens.order
 
 import android.content.res.Configuration
+import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Divider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.clipToBounds
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
@@ -30,8 +45,10 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import me.taste2plate.app.customer.domain.model.user.OrderListModel
+import me.taste2plate.app.customer.presentation.dialog.SettingDialogType
+import me.taste2plate.app.customer.presentation.dialog.SettingInfoDialog
 import me.taste2plate.app.customer.presentation.screens.Product
-import me.taste2plate.app.customer.presentation.theme.ExtraLowPadding
 import me.taste2plate.app.customer.presentation.theme.LowPadding
 import me.taste2plate.app.customer.presentation.theme.MediumRoundedCorners
 import me.taste2plate.app.customer.presentation.theme.MediumSpacing
@@ -42,6 +59,7 @@ import me.taste2plate.app.customer.presentation.theme.T2PCustomerAppTheme
 import me.taste2plate.app.customer.presentation.theme.VeryLowSpacing
 import me.taste2plate.app.customer.presentation.utils.rupeeSign
 import me.taste2plate.app.customer.presentation.widgets.AppButton
+import me.taste2plate.app.customer.presentation.widgets.AppEmptyView
 import me.taste2plate.app.customer.presentation.widgets.AppScaffold
 import me.taste2plate.app.customer.presentation.widgets.AppTopBar
 import me.taste2plate.app.customer.presentation.widgets.HorizontalSpace
@@ -50,36 +68,70 @@ import me.taste2plate.app.customer.presentation.widgets.RatingInfoRow
 import me.taste2plate.app.customer.presentation.widgets.RoundedCornerCard
 import me.taste2plate.app.customer.presentation.widgets.SpaceBetweenRow
 import me.taste2plate.app.customer.presentation.widgets.VerticalSpace
+import me.taste2plate.app.customer.utils.toDate
+import me.taste2plate.app.customer.utils.toDateObject
 
 @Composable
-fun OrderDetailsScreen() {
-    AppScaffold(
-        topBar = {
-            AppTopBar(
-                title = "T2P-1341343"
-            ) {}
-        }
-    ) {
-        ContentOrderDetailsScreen()
+fun OrderDetailsScreen(
+    viewModel: OrderViewModel,
+    onNavigateToTrackOrderScreen: () -> Unit = {}
+) {
+    val state = viewModel.state
+
+    var showOrderTrackDialog by remember {
+        mutableStateOf(false)
+    }
+    if (showOrderTrackDialog)
+        SettingInfoDialog(
+            setting = state.setting!!,
+            type = SettingDialogType.Track,
+            onDismissRequest = { showOrderTrackDialog = false },
+            onConfirmation = { showOrderTrackDialog = false }
+        )
+
+    LaunchedEffect(state) {
+        if (state.orderUpdates.isEmpty()) viewModel.onEvent(OrderEvent.GetOrderUpdate)
+    }
+
+    AppScaffold(topBar = {
+        AppTopBar(
+            title = viewModel.selectedOrder?.orderid ?: ""
+        ) {}
+    }) {
+        if (viewModel.selectedOrder == null) AppEmptyView()
+        else ContentOrderDetailsScreen(
+            state, viewModel.selectedOrder!!,
+            showOrderTrackDialog = {
+                showOrderTrackDialog = true
+            },
+            onNavigateToTrackOrderScreen = {
+                onNavigateToTrackOrderScreen()
+            }
+        )
     }
 }
 
 @Composable
-fun ContentOrderDetailsScreen() {
+fun ContentOrderDetailsScreen(
+    state: OrderState, order: OrderListModel.Result,
+    showOrderTrackDialog: () -> Unit,
+    onNavigateToTrackOrderScreen: () -> Unit
+) {
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
             .padding(horizontal = ScreenPadding)
     ) {
-        items(2) {
-            SingleOrderItem()
+        val orderItems = order.products
+        items(orderItems) { item ->
+            SingleOrderItem(item)
         }
 
         item {
             Divider(modifier = Modifier.padding(vertical = SpaceBetweenViews))
 
             Text(
-                text = "Delivery Date : 20-10-2024 (Night)",
+                text = "Delivery Date : ${order.deliveryDate.toDate("dd-MM-yyyy")} (${order.timeslot})",
                 fontWeight = FontWeight.W500
             )
 
@@ -88,39 +140,44 @@ fun ContentOrderDetailsScreen() {
 
         //Price list
         val priceList = listOf(
-            "Total Item Cost" to "$rupeeSign 900.00",
-            "Shipping Charge" to "$rupeeSign 178.00",
-            "Packaging Charge" to "$rupeeSign 178.00",
-            "IGST" to "$rupeeSign 178.00"
+            "Total Item Cost" to "$rupeeSign ${order.price.toDouble()}",
+            "Shipping Charge" to "$rupeeSign ${order.totalShippingPrice.toDouble()}",
+            "Packaging Charge" to "$rupeeSign ${order.totalPackingPrice.toDouble()}",
+            if (order.totalIGST.toFloat() != 0.0f) "IGST" to "$rupeeSign ${order.totalIGST.toDouble()}"
+            else {
+                "CGST" to "$rupeeSign ${order.totalCGST.toDouble()}"
+                "SGST" to "$rupeeSign ${order.totalSGST.toDouble()}"
+            },
+            if (order.coupon.isNotEmpty() && order.couponamount.isNotEmpty() && order.couponamount.toFloat() != 0f) "Applied Coupon" to "Rs -${order.couponamount.toFloat()}"
+            else "" to "",
+            if (order.pickupWeight.isNotEmpty() && order.pickupWeight.toFloat() > 0f) "Weight at Pickup" to "${order.pickupWeight} Kg"
+            else "" to "",
+            if (order.deliveryWeight.isNotEmpty() && order.deliveryWeight.toFloat() > 0f) "Weight at Delivery" to "${order.deliveryWeight} Kg"
+            else "" to ""
         )
 
         items(priceList) {
-            SpaceBetweenRow(
-                modifier = Modifier.padding(vertical = LowPadding),
-                item1 = {
+            if (it.first.isNotEmpty())
+                SpaceBetweenRow(modifier = Modifier.padding(vertical = LowPadding), item1 = {
                     Text(it.first, color = MaterialTheme.colorScheme.inverseSurface)
-                },
-                item2 = {
+                }, item2 = {
                     Text(text = it.second, color = MaterialTheme.colorScheme.inverseSurface)
-                }
-            )
+                })
 
         }
 
         item {
             Divider(modifier = Modifier.padding(vertical = SpaceBetweenViews))
 
-            SpaceBetweenRow(
-                modifier = Modifier.padding(vertical = SpaceBetweenViewsAndSubViews),
+            SpaceBetweenRow(modifier = Modifier.padding(vertical = SpaceBetweenViewsAndSubViews),
                 item1 = {
                     Text(
-                        "Final Total",
-                        fontSize = 20.sp,
-                        fontWeight = FontWeight.W500
+                        "Final Total", fontSize = 20.sp, fontWeight = FontWeight.W500
                     )
-                }, item2 = {
+                },
+                item2 = {
                     Text(
-                        "$rupeeSign 234",
+                        "$rupeeSign ${order.finalprice.toDouble()}",
                         fontSize = 20.sp,
                         fontWeight = FontWeight.W500
                     )
@@ -128,6 +185,18 @@ fun ContentOrderDetailsScreen() {
 
             Divider(modifier = Modifier.padding(vertical = SpaceBetweenViews))
 
+            if (state.orderUpdates.isNotEmpty()) {
+                Text("Update", fontSize = 20.sp)
+                VerticalSpace(space = SpaceBetweenViews)
+            }
+        }
+
+        if (state.orderUpdates.isNotEmpty()) itemsIndexed(state.orderUpdates) { index, item ->
+            SingleUpdateItem("${item.note}\n${item.createdDate.toDate()}")
+        }
+
+
+        item {
             val annotatedString = buildAnnotatedString {
                 withStyle(
                     style = SpanStyle(
@@ -139,12 +208,21 @@ fun ContentOrderDetailsScreen() {
                     append("Track Order")
                 }
             }
-            Text(
-                modifier = Modifier.fillMaxWidth(),
-                text = annotatedString,
-                color = MaterialTheme.colorScheme.primary,
-                textAlign = TextAlign.End
-            )
+
+            if (!order.status.contentEquals(OrderStatus.cancel.name))
+                Text(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable {
+                            if (order.status.contentEquals(OrderStatus.delivery_boy_started.name)) {
+                                onNavigateToTrackOrderScreen()
+                            } else
+                                showOrderTrackDialog()
+                        },
+                    text = annotatedString,
+                    color = MaterialTheme.colorScheme.primary,
+                    textAlign = TextAlign.End
+                )
 
             VerticalSpace(space = MediumSpacing)
 
@@ -153,22 +231,23 @@ fun ContentOrderDetailsScreen() {
             VerticalSpace(space = SpaceBetweenViewsAndSubViews)
 
             RoundedCornerCard(
-                modifier = Modifier
-                    .fillMaxWidth(),
-                cardColor = CardDefaults.cardColors(
+                modifier = Modifier.fillMaxWidth(), cardColor = CardDefaults.cardColors(
                     containerColor = MaterialTheme.colorScheme.onSecondary
                 ), elevation = 4.dp
             ) {
+                val address = order.address
                 Text(
-                    "Address 1\nCity\nState\nPincode",
-                    modifier = Modifier
-                        .padding(ScreenPadding)
+                    "${address.address}\n${address.address2}\n${address.city.name}\n${address.state.name}\nPin : ${address.pincode}",
+                    modifier = Modifier.padding(ScreenPadding)
                 )
             }
 
             Divider(modifier = Modifier.padding(vertical = SpaceBetweenViews))
 
-            AppButton(
+            val serverTimeDate = state.serverTime!!.toDateObject("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
+            val createdAt = order.createdDate.toDateObject("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
+            val diffHours: Long = (serverTimeDate.time - createdAt.time) / (60 * 60 * 1000)
+            if (diffHours < 4 && !order.status.contentEquals("cancel")) AppButton(
                 text = "Cancel Order"
             ) {}
         }
@@ -176,7 +255,9 @@ fun ContentOrderDetailsScreen() {
 }
 
 @Composable
-fun SingleOrderItem() {
+fun SingleOrderItem(
+    item: OrderListModel.Result.Product
+) {
     RoundedCornerCard(
         modifier = Modifier
             .fillMaxWidth()
@@ -190,7 +271,8 @@ fun SingleOrderItem() {
             ) {
                 val product = Product()
                 NetworkImage(
-                    image = product.image, modifier = Modifier
+                    image = item.product.file[0].location,
+                    modifier = Modifier
                         .size(100.dp)
                         .clip(RoundedCornerShape(MediumRoundedCorners)),
                     contentScale = ContentScale.Crop
@@ -199,7 +281,7 @@ fun SingleOrderItem() {
                 HorizontalSpace(space = SpaceBetweenViewsAndSubViews)
 
                 Text(
-                    text = product.name,
+                    text = item.product.name,
                     fontSize = 18.sp,
                     maxLines = 3,
                     overflow = TextOverflow.Ellipsis,
@@ -210,13 +292,69 @@ fun SingleOrderItem() {
             Divider()
 
             RatingInfoRow(
-                flatOff = "${rupeeSign}345 x 3",
-                rating = "$rupeeSign 983",
+                flatOff = "${rupeeSign}${item.product.price} x ${item.quantity}",
+                rating = "$rupeeSign ${item.product.price * item.quantity}",
                 showIcon = false,
                 modifier = Modifier.padding(ScreenPadding),
-                weight = ""
+                weight = item.product.weight
             )
         }
+    }
+}
+
+@Composable
+fun SingleUpdateItem(
+    text: String
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(100.dp),
+        horizontalArrangement = Arrangement.Center,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Box(
+            modifier = Modifier
+                .fillMaxHeight()
+                .width(50.dp),
+            contentAlignment = Alignment.Center
+        ) {
+            StraightLine(modifier = Modifier.fillMaxWidth())
+            Circle(modifier = Modifier.align(Alignment.Center))
+        }
+        Text(text = text, fontSize = 12.sp)
+    }
+}
+
+@Composable
+fun Circle(modifier: Modifier = Modifier) {
+    Canvas(
+        modifier = modifier.size(10.dp)
+    ) {
+        val radius = size.width / 2
+        drawCircle(
+            color = Color.Red, radius = radius
+        )
+    }
+}
+
+@Composable
+fun StraightLine(modifier: Modifier = Modifier) {
+    Canvas(
+        modifier = modifier
+            .fillMaxSize()
+            .clipToBounds()
+    ) {
+        val startY = 0f
+        val endY = size.height
+        val lineLength = size.width / 2 // Adjust the length as needed
+
+        drawLine(
+            color = Color.Red,
+            start = Offset(size.width / 2, startY),
+            end = Offset(size.width / 2, endY),
+            strokeWidth = 3.dp.toPx()
+        )
     }
 }
 
@@ -226,6 +364,6 @@ fun SingleOrderItem() {
 @Composable
 fun OrderDetailsScreenPreview() {
     T2PCustomerAppTheme {
-        OrderDetailsScreen()
+        //SingleUpdateItem()
     }
 }

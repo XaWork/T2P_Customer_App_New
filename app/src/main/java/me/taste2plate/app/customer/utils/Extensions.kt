@@ -2,6 +2,7 @@ package me.taste2plate.app.customer.utils
 
 import android.text.Html
 import java.text.SimpleDateFormat
+import java.util.Date
 import java.util.Locale
 import java.util.TimeZone
 
@@ -15,4 +16,10 @@ fun String.toDate(format: String = "dd-MM-yy HH:mm"): String {
 
 fun String.fromHtml(): String{
     return Html.fromHtml(this, 1).toString()
+}
+
+
+fun String.toDateObject(format: String = "dd-MM-yy HH:mm"): Date {
+    val converter = SimpleDateFormat(format, Locale.getDefault())
+    return converter.parse(this)!!
 }

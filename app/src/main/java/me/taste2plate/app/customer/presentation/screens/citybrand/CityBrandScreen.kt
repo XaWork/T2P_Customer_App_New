@@ -25,6 +25,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import me.taste2plate.app.customer.domain.mapper.CommonForItem
 import me.taste2plate.app.customer.presentation.screens.home.CityBrandScreens
 import me.taste2plate.app.customer.presentation.theme.HighPadding
@@ -148,7 +149,8 @@ fun SingleCityBrand(
                             horizontal = HighPadding,
                             vertical = LowPadding
                         ),
-                    color = backgroundColor.invoke()
+                    color = backgroundColor.invoke(),
+                    fontSize = 14.sp
                 )
 
             }

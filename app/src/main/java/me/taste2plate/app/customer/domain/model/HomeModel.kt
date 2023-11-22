@@ -222,7 +222,7 @@ data class HomeModel(
         @SerializedName("purchase_price")
         val purchasePrice: String,
         @SerializedName("selling_price")
-        val sellingPrice: String,
+        val sellingPrice: String?,
         @SerializedName("seo_description")
         val seoDescription: String,
         @SerializedName("seo_keywords")
@@ -409,7 +409,7 @@ data class HomeModel(
         @SerializedName("purchase_price")
         val purchasePrice: String,
         @SerializedName("selling_price")
-        val sellingPrice: String,
+        val sellingPrice: String?,
         @SerializedName("seo_description")
         val seoDescription: String,
         @SerializedName("seo_keywords")

@@ -9,6 +9,7 @@ import me.taste2plate.app.customer.domain.model.user.DeleteFromWishlistModel
 import me.taste2plate.app.customer.domain.model.user.GetProfileModel
 import me.taste2plate.app.customer.domain.model.user.MyPlanModel
 import me.taste2plate.app.customer.domain.model.user.OrderListModel
+import me.taste2plate.app.customer.domain.model.user.OrderUpdateModel
 import me.taste2plate.app.customer.domain.model.user.WalletTransactionModel
 import me.taste2plate.app.customer.domain.model.user.WishListModel
 import me.taste2plate.app.customer.domain.model.user.address.AddressListModel
@@ -174,6 +175,9 @@ interface UserApi {
         @Field("address") address: String,
         @Field("msg") msg: String,
     ): CommonResponse
+
+    @GET("order-updates")
+    suspend fun getOrderUpdates(@Query("id") orderId: String): OrderUpdateModel
 
     //------------------ Checkout ---------------------
     @FormUrlEncoded

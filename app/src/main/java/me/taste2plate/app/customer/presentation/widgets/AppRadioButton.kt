@@ -15,6 +15,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import me.taste2plate.app.customer.presentation.theme.backgroundColor
 import me.taste2plate.app.customer.presentation.theme.onBackgroundColor
@@ -27,6 +28,7 @@ fun AppRadioButton(
     selectedOption: String,
     onOptionSelected: (RadioButtonInfo) -> Unit,
     isIcon: Boolean = false,
+    fontSize : TextUnit = TextUnit.Unspecified
 ) {
     Row(Modifier.selectableGroup()) {
         radioOptions.forEach { text ->
@@ -64,7 +66,7 @@ fun AppRadioButton(
                         Text(
                             text = text.text,
                             style = MaterialTheme.typography.bodyLarge,
-                            modifier = Modifier.padding(start = 16.dp)
+                            modifier = Modifier.padding(start = 16.dp), fontSize = fontSize
                         )
                 }
         }

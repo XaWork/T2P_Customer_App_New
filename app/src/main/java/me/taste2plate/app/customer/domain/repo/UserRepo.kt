@@ -9,6 +9,7 @@ import me.taste2plate.app.customer.domain.model.user.DeleteFromWishlistModel
 import me.taste2plate.app.customer.domain.model.user.GetProfileModel
 import me.taste2plate.app.customer.domain.model.user.MyPlanModel
 import me.taste2plate.app.customer.domain.model.user.OrderListModel
+import me.taste2plate.app.customer.domain.model.user.OrderUpdateModel
 import me.taste2plate.app.customer.domain.model.user.WalletTransactionModel
 import me.taste2plate.app.customer.domain.model.user.WishListModel
 import me.taste2plate.app.customer.domain.model.user.address.AddressListModel
@@ -121,6 +122,7 @@ interface UserRepo {
     ): CommonResponse
 
     suspend fun getOrders(userId: String): OrderListModel
+    suspend fun getOrderUpdates(orderId: String): OrderUpdateModel
     suspend fun createBulkOrder(
         name:String,
         email:String,

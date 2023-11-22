@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -25,6 +26,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -33,6 +35,7 @@ import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.withStyle
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -195,7 +198,9 @@ fun SpaceBetweenRow(
 @Composable
 fun VegNonVegFilter(
     modifier: Modifier = Modifier,
+    switchModifier: Modifier = Modifier,
     checked: Boolean = false,
+    fontSize: TextUnit = 14.sp,
     onCheckChange: () -> Unit = {}
 ) {
     Row(
@@ -203,18 +208,31 @@ fun VegNonVegFilter(
         verticalAlignment = Alignment.CenterVertically,
         modifier = modifier.padding(horizontal = LowPadding)
     ) {
-        Text(text = "Veg")
+        Text(text = "Veg", fontSize = fontSize)
 
         Switch(
             checked = checked, onCheckedChange = { onCheckChange() },
-            modifier = Modifier.padding(horizontal = SpaceBetweenViewsAndSubViews),
+            modifier = switchModifier,
             colors = SwitchDefaults.colors(
-                checkedBorderColor = primaryColor.invoke(),
+                checkedBorderColor = backgroundColor.invoke(),
                 checkedTrackColor = backgroundColor.invoke(),
-                checkedThumbColor = primaryColor.invoke()
+                checkedThumbColor = Color.Red,
+                uncheckedThumbColor = ForestGreen,
+                uncheckedBorderColor = backgroundColor.invoke(),
+                uncheckedTrackColor = backgroundColor.invoke()
             )
         )
 
-        Text(text = "Non-veg")
+        Text(text = "Non-veg", fontSize = fontSize)
     }
+}
+
+@Preview
+@Composable
+fun SwitchPreview() {
+    Switch(
+        checked = true,
+        onCheckedChange = {},
+        modifier = Modifier.scale(1f)
+    )
 }

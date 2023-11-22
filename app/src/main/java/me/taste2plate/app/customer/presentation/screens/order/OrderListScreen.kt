@@ -70,6 +70,7 @@ fun OrderListScreen(
                 MyOrderList(
                     state.orderList,
                     onClick = {
+                        viewModel.selectedOrder = it
                         onNavigateToOrderDetailsScreen()
                     }
                 )
@@ -89,7 +90,7 @@ fun OrderListScreen(
 @Composable
 fun MyOrderList(
     orderList: List<OrderListModel.Result>,
-    onClick: () -> Unit
+    onClick: (order: OrderListModel.Result) -> Unit
 ) {
     LazyColumn(
         contentPadding = PaddingValues(
@@ -101,7 +102,7 @@ fun MyOrderList(
             SingleOrderInfoItem(
                 order,
                 onClick = {
-                    onClick()
+                    onClick(order)
                 }
             )
         }

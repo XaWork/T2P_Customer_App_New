@@ -48,7 +48,7 @@ fun AutoSlidingCarousel(
     pages: List<HomeModel.Slider>
 ) {
     val pagerState =
-        rememberPagerState(pageCount = { pages.size }, initialPageOffsetFraction = 0.4f)
+        rememberPagerState(pageCount = { pages.size })
     val isDragged by pagerState.interactionSource.collectIsDraggedAsState()
 
     LaunchedEffect(Unit) {

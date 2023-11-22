@@ -5,7 +5,8 @@ package me.taste2plate.app.customer.presentation.utils
 const val mapApiKey = "AIzaSyBbpYO8zLmSh0-c5_MDiyPiQnMCl4Jc6ko"
 
 
-const val appName = "Taste2plate"
+const val appName = "Tastes2plate"
+const val appNameWithFullForm = "T2P (tastes2plate)"
 const val tagLine = "Intercity Food Delivery"
 const val mobileNumber = "Mobile Number"
 const val emailString = "Email"

@@ -41,7 +41,9 @@ class ProductListUseCase @Inject constructor(
                         response = repo.productByCategory(id, taste)
                     }
 
-                    ProductBy.Slider -> {}
+                    ProductBy.Slider -> {
+                        //response = repo.productsBySlider(id, taste)
+                    }
                 }
                 emit(Resource.Success(response))
             } catch (io: IOException) {

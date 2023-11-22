@@ -45,10 +45,6 @@ fun SplashScreen(
         }
     }
 
-    LaunchedEffect(Unit) {
-        viewModel.onEvent(SplashEvents.GetSettings)
-    }
-
 
     AppScaffold(
         paddingValues = PaddingValues(0.dp)

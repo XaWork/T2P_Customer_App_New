@@ -4,6 +4,7 @@ import android.content.res.Configuration
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.collectIsDraggedAsState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -18,11 +19,13 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.filled.ShoppingCart
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
@@ -44,12 +47,15 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import me.taste2plate.app.customer.R
 import me.taste2plate.app.customer.domain.model.product.ProductDetailsModel
+import me.taste2plate.app.customer.presentation.screens.home.widgets.DotsIndicator
 import me.taste2plate.app.customer.presentation.screens.product.list.ProductEvents
 import me.taste2plate.app.customer.presentation.theme.ExtraLowElevation
+import me.taste2plate.app.customer.presentation.theme.LowPadding
 import me.taste2plate.app.customer.presentation.theme.MediumPadding
 import me.taste2plate.app.customer.presentation.theme.MediumRoundedCorners
 import me.taste2plate.app.customer.presentation.theme.ScreenPadding
@@ -80,12 +86,16 @@ import me.taste2plate.app.customer.utils.toDate
 @Composable
 fun ProductDetailsScreen(
     viewModel: ProductViewModel,
+    productId: String? = null,
     onNavigateToCartScreen: () -> Unit
 ) {
 
     val state = viewModel.state
 
     LaunchedEffect(Unit) {
+        if (productId != null)
+            viewModel.selectedProductId = productId
+
         viewModel.onEvent(ProductEvents.GetProductDetails)
     }
 
@@ -236,11 +246,16 @@ fun ProductDetails(
                     text = details.name,
                     maxLines = 5,
                     fontWeight = FontWeight.W500,
-                    fontSize = 22.sp,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .weight(2f)
                 )
 
                 CartAddRemove(
-                    0,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .weight(1f),
+                    cartItemLength = 0,
                 ) {}
             }
 
@@ -250,7 +265,7 @@ fun ProductDetails(
 
             Text(
                 text = "Check Availability",
-                fontWeight = FontWeight.W500,
+                fontWeight = FontWeight.W400,
             )
 
             VerticalSpace(space = SpaceBetweenViews)
@@ -297,13 +312,14 @@ fun ProductDetails(
 fun ProductImages(
     details: ProductDetailsModel.Result,
 ) {
-    val isOnSale = details.sellingPrice != null && details.sellingPrice.isNotEmpty()
     val images = details.file
+    val isOnSale = !details.sellingPrice.isNullOrEmpty()
+    val pagerState = rememberPagerState(pageCount = { images.size })
+    val isDragged by pagerState.interactionSource.collectIsDraggedAsState()
 
     Box(
         modifier = Modifier.fillMaxWidth()
     ) {
-        val pagerState = rememberPagerState(pageCount = { images.size })
 
         HorizontalPager(
             state = pagerState,
@@ -313,10 +329,7 @@ fun ProductImages(
                 image = images[it].location,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(300.dp)
-                    .clip(
-                        RoundedCornerShape(MediumRoundedCorners)
-                    ),
+                    .height(300.dp),
                 contentScale = ContentScale.Crop
             )
         }
@@ -328,9 +341,8 @@ fun ProductImages(
             isDrawableIcon = false,
             icon = Icons.Default.FavoriteBorder,
             modifier = Modifier
-                .padding(10.dp)
-                .align(Alignment.TopEnd),
-            iconModifier = Modifier
+                .padding(LowPadding)
+                .align(Alignment.TopEnd)
                 .size(30.dp)
         ) {}
 
@@ -347,6 +359,20 @@ fun ProductImages(
         }
 
 
+        Surface(
+            modifier = Modifier
+                .padding(bottom = 8.dp)
+                .align(Alignment.BottomCenter),
+            shape = CircleShape,
+            color = Color.Black.copy(alpha = 0.5f)
+        ) {
+            DotsIndicator(
+                modifier = Modifier.padding(horizontal = 8.dp, vertical = 6.dp),
+                totalDots = images.size,
+                selectedIndex = if (isDragged) pagerState.currentPage else pagerState.targetPage,
+                dotSize = 8.dp
+            )
+        }
     }
 }
 
@@ -372,15 +398,21 @@ fun SaleBanner(
 
 @Composable
 fun CartAddRemove(
+    modifier: Modifier = Modifier,
+    textInCircleModifier: Modifier = Modifier,
     cartItemLength: Int,
+    textInCircleFontSize: TextUnit = 22.sp,
+    fontSize: TextUnit = 18.sp,
     onUpdateCart: (quantity: Int) -> Unit
 ) {
     Row(
+        modifier = modifier,
         horizontalArrangement = Arrangement.Center,
         verticalAlignment = Alignment.CenterVertically
     ) {
         TextInCircle(
-            modifier = Modifier.clickable {
+            fontSize = textInCircleFontSize,
+            modifier = textInCircleModifier.clickable {
                 if (cartItemLength > 0)
                     onUpdateCart(cartItemLength - 1)
             },
@@ -394,11 +426,12 @@ fun CartAddRemove(
                     horizontal = MediumPadding,
                 ),
             textAlign = TextAlign.Center,
-            fontSize = 18.sp
+            fontSize = fontSize
         )
 
         TextInCircle(
-            modifier = Modifier.clickable {
+            fontSize = textInCircleFontSize,
+            modifier = textInCircleModifier.clickable {
                 onUpdateCart(cartItemLength + 1)
             },
             text = "+"

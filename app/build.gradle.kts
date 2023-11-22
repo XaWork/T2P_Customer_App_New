@@ -87,15 +87,12 @@ dependencies {
     //preference data store
     implementation("androidx.datastore:datastore-preferences:1.0.0")
 
-    //timber
-    implementation("com.jakewharton.timber:timber:5.0.1")
-
     //firebase
     implementation(platform("com.google.firebase:firebase-bom:32.3.1"))
     implementation("com.google.firebase:firebase-analytics-ktx")
     implementation("com.google.firebase:firebase-crashlytics-ktx")
     implementation("com.google.firebase:firebase-messaging")
-
+    implementation("com.google.firebase:firebase-database")
     //kotlin coroutine
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.1")
 

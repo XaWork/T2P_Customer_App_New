@@ -54,7 +54,8 @@ fun AppOutlineButton(
     text: String = "",
     shape: Shape = RoundedCornerShape(buttonRoundedShapeCornerRadius),
     paddingValues: PaddingValues = PaddingValues(horizontal = 10.dp),
-    onClick: () -> Unit
+    fontSize: TextUnit = TextUnit.Unspecified,
+    onClick: () -> Unit,
 ) {
     OutlinedButton(
         modifier = modifier
@@ -70,7 +71,7 @@ fun AppOutlineButton(
         ),
         elevation = ButtonDefaults.elevatedButtonElevation(0.dp)
     ) {
-        Text(text = text.uppercase(), color = primaryColor.invoke())
+        Text(text = text.uppercase(), color = primaryColor.invoke(), fontSize = fontSize)
     }
 }
 

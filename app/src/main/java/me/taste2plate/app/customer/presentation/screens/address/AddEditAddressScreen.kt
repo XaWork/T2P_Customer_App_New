@@ -36,7 +36,6 @@ import me.taste2plate.app.customer.presentation.widgets.AppTopBar
 import me.taste2plate.app.customer.presentation.widgets.ShowLoading
 import me.taste2plate.app.customer.presentation.widgets.SpaceBetweenRow
 import me.taste2plate.app.customer.presentation.widgets.showToast
-import timber.log.Timber
 
 @Composable
 fun AddEditAddressScreen(

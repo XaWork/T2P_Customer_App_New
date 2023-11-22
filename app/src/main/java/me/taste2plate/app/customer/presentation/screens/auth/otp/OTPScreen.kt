@@ -50,7 +50,7 @@ fun OTPScreen(
 
     //Observe State
     when {
-        state.verifyOTPModel != null -> {
+        state.loginSuccess && state.verifyOTPModel != null -> {
             onNavigateToHomeScreen()
         }
     }

@@ -17,12 +17,16 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import me.taste2plate.app.customer.presentation.theme.LowPadding
 import me.taste2plate.app.customer.presentation.theme.MediumPadding
 import me.taste2plate.app.customer.presentation.theme.MediumRoundedCorners
 import me.taste2plate.app.customer.presentation.theme.T2PCustomerAppTheme
+import me.taste2plate.app.customer.presentation.theme.primaryColor
+import me.taste2plate.app.customer.presentation.widgets.AppDivider
 
 @Composable
 fun HeadingChip(
@@ -36,6 +40,7 @@ fun HeadingChip(
     ) {
         Text(
             text,
+            fontSize = 12.sp,
             modifier = Modifier
                 .padding(horizontal = MediumPadding, vertical = LowPadding)
         )
@@ -45,32 +50,39 @@ fun HeadingChip(
 @Composable
 fun HeadingChipWithLine(
     text: String,
-    textColor: Color = MaterialTheme.colorScheme.background
+    textColor: Color = MaterialTheme.colorScheme.primary
 ) {
     Row(
         modifier = Modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.Center
     ) {
-        Divider(
-            thickness = 2.dp,
+        AppDivider(
+            thickness = 1.dp,
             modifier = Modifier
                 .fillMaxWidth()
                 .weight(1f)
-                .padding(end = MediumPadding)
+                .padding(end = MediumPadding),
+            color = primaryColor.invoke()
         )
+
         Text(
             text,
             color = textColor,
-            maxLines = 1
+            maxLines = 1,
+            fontSize = 12.sp,
+            fontWeight = FontWeight.W500
         )
-        Divider(
-            thickness = 2.dp,
+
+        AppDivider(
+            thickness = 1.dp,
             modifier = Modifier
                 .fillMaxWidth()
                 .weight(1f)
-                .padding(start = MediumPadding)
+                .padding(start = MediumPadding),
+            color = primaryColor.invoke()
         )
+
     }
 }
 

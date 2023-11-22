@@ -1,6 +1,7 @@
 package me.taste2plate.app.customer.presentation.widgets
 
 import android.content.res.Configuration
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
@@ -12,6 +13,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.sp
 import me.taste2plate.app.customer.R
 import me.taste2plate.app.customer.presentation.theme.MediumIcon
+import me.taste2plate.app.customer.presentation.theme.SpaceBetweenViewsAndSubViews
 import me.taste2plate.app.customer.presentation.theme.T2PCustomerAppTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -45,7 +47,8 @@ fun AppTopBar(
             if (tasteVisible)
                 VegNonVegFilter(
                     checked = checked,
-                    onCheckChange = onCheckChange
+                    onCheckChange = onCheckChange,
+                    switchModifier = Modifier.padding(horizontal = SpaceBetweenViewsAndSubViews)
                 )
         })
 }

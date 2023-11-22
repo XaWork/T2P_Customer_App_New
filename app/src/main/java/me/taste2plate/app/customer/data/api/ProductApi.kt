@@ -1,10 +1,12 @@
 package me.taste2plate.app.customer.data.api
 
 import me.taste2plate.app.customer.domain.model.CouponModel
+import me.taste2plate.app.customer.domain.model.product.ProductBySliderModel
 import me.taste2plate.app.customer.domain.model.product.ProductDetailsModel
 import me.taste2plate.app.customer.domain.model.product.ProductListModel
 import retrofit2.Call
 import retrofit2.http.GET
+import retrofit2.http.POST
 import retrofit2.http.Query
 
 interface ProductApi {
@@ -35,6 +37,12 @@ interface ProductApi {
         @Query("sub_category") id: String,
         @Query("taste") taste: String
     ): ProductListModel
+
+    @POST("fetch-shop-by-slider")
+    suspend fun productsBySlider(
+        @Query("slider_name") name: String,
+        @Query("taste") taste: String
+    ): ProductBySliderModel
 
 
     @GET("product-details")

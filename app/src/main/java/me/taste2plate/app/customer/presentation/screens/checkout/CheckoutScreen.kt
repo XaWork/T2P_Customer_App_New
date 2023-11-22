@@ -84,6 +84,9 @@ import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
 
+val fontSize = 14.sp
+val fontSize1 = 12.sp
+
 @RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -334,12 +337,16 @@ fun CheckoutScreenContent(
         //cart items
         val items = state.cart!!.result.map { it.toCommonForWishAndCartItem() }.toList()
         items(items) { item ->
-            SingleCartAndWishlistItem(isWishList = false, item, updateCart = {
-                updateCart(
-                    item.id,
-                    it
-                )
-            })
+            SingleCartAndWishlistItem(
+                isWishList = false, item,
+                updateCart = {
+                    updateCart(
+                        item.id,
+                        it
+                    )
+                },
+                fontSize = fontSize,
+            )
         }
 
         item {
@@ -363,6 +370,8 @@ fun CheckoutScreenContent(
 
             TipInfo({})
 
+            CancellationPolicy()
+
             HeadingText("Price Details")
 
             VerticalSpace(space = SpaceBetweenViewsAndSubViews)
@@ -374,11 +383,11 @@ fun CheckoutScreenContent(
             val items = listOf<@Composable RowScope.() -> Unit> {
                 Text(
                     text = price.title,
-                    fontWeight = FontWeight.Light
+                    fontWeight = FontWeight.Light, fontSize = fontSize
                 )
 
                 Text(
-                    text = "${price.sign}${price.price}"
+                    text = "${price.sign}${price.price}", fontSize = fontSize
                 )
             }
 
@@ -396,13 +405,13 @@ fun CheckoutScreenContent(
             SpaceBetweenRow(item1 = {
                 Text(
                     text = "Total Price",
-                    color = primaryColor.invoke()
+                    color = primaryColor.invoke(), fontSize = fontSize
                 )
 
             }, item2 = {
                 Text(
                     text = "${rupeeSign}${viewModel.totalPrice}",
-                    color = primaryColor.invoke()
+                    color = primaryColor.invoke(), fontSize = fontSize
                 )
             })
 
@@ -423,6 +432,8 @@ fun CheckoutScreenContent(
                 viewModel.onEvent(CheckoutEvents.ChangePaymentType(it))
             })
 
+            VerticalSpace(space = SpaceBetweenViewsAndSubViews)
+
             AppButton(
                 text = "Continue"
             ) {
@@ -442,14 +453,16 @@ fun AddressBar(
         modifier = Modifier.fillMaxWidth()
     ) {
         Text(
-            text = "${user.fullName} |  ${address.title}\n\n ${address.address}",
-            fontWeight = FontWeight.Light
+            text = "${user.fullName} | ${address.title}\n${address.address}\n${address.address2}\n${address.city.name}, ${address.state.name}\n${address.pincode}",
+            fontWeight = FontWeight.Light,
+            fontSize = fontSize
         )
 
         VerticalSpace(space = SpaceBetweenViewsAndSubViews)
 
         AppOutlineButton(
             text = "change or add new address".uppercase(),
+            fontSize = fontSize1
         ) {
             openAddressSheet()
         }
@@ -468,7 +481,8 @@ fun CouponInfo(
         AppDivider()
 
         AppOutlineButton(
-            text = "Apply Coupon"
+            text = "Apply Coupon",
+            fontSize = fontSize1
         ) {
             showCoupons()
         }
@@ -486,19 +500,20 @@ fun TipInfo(
         val aboutTip = buildAnnotatedString {
             withStyle(
                 SpanStyle(
-                    fontSize = 20.sp,
+                    fontSize = fontSize,
                     fontWeight = FontWeight.Bold
                 )
             ) {
-                append("Tip your delivery partner")
+                append("Tip your delivery partner\n")
             }
 
             withStyle(
                 SpanStyle(
-                    fontWeight = FontWeight.Light
+                    fontWeight = FontWeight.Light,
+                    fontSize = fontSize
                 )
             ) {
-                append("\nYour kindness a lot! 100% of\n your tip will go directly to them")
+                append("Thanks for your kindness! 100% of your tip will go directly to Delivery Associate.")
             }
         }
 
@@ -506,6 +521,8 @@ fun TipInfo(
             aboutTip,
             modifier = Modifier
                 .align(Alignment.Top)
+                .fillMaxWidth()
+                .weight(3f)
         )
 
         DrawableImage(
@@ -513,6 +530,8 @@ fun TipInfo(
             modifier = Modifier
                 .size(70.dp)
                 .align(Alignment.Bottom)
+                .fillMaxWidth()
+                .weight(1f)
         )
     }
 
@@ -538,7 +557,6 @@ fun TipInfo(
                 FilterChip(
                     selected = tip.selected,
                     shape = RoundedCornerShape(LowRoundedCorners),
-
                     onClick = {
                         if (tips[index].tipPrice != "Other")
                             tips[index].selected = !tips[index].selected
@@ -563,7 +581,7 @@ fun TipInfo(
 
                             Text(
                                 text = "$rupeeSign${tips[index].tipPrice}",
-                                fontSize = 16.sp,
+                                fontSize = fontSize1,
                                 fontWeight = FontWeight.Bold
                             )
                         }
@@ -575,6 +593,31 @@ fun TipInfo(
 
     }
 
+}
+
+@Composable
+fun CancellationPolicy(
+) {
+    Column(
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        Text(
+            text = "Cancellation Policy".uppercase(),
+            letterSpacing = 5.sp,
+            modifier = Modifier.padding(vertical = LowPadding)
+        )
+
+        Text(
+            text = "100% cancellation fee will be applicable if you decide to cancel the order anytime after order placement." +
+                    " Avoid cancellation as it leads to food wastage.",
+            fontSize = 12.sp,
+            fontWeight = FontWeight.Light
+        )
+
+        AppDivider()
+    }
 }
 
 @Composable
@@ -615,14 +658,15 @@ fun DeliveryInfo(
                         changeDeliveryType(DeliveryType.Standard)
                     }
                 }
-            }
+            },
+            fontSize = fontSize,
         )
 
         VerticalSpace(space = SpaceBetweenViews)
 
         Text(
             text = "Delivery Info",
-            color = primaryColor.invoke()
+            color = primaryColor.invoke(), fontSize = fontSize
         )
 
         VerticalSpace(space = SpaceBetweenViews)
@@ -640,7 +684,7 @@ fun DeliveryInfo(
                     .padding(end = LowPadding)
                     .clickable {
                         showDatePicker()
-                    }
+                    }, fontSize = fontSize
             )
         }) {
             TextInCircle(
@@ -649,7 +693,7 @@ fun DeliveryInfo(
                     .fillMaxWidth()
                     .weight(1f)
                     .padding(start = LowPadding)
-                    .clickable { showTimeSlots() }
+                    .clickable { showTimeSlots() }, fontSize = fontSize
             )
         }
     }
@@ -663,16 +707,16 @@ fun PaymentInfo(
     val radioOptions = listOf(
         RadioButtonInfo(
             id = 1,
-            text = "Online",
-            isIcon = true,
-            icon = R.drawable.online_payment
+            text = "Online",/*
+            isIcon = false,
+            icon = R.drawable.online_payment*/
         ),
         RadioButtonInfo(
             id = 2,
             text = "COD",
-            isIcon = true,
+            isIcon = false,/*
             icon = R.drawable.cod_icon,
-            enable = state.deliveryType == DeliveryType.Standard
+            enable = state.deliveryType == DeliveryType.Standard*/
         )
     )
     val selectedOption =
@@ -692,7 +736,6 @@ fun PaymentInfo(
                     2 -> changePaymentType(PaymentType.COD)
                 }
             },
-            isIcon = true
         )
     }
 }

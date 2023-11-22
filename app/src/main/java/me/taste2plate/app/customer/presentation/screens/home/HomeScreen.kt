@@ -31,11 +31,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.core.content.ContextCompat.startActivity
 import androidx.hilt.navigation.compose.hiltViewModel
 import kotlinx.coroutines.launch
 import me.taste2plate.app.customer.R
 import me.taste2plate.app.customer.T2PApp
+import me.taste2plate.app.customer.domain.mapper.CommonForItem
 import me.taste2plate.app.customer.domain.model.SettingsModel
 import me.taste2plate.app.customer.domain.model.auth.User
 import me.taste2plate.app.customer.presentation.screens.address.AddressBottomSheet
@@ -54,6 +54,7 @@ import me.taste2plate.app.customer.presentation.screens.home.widgets.TopOrderedF
 import me.taste2plate.app.customer.presentation.theme.SpaceBetweenViews
 import me.taste2plate.app.customer.presentation.theme.SpaceBetweenViewsAndSubViews
 import me.taste2plate.app.customer.presentation.theme.T2PCustomerAppTheme
+import me.taste2plate.app.customer.presentation.theme.VeryLowSpacing
 import me.taste2plate.app.customer.presentation.widgets.AppScaffold
 import me.taste2plate.app.customer.presentation.widgets.DrawableImage
 import me.taste2plate.app.customer.presentation.widgets.ShowLoading
@@ -69,7 +70,7 @@ fun HomeScreen(
     onNavigateToWishlistScreen: () -> Unit,
     onNavigateToProfileScreen: () -> Unit,
     onNavigateToAddressListScreen: () -> Unit,
-    onNavigateToProductListScreen: () -> Unit,
+    onNavigateToProductListScreen: (item: CommonForItem) -> Unit,
     onNavigateToProductDetailsScreen: (productId: String) -> Unit,
     onNavigateToBulkOrdersScreen: () -> Unit,
     onNavigateToWalletScreen: () -> Unit,
@@ -191,6 +192,9 @@ fun HomeScreen(
                         scope.launch {
                             drawerState.open()
                         }
+                    },
+                    onNavigateToWalletScreen = {
+                        onNavigateToWalletScreen()
                     }
                 )
             },
@@ -236,7 +240,7 @@ fun HomeScreen(
                                     AutoSlidingCarousel(
                                         pages = home.slider
                                     )
-                                    VerticalSpace(space = SpaceBetweenViewsAndSubViews)
+                                    VerticalSpace(space = VeryLowSpacing)
                                 }
 
 
@@ -244,12 +248,14 @@ fun HomeScreen(
                             if (home?.topMostOrderedProducts != null) {
                                 CenterColumn {
                                     HeadingChip("Top Ordered Food/City")
-                                    VerticalSpace(space = SpaceBetweenViewsAndSubViews)
+                                    VerticalSpace(space = VeryLowSpacing)
                                     TopOrderedFoodCityList(
-                                        onNavigateToProductListScreen = onNavigateToProductListScreen,
-                                        home.topMostOrderedProducts
+                                        onNavigateToProductListScreen = {
+                                           // onNavigateToProductListScreen(it)
+                                        },
+                                        foodItems = home.topMostOrderedProducts,
                                     )
-                                    VerticalSpace(space = SpaceBetweenViews)
+                                    VerticalSpace(space = VeryLowSpacing)
                                 }
                             }
 
@@ -262,19 +268,17 @@ fun HomeScreen(
                                         },
                                         viewModel = viewModel
                                     )
-                                    VerticalSpace(space = SpaceBetweenViews)
                                 }
 
                             //top brands
                             if (home?.topBrands != null)
                                 CenterColumn {
                                     HeadingChip("Top Brands")
-                                    VerticalSpace(space = SpaceBetweenViews)
+                                    VerticalSpace(space = VeryLowSpacing)
                                     TopBrands(
-                                        onNavigateToProductListScreen = onNavigateToProductListScreen,
+                                        onNavigateToProductListScreen = {  },
                                         topBrands = home.topBrands
                                     )
-                                    VerticalSpace(space = SpaceBetweenViewsAndSubViews)
                                 }
 
                             //Deals
@@ -286,14 +290,13 @@ fun HomeScreen(
                                         },
                                         viewModel = viewModel
                                     )
-                                    VerticalSpace(space = SpaceBetweenViews)
                                 }
 
                             //Featured
                             if (home?.featured != null)
                                 CenterColumn {
                                     HeadingChip("Featured")
-                                    VerticalSpace(space = SpaceBetweenViews)
+                                    VerticalSpace(space = VeryLowSpacing)
                                 }
                         }
 
@@ -301,6 +304,7 @@ fun HomeScreen(
                             items(home.featured) { product ->
                                 SingleFeaturedItem(
                                     product,
+                                    state = state,
                                     alreadyWishListed =
                                     if (state.wishListData!!.result.isEmpty()) false
                                     else state.wishListData.result.any { it.product.id == product.id },
@@ -313,8 +317,8 @@ fun HomeScreen(
                                     addToWishlist = {
                                         viewModel.onEvent(HomeEvent.AddToWishlist(product.id))
                                     },
-                                    addToCart = {
-                                        viewModel.onEvent(HomeEvent.AddToCart(product.id))
+                                    updateCart = {
+                                        viewModel.onEvent(HomeEvent.UpdateCart(it, product.id))
                                     }
                                 )
                             }

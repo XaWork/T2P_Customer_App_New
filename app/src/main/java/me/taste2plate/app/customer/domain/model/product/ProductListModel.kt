@@ -77,7 +77,7 @@ data class ProductListModel(
         @SerializedName("point_exp_date")
         val pointExpDate: String,
         @SerializedName("price")
-        val price: Int,
+        val price: String,
         @SerializedName("purchase_price")
         val purchasePrice: String,
         @SerializedName("selling_price")

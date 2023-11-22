@@ -25,6 +25,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import me.taste2plate.app.customer.domain.mapper.CommonForItem
 import me.taste2plate.app.customer.domain.mapper.toCommonForWishAndCartItem
@@ -139,6 +140,7 @@ fun ContentCartAndWishlist(
 fun SingleCartAndWishlistItem(
     isWishList: Boolean,
     item: CommonForItem,
+    fontSize: TextUnit = TextUnit.Unspecified,
     removeFromWishlist: () -> Unit = {},
     updateCart: (quantity: Int) -> Unit = {}
 ) {
@@ -160,22 +162,20 @@ fun SingleCartAndWishlistItem(
         ) {
             Text(
                 text = item.name,
-                maxLines = 2,
-                minLines = 2,
-                overflow = TextOverflow.Ellipsis
+                overflow = TextOverflow.Ellipsis,
+                fontSize =  fontSize
             )
 
             VerticalSpace(space = SpaceBetweenViewsAndSubViews)
 
-
             val innerItems = listOf<@Composable RowScope.() -> Unit> {
 
                 if (!isWishList)
-                    CartAddRemove(item.quantity!!) { quantity ->
+                    CartAddRemove(cartItemLength = item.quantity!!) { quantity ->
                         updateCart(quantity)
                     }
 
-                Text(text = "${rupeeSign}${item.price}")
+                Text(text = "${rupeeSign}${item.price}", fontSize =  fontSize)
             }
             SpaceBetweenRow(items = innerItems)
         }

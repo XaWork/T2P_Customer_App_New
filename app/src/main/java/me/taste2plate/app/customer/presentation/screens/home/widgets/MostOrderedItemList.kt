@@ -9,7 +9,9 @@ import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.pager.HorizontalPager
@@ -17,7 +19,6 @@ import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.LocationOn
 import androidx.compose.material.icons.outlined.ShoppingCart
 import androidx.compose.material.icons.rounded.Star
 import androidx.compose.material3.Card
@@ -39,24 +40,28 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import me.taste2plate.app.customer.R
 import me.taste2plate.app.customer.domain.model.HomeModel
+import me.taste2plate.app.customer.domain.model.user.CartModel
 import me.taste2plate.app.customer.presentation.screens.home.FoodItemUpdateInfo
 import me.taste2plate.app.customer.presentation.screens.home.HomeEvent
+import me.taste2plate.app.customer.presentation.screens.home.HomeState
 import me.taste2plate.app.customer.presentation.screens.home.HomeViewModel
+import me.taste2plate.app.customer.presentation.screens.product.CartAddRemove
 import me.taste2plate.app.customer.presentation.theme.ForestGreen
 import me.taste2plate.app.customer.presentation.theme.ForestGreenDark
 import me.taste2plate.app.customer.presentation.theme.LowPadding
 import me.taste2plate.app.customer.presentation.theme.LowRoundedCorners
 import me.taste2plate.app.customer.presentation.theme.ScreenPadding
-import me.taste2plate.app.customer.presentation.theme.SpaceBetweenViews
 import me.taste2plate.app.customer.presentation.theme.SpaceBetweenViewsAndSubViews
 import me.taste2plate.app.customer.presentation.theme.T2PCustomerAppTheme
+import me.taste2plate.app.customer.presentation.theme.VeryLowSpacing
+import me.taste2plate.app.customer.presentation.theme.primaryColor
 import me.taste2plate.app.customer.presentation.utils.rupeeSign
 import me.taste2plate.app.customer.presentation.widgets.ImageWithWishlistButton
 import me.taste2plate.app.customer.presentation.widgets.InfoWithIcon
 import me.taste2plate.app.customer.presentation.widgets.MaterialIcon
 import me.taste2plate.app.customer.presentation.widgets.RedBorderCard
 import me.taste2plate.app.customer.presentation.widgets.RoundedCornerIconButton
-import me.taste2plate.app.customer.presentation.widgets.ShowLoading
+import me.taste2plate.app.customer.presentation.widgets.SpaceBetweenRow
 import me.taste2plate.app.customer.presentation.widgets.VerticalSpace
 import me.taste2plate.app.customer.presentation.widgets.simpleAnimation
 
@@ -74,7 +79,7 @@ fun MostOrderedItemList(
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center,
-        modifier = Modifier
+     /*   modifier = Modifier
             .background(
                 brush = Brush.verticalGradient(
                     colors = listOf(
@@ -82,11 +87,10 @@ fun MostOrderedItemList(
                         MaterialTheme.colorScheme.background
                     )
                 )
-            )
+            )*/
     ) {
-        VerticalSpace(space = SpaceBetweenViewsAndSubViews)
         HeadingChipWithLine("Most Ordered Item")
-        VerticalSpace(space = SpaceBetweenViewsAndSubViews)
+        VerticalSpace(space = VeryLowSpacing)
         HorizontalPager(
             state = pagerState,
         ) { page ->
@@ -105,6 +109,7 @@ fun MostOrderedItemList(
                 page,
                 pagerState = pagerState,
                 modifier = Modifier.clickable { onNavigateToProductDetailsScreen(foodItems[page].id) },
+                state = state,
                 product = foodItems[page],
                 alreadyWishListed = alreadyInWishlist,
                 foodItemUpdateInfo = if (state.foodItemUpdateInfo != null && state.foodItemUpdateInfo.id == foodItems[page].id)
@@ -113,8 +118,8 @@ fun MostOrderedItemList(
                 addToWishlist = {
                     viewModel.onEvent(HomeEvent.AddToWishlist(foodItems[page].id))
                 },
-                addToCart = {
-                    viewModel.onEvent(HomeEvent.AddToCart(foodItems[page].id))
+                updateCart = {
+                    viewModel.onEvent(HomeEvent.UpdateCart(it, foodItems[page].id))
                 }
             )
         }
@@ -126,12 +131,13 @@ fun MostOrderedItemList(
 fun SingleMostOrderedItem(
     page: Int,
     modifier: Modifier = Modifier,
+    state: HomeState,
     pagerState: PagerState,
     product: HomeModel.MostOrderdItem,
     alreadyWishListed: Boolean = false,
     foodItemUpdateInfo: FoodItemUpdateInfo? = null,
     addToWishlist: () -> Unit,
-    addToCart: () -> Unit,
+    updateCart: (quantity: Int) -> Unit,
 ) {
     RedBorderCard(
         modifier = modifier.simpleAnimation(pagerState, page)
@@ -145,7 +151,7 @@ fun SingleMostOrderedItem(
                 addToWishlist()
             }
 
-            VerticalSpace(space = SpaceBetweenViewsAndSubViews)
+            VerticalSpace(space = VeryLowSpacing)
 
             Column(
                 modifier = Modifier.padding(ScreenPadding)
@@ -156,7 +162,7 @@ fun SingleMostOrderedItem(
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    if (product.sellingPrice != null && product.sellingPrice.isNotEmpty()) {
+                    if (!product.sellingPrice.isNullOrEmpty()) {
                         val flatOff = product.sellingPrice.toInt() - product.price.toInt()
                         Text(
                             "Flat $rupeeSign$flatOff OFF",
@@ -164,7 +170,7 @@ fun SingleMostOrderedItem(
                         )
                     }
 
-                    if (product.weight != null && product.weight.isNotEmpty())
+                    if (product.weight.isNotEmpty())
                         Text(
                             "${product.weight} Kg",
                             color = MaterialTheme.colorScheme.tertiary
@@ -196,30 +202,32 @@ fun SingleMostOrderedItem(
                     }
                 }
 
-                VerticalSpace(space = SpaceBetweenViews)
+                VerticalSpace(space = VeryLowSpacing)
 
                 Text(
                     text = product.name,
                     style = MaterialTheme.typography.titleMedium,
                     maxLines = 2,
+                    minLines = 2,
+                    fontSize = 14.sp
                 )
 
-                Text(
-                    text = product.brand.name,
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Light,
-                    maxLines = 2,
-                )
+                /*  Text(
+                      text = product.brand.name,
+                      style = MaterialTheme.typography.titleMedium,
+                      fontWeight = FontWeight.Light,
+                      maxLines = 2,
+                  )
 
-                VerticalSpace(space = SpaceBetweenViewsAndSubViews)
+                  VerticalSpace(space = SpaceBetweenViewsAndSubViews)
 
-                InfoWithIcon(
-                    icon = true,
-                    imageVector = Icons.Outlined.LocationOn,
-                    info = product.city.name
-                )
+                  InfoWithIcon(
+                      icon = true,
+                      imageVector = Icons.Outlined.LocationOn,
+                      info = product.city.name
+                  )*/
 
-                VerticalSpace(space = SpaceBetweenViewsAndSubViews)
+                VerticalSpace(space = VeryLowSpacing)
 
                 InfoWithIcon(
                     icon = false,
@@ -227,72 +235,108 @@ fun SingleMostOrderedItem(
                     info = "Estimate Delivery",
                     colorFilter = ColorFilter.tint(
                         color = MaterialTheme.colorScheme.onSurface
-                    )
+                    ),
+                    iconOrImageModifier = Modifier.size(20.dp)
                 )
 
-                VerticalSpace(space = SpaceBetweenViews)
+                VerticalSpace(space = VeryLowSpacing)
 
-                MostOrderedPriceCard(product.price) { addToCart() }
+
+                ProductPriceCard(price = product.price,
+                    productId = product.id,
+                    cartData = state.cartData,
+                    updateCart = {
+                        updateCart(it)
+                    })
             }
         }
     }
 }
 
+
 @Composable
-fun MostOrderedPriceCard(
+fun ProductPriceCard(
+    productId: String,
     price: String,
-    foodItemUpdateInfo: FoodItemUpdateInfo? = null,
-    addToCart: () -> Unit
+    cartData: CartModel? = null,
+    updateCart: (quantity: Int) -> Unit
 ) {
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.Center
-    ) {
-        Card(
-            border = BorderStroke(width = 1.dp, color = MaterialTheme.colorScheme.primary),
-            elevation = CardDefaults.cardElevation(defaultElevation = 5.dp)
-        ) {
-            val annotatedString = buildAnnotatedString {
-                withStyle(
-                    style = SpanStyle(
-                        color = MaterialTheme.colorScheme.primary,
-                        fontSize = 16.sp,
-                        fontWeight = FontWeight.Bold
-                    )
-                ) {
-                    append("$rupeeSign$price")
-                }
-                withStyle(
-                    style = SpanStyle()
-                ) {
-                    append(" Four Places")
-                }
 
-            }
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Text(
-                    text = annotatedString,
-                    modifier = Modifier.padding(horizontal = 20.dp)
-                )
+    val items = listOf<@Composable RowScope.() -> Unit> {
+        Text(
+            "$rupeeSign $price",
+            color = primaryColor.invoke(),
+            fontSize = 16.sp,
+            fontWeight = FontWeight.Bold
+        )
 
-                /*if (foodItemUpdateInfo != null && !foodItemUpdateInfo.wishlistItem && foodItemUpdateInfo.isLoading)
+        //get cart item length
+        var cartItemLength = 0
+        cartData?.result?.forEach {
+            if (it.product.id == productId)
+                cartItemLength = it.quantity
+        }
+
+        CartAddRemove(
+            textInCircleModifier = Modifier.padding(6.dp),
+            fontSize = 14.sp,
+            textInCircleFontSize = 14.sp,
+            cartItemLength = cartItemLength, onUpdateCart = {
+            updateCart(it)
+        })
+    }
+
+
+    SpaceBetweenRow(items = items)
+    /*  Row(
+          modifier = Modifier.fillMaxWidth(),
+          verticalAlignment = Alignment.CenterVertically,
+          horizontalArrangement = Arrangement.Center
+      ) {
+          Card(
+              border = BorderStroke(width = 1.dp, color = MaterialTheme.colorScheme.primary),
+              elevation = CardDefaults.cardElevation(defaultElevation = 5.dp)
+          ) {
+              val annotatedString = buildAnnotatedString {
+                  withStyle(
+                      style = SpanStyle(
+                          color = MaterialTheme.colorScheme.primary,
+                          fontSize = 16.sp,
+                          fontWeight = FontWeight.Bold
+                      )
+                  ) {
+                      append("$rupeeSign$price")
+                  }
+                  withStyle(
+                      style = SpanStyle()
+                  ) {
+                      append(" Four Places")
+                  }
+
+              }
+              Row(
+                  verticalAlignment = Alignment.CenterVertically,
+                  horizontalArrangement = Arrangement.SpaceBetween
+              ) {
+                  Text(
+                      text = annotatedString,
+                      modifier = Modifier.padding(horizontal = 20.dp)
+                  )
+
+                  *//*if (foodItemUpdateInfo != null && !foodItemUpdateInfo.wishlistItem && foodItemUpdateInfo.isLoading)
                     ShowLoading()
-                else*/
-                    RoundedCornerIconButton(
-                        isMaterialIcon = true,
-                        icon = Icons.Outlined.ShoppingCart,
-                        cornerRadius = LowRoundedCorners,
-                        cardColors = CardDefaults.cardColors(
-                            containerColor = MaterialTheme.colorScheme.primary
-                        )
-                    ) { addToCart() }
+                else*//*
+                RoundedCornerIconButton(
+                    isMaterialIcon = true,
+                    icon = Icons.Outlined.ShoppingCart,
+                    cornerRadius = LowRoundedCorners,
+                    cardColors = CardDefaults.cardColors(
+                        containerColor = MaterialTheme.colorScheme.primary
+                    )
+                ) { addToCart() }
             }
         }
-    }
+    }*/
 }
 
 @Preview

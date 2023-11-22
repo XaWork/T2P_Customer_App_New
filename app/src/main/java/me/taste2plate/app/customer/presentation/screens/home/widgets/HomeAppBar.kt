@@ -3,6 +3,7 @@ package me.taste2plate.app.customer.presentation.screens.home.widgets
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Menu
@@ -25,7 +26,9 @@ import me.taste2plate.app.customer.T2PApp
 import me.taste2plate.app.customer.presentation.theme.SpaceBetweenViewsAndSubViews
 import me.taste2plate.app.customer.presentation.theme.T2PCustomerAppTheme
 import me.taste2plate.app.customer.presentation.utils.appName
+import me.taste2plate.app.customer.presentation.utils.appNameWithFullForm
 import me.taste2plate.app.customer.presentation.utils.tagLine
+import me.taste2plate.app.customer.presentation.widgets.DrawableIconButton
 import me.taste2plate.app.customer.presentation.widgets.DrawableImage
 import me.taste2plate.app.customer.presentation.widgets.HorizontalSpace
 import me.taste2plate.app.customer.presentation.widgets.MaterialIconButton
@@ -37,10 +40,11 @@ import me.taste2plate.app.customer.presentation.widgets.WishlistIconWithCount
 fun HomeAppBar(
     onNavigationIconClick: () -> Unit,
     onNavigateToSearchScreen: () -> Unit,
+    onNavigateToWalletScreen: () -> Unit,
     onNavigateToCartScreen: () -> Unit,
     onNavigateToWishlistScreen: () -> Unit,
 ) {
-
+    val buttonSize = 17.dp
     TopAppBar(
         colors = TopAppBarDefaults.largeTopAppBarColors(
             containerColor = MaterialTheme.colorScheme.primary,
@@ -51,15 +55,16 @@ fun HomeAppBar(
         title = {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.Center
+                horizontalArrangement = Arrangement.Center,
+                modifier = Modifier.offset(x = ((-10).dp))
             ) {
                 DrawableImage(
                     id = R.drawable.logo_new,
-                    modifier = Modifier.size(40.dp)
+                    modifier = Modifier.size(30.dp)
                 )
                 HorizontalSpace(space = SpaceBetweenViewsAndSubViews)
                 Column {
-                    Text(appName, fontSize = 18.sp)
+                    Text(appNameWithFullForm, fontSize = 16.sp)
                     Text(tagLine, fontSize = 12.sp)
                 }
             }
@@ -72,14 +77,24 @@ fun HomeAppBar(
             }
         },
         actions = {
+            val modifier = Modifier.size(buttonSize)
 
             MaterialIconButton(
+                modifier = modifier,
                 imageVector = Icons.Outlined.Search,
             ) {
                 onNavigateToSearchScreen()
             }
+/*
+            DrawableIconButton(
+                modifier = modifier,
+                painterResource = R.drawable.wallet,
+            ) {
+                onNavigateToWalletScreen()
+            }*/
 
             MaterialIconButton(
+                modifier = modifier,
                 badge = true,
                 badgeText = T2PApp.wishlistCount,
                 imageVector = Icons.Outlined.FavoriteBorder
@@ -88,6 +103,7 @@ fun HomeAppBar(
             }
 
             MaterialIconButton(
+                modifier = modifier,
                 badge = true,
                 badgeText = T2PApp.cartCount,
                 imageVector = Icons.Outlined.ShoppingCart

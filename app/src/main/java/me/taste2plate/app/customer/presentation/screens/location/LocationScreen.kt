@@ -53,15 +53,14 @@ import com.google.maps.android.compose.MapProperties
 import com.google.maps.android.compose.MapUiSettings
 import com.google.maps.android.compose.rememberCameraPositionState
 import me.taste2plate.app.customer.presentation.screens.permissions.LocationPermissionScreen
+import me.taste2plate.app.customer.presentation.screens.permissions.RequestPermissions
 import me.taste2plate.app.customer.presentation.theme.ScreenPadding
 import me.taste2plate.app.customer.presentation.theme.T2PCustomerAppTheme
 import me.taste2plate.app.customer.presentation.theme.primaryColor
-import me.taste2plate.app.customer.presentation.screens.permissions.RequestPermissions
 import me.taste2plate.app.customer.presentation.widgets.AppButton
 import me.taste2plate.app.customer.presentation.widgets.AppScaffold
 import me.taste2plate.app.customer.presentation.widgets.RoundedCornerCard
 import me.taste2plate.app.customer.presentation.widgets.showToast
-import timber.log.Timber
 
 /**
 -> Check location permission

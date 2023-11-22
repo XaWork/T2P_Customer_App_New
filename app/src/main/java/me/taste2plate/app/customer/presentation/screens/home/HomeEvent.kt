@@ -1,6 +1,5 @@
 package me.taste2plate.app.customer.presentation.screens.home
 
-import android.content.Context
 import me.taste2plate.app.customer.domain.model.user.address.AddressListModel
 
 sealed class HomeEvent {
@@ -11,7 +10,8 @@ sealed class HomeEvent {
     data class AddToWishlist(
         val productId: String,
     ) : HomeEvent()
-    data class AddToCart(
+    data class UpdateCart(
+        val quantity: Int,
         val productId: String,
     ) : HomeEvent()
 

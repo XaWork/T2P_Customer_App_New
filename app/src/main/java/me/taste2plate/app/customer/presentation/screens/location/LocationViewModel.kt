@@ -28,7 +28,6 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import me.taste2plate.app.customer.data.UserPref
-import timber.log.Timber
 import javax.inject.Inject
 
 @HiltViewModel

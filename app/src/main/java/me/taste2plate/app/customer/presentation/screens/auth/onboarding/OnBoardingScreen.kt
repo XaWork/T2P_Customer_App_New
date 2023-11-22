@@ -54,9 +54,9 @@ fun OnBoardingScreen(
     val state = viewModel.state
     val scope = rememberCoroutineScope()
 
-    LaunchedEffect(key1 = state){
-        when{
-            state.loginModel != null  -> {
+    LaunchedEffect(key1 = state) {
+        when {
+            state.loginModel != null -> {
                 scope.launch {
                     onNavigateToOtpScreen()
                 }
@@ -72,23 +72,17 @@ fun OnBoardingScreen(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
 
-            Box {
-                DrawableImage(
-                    id = R.drawable.header_bg,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(300.dp),
-                    contentScale = ContentScale.Crop
-                )
-
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(300.dp),
+            ) {
 
                 DrawableImage(
                     id = R.drawable.logo_new,
                     modifier = Modifier
                         .align(Alignment.Center)
                 )
-
-
             }
 
             VerticalSpace(space = SpaceBetweenViews)
@@ -97,8 +91,7 @@ fun OnBoardingScreen(
                 modifier = Modifier.padding(ScreenPadding)
             ) {
                 Text(
-                    text = "India's One & Only InterCity Food Delivery App",
-                    style = MaterialTheme.typography.headlineSmall,
+                    text = "India’s Most Trusted Intercity Food Delivery Application",
                     textAlign = TextAlign.Center,
                     fontWeight = FontWeight.Bold
                 )

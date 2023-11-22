@@ -1,5 +1,6 @@
 package me.taste2plate.app.customer.presentation.screens.home
 
+import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -17,9 +18,10 @@ import me.taste2plate.app.customer.domain.use_case.HomeUseCase
 import me.taste2plate.app.customer.domain.use_case.user.address.AllAddressUseCase
 import me.taste2plate.app.customer.domain.use_case.user.cart.AddToCartUseCase
 import me.taste2plate.app.customer.domain.use_case.user.cart.CartUseCase
+import me.taste2plate.app.customer.domain.use_case.user.cart.DeleteCartUseCase
+import me.taste2plate.app.customer.domain.use_case.user.cart.UpdateCartUseCase
 import me.taste2plate.app.customer.domain.use_case.user.wishlist.AddToWishlistUseCase
 import me.taste2plate.app.customer.domain.use_case.user.wishlist.WishlistUseCase
-import me.taste2plate.app.customer.presentation.screens.product.list.ProductEvents
 import javax.inject.Inject
 
 @HiltViewModel
@@ -30,6 +32,8 @@ class HomeViewModel @Inject constructor(
     private val cartUseCase: CartUseCase,
     private val addToWishlistUseCase: AddToWishlistUseCase,
     private val allAddressUseCase: AllAddressUseCase,
+    private val updateCartUseCase: UpdateCartUseCase,
+    private val deleteCartUseCase: DeleteCartUseCase,
     private val addToCartUseCase: AddToCartUseCase
 ) : ViewModel() {
 
@@ -64,8 +68,31 @@ class HomeViewModel @Inject constructor(
                 addToWishlist(event.productId)
             }
 
-            is HomeEvent.AddToCart -> {
-                addToCart(event.productId)
+            is HomeEvent.UpdateCart -> {
+                Log.e("UpdateCart", "Product id ${event.productId} \n Quantity: ${event.quantity}")
+                when {
+                    event.quantity == 0 -> {
+                        deleteCart(event.productId)
+                    }
+
+                    state.cartData != null && state.cartData!!.result.isNotEmpty() -> {
+                        var itemInCart = false
+                        state.cartData!!.result.forEach {
+                            if (it.product.id == event.productId)
+                                itemInCart = true
+                        }
+
+                        if (itemInCart) {
+                            updateCart(productId = event.productId, quantity = event.quantity)
+                        } else {
+                            addToCart(event.productId)
+                        }
+                    }
+
+                    else -> {
+                        addToCart(event.productId)
+                    }
+                }
             }
 
             is HomeEvent.SetDefaultAddress -> {
@@ -207,6 +234,74 @@ class HomeViewModel @Inject constructor(
         }
     }
 
+
+    private fun updateCart(
+        productId: String,
+        quantity: Int
+    ) {
+        viewModelScope.launch {
+            updateCartUseCase.execute(
+                productId, quantity
+            ).collect { result ->
+                state = when (result) {
+                    is Resource.Loading -> state.copy(isLoading = false)
+                    is Resource.Success -> {
+                        val data = result.data
+                        val isError = data?.status == Status.error.name
+                        getCart()
+
+                        state.copy(
+                            isLoading = false,
+                            isError = isError,
+                            //errorMessage = "Something went Wrong",
+                        )
+
+                    }
+
+                    is Resource.Error ->
+                        state.copy(
+                            isLoading = false,
+                            isError = true,
+                            errorMessage = result.message
+                        )
+                }
+
+            }
+        }
+    }
+
+    private fun deleteCart(
+        productId: String,
+    ) {
+        viewModelScope.launch {
+            deleteCartUseCase.execute(
+                productId
+            ).collect { result ->
+                state = when (result) {
+                    is Resource.Loading -> state.copy(isLoading = false)
+                    is Resource.Success -> {
+                        val data = result.data
+                        val isError = data?.status == Status.error.name
+                            getCart()
+
+                        state.copy(
+                            isLoading = false,
+                            isError = isError,
+                        )
+                    }
+
+                    is Resource.Error ->
+                        state.copy(
+                            isLoading = false,
+                            isError = true,
+                            errorMessage = result.message
+                        )
+                }
+
+            }
+        }
+    }
+
     private fun getCart() {
         viewModelScope.launch {
             cartUseCase.execute().collect { result ->
@@ -340,13 +435,6 @@ class HomeViewModel @Inject constructor(
             ).collect { result ->
                 when (result) {
                     is Resource.Loading -> {
-                        state = state.copy(
-                            foodItemUpdateInfo = FoodItemUpdateInfo(
-                                id = productId,
-                                isLoading = true,
-                                wishlistItem = false
-                            )
-                        )
                     }
 
                     is Resource.Success -> {
@@ -358,10 +446,6 @@ class HomeViewModel @Inject constructor(
                                 message = result.data?.message,
                                 isError = result.data?.status == Status.error.name,
                                 errorMessage = result.data?.message,
-                                foodItemUpdateInfo = state.foodItemUpdateInfo?.copy(
-                                    isLoading = false,
-                                    added = result.data?.status == Status.success.name
-                                )
                             )
                     }
 
@@ -370,10 +454,6 @@ class HomeViewModel @Inject constructor(
                             isLoading = false,
                             isError = true,
                             errorMessage = result.message,
-                            foodItemUpdateInfo = state.foodItemUpdateInfo?.copy(
-                                isLoading = false,
-                                added = false
-                            )
                         )
                     }
                 }

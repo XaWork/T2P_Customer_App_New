@@ -75,11 +75,12 @@ fun TextInCircle(
 
 @Composable
 fun HeadingText(
-    text: String = ""
+    text: String = "",
+    fontSize: TextUnit = 16.sp
 ) {
     Text(
         text = text,
-        fontSize = 20.sp,
+        fontSize = fontSize,
         fontWeight = FontWeight.W400
     )
 }
