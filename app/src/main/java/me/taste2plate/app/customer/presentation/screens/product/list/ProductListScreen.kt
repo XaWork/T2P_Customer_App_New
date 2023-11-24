@@ -1,6 +1,8 @@
 package me.taste2plate.app.customer.presentation.screens.product.list
 
 import android.content.res.Configuration
+import android.util.Log
+import android.widget.RatingBar
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -28,6 +30,7 @@ import androidx.compose.ui.unit.sp
 import me.taste2plate.app.customer.R
 import me.taste2plate.app.customer.domain.mapper.CommonForItem
 import me.taste2plate.app.customer.domain.model.product.ProductListModel
+import me.taste2plate.app.customer.presentation.screens.home.widgets.AppSearchBar
 import me.taste2plate.app.customer.presentation.screens.home.widgets.ProductPriceCard
 import me.taste2plate.app.customer.presentation.screens.product.ProductViewModel
 import me.taste2plate.app.customer.presentation.theme.MediumElevation
@@ -42,9 +45,11 @@ import me.taste2plate.app.customer.presentation.widgets.AppScaffold
 import me.taste2plate.app.customer.presentation.widgets.AppTopBar
 import me.taste2plate.app.customer.presentation.widgets.InfoWithIcon
 import me.taste2plate.app.customer.presentation.widgets.NetworkImage
+import me.taste2plate.app.customer.presentation.widgets.RatingInfoRow
 import me.taste2plate.app.customer.presentation.widgets.RoundedCornerCard
 import me.taste2plate.app.customer.presentation.widgets.ShowLoading
 import me.taste2plate.app.customer.presentation.widgets.VerticalSpace
+import me.taste2plate.app.customer.presentation.widgets.showToast
 
 @Composable
 fun ProductListScreen(
@@ -54,15 +59,23 @@ fun ProductListScreen(
 ) {
     val state = viewModel.state
 
-    LaunchedEffect(state.productList.isEmpty()) {
-        viewModel.onEvent(ProductEvents.GetProducts(itemInfo))
+    LaunchedEffect(Unit) {
+        if (itemInfo.name != "Search")
+            viewModel.onEvent(ProductEvents.GetProducts(itemInfo))
+    }
+
+    LaunchedEffect(key1 = state) {
+        if (state.message != null) {
+            showToast(state.message)
+            viewModel.onEvent(ProductEvents.UpdateState)
+        }
     }
 
     AppScaffold(
         topBar = {
             AppTopBar(
                 title = itemInfo.name,
-                tasteVisible = true,
+                tasteVisible = itemInfo.name != "Search",
                 checked = state.checked,
                 onCheckChange = {
                     viewModel.onEvent(ProductEvents.ChangeTaste)
@@ -72,25 +85,44 @@ fun ProductListScreen(
     ) {
         if (state.isLoading)
             ShowLoading(isButton = false)
-        else if (state.productList.isEmpty())
-            AppEmptyView()
-        else
-            ContentProductListScreen(
-                state,
-                onNavigateToProductDetailsScreen = {
-                    viewModel.selectedProductId = it
-                    onNavigateToProductDetailsScreen()
-                }
-            )
+        else {
+            Column {
+                if (itemInfo.name == "Search")
+                    AppSearchBar(
+                        value = viewModel.searchValue,
+                        onValueChange = { viewModel.searchValue = it }
+                    ) {
+                        Log.e("Searc", "onSearch")
+                        if (viewModel.searchValue.length >= 3)
+                            viewModel.onEvent(ProductEvents.GetProducts(itemInfo))
+                    }
+
+                if (state.productList.isEmpty())
+                    AppEmptyView()
+                else
+                    ContentProductListScreen(
+                        viewModel = viewModel,
+                        onNavigateToProductDetailsScreen = {
+                            viewModel.selectedProductId = it
+                            onNavigateToProductDetailsScreen()
+                        },
+                        updateCart = { quantity, productId ->
+                            viewModel.onEvent(ProductEvents.UpdateCart(quantity, productId))
+                        }
+                    )
+            }
+        }
     }
 }
 
 @Composable
 fun ContentProductListScreen(
-    state: ProductListState,
+    viewModel: ProductViewModel,
+    updateCart: (quantity: Int, productId: String) -> Unit,
     onNavigateToProductDetailsScreen: (productId: String) -> Unit
 ) {
 
+    val state = viewModel.state
     val items: List<ProductListModel.Result> = state.productList
 
     LazyColumn(
@@ -101,9 +133,12 @@ fun ContentProductListScreen(
         items(items) { item ->
             SingleProductItem(
                 item,
-                state =state,
+                state = state,
                 onNavigateToProductDetailsScreen = {
                     onNavigateToProductDetailsScreen(item.id)
+                },
+                updateCart = {
+                    updateCart(it, item.id)
                 }
             )
         }
@@ -114,6 +149,7 @@ fun ContentProductListScreen(
 fun SingleProductItem(
     product: ProductListModel.Result,
     state: ProductListState,
+    updateCart: (quantity: Int) -> Unit,
     onNavigateToProductDetailsScreen: () -> Unit
 ) {
     RoundedCornerCard(
@@ -136,6 +172,11 @@ fun SingleProductItem(
             )
 
             VerticalSpace(space = SpaceBetweenViewsAndSubViews)
+
+            RatingInfoRow(flatOff = "", rating = "", weight = product.weight)
+
+
+            VerticalSpace(space = VeryLowSpacing)
 
             Text(
                 text = product.name,
@@ -163,7 +204,7 @@ fun SingleProductItem(
                 productId = product.id,
                 cartData = state.cartData,
                 updateCart = {
-                    //updateCart(it)
+                    updateCart(it)
                 })
 
         }

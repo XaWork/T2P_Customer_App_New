@@ -190,4 +190,19 @@ interface UserApi {
         @Field("customer_city") cityId: String,
         @Field("1") zipCode: String,
     ): ApplyCouponModel
+
+
+    //----------------- Product -----------
+
+    @FormUrlEncoded
+    @POST("add-review")
+    suspend fun postReview(
+        @Field("user") userId: String,
+        @Field("product") productId: String,
+        @Field("name") name: String,
+        @Field("email") email: String,
+        @Field("mobile") mobile: String,
+        @Field("rating") rating: Float,
+        @Field("review") reviewText: String,
+    ): CommonResponse
 }

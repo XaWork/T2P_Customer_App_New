@@ -38,6 +38,7 @@ import me.taste2plate.app.customer.T2PApp
 import me.taste2plate.app.customer.domain.mapper.CommonForItem
 import me.taste2plate.app.customer.domain.model.SettingsModel
 import me.taste2plate.app.customer.domain.model.auth.User
+import me.taste2plate.app.customer.domain.use_case.product.ProductBy
 import me.taste2plate.app.customer.presentation.screens.address.AddressBottomSheet
 import me.taste2plate.app.customer.presentation.screens.home.navigation.DrawerAppScreen
 import me.taste2plate.app.customer.presentation.screens.home.navigation.NavigationDrawer
@@ -98,6 +99,11 @@ fun HomeScreen(
             }
         }
     }
+
+    LaunchedEffect(Unit) {
+        viewModel.onEvent(HomeEvent.GetWishlist)
+    }
+
     val context = LocalContext.current
     val scrollState = rememberLazyListState()
 
@@ -190,7 +196,15 @@ fun HomeScreen(
                 HomeAppBar(
                     onNavigateToWishlistScreen = onNavigateToWishlistScreen,
                     onNavigateToCartScreen = onNavigateToCartScreen,
-                    onNavigateToSearchScreen = { },
+                    onNavigateToSearchScreen = {
+                        val item = CommonForItem(
+                            id = "",
+                            image = "",
+                            name = "Search",
+                            type = ProductBy.Search.name
+                        )
+                        onNavigateToProductListScreen(item)
+                    },
                     onNavigationIconClick = {
                         scope.launch {
                             drawerState.open()
@@ -279,7 +293,9 @@ fun HomeScreen(
                                     HeadingChip("Top Brands")
                                     VerticalSpace(space = VeryLowSpacing)
                                     TopBrands(
-                                        onNavigateToProductListScreen = { },
+                                        onNavigateToProductListScreen = {
+                                            onNavigateToProductListScreen(it)
+                                        },
                                         topBrands = home.topBrands
                                     )
                                 }

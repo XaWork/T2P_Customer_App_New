@@ -69,7 +69,7 @@ fun AddressBar(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .height(25.dp)
+            .height(30.dp)
             .background(color = if (isSystemInDarkTheme()) YellowBannerDark else YellowBanner)
             .padding(
                 horizontal = ScreenPadding,
@@ -100,11 +100,7 @@ fun AddressBar(
             modifier = Modifier
                 .fillMaxWidth(1f)
                 .weight(1f),
-            switchModifier = Modifier
-                .scale(0.5f)
-                .padding(LowPadding),
             checked = checked,
-            fontSize = 12.sp,
             onCheckChange = onCheckChange
         )
     }

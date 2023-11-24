@@ -44,6 +44,10 @@ class ProductListUseCase @Inject constructor(
                     ProductBy.Slider -> {
                         //response = repo.productsBySlider(id, taste)
                     }
+
+                    ProductBy.Search -> {
+                        response = repo.productByQuery(id)
+                    }
                 }
                 emit(Resource.Success(response))
             } catch (io: IOException) {
@@ -65,5 +69,6 @@ enum class ProductBy {
     Brand,
     Cuisine,
     Slider,
+    Search,
     Category
 }

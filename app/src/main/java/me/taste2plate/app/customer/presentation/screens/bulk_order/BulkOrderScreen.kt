@@ -173,6 +173,7 @@ fun ContentBulkOrderScreen(
     }
 }
 
+/*
 
 @Preview
 @Preview(name = "Dark Preview", uiMode = Configuration.UI_MODE_NIGHT_YES)
@@ -181,4 +182,4 @@ fun BulkOrderScreenPreview() {
     T2PCustomerAppTheme {
         // BulkOrderScreen()
     }
-}
+}*/

@@ -79,8 +79,6 @@ fun SignUpScreen(
                 }
             )
 
-            VerticalSpace(space = SpaceBetweenViews)
-
             AppTextField(
                 value = viewModel.email,
                 onValueChanged = { viewModel.email = it },

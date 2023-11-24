@@ -50,7 +50,8 @@ fun WishlistScreen(
                 items = items,
                 removeFromWishlist = {
                     viewModel.onEvent(WishlistEvents.RemoveFromWishlist(it))
-                }
+                },
+                onBackPress = {}
             )
         } else AppEmptyView()
     }

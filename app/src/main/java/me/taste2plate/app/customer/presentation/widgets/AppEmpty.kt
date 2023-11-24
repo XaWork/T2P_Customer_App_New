@@ -23,7 +23,7 @@ fun AppEmptyView() {
     AppScaffold {
         Column(
             modifier = Modifier
-                .fillMaxSize()
+                .fillMaxSize(1f)
                 .padding(ScreenPadding),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center

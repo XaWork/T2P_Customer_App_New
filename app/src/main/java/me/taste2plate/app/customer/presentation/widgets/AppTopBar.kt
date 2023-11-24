@@ -15,13 +15,15 @@ import me.taste2plate.app.customer.R
 import me.taste2plate.app.customer.presentation.theme.MediumIcon
 import me.taste2plate.app.customer.presentation.theme.SpaceBetweenViewsAndSubViews
 import me.taste2plate.app.customer.presentation.theme.T2PCustomerAppTheme
+import me.taste2plate.app.customer.presentation.utils.appNameWithFullForm
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AppTopBar(
-    title: String = "Taste2Plate",
+    title: String = appNameWithFullForm,
     tasteVisible: Boolean = false,
     checked: Boolean = false,
+    title1: @Composable () -> Unit = {},
     onCheckChange: () -> Unit = {},
     onBackClick: () -> Unit
 ) {
@@ -38,11 +40,14 @@ fun AppTopBar(
             }
         },
         title = {
-            InfoWithIcon(
-                info = title, id = R.drawable.logo_new,
-                iconOrImageModifier = Modifier.size(MediumIcon),
-                fontSize = 16.sp
-            )
+            if (title.isEmpty())
+                title1()
+            else
+                InfoWithIcon(
+                    info = title, id = R.drawable.logo_new,
+                    iconOrImageModifier = Modifier.size(MediumIcon),
+                    fontSize = 16.sp
+                )
         }, actions = {
             if (tasteVisible)
                 VegNonVegFilter(

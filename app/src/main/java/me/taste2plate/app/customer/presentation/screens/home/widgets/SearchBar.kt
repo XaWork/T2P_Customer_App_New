@@ -4,39 +4,51 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import me.taste2plate.app.customer.presentation.theme.ScreenPadding
 import me.taste2plate.app.customer.presentation.theme.T2PCustomerAppTheme
+import me.taste2plate.app.customer.presentation.theme.primaryColor
+import me.taste2plate.app.customer.presentation.theme.screenBackgroundColor
 import me.taste2plate.app.customer.presentation.widgets.MaterialIcon
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SearchBar(
+fun AppSearchBar(
+    modifier: Modifier = Modifier,
     value: String,
     onValueChange: (String) -> Unit,
     onSearch: () -> Unit
 ) {
-    TextField(
-        modifier = Modifier
-            .fillMaxWidth()
-            .background(color = MaterialTheme.colorScheme.primary)
-            .padding(start = ScreenPadding, end = ScreenPadding, bottom  = ScreenPadding),
+    OutlinedTextField(
+        modifier = modifier
+            .padding(ScreenPadding)
+            .background(screenBackgroundColor.invoke())
+            .fillMaxWidth(),
+        colors = TextFieldDefaults.colors(
+            focusedContainerColor = screenBackgroundColor.invoke(),
+            unfocusedContainerColor = screenBackgroundColor.invoke(),
+            disabledContainerColor = screenBackgroundColor.invoke(),
+        ),
         value = value,
         onValueChange = onValueChange,
-        label = {
+        shape = CircleShape,
+        /*label = {
             Text("Search")
-        },
+        },*/
         leadingIcon = {
             MaterialIcon(imageVector = Icons.Outlined.Search)
         },
@@ -55,6 +67,6 @@ fun SearchBar(
 @Composable
 fun SearchBarPreview() {
     T2PCustomerAppTheme {
-        SearchBar("", {}, {})
+       // AppSearchBar("", {}, {})
     }
 }

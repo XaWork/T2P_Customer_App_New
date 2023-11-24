@@ -44,7 +44,7 @@ fun HomeAppBar(
     onNavigateToCartScreen: () -> Unit,
     onNavigateToWishlistScreen: () -> Unit,
 ) {
-    val buttonSize = 17.dp
+    val buttonSize = 20.dp
     TopAppBar(
         colors = TopAppBarDefaults.largeTopAppBarColors(
             containerColor = MaterialTheme.colorScheme.primary,

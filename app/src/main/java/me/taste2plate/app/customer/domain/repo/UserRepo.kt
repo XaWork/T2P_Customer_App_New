@@ -125,12 +125,22 @@ interface UserRepo {
     suspend fun getOrders(userId: String): OrderListModel
     suspend fun getOrderUpdates(orderId: String): OrderUpdateModel
     suspend fun createBulkOrder(
-        name:String,
-        email:String,
-        mobile:String,
-        city:String,
-        address:String,
-        msg:String,
+        name: String,
+        email: String,
+        mobile: String,
+        city: String,
+        address: String,
+        msg: String,
+    ): CommonResponse
+
+    suspend fun postReview(
+        userId: String,
+        productId: String,
+        name: String,
+        email: String,
+        mobile: String,
+        rating: Float,
+        reviewText: String,
     ): CommonResponse
 
     suspend fun applyCoupon(

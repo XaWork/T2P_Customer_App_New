@@ -96,7 +96,9 @@ fun Navigation() {
                 OnBoardingScreen(
                     viewModel = viewModel
                 ) {
-                    navController.navigate(Screens.OTPScreen.route)
+                    navController.navigate(Screens.OTPScreen.route){
+                        //popUpTo(0)
+                    }
                 }
             }
 
@@ -121,7 +123,7 @@ fun Navigation() {
 
 
         // ----------------------------> Sign Up <--------------------------------------
-        composable(route = Screens.SignUpScreen.route) { entry ->
+        composable(route = Screens.SignUpScreen.route) {
             SignUpScreen {
                 navController.navigate(Screens.AddEditAddressScreen.route) {
                     popUpTo(0)
@@ -189,7 +191,8 @@ fun Navigation() {
                     navController.navigate(Screens.CartScreen.route)
                 },
                 onNavigateToProductListScreen = {
-                    navController.navigate(Screens.ProductListScreen.route + "?categoryInfo=$it")
+                    val jsonString = Gson().toJson(it, CommonForItem::class.java)
+                    navController.navigate(Screens.ProductListScreen.route + "?categoryInfo=$jsonString")
                 },
                 onNavigateContactUsScreen = {
                     navController.navigate(Screens.ContactUsScreen.route)

@@ -200,7 +200,7 @@ fun VegNonVegFilter(
     modifier: Modifier = Modifier,
     switchModifier: Modifier = Modifier,
     checked: Boolean = false,
-    fontSize: TextUnit = 14.sp,
+    fontSize: TextUnit = 12.sp,
     onCheckChange: () -> Unit = {}
 ) {
     Row(
@@ -212,7 +212,8 @@ fun VegNonVegFilter(
 
         Switch(
             checked = checked, onCheckedChange = { onCheckChange() },
-            modifier = switchModifier,
+            modifier = switchModifier
+                .scale(0.6f),
             colors = SwitchDefaults.colors(
                 checkedBorderColor = backgroundColor.invoke(),
                 checkedTrackColor = backgroundColor.invoke(),

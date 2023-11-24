@@ -53,7 +53,12 @@ class UserRepoImpl @Inject constructor(
         return api.getWalletTransactions(id)
     }
 
-    override suspend fun editProfile(id: String, fullName: String, mobile: String, email: String): CommonResponse {
+    override suspend fun editProfile(
+        id: String,
+        fullName: String,
+        mobile: String,
+        email: String
+    ): CommonResponse {
         return api.editProfile(id, fullName, mobile, email)
     }
 
@@ -177,5 +182,17 @@ class UserRepoImpl @Inject constructor(
         zipCode: String
     ): ApplyCouponModel {
         return api.applyCoupon(coupon, userid, cityId, zipCode)
+    }
+
+    override suspend fun postReview(
+        userId: String,
+        productId: String,
+        name: String,
+        email: String,
+        mobile: String,
+        rating: Float,
+        reviewText: String
+    ): CommonResponse {
+        return api.postReview(userId, productId, name, email, mobile, rating, reviewText)
     }
 }

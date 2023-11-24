@@ -210,7 +210,7 @@ class CityBrandViewModel @Inject constructor(
 
     private fun getAllSubCategories() {
         viewModelScope.launch {
-            subCategoryUseCase.execute(selectedItem.id).collect { result ->
+            subCategoryUseCase.execute(selectedItem.id!!).collect { result ->
                 when (result) {
                     is Resource.Loading -> {
                         state = state.copy(isLoading = true)

@@ -4,6 +4,7 @@ import me.taste2plate.app.customer.domain.model.user.address.AddressListModel
 
 sealed class HomeEvent {
     object GetHome : HomeEvent()
+    object GetWishlist : HomeEvent()
     object LogOut : HomeEvent()
     object GetAddress : HomeEvent()
     object ChangeTaste : HomeEvent()

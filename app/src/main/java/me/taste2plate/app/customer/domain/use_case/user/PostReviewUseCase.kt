@@ -1,27 +1,41 @@
-package me.taste2plate.app.customer.domain.use_case.user.wishlist
+package me.taste2plate.app.customer.domain.use_case.user
 
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import me.taste2plate.app.customer.data.ApiErrorMessages
 import me.taste2plate.app.customer.data.Resource
 import me.taste2plate.app.customer.data.UserPref
-import me.taste2plate.app.customer.domain.model.user.WishListModel
+import me.taste2plate.app.customer.domain.model.auth.VerifyOTPModel
+import me.taste2plate.app.customer.domain.model.user.CommonResponse
+import me.taste2plate.app.customer.domain.model.user.GetProfileModel
+import me.taste2plate.app.customer.domain.model.user.MyPlanModel
 import me.taste2plate.app.customer.domain.repo.UserRepo
 import retrofit2.HttpException
 import java.io.IOException
 import javax.inject.Inject
 
-class WishlistUseCase @Inject constructor(
+class PostReviewUseCase @Inject constructor(
     private val repo: UserRepo,
-    private val userPref: UserPref
+    private val userPref: UserPref,
 ) {
     suspend fun execute(
-    ): Flow<Resource<WishListModel>> {
+        productId: String,
+        rating: Float,
+        review: String
+    ): Flow<Resource<CommonResponse>> {
         return flow {
             emit(Resource.Loading(true))
             try {
-                val userId = userPref.getUser().id
-                val response = repo.getWishlist(userId)
+                val user = userPref.getUser()
+                val response = repo.postReview(
+                    userId = user.id,
+                    productId = productId,
+                    name = user.fullName,
+                    email = user.email!!,
+                    mobile = user.mobile,
+                    rating = rating,
+                    reviewText = review
+                )
                 emit(Resource.Success(response))
             } catch (io: IOException) {
                 io.printStackTrace()

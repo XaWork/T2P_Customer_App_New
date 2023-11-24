@@ -40,7 +40,6 @@ class WishlistViewModel @Inject constructor(
     private fun getWishlist(isLoading: Boolean = true) {
         viewModelScope.launch {
             wishlistUseCase.execute(
-                userId = userPref.getUser().id
             ).collect { result ->
                 when (result) {
                     is Resource.Loading -> {

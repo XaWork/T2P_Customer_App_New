@@ -1,6 +1,7 @@
 package me.taste2plate.app.customer.data.api
 
 import me.taste2plate.app.customer.domain.model.CouponModel
+import me.taste2plate.app.customer.domain.model.custom.CheckAvailabilityModel
 import me.taste2plate.app.customer.domain.model.product.ProductBySliderModel
 import me.taste2plate.app.customer.domain.model.product.ProductDetailsModel
 import me.taste2plate.app.customer.domain.model.product.ProductListModel
@@ -38,6 +39,9 @@ interface ProductApi {
         @Query("taste") taste: String
     ): ProductListModel
 
+    @GET("all-products")
+    suspend fun productByQuery(@Query("search") searchQuery: String):ProductListModel
+
     @POST("fetch-shop-by-slider")
     suspend fun productsBySlider(
         @Query("slider_name") name: String,
@@ -50,4 +54,7 @@ interface ProductApi {
 
     @GET("offer-deal")
     suspend fun getOfferByCity(@Query("city") cityId: String): CouponModel
+
+    @GET("check-zipcode")
+    suspend fun checkAvailability(@Query("zipcode") zipcode: String, @Query("vendor") id: String): CheckAvailabilityModel
 }

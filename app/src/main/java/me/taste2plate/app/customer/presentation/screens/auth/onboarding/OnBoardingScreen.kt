@@ -52,14 +52,11 @@ fun OnBoardingScreen(
 ) {
 
     val state = viewModel.state
-    val scope = rememberCoroutineScope()
 
     LaunchedEffect(key1 = state) {
         when {
-            state.loginModel != null -> {
-                scope.launch {
-                    onNavigateToOtpScreen()
-                }
+            state.loginModel != null && !state.isError -> {
+                onNavigateToOtpScreen()
             }
         }
     }

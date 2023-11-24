@@ -15,6 +15,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.TextUnit
@@ -52,9 +53,13 @@ fun AppButton(
 fun AppOutlineButton(
     modifier: Modifier = Modifier,
     text: String = "",
+    colors: ButtonColors = ButtonDefaults.buttonColors(
+        containerColor = primaryColor.invoke().copy(alpha = 0.1f)
+    ),
     shape: Shape = RoundedCornerShape(buttonRoundedShapeCornerRadius),
     paddingValues: PaddingValues = PaddingValues(horizontal = 10.dp),
     fontSize: TextUnit = TextUnit.Unspecified,
+    textColor: Color = primaryColor.invoke(),
     onClick: () -> Unit,
 ) {
     OutlinedButton(
@@ -62,16 +67,14 @@ fun AppOutlineButton(
             .fillMaxWidth(),
         shape = shape,
         onClick = { onClick() },
-        colors = ButtonDefaults.buttonColors(
-            containerColor = primaryColor.invoke().copy(alpha = 0.1f)
-        ),
+        colors = colors,
         border = BorderStroke(
             width = 0.5.dp,
             color = primaryColor.invoke()
         ),
         elevation = ButtonDefaults.elevatedButtonElevation(0.dp)
     ) {
-        Text(text = text.uppercase(), color = primaryColor.invoke(), fontSize = fontSize)
+        Text(text = text.uppercase(), color = textColor, fontSize = fontSize)
     }
 }
 

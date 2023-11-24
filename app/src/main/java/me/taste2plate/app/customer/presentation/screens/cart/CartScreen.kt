@@ -89,6 +89,7 @@ fun CartScreen(
                     viewModel.onEvent(CheckoutEvents.UpdateCart(productId, quantity))
                 },
                 onNavigateToCheckoutScreen = onNavigateToCheckoutScreen,
+                onBackPress = onBackPress
             )
         }
     }
@@ -100,6 +101,7 @@ fun ContentCartAndWishlist(
     items: List<CommonForItem>,
     removeFromWishlist: (productId: String) -> Unit = {},
     updateCart: (productId: String, quantity: Int) -> Unit = { _, _ -> },
+    onBackPress: () -> Unit,
     onNavigateToCheckoutScreen: () -> Unit = {},
 ) {
     Box(
@@ -123,15 +125,28 @@ fun ContentCartAndWishlist(
             }
         }
 
-        if (!isWishList)
-            AppButton(
+        if (!isWishList) {
+            Column(
                 modifier = Modifier
                     .align(Alignment.BottomCenter)
-                    .padding(ScreenPadding),
-                text = "Confirm Order"
             ) {
-                onNavigateToCheckoutScreen()
+                AppButton(
+                    modifier = Modifier
+                        .padding(horizontal = ScreenPadding),
+                    text = "Shop More"
+                ) {
+                    onBackPress()
+                }
+
+                AppButton(
+                    modifier = Modifier
+                        .padding(ScreenPadding),
+                    text = "Confirm Order"
+                ) {
+                    onNavigateToCheckoutScreen()
+                }
             }
+        }
     }
 }
 
@@ -163,7 +178,7 @@ fun SingleCartAndWishlistItem(
             Text(
                 text = item.name,
                 overflow = TextOverflow.Ellipsis,
-                fontSize =  fontSize
+                fontSize = fontSize
             )
 
             VerticalSpace(space = SpaceBetweenViewsAndSubViews)
@@ -175,7 +190,7 @@ fun SingleCartAndWishlistItem(
                         updateCart(quantity)
                     }
 
-                Text(text = "${rupeeSign}${item.price}", fontSize =  fontSize)
+                Text(text = "${rupeeSign}${item.price}", fontSize = fontSize)
             }
             SpaceBetweenRow(items = innerItems)
         }

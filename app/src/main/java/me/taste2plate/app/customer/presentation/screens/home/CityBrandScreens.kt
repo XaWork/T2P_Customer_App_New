@@ -4,5 +4,7 @@ enum class CityBrandScreens {
     City,
     Brand,
     Category,
-    Cuisine
+    Cuisine,
+    Search,
+    Slider
 }

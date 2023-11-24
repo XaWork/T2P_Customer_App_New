@@ -2,6 +2,7 @@ package me.taste2plate.app.customer.data.repo
 
 import me.taste2plate.app.customer.data.api.ProductApi
 import me.taste2plate.app.customer.domain.model.CouponModel
+import me.taste2plate.app.customer.domain.model.custom.CheckAvailabilityModel
 import me.taste2plate.app.customer.domain.model.product.ProductBySliderModel
 import me.taste2plate.app.customer.domain.model.product.ProductDetailsModel
 import me.taste2plate.app.customer.domain.model.product.ProductListModel
@@ -27,6 +28,10 @@ class ProductRepoImpl @Inject constructor(
         return api.productBySubcategory(id, taste)
     }
 
+    override suspend fun productByQuery(query: String): ProductListModel {
+        return api.productByQuery(query)
+    }
+
     override suspend fun productsBySlider(name: String, taste: String): ProductBySliderModel {
         return api.productsBySlider(name, taste)
     }
@@ -37,5 +42,9 @@ class ProductRepoImpl @Inject constructor(
 
     override suspend fun getOfferByCity(id: String): CouponModel {
         return api.getOfferByCity(id)
+    }
+
+    override suspend fun checkAvailability(zipCode: String, vendorId: String): CheckAvailabilityModel {
+        return api.checkAvailability(zipCode, vendorId)
     }
 }

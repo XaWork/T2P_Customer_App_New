@@ -20,15 +20,20 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.filled.ShoppingCart
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.LocalContentColor
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -51,25 +56,30 @@ import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import me.taste2plate.app.customer.R
+import me.taste2plate.app.customer.data.Status
 import me.taste2plate.app.customer.domain.model.product.ProductDetailsModel
 import me.taste2plate.app.customer.presentation.screens.home.widgets.DotsIndicator
 import me.taste2plate.app.customer.presentation.screens.product.list.ProductEvents
+import me.taste2plate.app.customer.presentation.screens.product.list.ProductListState
 import me.taste2plate.app.customer.presentation.theme.ExtraLowElevation
 import me.taste2plate.app.customer.presentation.theme.LowPadding
 import me.taste2plate.app.customer.presentation.theme.MediumPadding
-import me.taste2plate.app.customer.presentation.theme.MediumRoundedCorners
 import me.taste2plate.app.customer.presentation.theme.ScreenPadding
 import me.taste2plate.app.customer.presentation.theme.SpaceBetweenViews
 import me.taste2plate.app.customer.presentation.theme.SpaceBetweenViewsAndSubViews
 import me.taste2plate.app.customer.presentation.theme.T2PCustomerAppTheme
+import me.taste2plate.app.customer.presentation.theme.VeryLowSpacing
 import me.taste2plate.app.customer.presentation.theme.backgroundColor
 import me.taste2plate.app.customer.presentation.theme.cardContainerOnSecondaryColor
+import me.taste2plate.app.customer.presentation.theme.forestGreen
 import me.taste2plate.app.customer.presentation.theme.onSecondaryColor
 import me.taste2plate.app.customer.presentation.theme.primaryColor
+import me.taste2plate.app.customer.presentation.theme.screenBackgroundColor
 import me.taste2plate.app.customer.presentation.theme.secondaryColor
+import me.taste2plate.app.customer.presentation.utils.noRippleClickable
 import me.taste2plate.app.customer.presentation.utils.rupeeSign
+import me.taste2plate.app.customer.presentation.widgets.AppButton
 import me.taste2plate.app.customer.presentation.widgets.AppEmptyView
-import me.taste2plate.app.customer.presentation.widgets.AppOutlineButton
 import me.taste2plate.app.customer.presentation.widgets.AppScaffold
 import me.taste2plate.app.customer.presentation.widgets.AppTopBar
 import me.taste2plate.app.customer.presentation.widgets.CircleIconButton
@@ -80,9 +90,11 @@ import me.taste2plate.app.customer.presentation.widgets.ShowLoading
 import me.taste2plate.app.customer.presentation.widgets.SpaceBetweenRow
 import me.taste2plate.app.customer.presentation.widgets.TextInCircle
 import me.taste2plate.app.customer.presentation.widgets.VerticalSpace
+import me.taste2plate.app.customer.presentation.widgets.showToast
 import me.taste2plate.app.customer.utils.fromHtml
 import me.taste2plate.app.customer.utils.toDate
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProductDetailsScreen(
     viewModel: ProductViewModel,
@@ -97,6 +109,31 @@ fun ProductDetailsScreen(
             viewModel.selectedProductId = productId
 
         viewModel.onEvent(ProductEvents.GetProductDetails)
+    }
+
+    LaunchedEffect(key1 = state) {
+        if (state.message != null) {
+            showToast(state.message)
+            viewModel.onEvent(ProductEvents.UpdateState)
+        }
+    }
+
+    var shoReviewBottomSheet by remember {
+        mutableStateOf(false)
+    }
+    if (shoReviewBottomSheet) {
+        ModalBottomSheet(
+            containerColor = screenBackgroundColor.invoke(),
+            onDismissRequest = {
+                shoReviewBottomSheet = false
+            },
+            sheetState = rememberModalBottomSheetState()
+        ) {
+            AddReviewBottomSheet { rating, review ->
+                shoReviewBottomSheet = false
+                viewModel.onEvent(ProductEvents.PostReview(rating, review))
+            }
+        }
     }
 
     AppScaffold(
@@ -115,20 +152,33 @@ fun ProductDetailsScreen(
         else if (state.isError)
             AppEmptyView()
         else {
-            val details = state.productDetails.result[0]
             LazyColumn(
                 modifier = Modifier
                     .fillMaxSize(),
             ) {
                 item {
-                    ProductImages(details)
+                    ProductImages(state) {
+                        viewModel.onEvent(ProductEvents.AddToWishlist(productId = productId!!))
+                    }
 
                     VerticalSpace(space = SpaceBetweenViews)
 
                     Column(
                         modifier = Modifier.padding(ScreenPadding)
                     ) {
-                        ProductDetails(details, onPinCodeCheck = {})
+                        ProductDetails(
+                            state = state,
+                            updateCart = {
+                                viewModel.onEvent(
+                                    ProductEvents.UpdateCart(
+                                        quantity = it,
+                                        productId = productId!!
+                                    )
+                                )
+                            },
+                            onPinCodeCheck = {
+                                viewModel.onEvent(ProductEvents.CheckAvailibility(it))
+                            })
 
                         VerticalSpace(space = SpaceBetweenViews)
 
@@ -139,7 +189,13 @@ fun ProductDetailsScreen(
                                 fontSize = 18.sp
                             )
                         }) {
-                            Text(text = "Add Reviews", color = primaryColor.invoke())
+                            if (state.reviewLoading)
+                                ShowLoading()
+                            else
+                                Text(text = "Add Reviews", color = primaryColor.invoke(),
+                                    modifier = Modifier.noRippleClickable {
+                                        shoReviewBottomSheet = true
+                                    })
                         }
                     }
                 }
@@ -224,11 +280,15 @@ fun ProductReviews(
 
 @Composable
 fun ProductDetails(
-    details: ProductDetailsModel.Result,
-    onPinCodeCheck: (pin: String) -> Unit
+    state: ProductListState,
+    onPinCodeCheck: (pin: String) -> Unit,
+    updateCart: (quantity: Int) -> Unit
 ) {
+    val cartData = state.cartData
+    val details = state.productDetails!!.result[0]
+
     var pincode by remember {
-        mutableStateOf("")
+        mutableStateOf(if (state.defaultAddress == null) "" else state.defaultAddress.pincode)
     }
 
     RoundedCornerCard(
@@ -251,12 +311,23 @@ fun ProductDetails(
                         .weight(2f)
                 )
 
-                CartAddRemove(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .weight(1f),
-                    cartItemLength = 0,
-                ) {}
+
+                //get cart item length
+                var cartItemLength = 0
+                cartData!!.result.forEach {
+                    if (it.product.id == details.id)
+                        cartItemLength = it.quantity
+                }
+
+                if (state.addToCartEnable)
+                    CartAddRemove(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .weight(1f),
+                        cartItemLength = cartItemLength,
+                    ) {
+                        updateCart(it)
+                    }
             }
 
             SpaceBetweenRow(items = items)
@@ -292,15 +363,48 @@ fun ProductDetails(
                     ),
                 )
             }) {
-                AppOutlineButton(
-                    text = "Check",
-                    modifier = Modifier.weight(1f)
-                ) {
-                    onPinCodeCheck(pincode)
+                if (state.buttonLoading)
+                    ShowLoading()
+                else
+                    AppButton(
+                        text = "Check",
+                        modifier = Modifier.weight(1f),
+                        buttonColors = ButtonDefaults.buttonColors(
+                            contentColor = screenBackgroundColor.invoke(),
+                            containerColor = forestGreen.invoke()
+                        ),
+                    ) {
+                        onPinCodeCheck(pincode)
+                    }
+            }
+
+            VerticalSpace(space = VeryLowSpacing)
+
+            if (state.checkAvailabilityModel != null) {
+                if (state.checkAvailabilityModel.express)
+                    InfoWithIcon(
+                        id = R.drawable.delivery_bike,
+                        info = state.checkAvailabilityModel.cutoff_response.express_remarks,
+                        modifier = Modifier.padding(vertical = VeryLowSpacing),
+                        iconOrImageModifier = Modifier.size(20.dp),
+                        colorFilter = ColorFilter.tint(color = primaryColor.invoke()),
+                        maxLines = 10
+                    )
+
+                if (state.checkAvailabilityModel.status == Status.success.name) {
+                    InfoWithIcon(
+                        id = R.drawable.delivery_bike,
+                        info = state.checkAvailabilityModel.cutoff_response.remarks,
+                        modifier = Modifier.padding(vertical = VeryLowSpacing),
+                        iconOrImageModifier = Modifier.size(20.dp),
+                        colorFilter = ColorFilter.tint(color = primaryColor.invoke()),
+                        maxLines = 10,
+                        textColor = primaryColor.invoke()
+                    )
                 }
             }
 
-            VerticalSpace(space = SpaceBetweenViews)
+            VerticalSpace(space = VeryLowSpacing)
 
             Text(text = details.desc.fromHtml(), fontWeight = FontWeight.Light)
         }
@@ -310,8 +414,10 @@ fun ProductDetails(
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun ProductImages(
-    details: ProductDetailsModel.Result,
+    state: ProductListState,
+    addToWishlist: () -> Unit,
 ) {
+    val details = state.productDetails!!.result[0]
     val images = details.file
     val isOnSale = !details.sellingPrice.isNullOrEmpty()
     val pagerState = rememberPagerState(pageCount = { images.size })
@@ -337,14 +443,19 @@ fun ProductImages(
         if (isOnSale)
             SaleBanner(modifier = Modifier.align(Alignment.TopStart))
 
+        val alreadyWishListed =
+            if (state.wishListData!!.result.isEmpty()) false
+            else state.wishListData.result.any { it.product.id == details.id }
+
         CircleIconButton(
             isDrawableIcon = false,
-            icon = Icons.Default.FavoriteBorder,
+            tint = if (alreadyWishListed) primaryColor.invoke() else LocalContentColor.current,
+            icon = if (alreadyWishListed) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
             modifier = Modifier
                 .padding(LowPadding)
                 .align(Alignment.TopEnd)
                 .size(30.dp)
-        ) {}
+        ) { addToWishlist() }
 
         Column(
             modifier = Modifier.align(Alignment.BottomEnd)
@@ -412,7 +523,7 @@ fun CartAddRemove(
     ) {
         TextInCircle(
             fontSize = textInCircleFontSize,
-            modifier = textInCircleModifier.clickable {
+            modifier = textInCircleModifier.noRippleClickable {
                 if (cartItemLength > 0)
                     onUpdateCart(cartItemLength - 1)
             },
@@ -431,7 +542,7 @@ fun CartAddRemove(
 
         TextInCircle(
             fontSize = textInCircleFontSize,
-            modifier = textInCircleModifier.clickable {
+            modifier = textInCircleModifier.noRippleClickable {
                 onUpdateCart(cartItemLength + 1)
             },
             text = "+"

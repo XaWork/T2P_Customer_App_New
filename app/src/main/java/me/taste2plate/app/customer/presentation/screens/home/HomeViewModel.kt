@@ -50,6 +50,10 @@ class HomeViewModel @Inject constructor(
                 getHomeData()
             }
 
+            is HomeEvent.GetWishlist -> {
+                getWishlist()
+            }
+
             is HomeEvent.LogOut -> {
                 viewModelScope.launch {
                     userPref.logOut()
@@ -194,7 +198,6 @@ class HomeViewModel @Inject constructor(
     private fun getWishlist() {
         viewModelScope.launch {
             wishlistUseCase.execute(
-                userId = userPref.getUser().id
             ).collect { result ->
                 when (result) {
                     is Resource.Loading -> {
@@ -282,7 +285,7 @@ class HomeViewModel @Inject constructor(
                     is Resource.Success -> {
                         val data = result.data
                         val isError = data?.status == Status.error.name
-                            getCart()
+                        getCart()
 
                         state.copy(
                             isLoading = false,
