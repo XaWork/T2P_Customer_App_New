@@ -55,6 +55,7 @@ import me.taste2plate.app.customer.presentation.theme.SpaceBetweenViewsAndSubVie
 import me.taste2plate.app.customer.presentation.theme.T2PCustomerAppTheme
 import me.taste2plate.app.customer.presentation.theme.YellowBanner
 import me.taste2plate.app.customer.presentation.theme.YellowBannerDark
+import me.taste2plate.app.customer.presentation.utils.noRippleClickable
 import me.taste2plate.app.customer.presentation.widgets.HorizontalSpace
 import me.taste2plate.app.customer.presentation.widgets.MaterialIcon
 import me.taste2plate.app.customer.presentation.widgets.VegNonVegFilter
@@ -78,7 +79,7 @@ fun AddressBar(
         verticalAlignment = Alignment.CenterVertically
     ) {
         Row(modifier = Modifier
-            .clickable { showAddressSheet() }
+            .noRippleClickable { showAddressSheet() }
             .fillMaxWidth(1f)
             .weight(1f)) {
             MaterialIcon(
@@ -107,10 +108,4 @@ fun AddressBar(
 }
 
 
-@Preview
-@Composable
-fun AddressBarPreview() {
-    var checked by remember {
-        mutableStateOf(false)
-    }
-}
+

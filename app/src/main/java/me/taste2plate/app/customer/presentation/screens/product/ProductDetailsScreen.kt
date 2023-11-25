@@ -99,7 +99,8 @@ import me.taste2plate.app.customer.utils.toDate
 fun ProductDetailsScreen(
     viewModel: ProductViewModel,
     productId: String? = null,
-    onNavigateToCartScreen: () -> Unit
+    onNavigateToCartScreen: () -> Unit,
+    navigateBack: () -> Unit,
 ) {
 
     val state = viewModel.state
@@ -138,7 +139,7 @@ fun ProductDetailsScreen(
 
     AppScaffold(
         topBar = {
-            AppTopBar {}
+            AppTopBar { navigateBack() }
         },
         bottomBar = {
             BottomBar(
@@ -234,7 +235,7 @@ fun BottomBar(
                 iconInStart = false,
                 textColor = backgroundColor.invoke(),
                 colorFilter = ColorFilter.tint(color = backgroundColor.invoke()),
-                modifier = Modifier.clickable {
+                modifier = Modifier.noRippleClickable {
                     onNavigateToCartScreen()
                 },
                 fontSize = 14.sp

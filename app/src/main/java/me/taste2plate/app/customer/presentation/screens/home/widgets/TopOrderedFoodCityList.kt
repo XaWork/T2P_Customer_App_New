@@ -24,6 +24,7 @@ import me.taste2plate.app.customer.domain.mapper.CommonForItem
 import me.taste2plate.app.customer.domain.model.HomeModel
 import me.taste2plate.app.customer.presentation.theme.ScreenPadding
 import me.taste2plate.app.customer.presentation.theme.T2PCustomerAppTheme
+import me.taste2plate.app.customer.presentation.utils.noRippleClickable
 import me.taste2plate.app.customer.presentation.widgets.simpleAnimation
 import kotlin.math.absoluteValue
 
@@ -59,7 +60,7 @@ fun TopOrderedFoodCityList(
         SingleTopList(
             image = item.image, modifier = Modifier
                 .fillMaxWidth()
-                .clickable {
+                .noRippleClickable {
                     onNavigateToProductListScreen(
                         CommonForItem(
                             id = item.id,

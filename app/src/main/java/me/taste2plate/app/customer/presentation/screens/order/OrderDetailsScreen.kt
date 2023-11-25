@@ -1,8 +1,6 @@
 package me.taste2plate.app.customer.presentation.screens.order
 
-import android.content.res.Configuration
 import androidx.compose.foundation.Canvas
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -42,7 +40,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.withStyle
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import me.taste2plate.app.customer.domain.model.user.OrderListModel
@@ -55,8 +52,8 @@ import me.taste2plate.app.customer.presentation.theme.MediumSpacing
 import me.taste2plate.app.customer.presentation.theme.ScreenPadding
 import me.taste2plate.app.customer.presentation.theme.SpaceBetweenViews
 import me.taste2plate.app.customer.presentation.theme.SpaceBetweenViewsAndSubViews
-import me.taste2plate.app.customer.presentation.theme.T2PCustomerAppTheme
 import me.taste2plate.app.customer.presentation.theme.VeryLowSpacing
+import me.taste2plate.app.customer.presentation.utils.noRippleClickable
 import me.taste2plate.app.customer.presentation.utils.rupeeSign
 import me.taste2plate.app.customer.presentation.widgets.AppButton
 import me.taste2plate.app.customer.presentation.widgets.AppEmptyView
@@ -74,7 +71,8 @@ import me.taste2plate.app.customer.utils.toDateObject
 @Composable
 fun OrderDetailsScreen(
     viewModel: OrderViewModel,
-    onNavigateToTrackOrderScreen: () -> Unit = {}
+    onNavigateToTrackOrderScreen: () -> Unit = {},
+    navigateBack: () -> Unit,
 ) {
     val state = viewModel.state
 
@@ -96,7 +94,7 @@ fun OrderDetailsScreen(
     AppScaffold(topBar = {
         AppTopBar(
             title = viewModel.selectedOrder?.orderid ?: ""
-        ) {}
+        ) {navigateBack()}
     }) {
         if (viewModel.selectedOrder == null) AppEmptyView()
         else ContentOrderDetailsScreen(
@@ -213,7 +211,7 @@ fun ContentOrderDetailsScreen(
                 Text(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .clickable {
+                        .noRippleClickable {
                             if (order.status.contentEquals(OrderStatus.delivery_boy_started.name)) {
                                 onNavigateToTrackOrderScreen()
                             } else
@@ -358,12 +356,3 @@ fun StraightLine(modifier: Modifier = Modifier) {
     }
 }
 
-
-@Preview
-@Preview(name = "Dark Preview", uiMode = Configuration.UI_MODE_NIGHT_YES)
-@Composable
-fun OrderDetailsScreenPreview() {
-    T2PCustomerAppTheme {
-        //SingleUpdateItem()
-    }
-}

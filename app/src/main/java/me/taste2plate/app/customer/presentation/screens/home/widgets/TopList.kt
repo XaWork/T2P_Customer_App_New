@@ -18,6 +18,7 @@ import me.taste2plate.app.customer.presentation.screens.ImageItemList
 import me.taste2plate.app.customer.presentation.screens.home.CityBrandScreens
 import me.taste2plate.app.customer.presentation.theme.ScreenPadding
 import me.taste2plate.app.customer.presentation.theme.T2PCustomerAppTheme
+import me.taste2plate.app.customer.presentation.utils.noRippleClickable
 import me.taste2plate.app.customer.presentation.widgets.DrawableImage
 import me.taste2plate.app.customer.presentation.widgets.NetworkImage
 
@@ -33,7 +34,7 @@ fun TopList(
         horizontalArrangement = Arrangement.spacedBy(10.dp),
         content = {
             itemsIndexed(ImageItemList) { index, item ->
-                SingleTopList(drawableImage = item, modifier = Modifier.clickable {
+                SingleTopList(drawableImage = item, modifier = Modifier.noRippleClickable {
                     onNavigateToCityBrandScreen(
                         when (index) {
                             0 -> CityBrandScreens.City

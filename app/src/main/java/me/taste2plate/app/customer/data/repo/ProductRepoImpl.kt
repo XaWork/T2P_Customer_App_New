@@ -3,6 +3,7 @@ package me.taste2plate.app.customer.data.repo
 import me.taste2plate.app.customer.data.api.ProductApi
 import me.taste2plate.app.customer.domain.model.CouponModel
 import me.taste2plate.app.customer.domain.model.custom.CheckAvailabilityModel
+import me.taste2plate.app.customer.domain.model.product.CutOffTimeCheckModel
 import me.taste2plate.app.customer.domain.model.product.ProductBySliderModel
 import me.taste2plate.app.customer.domain.model.product.ProductDetailsModel
 import me.taste2plate.app.customer.domain.model.product.ProductListModel
@@ -44,7 +45,17 @@ class ProductRepoImpl @Inject constructor(
         return api.getOfferByCity(id)
     }
 
-    override suspend fun checkAvailability(zipCode: String, vendorId: String): CheckAvailabilityModel {
+    override suspend fun checkAvailability(
+        zipCode: String,
+        vendorId: String
+    ): CheckAvailabilityModel {
         return api.checkAvailability(zipCode, vendorId)
+    }
+
+    override suspend fun checkCutOffTimeCheck(
+        startCity: String,
+        endCity: String
+    ): CutOffTimeCheckModel {
+        return api.checkCutOffTimeCheck(startCity, endCity)
     }
 }

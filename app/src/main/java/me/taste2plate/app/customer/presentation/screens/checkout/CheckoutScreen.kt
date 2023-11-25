@@ -4,7 +4,6 @@ import android.content.res.Configuration
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -18,9 +17,12 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Cancel
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
+import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -31,7 +33,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -49,6 +50,10 @@ import me.taste2plate.app.customer.R
 import me.taste2plate.app.customer.domain.mapper.toCommonForWishAndCartItem
 import me.taste2plate.app.customer.domain.model.auth.User
 import me.taste2plate.app.customer.domain.model.user.address.AddressListModel
+import me.taste2plate.app.customer.presentation.dialog.CustomDialog
+import me.taste2plate.app.customer.presentation.dialog.PriceDialog
+import me.taste2plate.app.customer.presentation.dialog.SettingDialogType
+import me.taste2plate.app.customer.presentation.dialog.SettingInfoDialog
 import me.taste2plate.app.customer.presentation.screens.address.AddressBottomSheet
 import me.taste2plate.app.customer.presentation.screens.cart.CheckOutViewModel
 import me.taste2plate.app.customer.presentation.screens.cart.CheckoutEvents
@@ -61,8 +66,10 @@ import me.taste2plate.app.customer.presentation.theme.ScreenPadding
 import me.taste2plate.app.customer.presentation.theme.SpaceBetweenViews
 import me.taste2plate.app.customer.presentation.theme.SpaceBetweenViewsAndSubViews
 import me.taste2plate.app.customer.presentation.theme.T2PCustomerAppTheme
-import me.taste2plate.app.customer.presentation.theme.backgroundColor
+import me.taste2plate.app.customer.presentation.theme.VeryLowSpacing
 import me.taste2plate.app.customer.presentation.theme.primaryColor
+import me.taste2plate.app.customer.presentation.theme.screenBackgroundColor
+import me.taste2plate.app.customer.presentation.utils.noRippleClickable
 import me.taste2plate.app.customer.presentation.utils.rupeeSign
 import me.taste2plate.app.customer.presentation.widgets.AppButton
 import me.taste2plate.app.customer.presentation.widgets.AppCheckBox
@@ -75,6 +82,7 @@ import me.taste2plate.app.customer.presentation.widgets.DrawableImage
 import me.taste2plate.app.customer.presentation.widgets.HeadingText
 import me.taste2plate.app.customer.presentation.widgets.HorizontalSpace
 import me.taste2plate.app.customer.presentation.widgets.InfoWithIcon
+import me.taste2plate.app.customer.presentation.widgets.MaterialIcon
 import me.taste2plate.app.customer.presentation.widgets.RadioButtonInfo
 import me.taste2plate.app.customer.presentation.widgets.SpaceBetweenRow
 import me.taste2plate.app.customer.presentation.widgets.TextInCircle
@@ -95,6 +103,8 @@ fun CheckoutScreen(
     viewModel: CheckOutViewModel,
     onNavigateToOrderConfirmScreen: () -> Unit,
     onNavigateToAddressListScreen: () -> Unit,
+    onNavigateToHomeScreen: () -> Unit,
+    navigateBack: () -> Unit,
 ) {
     val state = viewModel.state
     var showAddressBottomSheet by remember {
@@ -113,17 +123,19 @@ fun CheckoutScreen(
             state.isError && state.errorMessage != null -> {
                 showToast(state.errorMessage)
                 viewModel.onEvent(CheckoutEvents.UpdateState)
+
+                if (!state.finish)
+                    onNavigateToHomeScreen()
             }
         }
     }
 
     val sheetState = rememberModalBottomSheetState()
-    val scope = rememberCoroutineScope()
 
     //address bottom sheet
     if (showAddressBottomSheet) {
         ModalBottomSheet(
-            containerColor = backgroundColor.invoke(),
+            containerColor = screenBackgroundColor.invoke(),
             onDismissRequest = {
                 showAddressBottomSheet = false
             },
@@ -147,7 +159,7 @@ fun CheckoutScreen(
     //coupon bottom sheet
     if (showCouponBottomSheet) {
         ModalBottomSheet(
-            containerColor = backgroundColor.invoke(),
+            containerColor = screenBackgroundColor.invoke(),
             onDismissRequest = {
                 showCouponBottomSheet = false
             },
@@ -157,11 +169,53 @@ fun CheckoutScreen(
                 state.couponList,
                 applyCoupon = {
                     showCouponBottomSheet = false
+                    viewModel.onEvent(CheckoutEvents.ApplyCoupon(it))
                 },
                 onItemSelected = {
                     showCouponBottomSheet = false
+                    if (state.couponList.isNotEmpty()) {
+                        val code = state.couponList[it].coupon
+                        viewModel.onEvent(CheckoutEvents.ApplyCoupon(code))
+                    }
                 }
             )
+        }
+    }
+
+    if (viewModel.showDialogExpress) {
+        SettingInfoDialog(
+            checkAvailability = state.cutOffTimeCheckModel,
+            setting = state.settings!!,
+            type = SettingDialogType.Express_Delivery,
+            setDate = { date, time ->
+                viewModel.selectedDate = date
+                viewModel.selectedTimeSlot = time
+            },
+            onDismissRequest = {
+                viewModel.showDialogExpress = false
+            },
+            onConfirmation = {
+                viewModel.showDialogExpress = false
+            }
+        )
+    }
+
+    if (viewModel.showDigitalCODDialog) {
+        SettingInfoDialog(
+            setting = state.settings!!,
+            type = SettingDialogType.COD_Digital,
+            onDismissRequest = {
+                viewModel.showDigitalCODDialog = false
+            },
+            onConfirmation = {
+                viewModel.showDigitalCODDialog = false
+            }
+        )
+    }
+
+    if (viewModel.showOrderAmountDialog) {
+        CustomDialog(title = "Alert!", text = viewModel.showOrderAmountDialogMessage) {
+            viewModel.showOrderAmountDialog = false
         }
     }
 
@@ -169,23 +223,32 @@ fun CheckoutScreen(
     var showTimeSlotBottomSheet by remember {
         mutableStateOf(false)
     }
-    val timeslots = listOf("Afternoon", "Morning")
     if (showTimeSlotBottomSheet) {
         ModalBottomSheet(
-            containerColor = backgroundColor.invoke(),
+            containerColor = screenBackgroundColor.invoke(),
             onDismissRequest = {
                 showTimeSlotBottomSheet = false
             },
             sheetState = sheetState
         ) {
             TimePickerBottomSheet(
-                timeslots,
+                state.timeSlots,
                 onItemSelected = {
-                    viewModel.timeSlot = timeslots[it]
+                    viewModel.selectedTimeSlot = state.timeSlots[it]
                     showTimeSlotBottomSheet = false
                 }
             )
         }
+    }
+
+    if (state.myPlan != null) {
+        PriceDialog(
+            minOrder = viewModel.minOrder,
+            walletPoint = viewModel.walletPoint,
+            onConfirmation = {
+                viewModel.onEvent(CheckoutEvents.ChangeMyPlanValue)
+            }
+        )
     }
 
     //date picker dialog
@@ -217,7 +280,7 @@ fun CheckoutScreen(
                     val selectedDate = datePickerState.selectedDateMillis?.let {
                         Instant.ofEpochMilli(it).atOffset(ZoneOffset.UTC)
                     }
-                    viewModel.date =
+                    viewModel.selectedDate =
                         selectedDate?.format(DateTimeFormatter.ISO_LOCAL_DATE).toString()
                     showDatePickerDialog = false
                 }) {
@@ -243,7 +306,9 @@ fun CheckoutScreen(
         topBar = {
             AppTopBar(
                 title = "Checkout"
-            ) {}
+            ) {
+                navigateBack()
+            }
         },
     ) {
         CheckoutScreenContent(
@@ -263,7 +328,8 @@ fun CheckoutScreen(
                 showDatePickerDialog = true
             },
             showTimeSlots = {
-                showTimeSlotBottomSheet = true
+                if (state.deliveryType == DeliveryType.Standard)
+                    showTimeSlotBottomSheet = true
             },
             changeDeliveryType = {
                 viewModel.onEvent(CheckoutEvents.ChangeDeliveryType(it))
@@ -312,7 +378,7 @@ fun CheckoutScreenContent(
         ),
         PriceData(
             title = "Coupon Discount",
-            price = viewModel.discount.toString()
+            price = viewModel.couponDiscount.toString()
         ),
         PriceData(
             title = "Subscription Discount",
@@ -320,7 +386,8 @@ fun CheckoutScreenContent(
         ),
         PriceData(
             title = "Wallet Discount",
-            price = viewModel.walletDiscount.toString()
+            price = viewModel.discountWallet.toString(),
+            subTitle = viewModel.pointConversionText.ifEmpty { null }
         ),
     )
 
@@ -368,11 +435,17 @@ fun CheckoutScreenContent(
             )
 
 
-            CouponInfo {
+            CouponInfo(
+                state = state
+            ) {
                 showCoupons()
             }
 
-            TipInfo({})
+            TipInfo(
+                state = state
+            ) { index ->
+                viewModel.onEvent(CheckoutEvents.UpdateTip(index))
+            }
 
             CancellationPolicy()
 
@@ -384,25 +457,34 @@ fun CheckoutScreenContent(
         items(
             priceList
         ) { price ->
-            val items = listOf<@Composable RowScope.() -> Unit> {
-                Text(
-                    text = price.title,
-                    fontWeight = FontWeight.Light, fontSize = fontSize
-                )
+            val itemList = listOf<@Composable RowScope.() -> Unit> {
+                Column {
+                    Text(
+                        text = price.title,
+                        fontWeight = FontWeight.Light, fontSize = fontSize
+                    )
+                    if (price.subTitle != null)
+                        Text(
+                            text = price.subTitle,
+                            fontSize = 12.sp,
+                        )
+                }
 
                 Text(
                     text = "${price.sign}${price.price}", fontSize = fontSize
                 )
             }
 
-            SpaceBetweenRow(items = items)
+            SpaceBetweenRow(items = itemList)
         }
 
         item {
-            AppCheckBox(
-                onCheckedChange = { /*TODO*/ },
-                text = "Check to use wallet discount"
-            )
+            if (viewModel.walletEnabled)
+                AppCheckBox(
+                    checked = viewModel.walletChecked,
+                    onCheckedChange = { viewModel.onEvent(CheckoutEvents.ChangeWalletCheckStatus) },
+                    text = "Check to use wallet discount"
+                )
 
             VerticalSpace(space = SpaceBetweenViewsAndSubViews)
 
@@ -422,8 +504,9 @@ fun CheckoutScreenContent(
             VerticalSpace(space = SpaceBetweenViewsAndSubViews)
 
             DeliveryInfo(
-                date = viewModel.date,
-                timeSlot = viewModel.timeSlot,
+                state = state,
+                date = viewModel.selectedDate,
+                timeSlot = viewModel.selectedTimeSlot,
                 deliveryType = state.deliveryType,
                 showDatePicker = { showDatePicker() },
                 showTimeSlots = { showTimeSlots() },
@@ -432,7 +515,7 @@ fun CheckoutScreenContent(
 
             VerticalSpace(space = SpaceBetweenViews)
 
-            PaymentInfo(state, changePaymentType = {
+            PaymentInfo(viewModel, changePaymentType = {
                 viewModel.onEvent(CheckoutEvents.ChangePaymentType(it))
             })
 
@@ -479,6 +562,7 @@ fun AddressBar(
 
 @Composable
 fun CouponInfo(
+    state: CheckoutState,
     showCoupons: () -> Unit
 ) {
     Column {
@@ -491,6 +575,23 @@ fun CouponInfo(
             showCoupons()
         }
 
+        if (state.applyCouponResponse != null) {
+            val items = listOf<@Composable RowScope.() -> Unit> {
+                Text(
+                    text = state.applyCouponResponse.coupon_type,
+                    color = primaryColor.invoke()
+                )
+
+                MaterialIcon(
+                    imageVector = Icons.Outlined.Cancel
+                )
+            }
+
+            VerticalSpace(space = VeryLowSpacing)
+
+            SpaceBetweenRow(items = items)
+        }
+
         AppDivider()
     }
 }
@@ -498,7 +599,8 @@ fun CouponInfo(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TipInfo(
-    onTipSelect: () -> Unit
+    state: CheckoutState,
+    onTipSelect: (index: Int) -> Unit
 ) {
     val items = listOf<@Composable RowScope.() -> Unit> {
         val aboutTip = buildAnnotatedString {
@@ -539,15 +641,6 @@ fun TipInfo(
         )
     }
 
-    var tips = remember {
-        mutableListOf(
-            TipData(tipPrice = "10"),
-            TipData(tipPrice = "20", mostTipped = true),
-            TipData(tipPrice = "30"),
-            TipData(tipPrice = "Other"),
-        )
-    }
-
     Column {
         SpaceBetweenRow(items = items)
 
@@ -556,15 +649,14 @@ fun TipInfo(
         LazyRow(
             horizontalArrangement = Arrangement.spacedBy(SpaceBetweenViewsAndSubViews)
         ) {
+            val tips = state.tips
             itemsIndexed(tips) { index, tip ->
-
                 FilterChip(
                     selected = tip.selected,
                     shape = RoundedCornerShape(LowRoundedCorners),
+                    border = FilterChipDefaults.filterChipBorder(selectedBorderColor = primaryColor.invoke()),
                     onClick = {
-                        if (tips[index].tipPrice != "Other")
-                            tips[index].selected = !tips[index].selected
-                        //TODo : show text field of product details page (which we use in pincode)
+                        onTipSelect(index)
                     }, label = {
 
                         Column(
@@ -582,6 +674,10 @@ fun TipInfo(
                                     fontSize = 10.sp,
                                     textAlign = TextAlign.Center
                                 )
+
+                            /* val text = if (tips[index].tipPrice != "Other")
+                                 "$rupeeSign${tips[index].tipPrice}"
+                             else tips[index].tipPrice*/
 
                             Text(
                                 text = "$rupeeSign${tips[index].tipPrice}",
@@ -625,6 +721,7 @@ fun CancellationPolicy(
 
 @Composable
 fun DeliveryInfo(
+    state: CheckoutState,
     date: String,
     timeSlot: String,
     deliveryType: DeliveryType,
@@ -667,6 +764,15 @@ fun DeliveryInfo(
 
         VerticalSpace(space = SpaceBetweenViews)
 
+        if (state.cutOffTimeCheckModel != null)
+            Text(
+                if (state.deliveryType == DeliveryType.Standard) state.cutOffTimeCheckModel.result.remarks
+                else state.cutOffTimeCheckModel.result.expressRemarks,
+                color = primaryColor.invoke()
+            )
+
+        VerticalSpace(space = SpaceBetweenViews)
+
         Text(
             text = "Delivery Info",
             color = primaryColor.invoke(), fontSize = fontSize
@@ -685,7 +791,7 @@ fun DeliveryInfo(
                     .fillMaxWidth()
                     .weight(1f)
                     .padding(end = LowPadding)
-                    .clickable {
+                    .noRippleClickable {
                         showDatePicker()
                     }, fontSize = fontSize
             )
@@ -696,7 +802,7 @@ fun DeliveryInfo(
                     .fillMaxWidth()
                     .weight(1f)
                     .padding(start = LowPadding)
-                    .clickable { showTimeSlots() }, fontSize = fontSize
+                    .noRippleClickable { showTimeSlots() }, fontSize = fontSize
             )
         }
     }
@@ -704,22 +810,20 @@ fun DeliveryInfo(
 
 @Composable
 fun PaymentInfo(
-    state: CheckoutState,
+    viewModel: CheckOutViewModel,
     changePaymentType: (PaymentType) -> Unit
 ) {
+    val state = viewModel.state
     val radioOptions = listOf(
         RadioButtonInfo(
             id = 1,
-            text = "Online",/*
-            isIcon = false,
-            icon = R.drawable.online_payment*/
+            text = "Online",
         ),
         RadioButtonInfo(
             id = 2,
             text = "COD",
-            isIcon = false,/*
-            icon = R.drawable.cod_icon,
-            enable = state.deliveryType == DeliveryType.Standard*/
+            isIcon = false,
+            enable = viewModel.codEnabled
         )
     )
     val selectedOption =

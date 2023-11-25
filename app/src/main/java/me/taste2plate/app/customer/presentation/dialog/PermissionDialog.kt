@@ -16,6 +16,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import me.taste2plate.app.customer.presentation.utils.noRippleClickable
 
 
 @Composable
@@ -37,7 +38,7 @@ fun PermissionDialog(
                     textAlign = TextAlign.Center,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .clickable {
+                        .noRippleClickable {
                             if (buttonText == "Grant Permission") {
                                 val intent = Intent(
                                     Settings.ACTION_APPLICATION_DETAILS_SETTINGS,

@@ -2,6 +2,7 @@ package me.taste2plate.app.customer.domain.repo
 
 import me.taste2plate.app.customer.domain.model.CouponModel
 import me.taste2plate.app.customer.domain.model.custom.CheckAvailabilityModel
+import me.taste2plate.app.customer.domain.model.product.CutOffTimeCheckModel
 import me.taste2plate.app.customer.domain.model.product.ProductBySliderModel
 import me.taste2plate.app.customer.domain.model.product.ProductDetailsModel
 import me.taste2plate.app.customer.domain.model.product.ProductListModel
@@ -48,4 +49,9 @@ interface ProductRepo {
         zipCode: String,
         vendorId: String,
     ): CheckAvailabilityModel
+
+    suspend fun checkCutOffTimeCheck(
+        startCity: String,
+        endCity: String,
+    ): CutOffTimeCheckModel
 }

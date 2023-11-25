@@ -7,7 +7,7 @@ data class CartModel(
     @SerializedName("cartprice")
     val cartprice: String,
     @SerializedName("customer_point")
-    val customerPoint: String,
+    val customerPoint: Float,
     @SerializedName("express")
     val express: Boolean,
     @SerializedName("express_timeslot")
@@ -25,7 +25,7 @@ data class CartModel(
     @SerializedName("normal_delivery_date")
     val normalDeliveryDate: String,
     @SerializedName("one_point_value")
-    val onePointValue: String,
+    val onePointValue: Float,
     @SerializedName("open_order_value")
     val openOrderValue: String,
     @SerializedName("plan_discount")
@@ -48,6 +48,8 @@ data class CartModel(
     val totalSgst: String
 ) {
 
+    val walletDiscount : Float
+        get() = customerPoint * onePointValue
     data class Result(
         @SerializedName("brand")
         val brand: String,
@@ -539,7 +541,7 @@ data class NewFinalPrice(
     @SerializedName("normal")
     val normal: String,
     @SerializedName("with_wallet")
-    val withWallet: WithWallet
+    val withWallet: WithWallet?
 )
 {
     data class WithWallet(

@@ -26,6 +26,7 @@ import me.taste2plate.app.customer.presentation.theme.SpaceBetweenViews
 import me.taste2plate.app.customer.presentation.theme.SpaceBetweenViewsAndSubViews
 import me.taste2plate.app.customer.presentation.theme.cardContainerOnSecondaryColor
 import me.taste2plate.app.customer.presentation.theme.primaryColor
+import me.taste2plate.app.customer.presentation.utils.noRippleClickable
 import me.taste2plate.app.customer.presentation.widgets.AppEmptyView
 import me.taste2plate.app.customer.presentation.widgets.AppScaffold
 import me.taste2plate.app.customer.presentation.widgets.AppTopBar
@@ -96,7 +97,7 @@ fun SingleSubCategory(
     RoundedCornerCard(
         cardColor = cardContainerOnSecondaryColor.invoke(),
         elevation = LowElevation,
-        modifier = Modifier.clickable { onNavigateToProductListScreen() }
+        modifier = Modifier.noRippleClickable { onNavigateToProductListScreen() }
     ) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,

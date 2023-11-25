@@ -55,6 +55,7 @@ import me.taste2plate.app.customer.presentation.theme.SpaceBetweenViewsAndSubVie
 import me.taste2plate.app.customer.presentation.theme.T2PCustomerAppTheme
 import me.taste2plate.app.customer.presentation.theme.VeryLowSpacing
 import me.taste2plate.app.customer.presentation.theme.primaryColor
+import me.taste2plate.app.customer.presentation.utils.noRippleClickable
 import me.taste2plate.app.customer.presentation.utils.rupeeSign
 import me.taste2plate.app.customer.presentation.widgets.ImageWithWishlistButton
 import me.taste2plate.app.customer.presentation.widgets.InfoWithIcon
@@ -108,7 +109,7 @@ fun MostOrderedItemList(
             SingleMostOrderedItem(
                 page,
                 pagerState = pagerState,
-                modifier = Modifier.clickable { onNavigateToProductDetailsScreen(foodItems[page].id) },
+                modifier = Modifier.noRippleClickable { onNavigateToProductDetailsScreen(foodItems[page].id) },
                 state = state,
                 product = foodItems[page],
                 alreadyWishListed = alreadyInWishlist,

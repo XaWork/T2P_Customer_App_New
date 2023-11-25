@@ -38,6 +38,7 @@ import me.taste2plate.app.customer.presentation.theme.T2PCustomerAppTheme
 import me.taste2plate.app.customer.presentation.theme.backgroundColor
 import me.taste2plate.app.customer.presentation.theme.cardContainerOnSecondaryColor
 import me.taste2plate.app.customer.presentation.theme.primaryColor
+import me.taste2plate.app.customer.presentation.utils.noRippleClickable
 import me.taste2plate.app.customer.presentation.widgets.AppEmptyView
 import me.taste2plate.app.customer.presentation.widgets.AppScaffold
 import me.taste2plate.app.customer.presentation.widgets.AppTopBar
@@ -53,6 +54,7 @@ fun CityBrandScreen(
     onNavigateToProductListScreen: (itemInfo: CommonForItem) -> Unit,
     onNavigateToDetailsScreen: () -> Unit,
     onNavigateToSubCategoryScreen: () -> Unit,
+    navigateBack: () -> Unit,
 ) {
     val state = viewModel.state
 
@@ -70,7 +72,7 @@ fun CityBrandScreen(
                     CityBrandScreens.Category -> "Explore"
                     else -> "Flavours Of India"
                 }
-            ) {}
+            ) {navigateBack()}
         }
     ) {
         if (state.isLoading)
@@ -127,7 +129,7 @@ fun SingleCityBrand(
     RoundedCornerCard(
         cardColor = cardContainerOnSecondaryColor.invoke(),
         elevation = LowElevation,
-        modifier = Modifier.clickable { onNavigateToProductListScreen() }
+        modifier = Modifier.noRippleClickable { onNavigateToProductListScreen() }
     ) {
         Column {
             Box {
@@ -159,12 +161,12 @@ fun SingleCityBrand(
                 modifier = Modifier.padding(ScreenPadding),
                 item1 = {
                     Text("View Products", color = primaryColor.invoke(), modifier =
-                    Modifier.clickable { onNavigateToProductListScreen() })
+                    Modifier.noRippleClickable { onNavigateToProductListScreen() })
                 }) {
                 Text(
                     "View Details", color = primaryColor.invoke(),
                     textDecoration = TextDecoration.Underline, modifier =
-                    Modifier.clickable { onNavigateToDetailsScreen() }
+                    Modifier.noRippleClickable { onNavigateToDetailsScreen() }
                 )
             }
         }

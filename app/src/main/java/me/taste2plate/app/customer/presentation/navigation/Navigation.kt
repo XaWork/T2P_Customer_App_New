@@ -96,7 +96,7 @@ fun Navigation() {
                 OnBoardingScreen(
                     viewModel = viewModel
                 ) {
-                    navController.navigate(Screens.OTPScreen.route){
+                    navController.navigate(Screens.OTPScreen.route) {
                         //popUpTo(0)
                     }
                 }
@@ -235,6 +235,9 @@ fun Navigation() {
                     viewModel,
                     onNavigateToOrderDetailsScreen = {
                         navController.navigate(Screens.OrderDetailsScreen.route)
+                    },
+                    navigateBack = {
+                        navController.popBackStack()
                     }
                 )
             }
@@ -243,7 +246,10 @@ fun Navigation() {
             composable(route = Screens.OrderDetailsScreen.route) { entry ->
                 val viewModel =
                     entry.sharedViewModel<OrderViewModel>(navHostController = navController)
-                OrderDetailsScreen(viewModel)
+                OrderDetailsScreen(viewModel,
+                    navigateBack = {
+                        navController.popBackStack()
+                    })
             }
         }
 
@@ -259,7 +265,10 @@ fun Navigation() {
 
         // ----------------------------> WishList <--------------------------------------
         composable(route = Screens.WishlistScreen.route) {
-            WishlistScreen()
+            WishlistScreen(
+                navigateBack = {
+                    navController.popBackStack()
+                })
         }
 
         // ----------------------------> Location Permission <--------------------------------------
@@ -275,17 +284,26 @@ fun Navigation() {
 
         // ----------------------------> Wallet <--------------------------------------
         composable(route = Screens.WalletScreen.route) {
-            WalletScreen()
+            WalletScreen(
+                navigateBack = {
+                    navController.popBackStack()
+                })
         }
 
         // ----------------------------> Contact Us <--------------------------------------
         composable(route = Screens.ContactUsScreen.route) {
-            ContactUsScreen()
+            ContactUsScreen(
+                navigateBack = {
+                    navController.popBackStack()
+                })
         }
 
         // ----------------------------> My Plan <--------------------------------------
         composable(route = Screens.MyPlanScreen.route) {
-            MyPlanScreen()
+            MyPlanScreen(
+                navigateBack = {
+                    navController.popBackStack()
+                })
         }
 
         // ----------------------------> Bulk Order <--------------------------------------
@@ -297,7 +315,10 @@ fun Navigation() {
 
         // ----------------------------> Membership <--------------------------------------
         composable(route = Screens.MembershipScreenScreen.route) {
-            MembershipPlanScreen()
+            MembershipPlanScreen(
+                navigateBack = {
+                    navController.popBackStack()
+                })
         }
 
 
@@ -326,6 +347,9 @@ fun Navigation() {
                     itemInfo = itemInfo,
                     onNavigateToProductDetailsScreen = {
                         navController.navigate(Screens.ProductDetailsScreen.route)
+                    },
+                    navigateBack = {
+                        navController.popBackStack()
                     })
             }
 
@@ -347,6 +371,9 @@ fun Navigation() {
                     viewModel = viewModel,
                     onNavigateToCartScreen = {
                         navController.navigate(Screens.CartScreen.route)
+                    },
+                    navigateBack = {
+                        navController.popBackStack()
                     }
                 )
             }
@@ -386,6 +413,9 @@ fun Navigation() {
                     },
                     onNavigateToSubCategoryScreen = {
                         navController.navigate(Screens.SubCategoryScreen.route)
+                    },
+                    navigateBack = {
+                        navController.popBackStack()
                     }
                 )
             }
@@ -440,6 +470,14 @@ fun Navigation() {
                     },
                     onNavigateToAddressListScreen = {
                         navController.navigate(Screens.AddressListScreen.route)
+                    },
+                    onNavigateToHomeScreen = {
+                        navController.navigate(Screens.HomeScreen.route) {
+                            popUpTo(0)
+                        }
+                    },
+                    navigateBack = {
+                        navController.popBackStack()
                     })
             }
 
@@ -469,6 +507,9 @@ fun Navigation() {
                     },
                     onNavigateToAddressListScreen = {
                         navController.navigate(Screens.AddressListScreen.route)
+                    },
+                    navigateBack = {
+                        navController.popBackStack()
                     }
                 )
             }
@@ -504,6 +545,9 @@ fun Navigation() {
                         navController.navigate(Screens.AddEditAddressScreen.route) {
                             popUpTo(0)
                         }
+                    },
+                    navigateBack = {
+                        navController.popBackStack()
                     }
                 )
             }
@@ -534,6 +578,9 @@ fun Navigation() {
                         navController.navigate(Screens.HomeScreen.route) {
                             popUpTo(0)
                         }
+                    },
+                    navigateBack = {
+                        navController.popBackStack()
                     }
                 )
             }

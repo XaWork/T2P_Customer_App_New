@@ -30,6 +30,7 @@ import me.taste2plate.app.customer.presentation.theme.ScreenPadding
 import me.taste2plate.app.customer.presentation.theme.SpaceBetweenViewsAndSubViews
 import me.taste2plate.app.customer.presentation.theme.T2PCustomerAppTheme
 import me.taste2plate.app.customer.presentation.theme.primaryColor
+import me.taste2plate.app.customer.presentation.utils.noRippleClickable
 import me.taste2plate.app.customer.presentation.widgets.AppDivider
 import me.taste2plate.app.customer.presentation.widgets.AppScaffold
 import me.taste2plate.app.customer.presentation.widgets.AppTopBar
@@ -39,13 +40,14 @@ import me.taste2plate.app.customer.presentation.widgets.VerticalSpace
 
 @Composable
 fun ContactUsScreen(
-    viewModel: ContactUsViewModel = hiltViewModel()
+    viewModel: ContactUsViewModel = hiltViewModel(),
+    navigateBack: () -> Unit,
 ) {
     val state = viewModel.state
 
     AppScaffold(
         topBar = {
-            AppTopBar {}
+            AppTopBar { navigateBack() }
         },
     ) {
         if (state.setting != null)
@@ -136,7 +138,7 @@ fun SingleContactInfo(
                 info = title,
                 maxLines = 5,
                 tint = primaryColor.invoke(),
-                modifier = Modifier.clickable { onItemClick() }
+                modifier = Modifier.noRippleClickable { onItemClick() }
             )
         }
     }
@@ -166,15 +168,6 @@ private fun sendMail(context: Context, contactEmail: String) {
     context.startActivity(Intent.createChooser(intent, "Send Via"))
 }
 
-
-@Preview
-@Preview(name = "Dark Preview", uiMode = Configuration.UI_MODE_NIGHT_YES)
-@Composable
-fun ContactUsScreenPreview() {
-    T2PCustomerAppTheme {
-        ContactUsScreen()
-    }
-}
 
 enum class ContactId {
     Call,

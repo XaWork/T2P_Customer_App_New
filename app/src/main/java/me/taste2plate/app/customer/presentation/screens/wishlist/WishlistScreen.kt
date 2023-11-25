@@ -18,7 +18,8 @@ import me.taste2plate.app.customer.presentation.widgets.showToast
 
 @Composable
 fun WishlistScreen(
-    viewModel: WishlistViewModel = hiltViewModel()
+    viewModel: WishlistViewModel = hiltViewModel(),
+    navigateBack: () -> Unit,
 ) {
 
     LaunchedEffect(Unit) {
@@ -36,7 +37,7 @@ fun WishlistScreen(
 
     AppScaffold(
         topBar = {
-            AppTopBar {}
+            AppTopBar {navigateBack()}
         },
     ) {
         if (state.isLoading)
@@ -54,15 +55,5 @@ fun WishlistScreen(
                 onBackPress = {}
             )
         } else AppEmptyView()
-    }
-}
-
-
-@Preview
-@Preview(name = "Dark Preview", uiMode = Configuration.UI_MODE_NIGHT_YES)
-@Composable
-fun WishlistScreenPreview() {
-    T2PCustomerAppTheme {
-        WishlistScreen()
     }
 }

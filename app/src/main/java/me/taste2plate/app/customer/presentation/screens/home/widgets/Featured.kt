@@ -33,6 +33,7 @@ import me.taste2plate.app.customer.presentation.theme.SpaceBetweenViews
 import me.taste2plate.app.customer.presentation.theme.SpaceBetweenViewsAndSubViews
 import me.taste2plate.app.customer.presentation.theme.T2PCustomerAppTheme
 import me.taste2plate.app.customer.presentation.theme.VeryLowSpacing
+import me.taste2plate.app.customer.presentation.utils.noRippleClickable
 import me.taste2plate.app.customer.presentation.utils.rupeeSign
 import me.taste2plate.app.customer.presentation.widgets.BlackBorderCard
 import me.taste2plate.app.customer.presentation.widgets.ImageWithWishlistButton
@@ -53,7 +54,7 @@ fun SingleFeaturedItem(
 ) {
     BlackBorderCard(
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.background),
-        modifier = Modifier.clickable { onNavigateToProductDetailsScreen() }
+        modifier = Modifier.noRippleClickable { onNavigateToProductDetailsScreen() }
     ) {
         Column {
             ImageWithWishlistButton(

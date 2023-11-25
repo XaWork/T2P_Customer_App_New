@@ -1,6 +1,5 @@
 package me.taste2plate.app.customer.presentation.screens.address
 
-import android.content.res.Configuration
 import android.util.Log
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -18,7 +17,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.tooling.preview.Preview
 import com.google.android.gms.maps.model.LatLng
 import me.taste2plate.app.customer.data.Status
 import me.taste2plate.app.customer.presentation.navigation.Screens
@@ -26,7 +24,6 @@ import me.taste2plate.app.customer.presentation.screens.countries
 import me.taste2plate.app.customer.presentation.theme.ExtraHighPadding
 import me.taste2plate.app.customer.presentation.theme.LowSpacing
 import me.taste2plate.app.customer.presentation.theme.ScreenPadding
-import me.taste2plate.app.customer.presentation.theme.T2PCustomerAppTheme
 import me.taste2plate.app.customer.presentation.widgets.AppButton
 import me.taste2plate.app.customer.presentation.widgets.AppDropDown
 import me.taste2plate.app.customer.presentation.widgets.AppRadioButton
@@ -42,7 +39,8 @@ fun AddEditAddressScreen(
     viewModel: AddressViewModel,
     latLng: LatLng? = null,
     onNavigateToLocationScreen: (screen: String) -> Unit,
-    onNavigateToHomeScreen: () -> Unit
+    onNavigateToHomeScreen: () -> Unit,
+    navigateBack: () -> Unit,
 ) {
     val state = viewModel.state
 
@@ -63,11 +61,11 @@ fun AddEditAddressScreen(
                 viewModel.onEvent(AddressEvents.UpdateState)
             }
 
-            state.addAddressResponse != null && state.addAddressResponse.status == Status.success.name-> {
+            state.addAddressResponse != null && state.addAddressResponse.status == Status.success.name -> {
                 onNavigateToHomeScreen()
             }
 
-            state.editAddressResponse != null  && state.editAddressResponse.status == Status.success.name-> {
+            state.editAddressResponse != null && state.editAddressResponse.status == Status.success.name -> {
                 onNavigateToHomeScreen()
             }
         }
@@ -77,7 +75,7 @@ fun AddEditAddressScreen(
         topBar = {
             AppTopBar(
                 title = if (viewModel.addressIndex != -1) "Edit Address" else "Add Address"
-            ) {}
+            ) { navigateBack() }
         }
     ) {
         ContentAddEditAddressScreen(viewModel) { onNavigateToLocationScreen(Screens.AddEditAddressScreen.route) }
@@ -250,6 +248,7 @@ fun ContentAddEditAddressScreen(
 }
 
 
+/*
 @Preview
 @Preview(name = "Dark Preview", uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
@@ -257,4 +256,4 @@ fun AddEditAddressScreenPreview() {
     T2PCustomerAppTheme {
         //  AddEditAddressScreen()
     }
-}
+}*/

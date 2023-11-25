@@ -30,6 +30,7 @@ import me.taste2plate.app.customer.presentation.theme.SpaceBetweenViewsAndSubVie
 import me.taste2plate.app.customer.presentation.theme.T2PCustomerAppTheme
 import me.taste2plate.app.customer.presentation.theme.backgroundColor
 import me.taste2plate.app.customer.presentation.theme.primaryColor
+import me.taste2plate.app.customer.presentation.utils.noRippleClickable
 import me.taste2plate.app.customer.presentation.widgets.AppButton
 import me.taste2plate.app.customer.presentation.widgets.AppTextField
 import me.taste2plate.app.customer.presentation.widgets.VerticalSpace
@@ -107,7 +108,7 @@ fun RatingBar(
                 tint = if (i <= currentRating) primaryColor.invoke()
                 else Color.Unspecified,
                 modifier = Modifier
-                    .clickable { onRatingChanged(i) }
+                    .noRippleClickable { onRatingChanged(i) }
                     .padding(4.dp)
                     .size(iconSize)
             )

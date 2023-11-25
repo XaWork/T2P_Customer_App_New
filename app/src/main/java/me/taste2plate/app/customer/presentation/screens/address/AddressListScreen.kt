@@ -44,6 +44,7 @@ fun AddressListScreen(
     onNavigateToEditAddEditScreen: () -> Unit,
     onPopUpToAddEditScreen: () -> Unit,
     viewModel: AddressViewModel,
+    navigateBack: () -> Unit,
 ) {
     val state = viewModel.state
     var showDeleteDialog by remember {
@@ -76,7 +77,7 @@ fun AddressListScreen(
         topBar = {
             AppTopBar(
                 title = "My Addresses"
-            ) {}
+            ) { navigateBack() }
         }
     ) {
         ContentAddressListScreen(state,

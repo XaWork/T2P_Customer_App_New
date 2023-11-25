@@ -38,7 +38,7 @@ import me.taste2plate.app.customer.presentation.widgets.showToast
 @Composable
 fun BulkOrderScreen(
     viewModel: BulkOrderViewModel = hiltViewModel(),
-    onNavigateToHomeScreen: () -> Unit
+    onNavigateToHomeScreen: () -> Unit,
 ) {
 
     val state = viewModel.state

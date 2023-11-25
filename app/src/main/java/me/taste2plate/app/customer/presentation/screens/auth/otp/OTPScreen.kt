@@ -30,6 +30,7 @@ import me.taste2plate.app.customer.presentation.theme.SpaceBetweenViewsAndSubVie
 import me.taste2plate.app.customer.presentation.theme.T2PCustomerAppTheme
 import me.taste2plate.app.customer.presentation.theme.outlineColor
 import me.taste2plate.app.customer.presentation.theme.primaryColor
+import me.taste2plate.app.customer.presentation.utils.noRippleClickable
 import me.taste2plate.app.customer.presentation.utils.verifyOtpString
 import me.taste2plate.app.customer.presentation.widgets.AppButton
 import me.taste2plate.app.customer.presentation.widgets.AppScaffold
@@ -158,7 +159,7 @@ fun OTPScreen(
             VerticalSpace(space = SpaceBetweenViews)
 
             Text(resendOTP, textAlign = TextAlign.Start, modifier = Modifier
-                .clickable {
+                .noRippleClickable {
                     if (seconds == 0)
                         viewModel.onEvent(AuthEvents.ResendOTP)
                 })

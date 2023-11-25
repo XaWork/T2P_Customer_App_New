@@ -35,6 +35,7 @@ import me.taste2plate.app.customer.presentation.theme.ScreenPadding
 import me.taste2plate.app.customer.presentation.theme.SpaceBetweenViews
 import me.taste2plate.app.customer.presentation.theme.T2PCustomerAppTheme
 import me.taste2plate.app.customer.presentation.utils.doneString
+import me.taste2plate.app.customer.presentation.utils.noRippleClickable
 import me.taste2plate.app.customer.presentation.widgets.AppButton
 import me.taste2plate.app.customer.presentation.widgets.AppEmptyView
 import me.taste2plate.app.customer.presentation.widgets.AppScaffold
@@ -48,7 +49,8 @@ import me.taste2plate.app.customer.utils.toDate
 @Composable
 fun OrderListScreen(
     viewModel: OrderViewModel,
-    onNavigateToOrderDetailsScreen: () -> Unit
+    onNavigateToOrderDetailsScreen: () -> Unit,
+    navigateBack: () -> Unit,
 ) {
     val state = viewModel.state
 
@@ -56,7 +58,7 @@ fun OrderListScreen(
         topBar = {
             AppTopBar(
                 title = "My Orders"
-            ) {}
+            ) {navigateBack()}
         }
     ) {
         if (state.isLoading)
@@ -120,7 +122,7 @@ fun SingleOrderInfoItem(
         ),
         borderWidth = 0.3.dp
     ) {
-        Column(modifier = Modifier.clickable {
+        Column(modifier = Modifier.noRippleClickable {
             onClick()
         }) {
             Row(
@@ -169,14 +171,5 @@ fun SingleOrderInfoItem(
                 modifier = Modifier.padding(ScreenPadding)
             )
         }
-    }
-}
-
-@Preview
-@Preview(name = "Dark Preview", uiMode = Configuration.UI_MODE_NIGHT_YES)
-@Composable
-fun OrderListScreenPreview() {
-    T2PCustomerAppTheme {
-        //OrderListScreen({})
     }
 }

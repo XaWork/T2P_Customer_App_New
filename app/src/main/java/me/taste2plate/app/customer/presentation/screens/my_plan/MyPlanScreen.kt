@@ -42,12 +42,13 @@ import me.taste2plate.app.customer.presentation.widgets.VerticalSpace
 
 @Composable
 fun MyPlanScreen(
-    viewModel: MyPlanViewModel = hiltViewModel()
+    viewModel: MyPlanViewModel = hiltViewModel(),
+    navigateBack: () -> Unit,
 ) {
     val state = viewModel.state
     AppScaffold(
         topBar = {
-            AppTopBar {}
+            AppTopBar { navigateBack() }
         },
     ) {
         if (state.isLoading)
@@ -176,12 +177,3 @@ fun MyPlanInfoCard(
     }
 }
 
-
-@Preview
-@Preview(name = "Dark Preview", uiMode = Configuration.UI_MODE_NIGHT_YES)
-@Composable
-fun MyPlanScreenPreview() {
-    T2PCustomerAppTheme {
-        MyPlanScreen()
-    }
-}

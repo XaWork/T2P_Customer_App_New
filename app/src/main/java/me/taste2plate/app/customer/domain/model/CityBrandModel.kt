@@ -21,7 +21,7 @@ data class CityBrandModel(
         @SerializedName("deleted")
         val deleted: Int,
         @SerializedName("description")
-        val description: String,
+        val description: String?,
         @SerializedName("desc")
         val desc: String,
         @SerializedName("description_after_content")

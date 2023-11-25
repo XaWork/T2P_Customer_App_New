@@ -21,6 +21,7 @@ import me.taste2plate.app.customer.domain.model.CouponModel
 import me.taste2plate.app.customer.presentation.theme.ScreenPadding
 import me.taste2plate.app.customer.presentation.theme.SpaceBetweenViewsAndSubViews
 import me.taste2plate.app.customer.presentation.theme.primaryColor
+import me.taste2plate.app.customer.presentation.utils.noRippleClickable
 import me.taste2plate.app.customer.presentation.widgets.AppDivider
 import me.taste2plate.app.customer.presentation.widgets.AppOutlineButton
 import me.taste2plate.app.customer.presentation.widgets.AppTextField
@@ -71,7 +72,7 @@ fun CouponBottomSheet(
         }
 
         itemsIndexed(coupons) { index, coupon ->
-            SingleCouponItem(modifier = Modifier.clickable {
+            SingleCouponItem(modifier = Modifier.noRippleClickable {
                 onItemSelected(index)
             }, coupon)
         }

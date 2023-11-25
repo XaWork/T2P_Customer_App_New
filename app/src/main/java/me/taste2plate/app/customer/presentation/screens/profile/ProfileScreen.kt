@@ -24,6 +24,7 @@ import me.taste2plate.app.customer.presentation.theme.SpaceBetweenViews
 import me.taste2plate.app.customer.presentation.theme.T2PCustomerAppTheme
 import me.taste2plate.app.customer.presentation.theme.onSecondaryColor
 import me.taste2plate.app.customer.presentation.theme.primaryColor
+import me.taste2plate.app.customer.presentation.utils.noRippleClickable
 import me.taste2plate.app.customer.presentation.widgets.AppScaffold
 import me.taste2plate.app.customer.presentation.widgets.AppTopBar
 import me.taste2plate.app.customer.presentation.widgets.RoundedCornerCard
@@ -36,13 +37,14 @@ fun ProfileScreen(
     viewModel: ProfileViewModel = hiltViewModel(),
     onNavigateToEditProfileScreen: () -> Unit,
     onNavigateToAddressListScreen: () -> Unit,
+    navigateBack: () -> Unit,
 
     ) {
     AppScaffold(
         topBar = {
             AppTopBar(
                 title = "Profile"
-            ) {}
+            ) {navigateBack()}
         }
     ) {
         ContentProfileScreen(
@@ -102,7 +104,7 @@ fun ContentProfileScreen(
                 TextAlignEnd(
                     text = "edit".uppercase(),
                     color = primaryColor.invoke(),
-                    modifier = Modifier.clickable {
+                    modifier = Modifier.noRippleClickable {
                         onNavigateToEditProfileScreen()
                     }
                 )
@@ -116,7 +118,7 @@ fun ContentProfileScreen(
                 containerColor = onSecondaryColor.invoke()
             ),
             elevation = LowElevation,
-            modifier = Modifier.clickable {
+            modifier = Modifier.noRippleClickable {
                 onNavigateToAddressListScreen()
             }
         ) {

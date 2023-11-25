@@ -221,7 +221,6 @@ class HomeViewModel @Inject constructor(
                             getCart()
                         else
                             getAddress()
-
                     }
 
                     is Resource.Error -> {

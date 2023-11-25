@@ -40,6 +40,7 @@ import me.taste2plate.app.customer.presentation.theme.SpaceBetweenViewsAndSubVie
 import me.taste2plate.app.customer.presentation.theme.T2PCustomerAppTheme
 import me.taste2plate.app.customer.presentation.theme.VeryLowSpacing
 import me.taste2plate.app.customer.presentation.theme.cardContainerOnSecondaryColor
+import me.taste2plate.app.customer.presentation.utils.noRippleClickable
 import me.taste2plate.app.customer.presentation.widgets.AppEmptyView
 import me.taste2plate.app.customer.presentation.widgets.AppScaffold
 import me.taste2plate.app.customer.presentation.widgets.AppTopBar
@@ -55,7 +56,8 @@ import me.taste2plate.app.customer.presentation.widgets.showToast
 fun ProductListScreen(
     itemInfo: CommonForItem,
     viewModel: ProductViewModel,
-    onNavigateToProductDetailsScreen: () -> Unit
+    onNavigateToProductDetailsScreen: () -> Unit,
+    navigateBack: () -> Unit,
 ) {
     val state = viewModel.state
 
@@ -80,7 +82,7 @@ fun ProductListScreen(
                 onCheckChange = {
                     viewModel.onEvent(ProductEvents.ChangeTaste)
                 }
-            ) {}
+            ) {navigateBack()}
         }
     ) {
         if (state.isLoading)
@@ -155,7 +157,7 @@ fun SingleProductItem(
     RoundedCornerCard(
         cardColor = cardContainerOnSecondaryColor.invoke(),
         elevation = MediumElevation,
-        modifier = Modifier.clickable {
+        modifier = Modifier.noRippleClickable {
             onNavigateToProductDetailsScreen()
         }
     ) {
@@ -208,15 +210,5 @@ fun SingleProductItem(
                 })
 
         }
-    }
-}
-
-
-@Preview
-@Preview(name = "Dark Preview", uiMode = Configuration.UI_MODE_NIGHT_YES)
-@Composable
-fun ProductListScreenPreview() {
-    T2PCustomerAppTheme {
-        // ProductListScreen({})
     }
 }

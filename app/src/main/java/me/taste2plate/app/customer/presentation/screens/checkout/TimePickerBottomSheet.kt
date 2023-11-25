@@ -23,6 +23,7 @@ import me.taste2plate.app.customer.domain.model.CouponModel
 import me.taste2plate.app.customer.presentation.theme.ScreenPadding
 import me.taste2plate.app.customer.presentation.theme.SpaceBetweenViewsAndSubViews
 import me.taste2plate.app.customer.presentation.theme.primaryColor
+import me.taste2plate.app.customer.presentation.utils.noRippleClickable
 import me.taste2plate.app.customer.presentation.widgets.AppDivider
 import me.taste2plate.app.customer.presentation.widgets.AppOutlineButton
 import me.taste2plate.app.customer.presentation.widgets.AppTextField
@@ -33,9 +34,6 @@ fun TimePickerBottomSheet(
     timeSlots: List<String>,
     onItemSelected: (index: Int) -> Unit
 ) {
-    var couponValue by remember {
-        mutableStateOf("")
-    }
 
     LazyColumn(
         modifier = Modifier
@@ -45,7 +43,7 @@ fun TimePickerBottomSheet(
 
         itemsIndexed(timeSlots) { index, timeSlot ->
             Column(
-                modifier = Modifier.clickable {
+                modifier = Modifier.noRippleClickable {
                     onItemSelected(index)
                 },
                 horizontalAlignment = Alignment.CenterHorizontally,

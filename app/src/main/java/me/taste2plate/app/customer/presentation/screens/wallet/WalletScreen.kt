@@ -47,13 +47,14 @@ import me.taste2plate.app.customer.presentation.widgets.SpaceBetweenRow
 
 @Composable
 fun WalletScreen(
-    viewModel: WalletViewModel = hiltViewModel()
+    viewModel: WalletViewModel = hiltViewModel(),
+    navigateBack: () -> Unit,
 ) {
     val state = viewModel.state
 
     AppScaffold(
         topBar = {
-            AppTopBar {}
+            AppTopBar {navigateBack()}
         },
     ) {
         if (state.isLoading)
@@ -200,11 +201,3 @@ fun SingleWalletTransaction(
     SpaceBetweenRow(items = items)
 }
 
-@Preview
-@Preview(name = "Dark Preview", uiMode = Configuration.UI_MODE_NIGHT_YES)
-@Composable
-fun WalletScreenPreview() {
-    T2PCustomerAppTheme {
-        // WalletScreen()
-    }
-}

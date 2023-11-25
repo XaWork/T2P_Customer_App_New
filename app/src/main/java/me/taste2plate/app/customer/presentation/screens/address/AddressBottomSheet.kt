@@ -18,6 +18,7 @@ import me.taste2plate.app.customer.presentation.theme.LowElevation
 import me.taste2plate.app.customer.presentation.theme.ScreenPadding
 import me.taste2plate.app.customer.presentation.theme.SpaceBetweenViewsAndSubViews
 import me.taste2plate.app.customer.presentation.theme.cardContainerOnSecondaryColor
+import me.taste2plate.app.customer.presentation.utils.noRippleClickable
 import me.taste2plate.app.customer.presentation.widgets.AppButton
 import me.taste2plate.app.customer.presentation.widgets.RoundedCornerCard
 import me.taste2plate.app.customer.presentation.widgets.ShowLoading
@@ -46,7 +47,7 @@ fun AddressBottomSheet(
             ) {
                 items(addressList) { address ->
                     SingleAddressItem(
-                        modifier = Modifier.clickable {
+                        modifier = Modifier.noRippleClickable {
                             setDefaultAddress(address)
                         },
                         address
