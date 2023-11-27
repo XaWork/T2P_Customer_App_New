@@ -1,6 +1,7 @@
 package me.taste2plate.app.customer.presentation.screens.citybrand
 
 import android.content.res.Configuration
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -18,6 +19,10 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -28,12 +33,14 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import me.taste2plate.app.customer.domain.mapper.CommonForItem
 import me.taste2plate.app.customer.presentation.screens.home.CityBrandScreens
+import me.taste2plate.app.customer.presentation.screens.home.widgets.AppSearchBar
 import me.taste2plate.app.customer.presentation.theme.HighPadding
 import me.taste2plate.app.customer.presentation.theme.HighRoundedCorners
 import me.taste2plate.app.customer.presentation.theme.LowElevation
 import me.taste2plate.app.customer.presentation.theme.LowPadding
 import me.taste2plate.app.customer.presentation.theme.ScreenPadding
 import me.taste2plate.app.customer.presentation.theme.SpaceBetweenViews
+import me.taste2plate.app.customer.presentation.theme.SpaceBetweenViewsAndSubViews
 import me.taste2plate.app.customer.presentation.theme.T2PCustomerAppTheme
 import me.taste2plate.app.customer.presentation.theme.backgroundColor
 import me.taste2plate.app.customer.presentation.theme.cardContainerOnSecondaryColor
@@ -46,6 +53,7 @@ import me.taste2plate.app.customer.presentation.widgets.NetworkImage
 import me.taste2plate.app.customer.presentation.widgets.RoundedCornerCard
 import me.taste2plate.app.customer.presentation.widgets.ShowLoading
 import me.taste2plate.app.customer.presentation.widgets.SpaceBetweenRow
+import me.taste2plate.app.customer.presentation.widgets.VerticalSpace
 
 @Composable
 fun CityBrandScreen(
@@ -72,7 +80,7 @@ fun CityBrandScreen(
                     CityBrandScreens.Category -> "Explore"
                     else -> "Flavours Of India"
                 }
-            ) {navigateBack()}
+            ) { navigateBack() }
         }
     ) {
         if (state.isLoading)
@@ -105,17 +113,40 @@ fun ContentCityBrandScreen(
     onNavigateToProductListScreen: (item: CommonForItem) -> Unit,
     onNavigateToDetailsScreen: (item: CommonForItem) -> Unit,
 ) {
-    LazyColumn(
-        modifier = Modifier.fillMaxSize(),
-        contentPadding = PaddingValues(ScreenPadding),
-        verticalArrangement = Arrangement.spacedBy(SpaceBetweenViews),
-    ) {
-        items(items) { item ->
-            SingleCityBrand(
-                item,
-                onNavigateToProductListScreen = { onNavigateToProductListScreen(item) },
-                onNavigateToDetailsScreen = { onNavigateToDetailsScreen(item) }
-            )
+    var searchValue by remember {
+        mutableStateOf("")
+    }
+
+    Column {
+        AppSearchBar(
+            value = searchValue,
+            onValueChange = {
+                searchValue = it
+            }
+        )
+
+        var modifyList = mutableListOf<CommonForItem>()
+        if (searchValue.isEmpty()) modifyList = items.toMutableList() else {
+            for (item in items) {
+                if (item.name.contains(searchValue, ignoreCase = true)) {
+                    modifyList.add(item)
+                }
+            }
+        }
+
+        LazyColumn(
+            modifier = Modifier.fillMaxSize(),
+            contentPadding = PaddingValues(ScreenPadding),
+            verticalArrangement = Arrangement.spacedBy(SpaceBetweenViews),
+        ) {
+
+            items(modifyList) { item ->
+                SingleCityBrand(
+                    item,
+                    onNavigateToProductListScreen = { onNavigateToProductListScreen(item) },
+                    onNavigateToDetailsScreen = { onNavigateToDetailsScreen(item) }
+                )
+            }
         }
     }
 }

@@ -18,6 +18,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import me.taste2plate.app.customer.presentation.screens.cart.CheckOutViewModel
+import me.taste2plate.app.customer.presentation.screens.cart.CheckoutState
 import me.taste2plate.app.customer.presentation.theme.SpaceBetweenViews
 import me.taste2plate.app.customer.presentation.theme.SpaceBetweenViewsAndSubViews
 import me.taste2plate.app.customer.presentation.theme.T2PCustomerAppTheme
@@ -29,17 +31,22 @@ import me.taste2plate.app.customer.presentation.widgets.VerticalSpace
 
 @Composable
 fun OrderConfirmScreen(
+    viewModel: CheckOutViewModel,
     onNavigateToHomeScreen: () -> Unit
 ) {
     AppScaffold {
-        OrderConfirmContent(onNavigateToHomeScreen = onNavigateToHomeScreen)
+        OrderConfirmContent(
+            state = viewModel.state,
+            onNavigateToHomeScreen = onNavigateToHomeScreen)
     }
 }
 
 @Composable
 fun OrderConfirmContent(
+    state: CheckoutState,
     onNavigateToHomeScreen: () -> Unit
 ) {
+    val orderInfo = state.orderConfirmModel!!.result
     Box(
         modifier = Modifier.fillMaxSize()
     ) {
@@ -66,7 +73,7 @@ fun OrderConfirmContent(
             VerticalSpace(space = SpaceBetweenViewsAndSubViews)
 
             Text(
-                text = "Order number".uppercase(),
+                text = orderInfo.orderid,
             )
 
             VerticalSpace(space = SpaceBetweenViewsAndSubViews)
@@ -81,7 +88,7 @@ fun OrderConfirmContent(
             VerticalSpace(space = SpaceBetweenViews)
 
             Text(
-                "estimated delivery".uppercase(),
+                orderInfo.timeslot.uppercase(),
                 fontSize = 25.sp,
                 color = primaryColor.invoke()
             )
@@ -107,6 +114,7 @@ fun OrderConfirmContent(
 }
 
 
+/*
 @Preview
 @Preview(name = "Dark Preview", uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
@@ -114,4 +122,4 @@ fun OrderConfirmScreenPreview() {
     T2PCustomerAppTheme {
         OrderConfirmScreen({})
     }
-}
+}*/

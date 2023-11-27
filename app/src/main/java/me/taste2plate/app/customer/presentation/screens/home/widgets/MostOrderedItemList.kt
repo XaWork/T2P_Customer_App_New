@@ -1,17 +1,15 @@
 package me.taste2plate.app.customer.presentation.screens.home.widgets
 
 import android.content.res.Configuration
-import androidx.compose.foundation.BorderStroke
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.pager.HorizontalPager
@@ -19,25 +17,21 @@ import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.ShoppingCart
 import androidx.compose.material.icons.rounded.Star
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.ColorFilter
-import androidx.compose.ui.text.SpanStyle
-import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.yield
 import me.taste2plate.app.customer.R
 import me.taste2plate.app.customer.domain.model.HomeModel
 import me.taste2plate.app.customer.domain.model.user.CartModel
@@ -51,7 +45,6 @@ import me.taste2plate.app.customer.presentation.theme.ForestGreenDark
 import me.taste2plate.app.customer.presentation.theme.LowPadding
 import me.taste2plate.app.customer.presentation.theme.LowRoundedCorners
 import me.taste2plate.app.customer.presentation.theme.ScreenPadding
-import me.taste2plate.app.customer.presentation.theme.SpaceBetweenViewsAndSubViews
 import me.taste2plate.app.customer.presentation.theme.T2PCustomerAppTheme
 import me.taste2plate.app.customer.presentation.theme.VeryLowSpacing
 import me.taste2plate.app.customer.presentation.theme.primaryColor
@@ -61,7 +54,6 @@ import me.taste2plate.app.customer.presentation.widgets.ImageWithWishlistButton
 import me.taste2plate.app.customer.presentation.widgets.InfoWithIcon
 import me.taste2plate.app.customer.presentation.widgets.MaterialIcon
 import me.taste2plate.app.customer.presentation.widgets.RedBorderCard
-import me.taste2plate.app.customer.presentation.widgets.RoundedCornerIconButton
 import me.taste2plate.app.customer.presentation.widgets.SpaceBetweenRow
 import me.taste2plate.app.customer.presentation.widgets.VerticalSpace
 import me.taste2plate.app.customer.presentation.widgets.simpleAnimation
@@ -70,6 +62,7 @@ import me.taste2plate.app.customer.presentation.widgets.simpleAnimation
 @Composable
 fun MostOrderedItemList(
     onNavigateToProductDetailsScreen: (productId: String) -> Unit,
+    autoSlideDuration: Long = 4000L,
     viewModel: HomeViewModel
 ) {
     val state = viewModel.state
@@ -77,18 +70,30 @@ fun MostOrderedItemList(
     val wishlistItems = state.wishListData!!.result
 
     val pagerState = rememberPagerState(pageCount = { foodItems.size })
+    LaunchedEffect(Unit) {
+        while (true) {
+            yield()
+            delay(autoSlideDuration)
+            pagerState.animateScrollToPage(
+                page = (pagerState.currentPage + 1) % (pagerState.pageCount),
+                animationSpec = tween(600)
+            )
+
+        }
+    }
+
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center,
-     /*   modifier = Modifier
-            .background(
-                brush = Brush.verticalGradient(
-                    colors = listOf(
-                        MaterialTheme.colorScheme.primary,
-                        MaterialTheme.colorScheme.background
-                    )
-                )
-            )*/
+        /*   modifier = Modifier
+               .background(
+                   brush = Brush.verticalGradient(
+                       colors = listOf(
+                           MaterialTheme.colorScheme.primary,
+                           MaterialTheme.colorScheme.background
+                       )
+                   )
+               )*/
     ) {
         HeadingChipWithLine("Most Ordered Item")
         VerticalSpace(space = VeryLowSpacing)
@@ -109,7 +114,9 @@ fun MostOrderedItemList(
             SingleMostOrderedItem(
                 page,
                 pagerState = pagerState,
-                modifier = Modifier.noRippleClickable { onNavigateToProductDetailsScreen(foodItems[page].id) },
+                modifier = Modifier
+                    .noRippleClickable { onNavigateToProductDetailsScreen(foodItems[page].id) }
+                    .simpleAnimation(pagerState, page),
                 state = state,
                 product = foodItems[page],
                 alreadyWishListed = alreadyInWishlist,
@@ -283,8 +290,8 @@ fun ProductPriceCard(
             fontSize = 14.sp,
             textInCircleFontSize = 14.sp,
             cartItemLength = cartItemLength, onUpdateCart = {
-            updateCart(it)
-        })
+                updateCart(it)
+            })
     }
 
 

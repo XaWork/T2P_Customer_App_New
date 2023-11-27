@@ -81,9 +81,6 @@ fun AddressListScreen(
         }
     ) {
         ContentAddressListScreen(state,
-            onNavigateToEditAddressScreen = {
-                onNavigateToEditAddEditScreen()
-            },
             onEdit = {
                 viewModel.onEvent(AddressEvents.StoreAddressId(it))
                 onNavigateToEditAddEditScreen()
@@ -103,7 +100,6 @@ fun AddressListScreen(
 @Composable
 fun ContentAddressListScreen(
     state: AddressState,
-    onNavigateToEditAddressScreen: () -> Unit,
     onNavigateToAddAddressScreen: () -> Unit,
     onEdit: (addressId: Int) -> Unit,
     onDelete: (addressId: Int) -> Unit

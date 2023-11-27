@@ -1,5 +1,7 @@
 package me.taste2plate.app.customer.presentation.screens.cart
 
+import android.app.Activity
+import android.content.Context
 import android.icu.text.DecimalFormat
 import android.util.Log
 import androidx.compose.runtime.getValue
@@ -8,8 +10,10 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.razorpay.Checkout
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
+import me.taste2plate.app.customer.MainActivity
 import me.taste2plate.app.customer.T2PApp
 import me.taste2plate.app.customer.data.Resource
 import me.taste2plate.app.customer.data.Status
@@ -19,13 +23,16 @@ import me.taste2plate.app.customer.domain.model.user.address.AddressListModel
 import me.taste2plate.app.customer.domain.use_case.ApplyCouponUseCase
 import me.taste2plate.app.customer.domain.use_case.CouponByCityUseCase
 import me.taste2plate.app.customer.domain.use_case.product.CutOffTimeCheckUseCase
+import me.taste2plate.app.customer.domain.use_case.user.InitCheckoutUseCase
 import me.taste2plate.app.customer.domain.use_case.user.MyPlanUseCase
+import me.taste2plate.app.customer.domain.use_case.user.OrderConfirmUseCase
 import me.taste2plate.app.customer.domain.use_case.user.address.AllAddressUseCase
 import me.taste2plate.app.customer.domain.use_case.user.cart.CartUseCase
 import me.taste2plate.app.customer.domain.use_case.user.cart.DeleteCartUseCase
 import me.taste2plate.app.customer.domain.use_case.user.cart.UpdateCartUseCase
 import me.taste2plate.app.customer.presentation.screens.checkout.DeliveryType
 import me.taste2plate.app.customer.presentation.screens.checkout.PaymentType
+import org.json.JSONObject
 import javax.inject.Inject
 
 @HiltViewModel
@@ -38,7 +45,9 @@ class CheckOutViewModel @Inject constructor(
     private val cutOffTimeCheckUseCase: CutOffTimeCheckUseCase,
     private val couponByCityUseCase: CouponByCityUseCase,
     private val applyCouponUseCase: ApplyCouponUseCase,
-    private val myPlanUseCase: MyPlanUseCase
+    private val myPlanUseCase: MyPlanUseCase,
+    private val initCheckoutUseCase: InitCheckoutUseCase,
+    private val orderConfirmUseCase: OrderConfirmUseCase
 ) : ViewModel() {
 
     var state by mutableStateOf(CheckoutState())
@@ -47,13 +56,14 @@ class CheckOutViewModel @Inject constructor(
     var walletChecked by mutableStateOf(false)
     var walletEnabled by mutableStateOf(false)
     var showDialogExpress by mutableStateOf(false)
-    var showOrderAmountDialog by mutableStateOf(false)
+    var showCustomDialog by mutableStateOf(false)
     var showDigitalCODDialog by mutableStateOf(false)
-    var showOrderAmountDialogMessage by mutableStateOf("")
+    var customDialogMessage by mutableStateOf("")
     var codEnabled by mutableStateOf(true)
     var expressEnabled by mutableStateOf(true)
 
     var selectedDate by mutableStateOf("")
+    var appliedCoupon by mutableStateOf("")
     var selectedTimeSlot by mutableStateOf("")
     var pointConversionText by mutableStateOf("")
     var price by mutableDoubleStateOf(0.0)
@@ -78,6 +88,10 @@ class CheckOutViewModel @Inject constructor(
     fun onEvent(event: CheckoutEvents) {
         when (event) {
             is CheckoutEvents.GetCart -> {}
+            is CheckoutEvents.Checkout -> {
+                allDetailFilled(event.context)
+            }
+
             is CheckoutEvents.ChangeMyPlanValue -> {
                 state = state.copy(myPlan = null)
             }
@@ -99,6 +113,7 @@ class CheckOutViewModel @Inject constructor(
 
             is CheckoutEvents.ChangePaymentType -> {
                 state = state.copy(paymentType = event.paymentType)
+                checkPriceRequirements()
             }
 
             is CheckoutEvents.GetUser -> {}
@@ -113,6 +128,13 @@ class CheckOutViewModel @Inject constructor(
                 }
 
                 state = state.copy(tips = updatedTipList)
+
+                val tipPrice = state.tips[event.index].tipPrice.toDouble()
+                if (state.tips[event.index].selected) {
+                    totalPrice += tipPrice
+                } else {
+                    totalPrice -= tipPrice
+                }
             }
 
             is CheckoutEvents.GetCoupons -> {
@@ -151,6 +173,24 @@ class CheckOutViewModel @Inject constructor(
         }
     }
 
+    private fun allDetailFilled(context: Context) {
+        val priceToCheck = if (state.deliveryType == DeliveryType.Express) {
+            state.cart!!.newFinalPrice.express.toFloat()
+        } else {
+            state.cart!!.newFinalPrice.normal.toFloat()
+        }
+        val minPrice =
+            state.settings!!.minimumOrderValue.toFloat()
+        if (selectedDate.isEmpty() && selectedTimeSlot.isEmpty())
+            state = state.copy(isError = true, errorMessage = "Select data and time.")
+        else if (priceToCheck < minPrice) {
+            customDialogMessage = "Order can be placed for amount bigger than Rs. $minPrice"
+            showCustomDialog = true
+        } else {
+            initCheckout(context)
+        }
+    }
+
     private fun checkPriceRequirements() {
         val priceToCheck = if (state.deliveryType == DeliveryType.Express) {
             state.cart!!.newFinalPrice.express.toFloat()
@@ -163,17 +203,17 @@ class CheckOutViewModel @Inject constructor(
         when (state.paymentType) {
             PaymentType.Online -> {
                 if (priceToCheck < minPrice) {
-                    showOrderAmountDialog = true
-                    showOrderAmountDialogMessage =
+                    showCustomDialog = true
+                    customDialogMessage =
                         "Online payment order can be placed for minimum amount of Rs. $minPrice"
                 }
             }
 
             PaymentType.COD -> {
                 if (priceToCheck < minPrice) {
-                    showOrderAmountDialogMessage =
+                    customDialogMessage =
                         "COD order can be placed for amount between Rs. $minPrice - Rs. $maxPrice"
-                    showOrderAmountDialog = true
+                    showCustomDialog = true
                 } else {
                     showDigitalCODDialog = true
                 }
@@ -187,6 +227,7 @@ class CheckOutViewModel @Inject constructor(
         when {
             state.applyCouponResponse != null -> {
                 if (state.deliveryType == DeliveryType.Standard) {
+                    codEnabled = false
                     val couponResponse = state.applyCouponResponse!!
                     deliveryCharge = couponResponse.shipping.normalShipping.toDouble()
 
@@ -229,6 +270,22 @@ class CheckOutViewModel @Inject constructor(
 
             state.cart != null -> {
                 if (state.deliveryType == DeliveryType.Standard) {
+                    codEnabled = false
+                    val cartData = state.cart!!
+                    deliveryCharge = cartData.shipping.normalShipping.toDouble()
+
+                    val tPrice = if (walletChecked) cartData.newFinalPrice.withWallet!!.normal
+                    else cartData.newFinalPrice.normal
+                    totalPrice = decimalFormat.format(tPrice.toDouble()).toDouble()
+
+                    igst = if (walletChecked) cartData.gstWithPoint.normal.totalIgst.toDouble()
+                    else cartData.gst.normal.totalIgst.toDouble()
+                    sgst = if (walletChecked) cartData.gstWithPoint.normal.totalSgst.toDouble()
+                    else cartData.gst.normal.totalSgst.toDouble()
+                    cgst = if (walletChecked) cartData.gstWithPoint.normal.totalCgst.toDouble()
+                    else cartData.gst.normal.totalCgst.toDouble()
+                    packagingFee = cartData.totalPackingPrice.toDouble()
+                } else {
                     val cartData = state.cart!!
                     deliveryCharge = cartData.shipping.expressShipping.toDouble()
 
@@ -243,8 +300,6 @@ class CheckOutViewModel @Inject constructor(
                     cgst = if (walletChecked) cartData.gstWithPoint.express.totalCgst.toDouble()
                     else cartData.gst.express.totalCgst.toDouble()
                     packagingFee = cartData.totalPackingPrice.toDouble()
-                } else {
-
                 }
             }
 
@@ -253,7 +308,6 @@ class CheckOutViewModel @Inject constructor(
             }
 
         }
-
         if (state.deliveryType == DeliveryType.Express)
             showDialogExpress = true
     }
@@ -401,6 +455,69 @@ class CheckOutViewModel @Inject constructor(
         }
     }
 
+    private fun confirmOrder(
+        gateWay: String,
+        orderId: String,
+        transactionId: String,
+        // context: Context
+    ) {
+        /* //added in application for conversion
+         val bundle = Bundle()
+         val mFirebaseAnalytics = FirebaseAnalytics.getInstance(context)
+         bundle.putString(FirebaseAnalytics.Param.COUPON, appliedCoupon)
+         bundle.putString(FirebaseAnalytics.Param.CURRENCY, "INR")
+         bundle.putString(FirebaseAnalytics.Param.PAYMENT_TYPE, gateWay)
+         mFirebaseAnalytics.logEvent(FirebaseAnalytics.Event.ADD_PAYMENT_INFO, bundle)*/
+
+        viewModelScope.launch {
+            orderConfirmUseCase.execute(
+                isWalletApplied = walletChecked,
+                gateWay, orderId, transactionId
+            ).collect { result ->
+                when (result) {
+                    is Resource.Loading -> state = state.copy(buttonLoading = true)
+                    is Resource.Success -> {
+                        val isError = result.data!!.status == Status.error.name
+                        val data = result.data
+
+                        state = state.copy(
+                            buttonLoading = false,
+                            orderConfirmModel = data,
+                            isError = isError,
+                            errorMessage = if (isError) data.message else null
+                        )
+
+                        if (!isError) {
+                            /*val bundle1 = Bundle()
+                            bundle1.putString(FirebaseAnalytics.Param.AFFILIATION, "affiliation")
+                            bundle1.putString(FirebaseAnalytics.Param.COUPON, appliedCoupon)
+                            bundle1.putString(FirebaseAnalytics.Param.CURRENCY, "INR")
+                            bundle1.putString(FirebaseAnalytics.Param.TRANSACTION_ID, transactionId)
+                            mFirebaseAnalytics.logEvent(FirebaseAnalytics.Event.PURCHASE, bundle)*/
+
+                            state = state.copy(
+                                isError = true,
+                                errorMessage = "Order placed",
+                                orderConfirmed = true
+                            )
+                        }
+
+
+                        //Todo: Send user to next Screen
+                    }
+
+                    is Resource.Error ->
+                        state = state.copy(
+                            buttonLoading = false,
+                            isError = true,
+                            errorMessage = result.message
+                        )
+                }
+
+            }
+        }
+    }
+
     private fun setPrice() {
         if (state.cart != null && state.cart!!.result.isNotEmpty())
             state.cart!!.apply {
@@ -429,7 +546,7 @@ class CheckOutViewModel @Inject constructor(
                 }
 
                 //cod enabled
-                codEnabled = openOrderValue < maxOpenCodOrder
+               // codEnabled = openOrderValue < maxOpenCodOrder
 
                 if (state.defaultAddress != null)
                     checkCutOffTime(
@@ -480,6 +597,144 @@ class CheckOutViewModel @Inject constructor(
             }
         }
     }
+
+    private fun initCheckout(
+        context: Context
+    ) {
+        var deliveryCost = ""
+        if (state.deliveryType == DeliveryType.Express) {
+            deliveryCost = if (state.applyCouponResponse != null)
+                state.applyCouponResponse!!.shipping.expressShipping
+            else
+                state.cart!!.shipping.expressShipping
+        }
+
+        var tipPrice = "0"
+        state.tips.forEach { if (it.selected) tipPrice = it.tipPrice.toString() }
+
+        var finalPrice = ""
+        if (state.deliveryType == DeliveryType.Express) {
+            finalPrice = if (state.applyCouponResponse != null) {
+                if (walletChecked) {
+                    state.applyCouponResponse!!.new_final_price.withWallet!!.express
+                } else {
+                    state.applyCouponResponse!!.new_final_price.express
+                }
+            } else {
+                if (walletChecked) {
+                    state.cart!!.newFinalPrice.withWallet!!.express
+                } else {
+                    state.cart!!.newFinalPrice.express
+                }
+            }
+        } else {
+            finalPrice = if (state.applyCouponResponse != null) {
+                if (walletChecked) {
+                    state.applyCouponResponse!!.new_final_price.withWallet!!.normal
+                } else {
+                    state.applyCouponResponse!!.new_final_price.normal
+                }
+            } else {
+                if (walletChecked) {
+                    state.cart!!.newFinalPrice.withWallet!!.normal
+                } else {
+                    state.cart!!.newFinalPrice.normal
+                }
+            }
+        }
+
+        viewModelScope.launch {
+            initCheckoutUseCase.execute(
+                walletDiscount = walletChecked,
+                timeSlot = selectedTimeSlot,
+                date = selectedDate,
+                deliveryCost = deliveryCost,
+                express = if (state.deliveryType == DeliveryType.Express) "Y" else "N",
+                couponCode = appliedCoupon,
+                couponType = if (state.applyCouponResponse != null) state.applyCouponResponse!!.coupon_type else "",
+                couponAmount = if (state.applyCouponResponse != null) state.applyCouponResponse!!.coupon_discount.toString() else "",
+                cartPrice = state.cart!!.cartprice,
+                tipPrice = tipPrice,
+                finalPrice = finalPrice,
+                addCost = "Of",
+                browser = "Android"
+            ).collect { result ->
+                when (result) {
+                    is Resource.Loading -> state = state.copy(buttonLoading = true)
+                    is Resource.Success -> {
+                        val data = result.data
+                        val isError = data?.status == Status.error.name
+
+                        state = state.copy(
+                            buttonLoading = false,
+                            isError = isError,
+                            errorMessage = if (isError) data!!.message else null,
+                            checkoutModel = data,
+                        )
+
+                        if (!isError) {
+                            state = state.copy(
+                                isError = true,
+                                errorMessage = "Order Created in Pending Status!"
+                            )
+
+                            if (state.paymentType == PaymentType.Online) {
+                               // Log.e("payment", "$finalPrice is this")
+                                startPayment(context, finalPrice.toDouble())
+                            } else {
+                                confirmOrder(
+                                    gateWay = "COD",
+                                    orderId = state.checkoutModel!!.orderId,
+                                    transactionId = "",
+                                    //context = context
+                                )
+                            }
+                        }
+                    }
+
+                    is Resource.Error ->
+                        state = state.copy(
+                            buttonLoading = false,
+                            isError = true,
+                            errorMessage = result.message,
+                            finish = false
+                        )
+                }
+
+            }
+        }
+    }
+
+    private fun startPayment(context : Context, price: Double) {
+
+        Checkout.preload(T2PApp.applicationContext())
+        val co = Checkout()
+        co.setKeyID("rzp_live_ZLgzjgdHBJDlP8")
+
+        try {
+            val options = JSONObject();
+            options.put("name", "Taste2Plate")
+            options.put("description", "Taste2Plate Order")
+            options.put("currency", "INR")
+            options.put("amount", (price * 100).toFloat())
+
+            val preFill = JSONObject();
+            val address = state.defaultAddress!!
+            val user = state.user!!
+            preFill.put("email", user.email)
+            preFill.put("contact", address.contactMobile)
+            options.put("prefill", preFill)
+            val activity: Activity = context as Activity
+            co.open(activity, options)
+
+            Log.e("Payment", "Payment successful")
+        } catch (e: Exception) {
+            state = state.copy(isError = true, errorMessage = "Error in payment: " + e.message)
+            Log.e("Payment", "Error in payment")
+            e.printStackTrace();
+        }
+    }
+
 
     private fun setDataAfterCheckCutOffTime() {
         if (state.cutOffTimeCheckModel != null)
@@ -593,6 +848,7 @@ class CheckOutViewModel @Inject constructor(
 
     private fun setDefaultAddress(address: AddressListModel.Result) {
         viewModelScope.launch {
+            userPref.saveDefaultAddress(address)
             state = state.copy(defaultAddress = address)
             getUser()
         }
@@ -689,12 +945,16 @@ class CheckOutViewModel @Inject constructor(
                         val data = result.data
                         val isError = data?.status == Status.error.name
 
+                        if (!isError)
+                            appliedCoupon = couponCode
+
                         state.copy(
                             isLoading = false,
                             isError = isError,
                             errorMessage = if (isError) data?.message else null,
                             applyCouponResponse = if (!isError) data else null,
                         )
+
                     }
 
                     is Resource.Error ->

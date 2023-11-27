@@ -82,43 +82,30 @@ fun ProductListScreen(
                 onCheckChange = {
                     viewModel.onEvent(ProductEvents.ChangeTaste)
                 }
-            ) {navigateBack()}
+            ) { navigateBack() }
         }
     ) {
         if (state.isLoading)
             ShowLoading(isButton = false)
         else {
-            Column {
-                if (itemInfo.name == "Search")
-                    AppSearchBar(
-                        value = viewModel.searchValue,
-                        onValueChange = { viewModel.searchValue = it }
-                    ) {
-                        Log.e("Searc", "onSearch")
-                        if (viewModel.searchValue.length >= 3)
-                            viewModel.onEvent(ProductEvents.GetProducts(itemInfo))
-                    }
-
-                if (state.productList.isEmpty())
-                    AppEmptyView()
-                else
-                    ContentProductListScreen(
-                        viewModel = viewModel,
-                        onNavigateToProductDetailsScreen = {
-                            viewModel.selectedProductId = it
-                            onNavigateToProductDetailsScreen()
-                        },
-                        updateCart = { quantity, productId ->
-                            viewModel.onEvent(ProductEvents.UpdateCart(quantity, productId))
-                        }
-                    )
-            }
+            ContentProductListScreen(
+                viewModel = viewModel,
+                itemInfo = itemInfo,
+                onNavigateToProductDetailsScreen = {
+                    viewModel.selectedProductId = it
+                    onNavigateToProductDetailsScreen()
+                },
+                updateCart = { quantity, productId ->
+                    viewModel.onEvent(ProductEvents.UpdateCart(quantity, productId))
+                }
+            )
         }
     }
 }
 
 @Composable
 fun ContentProductListScreen(
+    itemInfo: CommonForItem,
     viewModel: ProductViewModel,
     updateCart: (quantity: Int, productId: String) -> Unit,
     onNavigateToProductDetailsScreen: (productId: String) -> Unit
@@ -127,23 +114,47 @@ fun ContentProductListScreen(
     val state = viewModel.state
     val items: List<ProductListModel.Result> = state.productList
 
-    LazyColumn(
-        modifier = Modifier.fillMaxSize(),
-        contentPadding = PaddingValues(ScreenPadding),
-        verticalArrangement = Arrangement.spacedBy(SpaceBetweenViewsAndSubViews)
-    ) {
-        items(items) { item ->
-            SingleProductItem(
-                item,
-                state = state,
-                onNavigateToProductDetailsScreen = {
-                    onNavigateToProductDetailsScreen(item.id)
-                },
-                updateCart = {
-                    updateCart(it, item.id)
-                }
-            )
+    Column {
+        AppSearchBar(
+            value = viewModel.searchValue,
+            onValueChange = {
+                viewModel.searchValue = it
+            }
+        ) {
+            if (itemInfo.name == "Search" && viewModel.searchValue.length >= 3)
+                viewModel.onEvent(ProductEvents.GetProducts(itemInfo))
         }
+
+        val modifyList = mutableListOf<ProductListModel.Result>()
+        if (viewModel.searchValue.isEmpty()) items.forEach { modifyList.add(it) } else {
+            for (item in items) {
+                if (item.name.contains(viewModel.searchValue, ignoreCase = true)) {
+                    modifyList.add(item)
+                }
+            }
+        }
+
+        if (state.productList.isEmpty())
+            AppEmptyView()
+        else
+            LazyColumn(
+                modifier = Modifier.fillMaxSize(),
+                contentPadding = PaddingValues(ScreenPadding),
+                verticalArrangement = Arrangement.spacedBy(SpaceBetweenViewsAndSubViews)
+            ) {
+                items(modifyList) { item ->
+                    SingleProductItem(
+                        item,
+                        state = state,
+                        onNavigateToProductDetailsScreen = {
+                            onNavigateToProductDetailsScreen(item.id)
+                        },
+                        updateCart = {
+                            updateCart(it, item.id)
+                        }
+                    )
+                }
+            }
     }
 }
 

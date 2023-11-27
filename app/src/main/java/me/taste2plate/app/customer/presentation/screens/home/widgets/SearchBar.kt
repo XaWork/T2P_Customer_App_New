@@ -31,7 +31,7 @@ fun AppSearchBar(
     modifier: Modifier = Modifier,
     value: String,
     onValueChange: (String) -> Unit,
-    onSearch: () -> Unit
+    onSearch: () -> Unit = {}
 ) {
     OutlinedTextField(
         modifier = modifier

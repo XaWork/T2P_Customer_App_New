@@ -7,7 +7,7 @@ data class OrderListModel(
     @SerializedName("cancel_time")
     val cancelTime: String,
     @SerializedName("count")
-    val count: Int,
+    val count: String,
     @SerializedName("message")
     val message: String,
     @SerializedName("result")
@@ -31,17 +31,17 @@ data class OrderListModel(
         @SerializedName("bundle_id")
         val bundleId: Any,
         @SerializedName("bundle_qr")
-        val bundleQr: Int,
+        val bundleQr: String,
         @SerializedName("cargo_partner")
         val cargoPartner: CargoPartner,
         @SerializedName("cargo_partner_commission")
-        val cargoPartnerCommission: Int,
+        val cargoPartnerCommission: String,
         @SerializedName("cargo_position")
         val cargoPosition: CargoPosition,
         @SerializedName("cod_collected")
         val codCollected: String,
         @SerializedName("complementary")
-        val complementary: Int,
+        val complementary: String,
         @SerializedName("coupon")
         val coupon: String,
         @SerializedName("couponamount")
@@ -53,13 +53,13 @@ data class OrderListModel(
         @SerializedName("customer_order_status")
         val customerOrderStatus: String,
         @SerializedName("deleted")
-        val deleted: Int,
+        val deleted: String,
         @SerializedName("delivery_boy")
         val deliveryBoy: Any,
         @SerializedName("delivery_date")
         val deliveryDate: String,
         @SerializedName("delivery_distance")
-        val deliveryDistance: Int,
+        val deliveryDistance: String,
         @SerializedName("delivery_partner")
         val deliveryPartner: DeliveryPartner,
         @SerializedName("delivery_partner_commission")
@@ -87,13 +87,13 @@ data class OrderListModel(
         @SerializedName("order_city")
         val orderCity: String,
         @SerializedName("order_count")
-        val orderCount: Int,
+        val orderCount: String,
         @SerializedName("orderid")
         val orderid: String,
         @SerializedName("otp")
         val otp: String,
         @SerializedName("paid")
-        val paid: Int,
+        val paid: String,
         @SerializedName("partial_transaction")
         val partialTransaction: String,
         @SerializedName("partial_transaction_amount")
@@ -101,11 +101,11 @@ data class OrderListModel(
         @SerializedName("pickup_boy")
         val pickupBoy: Any,
         @SerializedName("pickup_distance")
-        val pickupDistance: Int,
+        val pickupDistance: String,
         @SerializedName("pickup_partner")
         val pickupPartner: PickupPartner,
         @SerializedName("pickup_partner_commission")
-        val pickupPartnerCommission: Int,
+        val pickupPartnerCommission: String,
         @SerializedName("pickup_weight")
         val pickupWeight: String,
         @SerializedName("position")
@@ -149,7 +149,7 @@ data class OrderListModel(
         @SerializedName("user")
         val user: User,
         @SerializedName("__v")
-        val v: Int,
+        val v: String,
         @SerializedName("vendor")
         val vendor: Vendor,
         @SerializedName("vendor_city")
@@ -173,7 +173,7 @@ data class OrderListModel(
             @SerializedName("created_date")
             val createdDate: String,
             @SerializedName("deleted")
-            val deleted: Int,
+            val deleted: String,
             @SerializedName("_id")
             val id: String,
             @SerializedName("landmark")
@@ -193,7 +193,7 @@ data class OrderListModel(
             @SerializedName("user")
             val user: String,
             @SerializedName("__v")
-            val v: Int
+            val v: String
         ) {
             data class City(
                 @SerializedName("_id")
@@ -227,11 +227,11 @@ data class OrderListModel(
             @SerializedName("acc_number")
             val accNumber: String,
             @SerializedName("active")
-            val active: Int,
+            val active: String,
             @SerializedName("additional_cost1")
-            val additionalCost1: Int,
+            val additionalCost1: String,
             @SerializedName("additional_cost2")
-            val additionalCost2: Int,
+            val additionalCost2: String,
             @SerializedName("address")
             val address: String,
             @SerializedName("bag_no")
@@ -251,7 +251,7 @@ data class OrderListModel(
             @SerializedName("cod")
             val cod: Any,
             @SerializedName("cod_order_cost")
-            val codOrderCost: Int,
+            val codOrderCost: String,
             @SerializedName("commission")
             val commission: String,
             @SerializedName("commission_type")
@@ -269,7 +269,7 @@ data class OrderListModel(
             @SerializedName("date_of_releiving")
             val dateOfReleiving: Any,
             @SerializedName("deleted")
-            val deleted: Int,
+            val deleted: String,
             @SerializedName("delivery_boy")
             val deliveryBoy: List<Any>,
             @SerializedName("delivery_city")
@@ -295,13 +295,13 @@ data class OrderListModel(
             @SerializedName("email")
             val email: String,
             @SerializedName("email_otp")
-            val emailOtp: Int,
+            val emailOtp: String,
             @SerializedName("father_name")
             val fatherName: String,
             @SerializedName("file")
             val `file`: String,
             @SerializedName("first_time")
-            val firstTime: Int,
+            val firstTime: String,
             @SerializedName("full_name")
             val fullName: String,
             @SerializedName("health_insurance_number")
@@ -311,7 +311,7 @@ data class OrderListModel(
             @SerializedName("ifsc")
             val ifsc: String,
             @SerializedName("login_active")
-            val loginActive: Int,
+            val loginActive: String,
             @SerializedName("lp_manager")
             val lpManager: List<Any>,
             @SerializedName("master")
@@ -325,7 +325,7 @@ data class OrderListModel(
             @SerializedName("office")
             val office: Any,
             @SerializedName("otp")
-            val otp: Int,
+            val otp: String,
             @SerializedName("pan")
             val pan: String,
             @SerializedName("password")
@@ -367,7 +367,7 @@ data class OrderListModel(
             @SerializedName("user_type")
             val userType: String,
             @SerializedName("__v")
-            val v: Int,
+            val v: String,
             @SerializedName("vendor_position")
             val vendorPosition: VendorPosition,
             @SerializedName("zipcode")
@@ -375,14 +375,14 @@ data class OrderListModel(
         ) {
             data class CargoPosition(
                 @SerializedName("coordinates")
-                val coordinates: List<Int>,
+                val coordinates: List<String>,
                 @SerializedName("type")
                 val type: String
             )
 
             data class DeliveryPartnerPosition(
                 @SerializedName("coordinates")
-                val coordinates: List<Int>,
+                val coordinates: List<String>,
                 @SerializedName("type")
                 val type: String
             )
@@ -394,15 +394,15 @@ data class OrderListModel(
                 val key: String,
                 @SerializedName("plan")
                 val plan: Any,
-                @SerializedName("point")
-                val point: Int,
+                @SerializedName("poString")
+                val point: String,
                 @SerializedName("updated")
                 val updated: Any
             )
 
             data class VendorPosition(
                 @SerializedName("coordinates")
-                val coordinates: List<Int>,
+                val coordinates: List<String>,
                 @SerializedName("type")
                 val type: String
             )
@@ -410,7 +410,7 @@ data class OrderListModel(
 
         data class CargoPosition(
             @SerializedName("coordinates")
-            val coordinates: List<Int>,
+            val coordinates: List<String>,
             @SerializedName("type")
             val type: String
         )
@@ -425,11 +425,11 @@ data class OrderListModel(
             @SerializedName("acc_number")
             val accNumber: String,
             @SerializedName("active")
-            val active: Int,
+            val active: String,
             @SerializedName("additional_cost1")
-            val additionalCost1: Int,
+            val additionalCost1: String,
             @SerializedName("additional_cost2")
-            val additionalCost2: Int,
+            val additionalCost2: String,
             @SerializedName("address")
             val address: String,
             @SerializedName("bag_no")
@@ -449,7 +449,7 @@ data class OrderListModel(
             @SerializedName("cod")
             val cod: Any,
             @SerializedName("cod_order_cost")
-            val codOrderCost: Int,
+            val codOrderCost: String,
             @SerializedName("commission")
             val commission: String,
             @SerializedName("commission_type")
@@ -467,7 +467,7 @@ data class OrderListModel(
             @SerializedName("date_of_releiving")
             val dateOfReleiving: Any,
             @SerializedName("deleted")
-            val deleted: Int,
+            val deleted: String,
             @SerializedName("delivery_boy")
             val deliveryBoy: List<Any>,
             @SerializedName("delivery_city")
@@ -493,13 +493,13 @@ data class OrderListModel(
             @SerializedName("email")
             val email: String,
             @SerializedName("email_otp")
-            val emailOtp: Int,
+            val emailOtp: String,
             @SerializedName("father_name")
             val fatherName: String,
             @SerializedName("file")
             val `file`: String,
             @SerializedName("first_time")
-            val firstTime: Int,
+            val firstTime: String,
             @SerializedName("full_name")
             val fullName: String,
             @SerializedName("health_insurance_number")
@@ -509,7 +509,7 @@ data class OrderListModel(
             @SerializedName("ifsc")
             val ifsc: String,
             @SerializedName("login_active")
-            val loginActive: Int,
+            val loginActive: String,
             @SerializedName("lp_manager")
             val lpManager: List<Any>,
             @SerializedName("master")
@@ -523,7 +523,7 @@ data class OrderListModel(
             @SerializedName("office")
             val office: Any,
             @SerializedName("otp")
-            val otp: Int,
+            val otp: String,
             @SerializedName("pan")
             val pan: String,
             @SerializedName("password")
@@ -567,7 +567,7 @@ data class OrderListModel(
             @SerializedName("user_type")
             val userType: String,
             @SerializedName("__v")
-            val v: Int,
+            val v: String,
             @SerializedName("vendor_position")
             val vendorPosition: VendorPosition,
             @SerializedName("zipcode")
@@ -575,14 +575,14 @@ data class OrderListModel(
         ) {
             data class CargoPosition(
                 @SerializedName("coordinates")
-                val coordinates: List<Int>,
+                val coordinates: List<String>,
                 @SerializedName("type")
                 val type: String
             )
 
             data class DeliveryPartnerPosition(
                 @SerializedName("coordinates")
-                val coordinates: List<Int>,
+                val coordinates: List<String>,
                 @SerializedName("type")
                 val type: String
             )
@@ -594,15 +594,15 @@ data class OrderListModel(
                 val key: String,
                 @SerializedName("plan")
                 val plan: Any,
-                @SerializedName("point")
-                val point: Int,
+                @SerializedName("poString")
+                val point: String,
                 @SerializedName("updated")
                 val updated: Any
             )
 
             data class VendorPosition(
                 @SerializedName("coordinates")
-                val coordinates: List<Int>,
+                val coordinates: List<String>,
                 @SerializedName("type")
                 val type: String
             )
@@ -610,7 +610,7 @@ data class OrderListModel(
 
         data class DeliveryPartnerPosition(
             @SerializedName("coordinates")
-            val coordinates: List<Int>,
+            val coordinates: List<String>,
             @SerializedName("type")
             val type: String
         )
@@ -625,11 +625,11 @@ data class OrderListModel(
             @SerializedName("acc_number")
             val accNumber: String,
             @SerializedName("active")
-            val active: Int,
+            val active: String,
             @SerializedName("additional_cost1")
-            val additionalCost1: Int,
+            val additionalCost1: String,
             @SerializedName("additional_cost2")
-            val additionalCost2: Int,
+            val additionalCost2: String,
             @SerializedName("address")
             val address: String,
             @SerializedName("bag_no")
@@ -649,7 +649,7 @@ data class OrderListModel(
             @SerializedName("cod")
             val cod: Any,
             @SerializedName("cod_order_cost")
-            val codOrderCost: Int,
+            val codOrderCost: String,
             @SerializedName("commission")
             val commission: String,
             @SerializedName("commission_type")
@@ -667,7 +667,7 @@ data class OrderListModel(
             @SerializedName("date_of_releiving")
             val dateOfReleiving: Any,
             @SerializedName("deleted")
-            val deleted: Int,
+            val deleted: String,
             @SerializedName("delivery_boy")
             val deliveryBoy: List<Any>,
             @SerializedName("delivery_city")
@@ -693,13 +693,13 @@ data class OrderListModel(
             @SerializedName("email")
             val email: String,
             @SerializedName("email_otp")
-            val emailOtp: Int,
+            val emailOtp: String,
             @SerializedName("father_name")
             val fatherName: String,
             @SerializedName("file")
             val `file`: String,
             @SerializedName("first_time")
-            val firstTime: Int,
+            val firstTime: String,
             @SerializedName("full_name")
             val fullName: String,
             @SerializedName("health_insurance_number")
@@ -709,7 +709,7 @@ data class OrderListModel(
             @SerializedName("ifsc")
             val ifsc: String,
             @SerializedName("login_active")
-            val loginActive: Int,
+            val loginActive: String,
             @SerializedName("lp_manager")
             val lpManager: List<Any>,
             @SerializedName("master")
@@ -723,7 +723,7 @@ data class OrderListModel(
             @SerializedName("office")
             val office: Any,
             @SerializedName("otp")
-            val otp: Int,
+            val otp: String,
             @SerializedName("pan")
             val pan: String,
             @SerializedName("password")
@@ -767,7 +767,7 @@ data class OrderListModel(
             @SerializedName("user_type")
             val userType: String,
             @SerializedName("__v")
-            val v: Int,
+            val v: String,
             @SerializedName("vendor_position")
             val vendorPosition: VendorPosition,
             @SerializedName("zipcode")
@@ -775,14 +775,14 @@ data class OrderListModel(
         ) {
             data class CargoPosition(
                 @SerializedName("coordinates")
-                val coordinates: List<Int>,
+                val coordinates: List<String>,
                 @SerializedName("type")
                 val type: String
             )
 
             data class DeliveryPartnerPosition(
                 @SerializedName("coordinates")
-                val coordinates: List<Int>,
+                val coordinates: List<String>,
                 @SerializedName("type")
                 val type: String
             )
@@ -795,14 +795,14 @@ data class OrderListModel(
                 @SerializedName("plan")
                 val plan: Any,
                 @SerializedName("point")
-                val point: Int,
+                val point: String,
                 @SerializedName("updated")
                 val updated: Any
             )
 
             data class VendorPosition(
                 @SerializedName("coordinates")
-                val coordinates: List<Int>,
+                val coordinates: List<String>,
                 @SerializedName("type")
                 val type: String
             )
@@ -810,7 +810,7 @@ data class OrderListModel(
 
         data class Position(
             @SerializedName("coordinates")
-            val coordinates: List<Int>,
+            val coordinates: List<String>,
             @SerializedName("type")
             val type: String
         )
@@ -827,13 +827,13 @@ data class OrderListModel(
             @SerializedName("_id")
             val id: String,
             @SerializedName("price")
-            val price: Int,
+            val price: String,
             @SerializedName("product")
             val product: Product,
             @SerializedName("productname")
             val productname: String,
             @SerializedName("quantity")
-            val quantity: Int,
+            val quantity: String,
             @SerializedName("sub_category")
             val subCategory: String,
             @SerializedName("user")
@@ -843,7 +843,7 @@ data class OrderListModel(
         ) {
             data class Product(
                 @SerializedName("active")
-                val active: Int,
+                val active: String,
                 @SerializedName("added_by")
                 val addedBy: String,
                 @SerializedName("attribute")
@@ -865,15 +865,15 @@ data class OrderListModel(
                 @SerializedName("commission")
                 val commission: String,
                 @SerializedName("consumable")
-                val consumable: Int,
+                val consumable: String,
                 @SerializedName("created_date")
                 val createdDate: String,
                 @SerializedName("cuisine")
                 val cuisine: String,
                 @SerializedName("deal")
-                val deal: Int,
+                val deal: String,
                 @SerializedName("deleted")
-                val deleted: Int,
+                val deleted: String,
                 @SerializedName("desc")
                 val desc: String,
                 @SerializedName("discounted_price")
@@ -883,7 +883,7 @@ data class OrderListModel(
                 @SerializedName("express")
                 val express: Boolean,
                 @SerializedName("featured")
-                val featured: Int,
+                val featured: String,
                 @SerializedName("file")
                 val `file`: List<File>,
                 @SerializedName("height")
@@ -895,17 +895,17 @@ data class OrderListModel(
                 @SerializedName("length")
                 val length: String,
                 @SerializedName("manage_stock")
-                val manageStock: Int,
+                val manageStock: String,
                 @SerializedName("name")
                 val name: String,
                 @SerializedName("packaging_charge")
                 val packagingCharge: String,
                 @SerializedName("point")
-                val point: Int,
+                val point: String,
                 @SerializedName("point_exp_date")
                 val pointExpDate: String,
                 @SerializedName("price")
-                val price: Int,
+                val price: String,
                 @SerializedName("purchase_price")
                 val purchasePrice: String,
                 @SerializedName("selling_price")
@@ -937,17 +937,17 @@ data class OrderListModel(
                 @SerializedName("tags")
                 val tags: String,
                 @SerializedName("taste")
-                val taste: Int,
+                val taste: String,
                 @SerializedName("tax_status")
                 val taxStatus: String,
                 @SerializedName("threshold")
                 val threshold: String,
                 @SerializedName("top")
-                val top: Int,
+                val top: String,
                 @SerializedName("update_date")
                 val updateDate: String,
                 @SerializedName("__v")
-                val v: Int,
+                val v: String,
                 @SerializedName("vendor")
                 val vendor: String,
                 @SerializedName("weight")
@@ -983,7 +983,7 @@ data class OrderListModel(
                     @SerializedName("serverSideEncryption")
                     val serverSideEncryption: Any,
                     @SerializedName("size")
-                    val size: Int,
+                    val size: String,
                     @SerializedName("storageClass")
                     val storageClass: String
                 )
@@ -1000,11 +1000,11 @@ data class OrderListModel(
             @SerializedName("acc_number")
             val accNumber: Any,
             @SerializedName("active")
-            val active: Int,
+            val active: String,
             @SerializedName("additional_cost1")
-            val additionalCost1: Int,
+            val additionalCost1: String,
             @SerializedName("additional_cost2")
-            val additionalCost2: Int,
+            val additionalCost2: String,
             @SerializedName("address")
             val address: String,
             @SerializedName("bag_no")
@@ -1022,9 +1022,9 @@ data class OrderListModel(
             @SerializedName("city2")
             val city2: String,
             @SerializedName("cod")
-            val cod: Int,
+            val cod: String,
             @SerializedName("cod_order_cost")
-            val codOrderCost: Int,
+            val codOrderCost: String,
             @SerializedName("commission")
             val commission: String,
             @SerializedName("commission_type")
@@ -1042,7 +1042,7 @@ data class OrderListModel(
             @SerializedName("date_of_releiving")
             val dateOfReleiving: Any,
             @SerializedName("deleted")
-            val deleted: Int,
+            val deleted: String,
             @SerializedName("delivery_boy")
             val deliveryBoy: List<Any>,
             @SerializedName("delivery_city")
@@ -1068,13 +1068,13 @@ data class OrderListModel(
             @SerializedName("email")
             val email: String,
             @SerializedName("email_otp")
-            val emailOtp: Int,
+            val emailOtp: String,
             @SerializedName("father_name")
             val fatherName: String,
             @SerializedName("file")
             val `file`: String,
             @SerializedName("first_time")
-            val firstTime: Int,
+            val firstTime: String,
             @SerializedName("full_name")
             val fullName: String,
             @SerializedName("health_insurance_number")
@@ -1084,7 +1084,7 @@ data class OrderListModel(
             @SerializedName("ifsc")
             val ifsc: Any,
             @SerializedName("login_active")
-            val loginActive: Int,
+            val loginActive: String,
             @SerializedName("lp_manager")
             val lpManager: List<Any>,
             @SerializedName("master")
@@ -1142,7 +1142,7 @@ data class OrderListModel(
             @SerializedName("user_type")
             val userType: String,
             @SerializedName("__v")
-            val v: Int,
+            val v: String,
             @SerializedName("vendor_position")
             val vendorPosition: VendorPosition,
             @SerializedName("zipcode")
@@ -1150,14 +1150,14 @@ data class OrderListModel(
         ) {
             data class CargoPosition(
                 @SerializedName("coordinates")
-                val coordinates: List<Int>,
+                val coordinates: List<String>,
                 @SerializedName("type")
                 val type: String
             )
 
             data class DeliveryPartnerPosition(
                 @SerializedName("coordinates")
-                val coordinates: List<Int>,
+                val coordinates: List<String>,
                 @SerializedName("type")
                 val type: String
             )
@@ -1170,14 +1170,14 @@ data class OrderListModel(
                 @SerializedName("plan")
                 val plan: Any,
                 @SerializedName("point")
-                val point: Int,
+                val point: String,
                 @SerializedName("updated")
                 val updated: Any
             )
 
             data class VendorPosition(
                 @SerializedName("coordinates")
-                val coordinates: List<Int>,
+                val coordinates: List<String>,
                 @SerializedName("type")
                 val type: String
             )
@@ -1193,11 +1193,11 @@ data class OrderListModel(
             @SerializedName("acc_number")
             val accNumber: Any,
             @SerializedName("active")
-            val active: Int,
+            val active: String,
             @SerializedName("additional_cost1")
-            val additionalCost1: Int,
+            val additionalCost1: String,
             @SerializedName("additional_cost2")
-            val additionalCost2: Int,
+            val additionalCost2: String,
             @SerializedName("address")
             val address: String,
             @SerializedName("bag_no")
@@ -1215,9 +1215,9 @@ data class OrderListModel(
             @SerializedName("city2")
             val city2: String,
             @SerializedName("cod")
-            val cod: Int,
+            val cod: String,
             @SerializedName("cod_order_cost")
-            val codOrderCost: Int,
+            val codOrderCost: String,
             @SerializedName("commission")
             val commission: String,
             @SerializedName("commission_type")
@@ -1235,7 +1235,7 @@ data class OrderListModel(
             @SerializedName("date_of_releiving")
             val dateOfReleiving: Any,
             @SerializedName("deleted")
-            val deleted: Int,
+            val deleted: String,
             @SerializedName("delivery_boy")
             val deliveryBoy: List<Any>,
             @SerializedName("delivery_city")
@@ -1261,13 +1261,13 @@ data class OrderListModel(
             @SerializedName("email")
             val email: String,
             @SerializedName("email_otp")
-            val emailOtp: Int,
+            val emailOtp: String,
             @SerializedName("father_name")
             val fatherName: String,
             @SerializedName("file")
             val `file`: String,
             @SerializedName("first_time")
-            val firstTime: Int,
+            val firstTime: String,
             @SerializedName("full_name")
             val fullName: String,
             @SerializedName("health_insurance_number")
@@ -1277,7 +1277,7 @@ data class OrderListModel(
             @SerializedName("ifsc")
             val ifsc: Any,
             @SerializedName("login_active")
-            val loginActive: Int,
+            val loginActive: String,
             @SerializedName("lp_manager")
             val lpManager: List<Any>,
             @SerializedName("master")
@@ -1291,7 +1291,7 @@ data class OrderListModel(
             @SerializedName("office")
             val office: Any,
             @SerializedName("otp")
-            val otp: Int,
+            val otp: String,
             @SerializedName("pan")
             val pan: String,
             @SerializedName("password")
@@ -1333,7 +1333,7 @@ data class OrderListModel(
             @SerializedName("user_type")
             val userType: String,
             @SerializedName("__v")
-            val v: Int,
+            val v: String,
             @SerializedName("vendor_position")
             val vendorPosition: VendorPosition,
             @SerializedName("zipcode")
@@ -1341,14 +1341,14 @@ data class OrderListModel(
         ) {
             data class CargoPosition(
                 @SerializedName("coordinates")
-                val coordinates: List<Int>,
+                val coordinates: List<String>,
                 @SerializedName("type")
                 val type: String
             )
 
             data class DeliveryPartnerPosition(
                 @SerializedName("coordinates")
-                val coordinates: List<Int>,
+                val coordinates: List<String>,
                 @SerializedName("type")
                 val type: String
             )
@@ -1361,14 +1361,14 @@ data class OrderListModel(
                 @SerializedName("plan")
                 val plan: Any,
                 @SerializedName("point")
-                val point: Int,
+                val point: String,
                 @SerializedName("updated")
                 val updated: Any
             )
 
             data class VendorPosition(
                 @SerializedName("coordinates")
-                val coordinates: List<Int>,
+                val coordinates: List<String>,
                 @SerializedName("type")
                 val type: String
             )
@@ -1376,7 +1376,7 @@ data class OrderListModel(
 
         data class VendorPosition(
             @SerializedName("coordinates")
-            val coordinates: List<Int>,
+            val coordinates: List<String>,
             @SerializedName("type")
             val type: String
         )

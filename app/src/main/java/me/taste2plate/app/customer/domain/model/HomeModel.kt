@@ -166,13 +166,13 @@ data class HomeModel(
         @SerializedName("batchno")
         val batchno: String,
         @SerializedName("brand")
-        val brand: Brand,
+        val brand: String,
         @SerializedName("category")
-        val category: Category,
+        val category: String,
         @SerializedName("cgst")
         val cgst: String,
         @SerializedName("city")
-        val city: City,
+        val city: String,
         @SerializedName("combo_products")
         val comboProducts: Any,
         @SerializedName("commission")
@@ -182,7 +182,7 @@ data class HomeModel(
         @SerializedName("created_date")
         val createdDate: String,
         @SerializedName("cuisine")
-        val cuisine: Cuisine,
+        val cuisine: String,
         @SerializedName("deal")
         val deal: Int,
         @SerializedName("deleted")
@@ -221,6 +221,8 @@ data class HomeModel(
         val price: String,
         @SerializedName("purchase_price")
         val purchasePrice: String,
+        @SerializedName("rating")
+        val rating: String,
         @SerializedName("selling_price")
         val sellingPrice: String?,
         @SerializedName("seo_description")
@@ -246,7 +248,7 @@ data class HomeModel(
         @SerializedName("stock_qty")
         val stockQty: String,
         @SerializedName("sub_category")
-        val subCategory: SubCategory,
+        val subCategory: String,
         @SerializedName("tags")
         val tags: String,
         @SerializedName("taste")
@@ -268,34 +270,6 @@ data class HomeModel(
         @SerializedName("width")
         val width: String
     ) {
-        data class Brand(
-            @SerializedName("_id")
-            val id: String,
-            @SerializedName("name")
-            val name: String
-        )
-
-        data class Category(
-            @SerializedName("_id")
-            val id: String,
-            @SerializedName("name")
-            val name: String
-        )
-
-        data class City(
-            @SerializedName("_id")
-            val id: String,
-            @SerializedName("name")
-            val name: String
-        )
-
-        data class Cuisine(
-            @SerializedName("_id")
-            val id: String,
-            @SerializedName("name")
-            val name: String
-        )
-
         data class File(
             @SerializedName("acl")
             val acl: String,
@@ -331,13 +305,6 @@ data class HomeModel(
             val storageClass: String,
             @SerializedName("versionId")
             val versionId: Any
-        )
-
-        data class SubCategory(
-            @SerializedName("_id")
-            val id: String,
-            @SerializedName("name")
-            val name: String
         )
     }
 
@@ -353,13 +320,13 @@ data class HomeModel(
         @SerializedName("batchno")
         val batchno: String,
         @SerializedName("brand")
-        val brand: Brand,
+        val brand: String,
         @SerializedName("category")
-        val category: Category,
+        val category: String,
         @SerializedName("cgst")
         val cgst: String,
         @SerializedName("city")
-        val city: City,
+        val city: String,
         @SerializedName("combo_products")
         val comboProducts: Any,
         @SerializedName("commission")
@@ -369,7 +336,7 @@ data class HomeModel(
         @SerializedName("created_date")
         val createdDate: String,
         @SerializedName("cuisine")
-        val cuisine: Cuisine,
+        val cuisine: String,
         @SerializedName("deal")
         val deal: Int,
         @SerializedName("deleted")
@@ -408,6 +375,8 @@ data class HomeModel(
         val price: String,
         @SerializedName("purchase_price")
         val purchasePrice: String,
+        @SerializedName("rating")
+        val rating: String,
         @SerializedName("selling_price")
         val sellingPrice: String?,
         @SerializedName("seo_description")
@@ -433,7 +402,7 @@ data class HomeModel(
         @SerializedName("stock_qty")
         val stockQty: String,
         @SerializedName("sub_category")
-        val subCategory: SubCategory,
+        val subCategory: String,
         @SerializedName("tags")
         val tags: String,
         @SerializedName("taste")
@@ -455,34 +424,6 @@ data class HomeModel(
         @SerializedName("width")
         val width: String
     ) {
-        data class Brand(
-            @SerializedName("_id")
-            val id: String,
-            @SerializedName("name")
-            val name: String
-        )
-
-        data class Category(
-            @SerializedName("_id")
-            val id: String,
-            @SerializedName("name")
-            val name: String
-        )
-
-        data class City(
-            @SerializedName("_id")
-            val id: String,
-            @SerializedName("name")
-            val name: String
-        )
-
-        data class Cuisine(
-            @SerializedName("_id")
-            val id: String,
-            @SerializedName("name")
-            val name: String
-        )
-
         data class File(
             @SerializedName("acl")
             val acl: String,
@@ -519,13 +460,6 @@ data class HomeModel(
             @SerializedName("versionId")
             val versionId: Any
         )
-
-        data class SubCategory(
-            @SerializedName("_id")
-            val id: String,
-            @SerializedName("name")
-            val name: String
-        )
     }
 
     data class ProductDeal(
@@ -540,13 +474,13 @@ data class HomeModel(
         @SerializedName("batchno")
         val batchno: String,
         @SerializedName("brand")
-        val brand: Brand,
+        val brand: String,
         @SerializedName("category")
-        val category: Category,
+        val category: String,
         @SerializedName("cgst")
         val cgst: String,
         @SerializedName("city")
-        val city: City,
+        val city: String,
         @SerializedName("combo_products")
         val comboProducts: Any,
         @SerializedName("commission")
@@ -556,7 +490,7 @@ data class HomeModel(
         @SerializedName("created_date")
         val createdDate: String,
         @SerializedName("cuisine")
-        val cuisine: Cuisine,
+        val cuisine: String,
         @SerializedName("deal")
         val deal: Int,
         @SerializedName("deleted")
@@ -595,6 +529,8 @@ data class HomeModel(
         val price: String,
         @SerializedName("purchase_price")
         val purchasePrice: String,
+        @SerializedName("rating")
+        val rating: String,
         @SerializedName("selling_price")
         val sellingPrice: String?,
         @SerializedName("seo_description")
@@ -620,7 +556,7 @@ data class HomeModel(
         @SerializedName("stock_qty")
         val stockQty: String,
         @SerializedName("sub_category")
-        val subCategory: SubCategory,
+        val subCategory: String,
         @SerializedName("tags")
         val tags: String,
         @SerializedName("taste")
@@ -642,34 +578,6 @@ data class HomeModel(
         @SerializedName("width")
         val width: String
     ) {
-        data class Brand(
-            @SerializedName("_id")
-            val id: String,
-            @SerializedName("name")
-            val name: String
-        )
-
-        data class Category(
-            @SerializedName("_id")
-            val id: String,
-            @SerializedName("name")
-            val name: String
-        )
-
-        data class City(
-            @SerializedName("_id")
-            val id: String,
-            @SerializedName("name")
-            val name: String
-        )
-
-        data class Cuisine(
-            @SerializedName("_id")
-            val id: String,
-            @SerializedName("name")
-            val name: String
-        )
-
         data class File(
             @SerializedName("acl")
             val acl: String,
@@ -677,6 +585,8 @@ data class HomeModel(
             val bucket: String,
             @SerializedName("contentDisposition")
             val contentDisposition: Any,
+            @SerializedName("contentEncoding")
+            val contentEncoding: Any,
             @SerializedName("contentType")
             val contentType: String,
             @SerializedName("encoding")
@@ -700,14 +610,9 @@ data class HomeModel(
             @SerializedName("size")
             val size: Int,
             @SerializedName("storageClass")
-            val storageClass: String
-        )
-
-        data class SubCategory(
-            @SerializedName("_id")
-            val id: String,
-            @SerializedName("name")
-            val name: String
+            val storageClass: String,
+            @SerializedName("versionId")
+            val versionId: Any
         )
     }
 
@@ -957,6 +862,8 @@ data class HomeModel(
             val price: Int,
             @SerializedName("purchase_price")
             val purchasePrice: String,
+            @SerializedName("rating")
+            val rating: String,
             @SerializedName("selling_price")
             val sellingPrice: Int,
             @SerializedName("seo_description")

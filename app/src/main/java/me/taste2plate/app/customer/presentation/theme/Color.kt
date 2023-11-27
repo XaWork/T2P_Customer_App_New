@@ -85,6 +85,8 @@ val YellowBannerDark = Color(0xFF6c5e00)
 val ForestGreen = Color(0xFF176d29)
 val ForestGreenDark = Color(0xFF86d988)
 
+val whatsappColor = Color(0xFF28D146)
+
 
 val forestGreen: @Composable () -> Color = {
     if (isSystemInDarkTheme())

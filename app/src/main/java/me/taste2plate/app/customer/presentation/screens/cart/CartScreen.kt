@@ -133,7 +133,7 @@ fun ContentCartAndWishlist(
                 AppButton(
                     modifier = Modifier
                         .padding(horizontal = ScreenPadding),
-                    text = "Shop More"
+                    text = "Continue Shopping"
                 ) {
                     onBackPress()
                 }
@@ -221,6 +221,7 @@ fun SingleCartAndWishlistItem(
     }
 }
 
+/*
 @Preview
 @Preview(name = "Dark Preview", uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
@@ -228,4 +229,4 @@ fun CartScreenPreview() {
     T2PCustomerAppTheme {
         //CartScreen({})
     }
-}
+}*/

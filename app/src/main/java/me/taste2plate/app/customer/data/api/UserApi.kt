@@ -4,10 +4,12 @@ import me.taste2plate.app.customer.domain.model.ApplyCouponModel
 import me.taste2plate.app.customer.domain.model.auth.LoginModel
 import me.taste2plate.app.customer.domain.model.auth.VerifyOTPModel
 import me.taste2plate.app.customer.domain.model.user.CartModel
+import me.taste2plate.app.customer.domain.model.user.CheckoutModel
 import me.taste2plate.app.customer.domain.model.user.CommonResponse
 import me.taste2plate.app.customer.domain.model.user.DeleteFromWishlistModel
 import me.taste2plate.app.customer.domain.model.user.GetProfileModel
 import me.taste2plate.app.customer.domain.model.user.MyPlanModel
+import me.taste2plate.app.customer.domain.model.user.OrderConfirmModel
 import me.taste2plate.app.customer.domain.model.user.OrderListModel
 import me.taste2plate.app.customer.domain.model.user.OrderUpdateModel
 import me.taste2plate.app.customer.domain.model.user.WalletTransactionModel
@@ -205,4 +207,36 @@ interface UserApi {
         @Field("rating") rating: Float,
         @Field("review") reviewText: String,
     ): CommonResponse
+
+    @FormUrlEncoded
+    @POST("checkout")
+    suspend fun initCheckout(
+        @Field("wallet_discount") walletDiscount: Boolean,
+        @Field("userid") userId: String,
+        @Field("address") addressId: String,
+        @Field("timeslot") timeSlot: String,
+        @Field("delivery_date") date: String,
+        @Field("shipping_price") deliveryCost: String,
+        @Field("express") express: String,
+        @Field("coupon") couponCode: String,
+        @Field("coupontype") couponType: String,
+        @Field("couponamount") couponAmount: String,
+        @Field("price") cartPrice: String,
+        @Field("tip_price") tipPrice: String,
+        @Field("final_price") finalPrice: String,
+        @Field("customer_city") customerCity: String,
+        @Field("additional_cost") addCost: String,
+        @Field("customer_zip") zip: String,
+        @Field("browser") browser: String,
+    ): CheckoutModel
+
+
+    @FormUrlEncoded
+    @POST("checkout-confirm")
+    suspend fun confirmOrder(
+        @Field("wallet_discount") isWalletApplied: Boolean,
+        @Field("gateway") gateWay: String,
+        @Field("orderid") orderId: String,
+        @Field("transactionid") transactionId: String,
+    ): OrderConfirmModel
 }

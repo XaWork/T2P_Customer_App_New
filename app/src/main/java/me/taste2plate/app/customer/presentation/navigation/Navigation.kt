@@ -16,6 +16,7 @@ import androidx.navigation.navigation
 import com.google.android.gms.maps.model.LatLng
 import com.google.gson.Gson
 import me.taste2plate.app.customer.domain.mapper.CommonForItem
+import me.taste2plate.app.customer.domain.model.user.OrderConfirmModel
 import me.taste2plate.app.customer.presentation.screens.address.AddEditAddressScreen
 import me.taste2plate.app.customer.presentation.screens.address.AddressListScreen
 import me.taste2plate.app.customer.presentation.screens.address.AddressViewModel
@@ -366,6 +367,7 @@ fun Navigation() {
                 val viewModel =
                     entry.sharedViewModel<ProductViewModel>(navHostController = navController)
                 val id = entry.arguments?.getString("id")
+
                 ProductDetailsScreen(
                     productId = id,
                     viewModel = viewModel,
@@ -424,7 +426,9 @@ fun Navigation() {
             composable(route = Screens.DetailsScreen.route) { entry ->
                 val viewModel =
                     entry.sharedViewModel<CityBrandViewModel>(navHostController = navController)
-                DetailScreen(viewModel)
+                DetailScreen(viewModel){
+                    navController.popBackStack()
+                }
             }
 
             // ----------------------------> SubCategory Screen <--------------------------------------
@@ -482,8 +486,12 @@ fun Navigation() {
             }
 
             // ----------------------------> Order Confirmed <--------------------------------------
-            composable(route = Screens.OrderConfirmScreen.route) {
-                OrderConfirmScreen(onNavigateToHomeScreen = {
+            composable(route = Screens.OrderConfirmScreen.route) { entry ->
+                val viewModel =
+                    entry.sharedViewModel<CheckOutViewModel>(navHostController = navController)
+                OrderConfirmScreen(
+                    viewModel = viewModel,
+                    onNavigateToHomeScreen = {
                     navController.navigate(Screens.HomeScreen.route) {
                         popUpTo(Screens.HomeScreen.route) {
                             inclusive = true

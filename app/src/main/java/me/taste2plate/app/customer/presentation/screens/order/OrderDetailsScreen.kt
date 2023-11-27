@@ -291,7 +291,7 @@ fun SingleOrderItem(
 
             RatingInfoRow(
                 flatOff = "${rupeeSign}${item.product.price} x ${item.quantity}",
-                rating = "$rupeeSign ${item.product.price * item.quantity}",
+                rating = "$rupeeSign ${item.product.price.toInt() * item.quantity.toInt()}",
                 showIcon = false,
                 modifier = Modifier.padding(ScreenPadding),
                 weight = item.product.weight

@@ -21,13 +21,16 @@ import me.taste2plate.app.customer.presentation.widgets.VerticalSpace
 @Composable
 fun DetailScreen(
     viewModel: CityBrandViewModel,
+    navigateBack: () -> Unit,
 ) {
 
     AppScaffold(
         topBar = {
             AppTopBar(
                 title = viewModel.selectedItem.name
-            ) {}
+            ) {
+                navigateBack()
+            }
         }
     ) {
         DetailsScreenContent(viewModel.selectedItem)

@@ -76,6 +76,7 @@ import me.taste2plate.app.customer.presentation.theme.onSecondaryColor
 import me.taste2plate.app.customer.presentation.theme.primaryColor
 import me.taste2plate.app.customer.presentation.theme.screenBackgroundColor
 import me.taste2plate.app.customer.presentation.theme.secondaryColor
+import me.taste2plate.app.customer.presentation.theme.whatsappColor
 import me.taste2plate.app.customer.presentation.utils.noRippleClickable
 import me.taste2plate.app.customer.presentation.utils.rupeeSign
 import me.taste2plate.app.customer.presentation.widgets.AppButton
@@ -106,7 +107,7 @@ fun ProductDetailsScreen(
     val state = viewModel.state
 
     LaunchedEffect(Unit) {
-        if (productId != null)
+        if (!productId.isNullOrEmpty())
             viewModel.selectedProductId = productId
 
         viewModel.onEvent(ProductEvents.GetProductDetails)
@@ -372,7 +373,7 @@ fun ProductDetails(
                         modifier = Modifier.weight(1f),
                         buttonColors = ButtonDefaults.buttonColors(
                             contentColor = screenBackgroundColor.invoke(),
-                            containerColor = forestGreen.invoke()
+                            containerColor = whatsappColor
                         ),
                     ) {
                         onPinCodeCheck(pincode)

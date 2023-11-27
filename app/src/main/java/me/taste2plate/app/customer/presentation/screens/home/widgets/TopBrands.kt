@@ -1,8 +1,8 @@
 package me.taste2plate.app.customer.presentation.screens.home.widgets
 
 import android.content.res.Configuration
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -13,15 +13,17 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.yield
 import me.taste2plate.app.customer.domain.mapper.CommonForItem
 import me.taste2plate.app.customer.domain.model.HomeModel
 import me.taste2plate.app.customer.presentation.screens.home.CityBrandScreens
-import me.taste2plate.app.customer.presentation.theme.ExtraHighPadding
 import me.taste2plate.app.customer.presentation.theme.ScreenPadding
 import me.taste2plate.app.customer.presentation.theme.T2PCustomerAppTheme
 import me.taste2plate.app.customer.presentation.utils.noRippleClickable
@@ -33,9 +35,22 @@ import me.taste2plate.app.customer.presentation.widgets.simpleAnimation
 @Composable
 fun TopBrands(
     onNavigateToProductListScreen: (item: CommonForItem) -> Unit,
+    autoSlideDuration: Long = 4000L,
     topBrands: List<HomeModel.TopBrand>
 ) {
     val pagerState = rememberPagerState(pageCount = { topBrands.size })
+    LaunchedEffect(Unit) {
+        while (true) {
+            yield()
+            delay(autoSlideDuration)
+            pagerState.animateScrollToPage(
+                page = (pagerState.currentPage + 1) % (pagerState.pageCount),
+                animationSpec = tween(600)
+            )
+
+        }
+    }
+
     HorizontalPager(
         state = pagerState,
     ) { page ->

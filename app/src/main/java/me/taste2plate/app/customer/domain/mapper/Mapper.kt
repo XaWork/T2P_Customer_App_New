@@ -4,8 +4,6 @@ import me.taste2plate.app.customer.domain.model.Category
 import me.taste2plate.app.customer.domain.model.CityBrandModel
 import me.taste2plate.app.customer.domain.model.HomeModel
 import me.taste2plate.app.customer.domain.model.SubCategoryModel
-import me.taste2plate.app.customer.domain.model.product.ProductBySliderModel
-import me.taste2plate.app.customer.domain.model.product.ProductListModel
 import me.taste2plate.app.customer.domain.model.user.CartModel
 import me.taste2plate.app.customer.domain.model.user.WishListModel
 

@@ -132,6 +132,16 @@ class AddressViewModel @Inject constructor(
                     else -> addressTypes[0]
                 }
             }
+        } else {
+            fullName.value = ""
+            phone.value = ""
+            address1.value = ""
+            address2A.value = ""
+            stateA.value = ""
+            cityA.value = ""
+            pincodeA.value = ""
+            landmarkA.value = ""
+            addressType.value = addressTypes[0]
         }
         getStateList()
     }

@@ -5,10 +5,12 @@ import me.taste2plate.app.customer.domain.model.ApplyCouponModel
 import me.taste2plate.app.customer.domain.model.auth.LoginModel
 import me.taste2plate.app.customer.domain.model.auth.VerifyOTPModel
 import me.taste2plate.app.customer.domain.model.user.CartModel
+import me.taste2plate.app.customer.domain.model.user.CheckoutModel
 import me.taste2plate.app.customer.domain.model.user.CommonResponse
 import me.taste2plate.app.customer.domain.model.user.DeleteFromWishlistModel
 import me.taste2plate.app.customer.domain.model.user.GetProfileModel
 import me.taste2plate.app.customer.domain.model.user.MyPlanModel
+import me.taste2plate.app.customer.domain.model.user.OrderConfirmModel
 import me.taste2plate.app.customer.domain.model.user.OrderListModel
 import me.taste2plate.app.customer.domain.model.user.OrderUpdateModel
 import me.taste2plate.app.customer.domain.model.user.WalletTransactionModel
@@ -194,5 +196,54 @@ class UserRepoImpl @Inject constructor(
         reviewText: String
     ): CommonResponse {
         return api.postReview(userId, productId, name, email, mobile, rating, reviewText)
+    }
+
+    override suspend fun initCheckout(
+        walletDiscount: Boolean,
+        userId: String,
+        addressId: String,
+        timeSlot: String,
+        date: String,
+        deliveryCost: String,
+        express: String,
+        couponCode: String,
+        couponType: String,
+        couponAmount: String,
+        cartPrice: String,
+        tipPrice: String,
+        finalPrice: String,
+        customerCity: String,
+        addCost: String,
+        zip: String,
+        browser: String
+    ): CheckoutModel {
+        return api.initCheckout(
+            walletDiscount,
+            userId,
+            addressId,
+            timeSlot,
+            date,
+            deliveryCost,
+            express,
+            couponCode,
+            couponType,
+            couponAmount,
+            cartPrice,
+            tipPrice,
+            finalPrice,
+            customerCity,
+            addCost,
+            zip,
+            browser
+        )
+    }
+
+    override suspend fun confirmOrder(
+        isWalletApplied: Boolean,
+        gateWay: String,
+        orderId: String,
+        transactionId: String
+    ): OrderConfirmModel {
+        return api.confirmOrder(isWalletApplied, gateWay, orderId, transactionId)
     }
 }

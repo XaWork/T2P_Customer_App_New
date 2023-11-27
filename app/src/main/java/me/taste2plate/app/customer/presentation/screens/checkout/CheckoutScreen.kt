@@ -38,6 +38,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
@@ -61,6 +62,7 @@ import me.taste2plate.app.customer.presentation.screens.cart.CheckoutState
 import me.taste2plate.app.customer.presentation.screens.cart.SingleCartAndWishlistItem
 import me.taste2plate.app.customer.presentation.theme.LowPadding
 import me.taste2plate.app.customer.presentation.theme.LowRoundedCorners
+import me.taste2plate.app.customer.presentation.theme.LowSpacing
 import me.taste2plate.app.customer.presentation.theme.MediumPadding
 import me.taste2plate.app.customer.presentation.theme.ScreenPadding
 import me.taste2plate.app.customer.presentation.theme.SpaceBetweenViews
@@ -84,6 +86,7 @@ import me.taste2plate.app.customer.presentation.widgets.HorizontalSpace
 import me.taste2plate.app.customer.presentation.widgets.InfoWithIcon
 import me.taste2plate.app.customer.presentation.widgets.MaterialIcon
 import me.taste2plate.app.customer.presentation.widgets.RadioButtonInfo
+import me.taste2plate.app.customer.presentation.widgets.ShowLoading
 import me.taste2plate.app.customer.presentation.widgets.SpaceBetweenRow
 import me.taste2plate.app.customer.presentation.widgets.TextInCircle
 import me.taste2plate.app.customer.presentation.widgets.VerticalSpace
@@ -107,6 +110,7 @@ fun CheckoutScreen(
     navigateBack: () -> Unit,
 ) {
     val state = viewModel.state
+    val context = LocalContext.current
     var showAddressBottomSheet by remember {
         mutableStateOf(false)
     }
@@ -126,6 +130,10 @@ fun CheckoutScreen(
 
                 if (!state.finish)
                     onNavigateToHomeScreen()
+            }
+
+            state.orderConfirmed -> {
+                onNavigateToOrderConfirmScreen()
             }
         }
     }
@@ -213,9 +221,9 @@ fun CheckoutScreen(
         )
     }
 
-    if (viewModel.showOrderAmountDialog) {
-        CustomDialog(title = "Alert!", text = viewModel.showOrderAmountDialogMessage) {
-            viewModel.showOrderAmountDialog = false
+    if (viewModel.showCustomDialog) {
+        CustomDialog(title = "Alert!", text = viewModel.customDialogMessage) {
+            viewModel.showCustomDialog = false
         }
     }
 
@@ -294,8 +302,6 @@ fun CheckoutScreen(
                 }) {
                     Text("CANCEL")
                 }
-
-
             }
 
             AppDivider()
@@ -317,7 +323,9 @@ fun CheckoutScreen(
                 viewModel.onEvent(CheckoutEvents.GetAddressList)
                 showAddressBottomSheet = true
             },
-            onNavigateToOrderConfirmScreen = onNavigateToOrderConfirmScreen,
+            onNavigateToOrderConfirmScreen = {
+                viewModel.onEvent(CheckoutEvents.Checkout(context))
+            },
             updateCart = { id, quantity ->
                 viewModel.onEvent(CheckoutEvents.UpdateCart(id, quantity))
             },
@@ -504,7 +512,7 @@ fun CheckoutScreenContent(
             VerticalSpace(space = SpaceBetweenViewsAndSubViews)
 
             DeliveryInfo(
-                state = state,
+                viewModel = viewModel,
                 date = viewModel.selectedDate,
                 timeSlot = viewModel.selectedTimeSlot,
                 deliveryType = state.deliveryType,
@@ -521,11 +529,14 @@ fun CheckoutScreenContent(
 
             VerticalSpace(space = SpaceBetweenViewsAndSubViews)
 
-            AppButton(
-                text = "Continue"
-            ) {
-                onNavigateToOrderConfirmScreen()
-            }
+            if (state.buttonLoading)
+                ShowLoading()
+            else
+                AppButton(
+                    text = "Continue"
+                ) {
+                    onNavigateToOrderConfirmScreen()
+                }
         }
     }
 }
@@ -704,15 +715,46 @@ fun CancellationPolicy(
         modifier = Modifier.fillMaxWidth()
     ) {
         Text(
+            text = "Distance Traveled".uppercase(),
+            letterSpacing = 5.sp,
+            modifier = Modifier.padding(vertical = LowPadding)
+        )
+
+        Text(
+            text = "Your food will travel 1212kms by Air to reach Fresh to you :)",
+            fontSize = 12.sp,
+            fontWeight = FontWeight.Light,
+            textAlign = TextAlign.Center
+        )
+
+        VerticalSpace(space = LowSpacing)
+
+        Text(
+            text = "Freshness Assured".uppercase(),
+            letterSpacing = 5.sp,
+            modifier = Modifier.padding(vertical = LowPadding)
+        )
+
+        Text(
+            text = "We assured same freshness for the Delivered food as it was packed. Please check on Delivery and help",
+            fontSize = 12.sp,
+            fontWeight = FontWeight.Light,
+            textAlign = TextAlign.Center
+        )
+
+        VerticalSpace(space = LowSpacing)
+
+        Text(
             text = "Order cancellation".uppercase(),
             letterSpacing = 5.sp,
             modifier = Modifier.padding(vertical = LowPadding)
         )
 
         Text(
-            text = "Order can be cancelled only up-to 4hours of order confirmation or before the cutoff time, whichever will be earlier.",
+            text = "Order can be cancelled only up-to 4 hours of order confirmation or before the cutoff time, whichever will be earlier.",
             fontSize = 12.sp,
-            fontWeight = FontWeight.Light
+            fontWeight = FontWeight.Light,
+            textAlign = TextAlign.Center
         )
 
         AppDivider()
@@ -721,7 +763,7 @@ fun CancellationPolicy(
 
 @Composable
 fun DeliveryInfo(
-    state: CheckoutState,
+    viewModel: CheckOutViewModel,
     date: String,
     timeSlot: String,
     deliveryType: DeliveryType,
@@ -729,6 +771,7 @@ fun DeliveryInfo(
     showDatePicker: () -> Unit,
     showTimeSlots: () -> Unit
 ) {
+    val state = viewModel.state
     Column {
         HeadingText("Delivery Options")
 
@@ -737,7 +780,8 @@ fun DeliveryInfo(
         val radioOptions = listOf(
             RadioButtonInfo(
                 id = 1,
-                text = "Express\nDelivery"
+                text = "Express\nDelivery",
+                enable = viewModel.expressEnabled
             ),
             RadioButtonInfo(
                 id = 2,
