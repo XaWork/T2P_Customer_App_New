@@ -1,5 +1,6 @@
 package me.taste2plate.app.customer.domain.use_case.product
 
+import android.util.Log
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import me.taste2plate.app.customer.data.ApiErrorMessages
@@ -42,6 +43,7 @@ class ProductListUseCase @Inject constructor(
                     }
 
                     ProductBy.Slider -> {
+                Log.e("Product", "product id is $id and Product by is $productBy")
                         response = repo.productsBySlider(id, taste)
                     }
 

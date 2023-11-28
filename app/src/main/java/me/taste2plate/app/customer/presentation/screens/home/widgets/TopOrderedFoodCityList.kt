@@ -59,7 +59,7 @@ fun TopOrderedFoodCityList(
                 .noRippleClickable {
                     onNavigateToProductListScreen(
                         CommonForItem(
-                            id = item.id,
+                            id = item.sliderName,
                             image = item.image,
                             name = item.sliderName,
                             type = CityBrandScreens.Slider.name
@@ -70,14 +70,5 @@ fun TopOrderedFoodCityList(
                 .height(200.dp)
                 .simpleAnimation(pagerState, page)
         )
-    }
-}
-
-
-@Preview
-@Composable
-fun TopOrderedFoodCityListPreview() {
-    T2PCustomerAppTheme {
-        //TopOrderedFoodCityList({})
     }
 }
