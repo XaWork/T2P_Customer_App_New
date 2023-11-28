@@ -1,14 +1,16 @@
-package me.taste2plate.app.customer.presentation.screens.checkout
+package me.taste2plate.app.customer.presentation.dialog
 
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -21,15 +23,19 @@ import me.taste2plate.app.customer.domain.model.CouponModel
 import me.taste2plate.app.customer.presentation.theme.ScreenPadding
 import me.taste2plate.app.customer.presentation.theme.SpaceBetweenViewsAndSubViews
 import me.taste2plate.app.customer.presentation.theme.primaryColor
+import me.taste2plate.app.customer.presentation.theme.screenBackgroundColor
 import me.taste2plate.app.customer.presentation.utils.noRippleClickable
 import me.taste2plate.app.customer.presentation.widgets.AppDivider
 import me.taste2plate.app.customer.presentation.widgets.AppOutlineButton
 import me.taste2plate.app.customer.presentation.widgets.AppTextField
 import me.taste2plate.app.customer.presentation.widgets.SpaceBetweenRow
+import me.taste2plate.app.customer.presentation.widgets.VerticalSpace
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CouponBottomSheet(
+fun CouponDialog(
     coupons: List<CouponModel.Coupon>,
+    onDismiss: () -> Unit,
     applyCoupon: (couponValue: String) -> Unit,
     onItemSelected: (index: Int) -> Unit
 ) {
@@ -37,12 +43,10 @@ fun CouponBottomSheet(
         mutableStateOf("")
     }
 
-    LazyColumn(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(ScreenPadding)
-    ) {
-        item {
+
+    AlertDialog(
+        containerColor = screenBackgroundColor.invoke(),
+        title = {
             val items = listOf<@Composable RowScope.() -> Unit> {
                 AppTextField(
                     value = couponValue, onValueChanged = { couponValue = it },
@@ -52,6 +56,7 @@ fun CouponBottomSheet(
                 )
 
                 AppOutlineButton(
+                    fontSize = 10.sp,
                     text = "Apply",
                     modifier = Modifier
                         .fillMaxWidth()
@@ -63,20 +68,33 @@ fun CouponBottomSheet(
             }
 
             SpaceBetweenRow(items = items)
+        },
+        text = {
+            LazyColumn(
+                modifier = Modifier
+                    .fillMaxWidth()
+            ) {
+                item {
+                    Text(
+                        text = "Select Coupon",
+                        fontSize = 20.sp,
+                    )
 
-            Text(
-                text = "Select Coupon",
-                fontSize = 25.sp,
-                modifier = Modifier.padding(vertical = ScreenPadding)
-            )
-        }
+                    VerticalSpace(space = SpaceBetweenViewsAndSubViews)
+                }
 
-        itemsIndexed(coupons) { index, coupon ->
-            SingleCouponItem(modifier = Modifier.noRippleClickable {
-                onItemSelected(index)
-            }, coupon)
-        }
-    }
+                itemsIndexed(coupons) { index, coupon ->
+                    SingleCouponItem(modifier = Modifier.noRippleClickable {
+                        onItemSelected(index)
+                    }, coupon)
+                }
+            }
+        },
+        onDismissRequest = {
+            onDismiss()
+        },
+        confirmButton = {}
+    )
 }
 
 @Composable

@@ -8,6 +8,8 @@ sealed class AddressEvents {
     data class StoreAddressId(
         val addressId:Int
     ) : AddressEvents()
+
+    data class SearchPin(val query: String): AddressEvents()
     object DeleteAddress : AddressEvents()
     object SetData : AddressEvents()
     object GetCityList : AddressEvents()

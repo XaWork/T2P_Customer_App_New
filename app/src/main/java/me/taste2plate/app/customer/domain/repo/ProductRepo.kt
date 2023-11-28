@@ -35,10 +35,11 @@ interface ProductRepo {
     suspend fun productsBySlider(
         name: String,
         taste: String
-    ): ProductBySliderModel
+    ): ProductListModel
 
     suspend fun productDetails(
         id: String,
+        address: String
     ): ProductDetailsModel
 
     suspend fun getOfferByCity(

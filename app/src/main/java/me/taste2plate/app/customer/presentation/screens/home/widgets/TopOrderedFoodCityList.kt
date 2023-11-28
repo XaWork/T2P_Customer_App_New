@@ -18,6 +18,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.yield
 import me.taste2plate.app.customer.domain.mapper.CommonForItem
 import me.taste2plate.app.customer.domain.model.HomeModel
+import me.taste2plate.app.customer.presentation.screens.home.CityBrandScreens
 import me.taste2plate.app.customer.presentation.theme.ScreenPadding
 import me.taste2plate.app.customer.presentation.theme.T2PCustomerAppTheme
 import me.taste2plate.app.customer.presentation.utils.noRippleClickable
@@ -61,7 +62,7 @@ fun TopOrderedFoodCityList(
                             id = item.id,
                             image = item.image,
                             name = item.sliderName,
-                            type = "slider"
+                            type = CityBrandScreens.Slider.name
                         )
                     )
                 }

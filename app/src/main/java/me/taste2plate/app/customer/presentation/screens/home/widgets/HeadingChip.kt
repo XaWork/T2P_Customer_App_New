@@ -70,7 +70,7 @@ fun HeadingChipWithLine(
             text,
             color = textColor,
             maxLines = 1,
-            fontSize = 12.sp,
+            fontSize = 14.sp,
             fontWeight = FontWeight.W500
         )
 

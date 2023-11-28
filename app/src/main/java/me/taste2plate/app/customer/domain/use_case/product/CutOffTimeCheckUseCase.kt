@@ -4,10 +4,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import me.taste2plate.app.customer.data.ApiErrorMessages
 import me.taste2plate.app.customer.data.Resource
-import me.taste2plate.app.customer.data.UserPref
 import me.taste2plate.app.customer.domain.model.product.CutOffTimeCheckModel
-import me.taste2plate.app.customer.domain.model.product.ProductDetailsModel
-import me.taste2plate.app.customer.domain.model.product.ProductListModel
 import me.taste2plate.app.customer.domain.repo.ProductRepo
 import retrofit2.HttpException
 import java.io.IOException

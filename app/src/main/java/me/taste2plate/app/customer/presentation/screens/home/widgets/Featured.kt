@@ -6,16 +6,12 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
-import me.taste2plate.app.customer.R
 import me.taste2plate.app.customer.domain.model.HomeModel
 import me.taste2plate.app.customer.presentation.screens.home.FoodItemUpdateInfo
 import me.taste2plate.app.customer.presentation.screens.home.HomeState
@@ -26,7 +22,6 @@ import me.taste2plate.app.customer.presentation.utils.noRippleClickable
 import me.taste2plate.app.customer.presentation.utils.rupeeSign
 import me.taste2plate.app.customer.presentation.widgets.BlackBorderCard
 import me.taste2plate.app.customer.presentation.widgets.ImageWithWishlistButton
-import me.taste2plate.app.customer.presentation.widgets.InfoWithIcon
 import me.taste2plate.app.customer.presentation.widgets.RatingInfoRow
 import me.taste2plate.app.customer.presentation.widgets.VerticalSpace
 
@@ -77,7 +72,7 @@ fun SingleFeaturedItem(
                             maxLines = 2,
                         )
 
-                        VerticalSpace(space = VeryLowSpacing)
+                        /*VerticalSpace(space = VeryLowSpacing)
 
                         InfoWithIcon(
                             icon = false,
@@ -87,7 +82,8 @@ fun SingleFeaturedItem(
                                 color = MaterialTheme.colorScheme.onSurface
                             ),
                             iconOrImageModifier = Modifier.size(20.dp)
-                        )
+                        )*/
+
                         VerticalSpace(space = VeryLowSpacing)
                     }
                 }

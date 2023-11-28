@@ -12,6 +12,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import me.taste2plate.app.customer.domain.model.user.address.AddressListModel
 import me.taste2plate.app.customer.presentation.theme.ExtraHighPadding
 import me.taste2plate.app.customer.presentation.theme.LowElevation
@@ -32,6 +33,7 @@ fun AddressBottomSheet(
 ) {
     Box(
         modifier = Modifier.fillMaxWidth()
+            .padding(bottom = 50.dp)
     ) {
         if (isLoading || addressList.isEmpty())
             ShowLoading(isButton = false)

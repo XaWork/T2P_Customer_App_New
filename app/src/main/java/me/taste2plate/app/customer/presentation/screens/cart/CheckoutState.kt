@@ -34,7 +34,7 @@ data class CheckoutState(
             TipData(tipPrice = 10),
             TipData(tipPrice = 20, mostTipped = true),
             TipData(tipPrice = 30),
-            TipData(tipPrice = 50),
+            TipData(tipPrice = 0, other = true),
         ),
     val deliveryType: DeliveryType = DeliveryType.Standard,
     val paymentType: PaymentType = PaymentType.Online,

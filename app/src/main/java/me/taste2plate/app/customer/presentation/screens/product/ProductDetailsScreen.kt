@@ -3,7 +3,6 @@ package me.taste2plate.app.customer.presentation.screens.product
 import android.content.res.Configuration
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.collectIsDraggedAsState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -337,6 +336,14 @@ fun ProductDetails(
             VerticalSpace(space = SpaceBetweenViews)
 
             Text(
+                text = "You food will travel ${state.productDetails.distance}kms by Air to reach Fresh to you:)",
+                fontWeight = FontWeight.W400,
+                color = primaryColor.invoke()
+            )
+
+            VerticalSpace(space = SpaceBetweenViews)
+
+            Text(
                 text = "Check Availability",
                 fontWeight = FontWeight.W400,
             )
@@ -389,8 +396,9 @@ fun ProductDetails(
                         info = state.checkAvailabilityModel.cutoff_response.express_remarks,
                         modifier = Modifier.padding(vertical = VeryLowSpacing),
                         iconOrImageModifier = Modifier.size(20.dp),
-                        colorFilter = ColorFilter.tint(color = primaryColor.invoke()),
-                        maxLines = 10
+                        colorFilter = ColorFilter.tint(color = forestGreen.invoke()),
+                        maxLines = 10,
+                        textColor = forestGreen.invoke()
                     )
 
                 if (state.checkAvailabilityModel.status == Status.success.name) {
@@ -399,9 +407,9 @@ fun ProductDetails(
                         info = state.checkAvailabilityModel.cutoff_response.remarks,
                         modifier = Modifier.padding(vertical = VeryLowSpacing),
                         iconOrImageModifier = Modifier.size(20.dp),
-                        colorFilter = ColorFilter.tint(color = primaryColor.invoke()),
+                        colorFilter = ColorFilter.tint(color = forestGreen.invoke()),
                         maxLines = 10,
-                        textColor = primaryColor.invoke()
+                        textColor = forestGreen.invoke()
                     )
                 }
             }

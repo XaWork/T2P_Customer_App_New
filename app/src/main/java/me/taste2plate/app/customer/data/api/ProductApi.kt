@@ -6,7 +6,6 @@ import me.taste2plate.app.customer.domain.model.product.CutOffTimeCheckModel
 import me.taste2plate.app.customer.domain.model.product.ProductBySliderModel
 import me.taste2plate.app.customer.domain.model.product.ProductDetailsModel
 import me.taste2plate.app.customer.domain.model.product.ProductListModel
-import retrofit2.Call
 import retrofit2.http.GET
 import retrofit2.http.POST
 import retrofit2.http.Query
@@ -47,11 +46,14 @@ interface ProductApi {
     suspend fun productsBySlider(
         @Query("slider_name") name: String,
         @Query("taste") taste: String
-    ): ProductBySliderModel
+    ): ProductListModel
 
 
     @GET("product-details")
-    suspend fun productDetails(@Query("id") id: String): ProductDetailsModel
+    suspend fun productDetails(
+        @Query("id") id: String,
+        @Query("address") address: String
+    ): ProductDetailsModel
 
     @GET("offer-deal")
     suspend fun getOfferByCity(@Query("city") cityId: String): CouponModel

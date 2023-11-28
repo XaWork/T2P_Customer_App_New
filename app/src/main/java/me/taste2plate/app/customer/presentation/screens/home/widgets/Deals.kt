@@ -117,7 +117,7 @@ fun SingleBestSellerItem(
             ) {
                 RatingInfoRow(
                     flatOff = if (!deal.sellingPrice.isNullOrEmpty())
-                        "Flat $rupeeSign${(deal.sellingPrice.toInt() - deal.price.toInt())} OFF"
+                        "Flat $rupeeSign${(deal.price.toInt() - deal.sellingPrice.toInt())} OFF"
                     else "",
                     rating = "",
                     weight = deal.weight
@@ -131,7 +131,7 @@ fun SingleBestSellerItem(
                     minLines = 2
                 )
 
-                VerticalSpace(space = VeryLowSpacing)
+               /* VerticalSpace(space = VeryLowSpacing)
 
                 InfoWithIcon(
                     icon = false,
@@ -142,7 +142,7 @@ fun SingleBestSellerItem(
                     ),
                     iconOrImageModifier = Modifier.size(20.dp)
 
-                )
+                )*/
 
                 ProductPriceCard(price = deal.price,
                     productId = deal.id,

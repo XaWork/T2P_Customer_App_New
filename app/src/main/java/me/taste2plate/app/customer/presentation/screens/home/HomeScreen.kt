@@ -268,7 +268,7 @@ fun HomeScreen(
                                     VerticalSpace(space = VeryLowSpacing)
                                     TopOrderedFoodCityList(
                                         onNavigateToProductListScreen = {
-                                            // onNavigateToProductListScreen(it)
+                                             onNavigateToProductListScreen(it)
                                         },
                                         foodItems = home.topMostOrderedProducts,
                                     )

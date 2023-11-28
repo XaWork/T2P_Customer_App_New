@@ -7,13 +7,13 @@ import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableDoubleStateOf
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.razorpay.Checkout
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
-import me.taste2plate.app.customer.MainActivity
 import me.taste2plate.app.customer.T2PApp
 import me.taste2plate.app.customer.data.Resource
 import me.taste2plate.app.customer.data.Status
@@ -63,6 +63,8 @@ class CheckOutViewModel @Inject constructor(
     var expressEnabled by mutableStateOf(true)
 
     var selectedDate by mutableStateOf("")
+    var customTip by mutableStateOf("")
+
     var appliedCoupon by mutableStateOf("")
     var selectedTimeSlot by mutableStateOf("")
     var pointConversionText by mutableStateOf("")
@@ -88,6 +90,11 @@ class CheckOutViewModel @Inject constructor(
     fun onEvent(event: CheckoutEvents) {
         when (event) {
             is CheckoutEvents.GetCart -> {}
+            is CheckoutEvents.RemoveCoupon -> {
+                state = state.copy(applyCouponResponse = null)
+                getCart()
+            }
+
             is CheckoutEvents.Checkout -> {
                 allDetailFilled(event.context)
             }
@@ -119,9 +126,14 @@ class CheckOutViewModel @Inject constructor(
             is CheckoutEvents.GetUser -> {}
 
             is CheckoutEvents.UpdateTip -> {
+                val index = event.index
+
                 val updatedTipList = state.tips.mapIndexed { i, tip ->
-                    if (i == event.index) {
-                        tip.copy(selected = !tip.selected)
+                    if (i == index) {
+                        tip.copy(
+                            selected = !tip.selected, tipPrice = if (state.tips[index].other)
+                                event.otherTipPrice else state.tips[index].tipPrice
+                        )
                     } else {
                         tip.copy(selected = false)
                     }
@@ -129,8 +141,10 @@ class CheckOutViewModel @Inject constructor(
 
                 state = state.copy(tips = updatedTipList)
 
-                val tipPrice = state.tips[event.index].tipPrice.toDouble()
-                if (state.tips[event.index].selected) {
+                val tipPrice = if (index != 3) state.tips[index].tipPrice.toDouble()
+                else customTip.toDouble()
+                Log.e("Tip", "Tip price $tipPrice\nSelected : ${state.tips[index].selected}")
+                if (state.tips[index].selected) {
                     totalPrice += tipPrice
                 } else {
                     totalPrice -= tipPrice
@@ -227,7 +241,6 @@ class CheckOutViewModel @Inject constructor(
         when {
             state.applyCouponResponse != null -> {
                 if (state.deliveryType == DeliveryType.Standard) {
-                    codEnabled = false
                     val couponResponse = state.applyCouponResponse!!
                     deliveryCharge = couponResponse.shipping.normalShipping.toDouble()
 
@@ -308,8 +321,36 @@ class CheckOutViewModel @Inject constructor(
             }
 
         }
-        if (state.deliveryType == DeliveryType.Express)
+        if (state.deliveryType == DeliveryType.Express) {
+            codEnabled = false
             showDialogExpress = true
+        }else{
+            codEnabled = true
+        }
+    }
+
+    private fun setPriceAfterApplyCoupon() {
+        state.applyCouponResponse!!.run {
+            price = cartprice.toDouble()
+            packagingFee = total_packing_price.toDouble()
+            couponDiscount = coupon_discount.toDouble()
+
+            when (state.deliveryType) {
+                DeliveryType.Express -> {
+                    totalPrice = new_final_price.express.toDouble()
+                    igst = gst.express.totalIgst.toDouble()
+                    cgst = gst.express.totalCgst.toDouble()
+                    sgst = gst.express.totalSgst.toDouble()
+                }
+
+                DeliveryType.Standard -> {
+                    totalPrice = new_final_price.normal.toDouble()
+                    igst = gst.normal.totalIgst.toDouble()
+                    cgst = gst.normal.totalCgst.toDouble()
+                    sgst = gst.normal.totalSgst.toDouble()
+                }
+            }
+        }
     }
 
     private fun setPriceAfterWalletStatusChange() {
@@ -347,39 +388,37 @@ class CheckOutViewModel @Inject constructor(
                         else cartItemResponse.gstWithPoint.normal.totalSgst.toDouble()
                 }
             } else {
-                val couponResponse = state.applyCouponResponse
-                if (couponResponse != null) {
-                    if (state.applyCouponResponse != null) {
-                        val couponResponse = state.applyCouponResponse
-                        val tPrice =
-                            if (state.deliveryType == DeliveryType.Express) couponResponse!!.new_final_price.express.toDouble()
-                            else couponResponse!!.new_final_price.normal.toDouble()
-                        totalPrice = decimalFormat.format(tPrice).toDouble()
-                        igst =
-                            if (state.deliveryType == DeliveryType.Express) couponResponse.gst.express.totalIgst.toDouble()
-                            else couponResponse.gst.normal.totalIgst.toDouble()
-                        cgst =
-                            if (state.deliveryType == DeliveryType.Express) couponResponse.gst.express.totalCgst.toDouble()
-                            else couponResponse.gst.normal.totalCgst.toDouble()
-                        sgst =
-                            if (state.deliveryType == DeliveryType.Express) couponResponse.gst.express.totalSgst.toDouble()
-                            else couponResponse.gst.normal.totalSgst.toDouble()
-                    } else {
-                        val cartItemResponse = state.cart
-                        val tPrice =
-                            if (state.deliveryType == DeliveryType.Express) cartItemResponse!!.newFinalPrice.express.toDouble()
-                            else cartItemResponse!!.newFinalPrice.normal.toDouble()
-                        totalPrice = decimalFormat.format(tPrice).toDouble()
-                        igst =
-                            if (state.deliveryType == DeliveryType.Express) cartItemResponse.gst.express.totalIgst.toDouble()
-                            else cartItemResponse.gst.normal.totalIgst.toDouble()
-                        cgst =
-                            if (state.deliveryType == DeliveryType.Express) cartItemResponse.gst.express.totalCgst.toDouble()
-                            else cartItemResponse.gst.normal.totalCgst.toDouble()
-                        sgst =
-                            if (state.deliveryType == DeliveryType.Express) cartItemResponse.gst.express.totalSgst.toDouble()
-                            else cartItemResponse.gst.normal.totalSgst.toDouble()
-                    }
+                if (state.applyCouponResponse != null) {
+                    val couponResponse = state.applyCouponResponse
+                    val tPrice =
+                        if (state.deliveryType == DeliveryType.Express) couponResponse!!.new_final_price.express.toDouble()
+                        else couponResponse!!.new_final_price.normal.toDouble()
+                    totalPrice = decimalFormat.format(tPrice).toDouble()
+                    igst =
+                        if (state.deliveryType == DeliveryType.Express) couponResponse.gst.express.totalIgst.toDouble()
+                        else couponResponse.gst.normal.totalIgst.toDouble()
+                    cgst =
+                        if (state.deliveryType == DeliveryType.Express) couponResponse.gst.express.totalCgst.toDouble()
+                        else couponResponse.gst.normal.totalCgst.toDouble()
+                    sgst =
+                        if (state.deliveryType == DeliveryType.Express) couponResponse.gst.express.totalSgst.toDouble()
+                        else couponResponse.gst.normal.totalSgst.toDouble()
+                }
+                else {
+                    val cartItemResponse = state.cart
+                    val tPrice =
+                        if (state.deliveryType == DeliveryType.Express) cartItemResponse!!.newFinalPrice.express.toDouble()
+                        else cartItemResponse!!.newFinalPrice.normal.toDouble()
+                    totalPrice = decimalFormat.format(tPrice).toDouble()
+                    igst =
+                        if (state.deliveryType == DeliveryType.Express) cartItemResponse.gst.express.totalIgst.toDouble()
+                        else cartItemResponse.gst.normal.totalIgst.toDouble()
+                    cgst =
+                        if (state.deliveryType == DeliveryType.Express) cartItemResponse.gst.express.totalCgst.toDouble()
+                        else cartItemResponse.gst.normal.totalCgst.toDouble()
+                    sgst =
+                        if (state.deliveryType == DeliveryType.Express) cartItemResponse.gst.express.totalSgst.toDouble()
+                        else cartItemResponse.gst.normal.totalSgst.toDouble()
                 }
             }
         } else {
@@ -546,7 +585,7 @@ class CheckOutViewModel @Inject constructor(
                 }
 
                 //cod enabled
-               // codEnabled = openOrderValue < maxOpenCodOrder
+                // codEnabled = openOrderValue < maxOpenCodOrder
 
                 if (state.defaultAddress != null)
                     checkCutOffTime(
@@ -679,7 +718,7 @@ class CheckOutViewModel @Inject constructor(
                             )
 
                             if (state.paymentType == PaymentType.Online) {
-                               // Log.e("payment", "$finalPrice is this")
+                                // Log.e("payment", "$finalPrice is this")
                                 startPayment(context, finalPrice.toDouble())
                             } else {
                                 confirmOrder(
@@ -705,7 +744,7 @@ class CheckOutViewModel @Inject constructor(
         }
     }
 
-    private fun startPayment(context : Context, price: Double) {
+    private fun startPayment(context: Context, price: Double) {
 
         Checkout.preload(T2PApp.applicationContext())
         val co = Checkout()
@@ -939,26 +978,28 @@ class CheckOutViewModel @Inject constructor(
             applyCouponUseCase.execute(
                 couponCode
             ).collect { result ->
-                state = when (result) {
-                    is Resource.Loading -> state.copy(isLoading = false)
+                when (result) {
+                    is Resource.Loading -> state = state.copy(isLoading = false)
                     is Resource.Success -> {
                         val data = result.data
                         val isError = data?.status == Status.error.name
 
-                        if (!isError)
-                            appliedCoupon = couponCode
-
-                        state.copy(
+                        state = state.copy(
                             isLoading = false,
                             isError = isError,
                             errorMessage = if (isError) data?.message else null,
                             applyCouponResponse = if (!isError) data else null,
                         )
 
+                        if (!isError) {
+                            appliedCoupon = couponCode
+                            setPriceAfterApplyCoupon()
+                        }
+
                     }
 
                     is Resource.Error ->
-                        state.copy(
+                        state = state.copy(
                             isLoading = false,
                             isError = true,
                             errorMessage = result.message

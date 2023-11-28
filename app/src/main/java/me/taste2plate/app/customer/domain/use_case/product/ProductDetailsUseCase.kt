@@ -6,13 +6,13 @@ import me.taste2plate.app.customer.data.ApiErrorMessages
 import me.taste2plate.app.customer.data.Resource
 import me.taste2plate.app.customer.data.UserPref
 import me.taste2plate.app.customer.domain.model.product.ProductDetailsModel
-import me.taste2plate.app.customer.domain.model.product.ProductListModel
 import me.taste2plate.app.customer.domain.repo.ProductRepo
 import retrofit2.HttpException
 import java.io.IOException
 import javax.inject.Inject
 
 class ProductDetailsUseCase @Inject constructor(
+    private val userPref: UserPref,
     private val repo: ProductRepo,
 ) {
     suspend fun execute(
@@ -21,7 +21,7 @@ class ProductDetailsUseCase @Inject constructor(
         return flow {
             emit(Resource.Loading(true))
             try {
-                val response = repo.productDetails(id)
+                val response = repo.productDetails(id, userPref.getDefaultAddress()!!.id)
                 emit(Resource.Success(response))
             } catch (io: IOException) {
                 io.printStackTrace()

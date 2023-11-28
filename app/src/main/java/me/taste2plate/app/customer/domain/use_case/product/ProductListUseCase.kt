@@ -42,7 +42,7 @@ class ProductListUseCase @Inject constructor(
                     }
 
                     ProductBy.Slider -> {
-                        //response = repo.productsBySlider(id, taste)
+                        response = repo.productsBySlider(id, taste)
                     }
 
                     ProductBy.Search -> {

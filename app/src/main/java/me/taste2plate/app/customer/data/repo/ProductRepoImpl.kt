@@ -33,12 +33,12 @@ class ProductRepoImpl @Inject constructor(
         return api.productByQuery(query)
     }
 
-    override suspend fun productsBySlider(name: String, taste: String): ProductBySliderModel {
+    override suspend fun productsBySlider(name: String, taste: String): ProductListModel {
         return api.productsBySlider(name, taste)
     }
 
-    override suspend fun productDetails(id: String): ProductDetailsModel {
-        return api.productDetails(id)
+    override suspend fun productDetails(id: String,address: String): ProductDetailsModel {
+        return api.productDetails(id, address)
     }
 
     override suspend fun getOfferByCity(id: String): CouponModel {

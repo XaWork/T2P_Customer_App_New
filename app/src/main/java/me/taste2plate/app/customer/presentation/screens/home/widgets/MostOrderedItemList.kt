@@ -234,7 +234,7 @@ fun SingleMostOrderedItem(
                       imageVector = Icons.Outlined.LocationOn,
                       info = product.city.name
                   )*/
-
+/*
                 VerticalSpace(space = VeryLowSpacing)
 
                 InfoWithIcon(
@@ -245,7 +245,7 @@ fun SingleMostOrderedItem(
                         color = MaterialTheme.colorScheme.onSurface
                     ),
                     iconOrImageModifier = Modifier.size(20.dp)
-                )
+                )*/
 
                 VerticalSpace(space = VeryLowSpacing)
 

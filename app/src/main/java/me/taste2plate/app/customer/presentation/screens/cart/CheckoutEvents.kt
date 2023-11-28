@@ -8,6 +8,7 @@ import me.taste2plate.app.customer.presentation.screens.checkout.TipData
 
 sealed class CheckoutEvents {
     object GetCart : CheckoutEvents()
+    object RemoveCoupon : CheckoutEvents()
     object ChangeWalletCheckStatus : CheckoutEvents()
     object GetUser : CheckoutEvents()
     object GetCoupons : CheckoutEvents()
@@ -18,7 +19,7 @@ sealed class CheckoutEvents {
         val address: AddressListModel.Result
     ) : CheckoutEvents()
 
-    object ChangeMyPlanValue: CheckoutEvents()
+    object ChangeMyPlanValue : CheckoutEvents()
     object UpdateState : CheckoutEvents()
     data class ChangeDeliveryType(
         val deliveryType: DeliveryType
@@ -33,7 +34,7 @@ sealed class CheckoutEvents {
         val quantity: Int
     ) : CheckoutEvents()
 
-    data class UpdateTip(val index: Int) : CheckoutEvents()
+    data class UpdateTip(val index: Int, val otherTipPrice: Int = 0) : CheckoutEvents()
 
     data class ApplyCoupon(val couponCode: String) : CheckoutEvents()
 }

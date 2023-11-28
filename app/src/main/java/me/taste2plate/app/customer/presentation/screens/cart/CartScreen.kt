@@ -15,6 +15,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Divider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -38,6 +39,7 @@ import me.taste2plate.app.customer.presentation.theme.SpaceBetweenViewsAndSubVie
 import me.taste2plate.app.customer.presentation.theme.T2PCustomerAppTheme
 import me.taste2plate.app.customer.presentation.theme.dividerThickness
 import me.taste2plate.app.customer.presentation.theme.primaryColor
+import me.taste2plate.app.customer.presentation.theme.whatsappColor
 import me.taste2plate.app.customer.presentation.utils.rupeeSign
 import me.taste2plate.app.customer.presentation.widgets.AppButton
 import me.taste2plate.app.customer.presentation.widgets.AppEmptyView
@@ -109,7 +111,7 @@ fun ContentCartAndWishlist(
     ) {
         LazyColumn(
             verticalArrangement = Arrangement.spacedBy(SpaceBetweenViewsAndSubViews),
-            contentPadding = PaddingValues(bottom = ExtraHighPadding)
+            contentPadding = PaddingValues(bottom = 150.dp)
         ) {
             items(items) { item ->
                 SingleCartAndWishlistItem(
@@ -131,6 +133,9 @@ fun ContentCartAndWishlist(
                     .align(Alignment.BottomCenter)
             ) {
                 AppButton(
+                    buttonColors = ButtonDefaults.buttonColors(
+                        containerColor = whatsappColor
+                    ),
                     modifier = Modifier
                         .padding(horizontal = ScreenPadding),
                     text = "Continue Shopping"

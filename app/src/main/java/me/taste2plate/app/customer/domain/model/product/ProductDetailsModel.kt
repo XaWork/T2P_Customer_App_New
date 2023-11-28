@@ -4,6 +4,8 @@ package me.taste2plate.app.customer.domain.model.product
 import com.google.gson.annotations.SerializedName
 
 data class ProductDetailsModel(
+    @SerializedName("distance")
+    val distance: Double,
     @SerializedName("message")
     val message: String,
     @SerializedName("result")
@@ -80,6 +82,8 @@ data class ProductDetailsModel(
         val price: Int,
         @SerializedName("purchase_price")
         val purchasePrice: String,
+        @SerializedName("rating")
+        val rating: String,
         @SerializedName("selling_price")
         val sellingPrice: String?,
         @SerializedName("seo_description")
@@ -162,6 +166,8 @@ data class ProductDetailsModel(
             val bucket: String,
             @SerializedName("contentDisposition")
             val contentDisposition: Any,
+            @SerializedName("contentEncoding")
+            val contentEncoding: Any,
             @SerializedName("contentType")
             val contentType: String,
             @SerializedName("encoding")
@@ -185,7 +191,9 @@ data class ProductDetailsModel(
             @SerializedName("size")
             val size: Int,
             @SerializedName("storageClass")
-            val storageClass: String
+            val storageClass: String,
+            @SerializedName("versionId")
+            val versionId: Any
         )
 
         data class SubCategory(

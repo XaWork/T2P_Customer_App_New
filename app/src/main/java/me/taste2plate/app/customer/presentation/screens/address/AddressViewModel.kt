@@ -1,6 +1,8 @@
 package me.taste2plate.app.customer.presentation.screens.address
 
+import android.util.Log
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
@@ -46,6 +48,7 @@ class AddressViewModel @Inject constructor(
     var stateA = mutableStateOf("")
     var cityA = mutableStateOf("")
     var pincodeA = mutableStateOf("")
+    var filterPinList = mutableStateListOf<String>()
     var landmarkA = mutableStateOf("")
     val addressTypes = listOf(
         RadioButtonInfo(
@@ -109,6 +112,20 @@ class AddressViewModel @Inject constructor(
 
             is AddressEvents.DeleteAddress -> {
                 deleteAddress()
+            }
+
+            is AddressEvents.SearchPin -> {
+                searchPin(event.query)
+            }
+        }
+    }
+
+    private fun searchPin(query: String) {
+        Log.e("Search pin", "Query is $query")
+        for (item in state.zipList) {
+            if (item.name.contains(query)) {
+                Log.e("Search pin", "zip item  is ${item.name}")
+                filterPinList += item.name
             }
         }
     }
