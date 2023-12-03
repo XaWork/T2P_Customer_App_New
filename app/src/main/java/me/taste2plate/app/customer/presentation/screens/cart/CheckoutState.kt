@@ -4,6 +4,7 @@ import me.taste2plate.app.customer.domain.model.ApplyCouponModel
 import me.taste2plate.app.customer.domain.model.CouponModel
 import me.taste2plate.app.customer.domain.model.SettingsModel
 import me.taste2plate.app.customer.domain.model.auth.User
+import me.taste2plate.app.customer.domain.model.product.CalculateCheckoutDistanceModel
 import me.taste2plate.app.customer.domain.model.product.CutOffTimeCheckModel
 import me.taste2plate.app.customer.domain.model.user.CartModel
 import me.taste2plate.app.customer.domain.model.user.CheckoutModel
@@ -40,6 +41,7 @@ data class CheckoutState(
     val paymentType: PaymentType = PaymentType.Online,
     val defaultAddress: AddressListModel.Result? = null,
     val updateCartResponse: CommonResponse? = null,
+    val calculateCheckoutDistanceModel: CalculateCheckoutDistanceModel? = null,
     val cutOffTimeCheckModel: CutOffTimeCheckModel? = null,
     val checkoutModel: CheckoutModel? = null,
     val addressList: List<AddressListModel.Result> = emptyList(),

@@ -1,6 +1,7 @@
 package me.taste2plate.app.customer.presentation.screens.product
 
 import android.content.res.Configuration
+import android.widget.Toast
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.interaction.collectIsDraggedAsState
@@ -19,6 +20,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
@@ -62,7 +64,9 @@ import me.taste2plate.app.customer.presentation.screens.product.list.ProductEven
 import me.taste2plate.app.customer.presentation.screens.product.list.ProductListState
 import me.taste2plate.app.customer.presentation.theme.ExtraLowElevation
 import me.taste2plate.app.customer.presentation.theme.LowPadding
+import me.taste2plate.app.customer.presentation.theme.LowRoundedCorners
 import me.taste2plate.app.customer.presentation.theme.MediumPadding
+import me.taste2plate.app.customer.presentation.theme.MediumRoundedCorners
 import me.taste2plate.app.customer.presentation.theme.ScreenPadding
 import me.taste2plate.app.customer.presentation.theme.SpaceBetweenViews
 import me.taste2plate.app.customer.presentation.theme.SpaceBetweenViewsAndSubViews
@@ -114,7 +118,7 @@ fun ProductDetailsScreen(
 
     LaunchedEffect(key1 = state) {
         if (state.message != null) {
-            showToast(state.message)
+            showToast(state.message, toastLength = Toast.LENGTH_LONG)
             viewModel.onEvent(ProductEvents.UpdateState)
         }
     }
@@ -302,6 +306,10 @@ fun ProductDetails(
                 .padding(ScreenPadding)
         ) {
 
+            Text("Total Weight : ${details.weight} kg", color = secondaryColor.invoke())
+
+            VerticalSpace(space = SpaceBetweenViewsAndSubViews)
+
             val items = listOf<@Composable RowScope.() -> Unit> {
                 Text(
                     text = details.name,
@@ -336,7 +344,7 @@ fun ProductDetails(
             VerticalSpace(space = SpaceBetweenViews)
 
             Text(
-                text = "You food will travel ${state.productDetails.distance}kms by Air to reach Fresh to you:)",
+                text = "Last Mile Delivery - Your food will travel ${state.productDetails.distance}Kms in your city to reach to you.",
                 fontWeight = FontWeight.W400,
                 color = primaryColor.invoke()
             )
@@ -527,17 +535,21 @@ fun CartAddRemove(
     onUpdateCart: (quantity: Int) -> Unit
 ) {
     Row(
-        modifier = modifier,
+        modifier = modifier
+            .background(color = primaryColor.invoke())
+            .padding(horizontal = MediumPadding, )
+            .clip(RoundedCornerShape(MediumRoundedCorners)),
         horizontalArrangement = Arrangement.Center,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        TextInCircle(
-            fontSize = textInCircleFontSize,
+        Text(
             modifier = textInCircleModifier.noRippleClickable {
                 if (cartItemLength > 0)
                     onUpdateCart(cartItemLength - 1)
             },
-            text = "-"
+            text = "-",
+            color = screenBackgroundColor.invoke(),
+            fontSize = fontSize,
         )
 
         Text(
@@ -547,15 +559,17 @@ fun CartAddRemove(
                     horizontal = MediumPadding,
                 ),
             textAlign = TextAlign.Center,
-            fontSize = fontSize
+            fontSize = fontSize,
+            color = screenBackgroundColor.invoke()
         )
 
-        TextInCircle(
-            fontSize = textInCircleFontSize,
+        Text(
             modifier = textInCircleModifier.noRippleClickable {
                 onUpdateCart(cartItemLength + 1)
             },
-            text = "+"
+            text = "+",
+            color = screenBackgroundColor.invoke(),
+            fontSize = fontSize,
         )
     }
 }

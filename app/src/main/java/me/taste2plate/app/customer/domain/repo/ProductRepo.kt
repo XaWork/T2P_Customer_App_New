@@ -2,6 +2,7 @@ package me.taste2plate.app.customer.domain.repo
 
 import me.taste2plate.app.customer.domain.model.CouponModel
 import me.taste2plate.app.customer.domain.model.custom.CheckAvailabilityModel
+import me.taste2plate.app.customer.domain.model.product.CalculateCheckoutDistanceModel
 import me.taste2plate.app.customer.domain.model.product.CutOffTimeCheckModel
 import me.taste2plate.app.customer.domain.model.product.ProductBySliderModel
 import me.taste2plate.app.customer.domain.model.product.ProductDetailsModel
@@ -12,6 +13,11 @@ interface ProductRepo {
         id: String,
         taste: String
     ): ProductListModel
+
+    suspend fun calculateCheckoutDistance(
+        addressId: String,
+        productId: String,
+    ): CalculateCheckoutDistanceModel
 
     suspend fun productByBrand(
         id: String,

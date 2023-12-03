@@ -12,7 +12,8 @@ fun WishListModel.Result.toCommonForWishAndCartItem(): CommonForItem {
         id = product.id,
         image = product.file[0].location,
         name = product.name,
-        price = product.price.toString()
+        price = product.price.toString(),
+        quantity = 1
     )
 
 }

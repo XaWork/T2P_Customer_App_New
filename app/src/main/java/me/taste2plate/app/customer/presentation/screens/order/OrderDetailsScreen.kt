@@ -53,6 +53,7 @@ import me.taste2plate.app.customer.presentation.theme.ScreenPadding
 import me.taste2plate.app.customer.presentation.theme.SpaceBetweenViews
 import me.taste2plate.app.customer.presentation.theme.SpaceBetweenViewsAndSubViews
 import me.taste2plate.app.customer.presentation.theme.VeryLowSpacing
+import me.taste2plate.app.customer.presentation.theme.screenBackgroundColor
 import me.taste2plate.app.customer.presentation.utils.noRippleClickable
 import me.taste2plate.app.customer.presentation.utils.rupeeSign
 import me.taste2plate.app.customer.presentation.widgets.AppButton
@@ -260,6 +261,9 @@ fun SingleOrderItem(
         modifier = Modifier
             .fillMaxWidth()
             .padding(vertical = VeryLowSpacing),
+        cardColor = CardDefaults.cardColors(
+            containerColor = screenBackgroundColor.invoke()
+        )
     ) {
         Column {
             Row(

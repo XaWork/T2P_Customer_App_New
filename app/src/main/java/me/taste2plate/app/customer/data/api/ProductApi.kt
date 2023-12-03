@@ -2,10 +2,13 @@ package me.taste2plate.app.customer.data.api
 
 import me.taste2plate.app.customer.domain.model.CouponModel
 import me.taste2plate.app.customer.domain.model.custom.CheckAvailabilityModel
+import me.taste2plate.app.customer.domain.model.product.CalculateCheckoutDistanceModel
 import me.taste2plate.app.customer.domain.model.product.CutOffTimeCheckModel
 import me.taste2plate.app.customer.domain.model.product.ProductBySliderModel
 import me.taste2plate.app.customer.domain.model.product.ProductDetailsModel
 import me.taste2plate.app.customer.domain.model.product.ProductListModel
+import retrofit2.http.Field
+import retrofit2.http.FormUrlEncoded
 import retrofit2.http.GET
 import retrofit2.http.POST
 import retrofit2.http.Query
@@ -17,6 +20,16 @@ interface ProductApi {
         @Query("city") cityId: String,
         @Query("taste") taste: String
     ): ProductListModel
+
+
+
+    @FormUrlEncoded
+    @POST("calculate-checkout-distance")
+    suspend fun calculateCheckoutDistance(
+        @Field("address") address: String,
+        @Field("product") productId: String,
+    ): CalculateCheckoutDistanceModel
+
 
 
     @GET("all-products")

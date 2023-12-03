@@ -195,7 +195,7 @@ fun SingleCartAndWishlistItem(
                         updateCart(quantity)
                     }
 
-                Text(text = "${rupeeSign}${item.price}", fontSize = fontSize)
+                Text(text = "${rupeeSign}${item.price!!.toInt() * item.quantity!!}", fontSize = fontSize)
             }
             SpaceBetweenRow(items = innerItems)
         }

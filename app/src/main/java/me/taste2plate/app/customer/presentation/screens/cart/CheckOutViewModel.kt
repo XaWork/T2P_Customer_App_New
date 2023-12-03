@@ -18,10 +18,12 @@ import me.taste2plate.app.customer.T2PApp
 import me.taste2plate.app.customer.data.Resource
 import me.taste2plate.app.customer.data.Status
 import me.taste2plate.app.customer.data.UserPref
+import me.taste2plate.app.customer.domain.model.product.CalculateCheckoutDistanceModel
 import me.taste2plate.app.customer.domain.model.user.MyPlanModel
 import me.taste2plate.app.customer.domain.model.user.address.AddressListModel
 import me.taste2plate.app.customer.domain.use_case.ApplyCouponUseCase
 import me.taste2plate.app.customer.domain.use_case.CouponByCityUseCase
+import me.taste2plate.app.customer.domain.use_case.product.CalculateCheckoutDistanceUseCase
 import me.taste2plate.app.customer.domain.use_case.product.CutOffTimeCheckUseCase
 import me.taste2plate.app.customer.domain.use_case.user.InitCheckoutUseCase
 import me.taste2plate.app.customer.domain.use_case.user.MyPlanUseCase
@@ -40,6 +42,7 @@ class CheckOutViewModel @Inject constructor(
     private val userPref: UserPref,
     private val cartUseCase: CartUseCase,
     private val updateCartUseCase: UpdateCartUseCase,
+    private val calculateCheckoutDistanceUseCase: CalculateCheckoutDistanceUseCase,
     private val deleteCartUseCase: DeleteCartUseCase,
     private val allAddressUseCase: AllAddressUseCase,
     private val cutOffTimeCheckUseCase: CutOffTimeCheckUseCase,
@@ -101,6 +104,10 @@ class CheckOutViewModel @Inject constructor(
 
             is CheckoutEvents.ChangeMyPlanValue -> {
                 state = state.copy(myPlan = null)
+            }
+
+            is CheckoutEvents.CalculateCheckoutDistance -> {
+                calculateCheckoutDistance()
             }
 
             is CheckoutEvents.ChangeWalletCheckStatus -> {
@@ -324,7 +331,7 @@ class CheckOutViewModel @Inject constructor(
         if (state.deliveryType == DeliveryType.Express) {
             codEnabled = false
             showDialogExpress = true
-        }else{
+        } else {
             codEnabled = true
         }
     }
@@ -403,8 +410,7 @@ class CheckOutViewModel @Inject constructor(
                     sgst =
                         if (state.deliveryType == DeliveryType.Express) couponResponse.gst.express.totalSgst.toDouble()
                         else couponResponse.gst.normal.totalSgst.toDouble()
-                }
-                else {
+                } else {
                     val cartItemResponse = state.cart
                     val tPrice =
                         if (state.deliveryType == DeliveryType.Express) cartItemResponse!!.newFinalPrice.express.toDouble()
@@ -478,8 +484,9 @@ class CheckOutViewModel @Inject constructor(
                             isLoading = false,
                             cart = data
                         )
-                        if (state.defaultAddress != null)
+                        if (state.defaultAddress != null) {
                             setPrice()
+                        }
                     }
 
                     is Resource.Error ->
@@ -823,6 +830,40 @@ class CheckOutViewModel @Inject constructor(
                             errorMessage = "Something went Wrong",
                             updateCartResponse = data,
                             normalMessage = data?.message,
+                        )
+
+                    }
+
+                    is Resource.Error ->
+                        state.copy(
+                            isLoading = false,
+                            isError = true,
+                            errorMessage = result.message
+                        )
+                }
+
+            }
+        }
+    }
+
+    private fun calculateCheckoutDistance() {
+        viewModelScope.launch {
+            calculateCheckoutDistanceUseCase.execute(
+                state.cart!!.result[0].product.id
+            ).collect { result ->
+                state = when (result) {
+                    is Resource.Loading -> state.copy(isLoading = false)
+                    is Resource.Success -> {
+                        val data = result.data
+                        val isError = data?.status == Status.error.name
+
+                        if (!isError)
+                            getCart(isLoading = false)
+
+                        state.copy(
+                            isLoading = false,
+                            isError = isError,
+                            calculateCheckoutDistanceModel = data,
                         )
 
                     }

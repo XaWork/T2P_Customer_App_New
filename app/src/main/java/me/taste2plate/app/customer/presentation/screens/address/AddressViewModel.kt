@@ -149,7 +149,7 @@ class AddressViewModel @Inject constructor(
                     else -> addressTypes[0]
                 }
             }
-        } else {
+        } /*else {
             fullName.value = ""
             phone.value = ""
             address1.value = ""
@@ -159,7 +159,7 @@ class AddressViewModel @Inject constructor(
             pincodeA.value = ""
             landmarkA.value = ""
             addressType.value = addressTypes[0]
-        }
+        }*/
         getStateList()
     }
 

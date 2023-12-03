@@ -349,6 +349,9 @@ fun Navigation() {
                     onNavigateToProductDetailsScreen = {
                         navController.navigate(Screens.ProductDetailsScreen.route)
                     },
+                    onNavigateToCartScreen = {
+                        navController.navigate(Screens.CartScreen.route)
+                    },
                     navigateBack = {
                         navController.popBackStack()
                     })

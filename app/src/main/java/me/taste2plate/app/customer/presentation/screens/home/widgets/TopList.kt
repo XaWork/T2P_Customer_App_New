@@ -54,11 +54,12 @@ fun SingleTopList(
     modifier: Modifier = Modifier,
     drawableImage: Int? = null,
     image: String? = null,
+    contentScale: ContentScale = ContentScale.Crop,
 ) {
     if (drawableImage != null)
         DrawableImage(
             id = drawableImage,
-            contentScale = ContentScale.Crop,
+            contentScale = contentScale,
             modifier = modifier
                 .clip(RoundedCornerShape(10.dp))
                 .height(80.dp)
@@ -69,7 +70,7 @@ fun SingleTopList(
             modifier = modifier
                 .clip(RoundedCornerShape(10.dp))
                 .height(80.dp),
-            contentScale = ContentScale.Crop
+            contentScale = contentScale
         )
 }
 

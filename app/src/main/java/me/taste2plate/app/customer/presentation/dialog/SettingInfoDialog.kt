@@ -1,12 +1,27 @@
 package me.taste2plate.app.customer.presentation.dialog
 
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.sp
 import me.taste2plate.app.customer.domain.model.SettingsModel
 import me.taste2plate.app.customer.domain.model.product.CutOffTimeCheckModel
+import me.taste2plate.app.customer.presentation.theme.SpaceBetweenViews
+import me.taste2plate.app.customer.presentation.theme.primaryColor
+import me.taste2plate.app.customer.presentation.theme.screenBackgroundColor
+import me.taste2plate.app.customer.presentation.widgets.AppButton
+import me.taste2plate.app.customer.presentation.widgets.AppRadioButton
+import me.taste2plate.app.customer.presentation.widgets.RadioButtonInfo
+import me.taste2plate.app.customer.presentation.widgets.VerticalSpace
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Date
@@ -37,7 +52,7 @@ fun SettingInfoDialog(
     var cut_of_time_first: Date? = null
     var cut_of_time_second: Date? = null
 
-    if(checkAvailability!=null) {
+    if (checkAvailability != null) {
         cut_of_time_first =
             format.parse(checkAvailability.result.expressCutOfTimeFirst)
         cut_of_time_second =
@@ -55,22 +70,44 @@ fun SettingInfoDialog(
     }
 
     AlertDialog(
+        containerColor = screenBackgroundColor.invoke(),
         title = {
-            Text(text = title)
+            Text(
+                modifier = Modifier.fillMaxWidth(),
+                text = title,
+                fontSize = 25.sp,
+                fontWeight = FontWeight.Bold,
+                textAlign = TextAlign.Center
+            )
         },
         text = {
-            Text(text = "$subtitle\n\n$description")
+            val radioOptions = listOf(RadioButtonInfo(1, description))
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
+            ) {
+                AppRadioButton(
+                    radioOptions = radioOptions,
+                    selectedOption = radioOptions[0].text,
+                    onOptionSelected = {},
+                    color = primaryColor.invoke()
+                )
+
+                VerticalSpace(space = SpaceBetweenViews)
+
+                Text(
+                    text = subtitle,
+                    fontSize = 25.sp,
+                    fontWeight = FontWeight.W400
+                )
+            }
         },
         onDismissRequest = {
             onDismissRequest()
         },
         confirmButton = {
-            TextButton(
-                onClick = {
-                    onConfirmation()
-                }
-            ) {
-                Text("Ok")
+            AppButton(text = "Ok", modifier = Modifier.fillMaxWidth()) {
+                onConfirmation()
             }
         }
     )

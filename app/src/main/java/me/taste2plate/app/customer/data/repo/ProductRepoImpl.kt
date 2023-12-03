@@ -3,6 +3,7 @@ package me.taste2plate.app.customer.data.repo
 import me.taste2plate.app.customer.data.api.ProductApi
 import me.taste2plate.app.customer.domain.model.CouponModel
 import me.taste2plate.app.customer.domain.model.custom.CheckAvailabilityModel
+import me.taste2plate.app.customer.domain.model.product.CalculateCheckoutDistanceModel
 import me.taste2plate.app.customer.domain.model.product.CutOffTimeCheckModel
 import me.taste2plate.app.customer.domain.model.product.ProductBySliderModel
 import me.taste2plate.app.customer.domain.model.product.ProductDetailsModel
@@ -15,6 +16,13 @@ class ProductRepoImpl @Inject constructor(
 ) : ProductRepo {
     override suspend fun productByCity(id: String, taste: String): ProductListModel {
         return api.productsByCity(id, taste)
+    }
+
+    override suspend fun calculateCheckoutDistance(
+        addressId: String,
+        productId: String
+    ): CalculateCheckoutDistanceModel {
+        return api.calculateCheckoutDistance(addressId, productId)
     }
 
     override suspend fun productByBrand(id: String, taste: String): ProductListModel {

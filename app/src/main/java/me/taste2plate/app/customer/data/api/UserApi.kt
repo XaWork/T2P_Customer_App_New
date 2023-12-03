@@ -3,6 +3,7 @@ package me.taste2plate.app.customer.data.api
 import me.taste2plate.app.customer.domain.model.ApplyCouponModel
 import me.taste2plate.app.customer.domain.model.auth.LoginModel
 import me.taste2plate.app.customer.domain.model.auth.VerifyOTPModel
+import me.taste2plate.app.customer.domain.model.product.CalculateCheckoutDistanceModel
 import me.taste2plate.app.customer.domain.model.user.CartModel
 import me.taste2plate.app.customer.domain.model.user.CheckoutModel
 import me.taste2plate.app.customer.domain.model.user.CommonResponse

@@ -4,6 +4,7 @@ import me.taste2plate.app.customer.data.api.UserApi
 import me.taste2plate.app.customer.domain.model.ApplyCouponModel
 import me.taste2plate.app.customer.domain.model.auth.LoginModel
 import me.taste2plate.app.customer.domain.model.auth.VerifyOTPModel
+import me.taste2plate.app.customer.domain.model.product.CalculateCheckoutDistanceModel
 import me.taste2plate.app.customer.domain.model.user.CartModel
 import me.taste2plate.app.customer.domain.model.user.CheckoutModel
 import me.taste2plate.app.customer.domain.model.user.CommonResponse
@@ -89,6 +90,7 @@ class UserRepoImpl @Inject constructor(
 
     override suspend fun deleteCart(userId: String, productID: String) =
         api.deleteCart(userId, productID)
+
 
     override suspend fun allAddress(userId: String): AddressListModel {
         return api.allAddress(userId)

@@ -28,47 +28,49 @@ fun AppRadioButton(
     selectedOption: String,
     onOptionSelected: (RadioButtonInfo) -> Unit,
     isIcon: Boolean = false,
-    fontSize : TextUnit = TextUnit.Unspecified
+    fontSize: TextUnit = TextUnit.Unspecified,
+    color: Color = Color.Unspecified
 ) {
     Row(Modifier.selectableGroup()) {
-        radioOptions.forEach { text ->
-            if (text.enable)
-                Row(
-                    Modifier
-                        .selectable(
-                            selected = (text.text == selectedOption),
-                            onClick = { onOptionSelected(text) },
-                            role = Role.RadioButton
-                        )
-                        .padding(horizontal = 16.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    RadioButton(
-                        selected = (text.text == selectedOption),
-                        onClick = null // null recommended for accessibility with screen readers
+        radioOptions.forEach { radioButtonInfo ->
+            Row(
+                Modifier
+                    .selectable(
+                        selected = (radioButtonInfo.text == selectedOption),
+                        onClick = { if (radioButtonInfo.enable) onOptionSelected(radioButtonInfo) },
+                        role = Role.RadioButton
                     )
+                    .padding(horizontal = 16.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                RadioButton(
+                    selected = if (radioButtonInfo.enable) (radioButtonInfo.text == selectedOption) else false,
+                    onClick = null,
+                    enabled = radioButtonInfo.enable,
+                )
 
-                    if (isIcon)
-                        DrawableImage(
-                            id = text.icon!!,
-                            modifier = Modifier
-                                .size(70.dp)
-                                .padding(start = 16.dp),
-                            colorFilter = ColorFilter.tint(
-                                color =
-                                if (text.text == selectedOption)
-                                    primaryColor.invoke()
-                                else
-                                    onBackgroundColor.invoke()
-                            )
+                if (isIcon)
+                    DrawableImage(
+                        id = radioButtonInfo.icon!!,
+                        modifier = Modifier
+                            .size(70.dp)
+                            .padding(start = 16.dp),
+                        colorFilter = ColorFilter.tint(
+                            color =
+                            if (radioButtonInfo.text == selectedOption)
+                                primaryColor.invoke()
+                            else
+                                onBackgroundColor.invoke()
                         )
-                    else
-                        Text(
-                            text = text.text,
-                            style = MaterialTheme.typography.bodyLarge,
-                            modifier = Modifier.padding(start = 16.dp), fontSize = fontSize
-                        )
-                }
+                    )
+                else
+                    Text(
+                        text = radioButtonInfo.text,
+                        style = MaterialTheme.typography.bodyLarge,
+                        modifier = Modifier.padding(start = 16.dp), fontSize = fontSize,
+                        color = if (radioButtonInfo.enable) color else Color.Gray
+                    )
+            }
         }
     }
 }

@@ -88,16 +88,20 @@ fun OrderConfirmContent(
             VerticalSpace(space = SpaceBetweenViews)
 
             Text(
+                text = "Your Order Delivery schedule is",
+            )
+
+            Text(
                 orderInfo.timeslot.uppercase(),
                 fontSize = 25.sp,
                 color = primaryColor.invoke()
             )
-
+/*
             VerticalSpace(space = SpaceBetweenViewsAndSubViews)
 
             Text(
                 text = "For you order".uppercase(),
-            )
+            )*/
         }
 
         AppButton(

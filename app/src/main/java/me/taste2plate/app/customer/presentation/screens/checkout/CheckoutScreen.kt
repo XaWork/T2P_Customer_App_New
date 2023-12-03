@@ -7,6 +7,7 @@ import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -147,6 +148,10 @@ fun CheckoutScreen(
 
             state.orderConfirmed -> {
                 onNavigateToOrderConfirmScreen()
+            }
+
+            state.calculateCheckoutDistanceModel == null -> {
+                viewModel.onEvent(CheckoutEvents.CalculateCheckoutDistance)
             }
         }
     }
@@ -311,7 +316,7 @@ fun CheckoutScreen(
     val startFromDate =
         simpleDateFormatter.parse(state.cart!!.normalDeliveryDate)!!.time
     val datePickerState =
-        rememberDatePickerState(initialSelectedDateMillis = startFromDate)
+        rememberDatePickerState()
     var showDatePickerDialog by rememberSaveable { mutableStateOf(false) }
     if (showDatePickerDialog) {
         DatePickerDialog(
@@ -336,8 +341,9 @@ fun CheckoutScreen(
                     val selectedDate = datePickerState.selectedDateMillis?.let {
                         Instant.ofEpochMilli(it).atOffset(ZoneOffset.UTC)
                     }
-                    viewModel.selectedDate =
-                        selectedDate?.format(DateTimeFormatter.ISO_LOCAL_DATE).toString()
+                    if (selectedDate != null)
+                        viewModel.selectedDate =
+                            selectedDate.format(DateTimeFormatter.ISO_LOCAL_DATE).toString()
                     showDatePickerDialog = false
                 }) {
                     Text("OK")
@@ -449,167 +455,185 @@ fun CheckoutScreenContent(
             price = viewModel.discountWallet.toString(),
             subTitle = viewModel.pointConversionText.ifEmpty { null }
         ),
+        PriceData(
+            title = "Total Weight",
+            price = state.cart!!.shippingWeight.toString(),
+            isWeight = true
+        ),
     )
 
-    LazyColumn(
-        contentPadding = PaddingValues(ScreenPadding),
-        verticalArrangement = Arrangement.spacedBy(SpaceBetweenViewsAndSubViews)
-    ) {
-        //user info
-        item {
-            if (state.defaultAddress != null && state.user != null)
-                AddressBar(
-                    address = state.defaultAddress,
-                    user = state.user,
-                    openAddressSheet = openAddressSheet
-                )
-        }
+    Box {
 
-        //cart items
-        val items = state.cart!!.result.map { it.toCommonForWishAndCartItem() }.toList()
-        items(items) { item ->
-            SingleCartAndWishlistItem(
-                isWishList = false, item,
-                updateCart = {
-                    updateCart(
-                        item.id,
-                        it
+        LazyColumn(
+            contentPadding = PaddingValues(ScreenPadding),
+            verticalArrangement = Arrangement.spacedBy(SpaceBetweenViewsAndSubViews)
+        ) {
+            //user info
+            item {
+                if (state.defaultAddress != null && state.user != null)
+                    AddressBar(
+                        address = state.defaultAddress,
+                        user = state.user,
+                        openAddressSheet = openAddressSheet
                     )
-                },
-                fontSize = fontSize,
-            )
-        }
-
-        item {
-            var youSave = 0.0F
-            state.cart.result.forEach {
-                val sellingPrice = it.product.sellingPrice
-                if (!sellingPrice.isNullOrEmpty()) {
-                    youSave += it.product.price.toFloat() - sellingPrice.toFloat()
-                }
             }
 
-            if (youSave != 0.0F)
-                InfoWithIcon(
-                    id = R.drawable.party,
-                    info = "You Saved $rupeeSign$youSave on this order",
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .background(Color.Blue.copy(alpha = 0.1f))
-                        .padding(MediumPadding),
-                    textColor = Color.Blue,
-                    iconOrImageModifier = Modifier
-                        .size(30.dp)
-
-                )
-
-
-            /***
-            if coupon applied successfully then update price according to apply coupon response
-            if not then take price as it is, that are inside cart
-             ***/
-
-            CouponInfo(
-                state = state,
-                removeCoupon = {
-                    viewModel.onEvent(CheckoutEvents.RemoveCoupon)
-                },
-                showCoupons = {
-                    showCoupons()
-                }
-            )
-
-            TipInfo(
-                state = state,
-                onTipSelect = { index ->
-                    viewModel.onEvent(CheckoutEvents.UpdateTip(index))
-                },
-                showOtherTipDialog = showOtherTipDialog
-            )
-
-            CancellationPolicy("12")
-
-            HeadingText("Price Details")
-
-            VerticalSpace(space = SpaceBetweenViewsAndSubViews)
-        }
-
-        items(
-            priceList
-        ) { price ->
-            val itemList = listOf<@Composable RowScope.() -> Unit> {
-                Column {
-                    Text(
-                        text = price.title,
-                        fontWeight = FontWeight.Light, fontSize = fontSize
-                    )
-                    if (price.subTitle != null)
-                        Text(
-                            text = price.subTitle,
-                            fontSize = 12.sp,
+            //cart items
+            val items = state.cart.result.map { it.toCommonForWishAndCartItem() }.toList()
+            items(items) { item ->
+                SingleCartAndWishlistItem(
+                    isWishList = false, item,
+                    updateCart = {
+                        updateCart(
+                            item.id,
+                            it
                         )
-                }
-
-                Text(
-                    text = "${price.sign}${price.price}", fontSize = fontSize
+                    },
+                    fontSize = fontSize,
                 )
             }
 
-            SpaceBetweenRow(items = itemList)
-        }
-
-        item {
-            if (viewModel.walletEnabled)
-                AppCheckBox(
-                    checked = viewModel.walletChecked,
-                    onCheckedChange = { viewModel.onEvent(CheckoutEvents.ChangeWalletCheckStatus) },
-                    text = "Check to use wallet discount"
-                )
-
-            VerticalSpace(space = SpaceBetweenViewsAndSubViews)
-
-            SpaceBetweenRow(item1 = {
-                Text(
-                    text = "Total Price",
-                    color = primaryColor.invoke(), fontSize = fontSize
-                )
-
-            }, item2 = {
-                Text(
-                    text = "${rupeeSign}${viewModel.totalPrice}",
-                    color = primaryColor.invoke(), fontSize = fontSize
-                )
-            })
-
-            VerticalSpace(space = SpaceBetweenViewsAndSubViews)
-
-            DeliveryInfo(
-                viewModel = viewModel,
-                date = viewModel.selectedDate,
-                timeSlot = viewModel.selectedTimeSlot,
-                deliveryType = state.deliveryType,
-                showDatePicker = { showDatePicker() },
-                showTimeSlots = { showTimeSlots() },
-                changeDeliveryType = changeDeliveryType
-            )
-
-            VerticalSpace(space = SpaceBetweenViews)
-
-            PaymentInfo(viewModel, changePaymentType = {
-                viewModel.onEvent(CheckoutEvents.ChangePaymentType(it))
-            })
-
-            VerticalSpace(space = SpaceBetweenViewsAndSubViews)
-
-            if (state.buttonLoading)
-                ShowLoading()
-            else
-                AppButton(
-                    text = "Continue"
-                ) {
-                    onNavigateToOrderConfirmScreen()
+            item {
+                var youSave = 0.0F
+                state.cart.result.forEach {
+                    val sellingPrice = it.product.sellingPrice
+                    if (!sellingPrice.isNullOrEmpty()) {
+                        youSave += it.product.price.toFloat() - sellingPrice.toFloat()
+                    }
                 }
+
+                if (youSave != 0.0F)
+                    InfoWithIcon(
+                        id = R.drawable.party,
+                        info = "You Saved $rupeeSign$youSave on this order",
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .background(Color.Blue.copy(alpha = 0.1f))
+                            .padding(MediumPadding),
+                        textColor = Color.Blue,
+                        iconOrImageModifier = Modifier
+                            .size(30.dp)
+
+                    )
+
+
+                /***
+                if coupon applied successfully then update price according to apply coupon response
+                if not then take price as it is, that are inside cart
+                 ***/
+
+
+                /***
+                if coupon applied successfully then update price according to apply coupon response
+                if not then take price as it is, that are inside cart
+                 ***/
+
+                CouponInfo(
+                    state = state,
+                    removeCoupon = {
+                        viewModel.onEvent(CheckoutEvents.RemoveCoupon)
+                    },
+                    showCoupons = {
+                        showCoupons()
+                    }
+                )
+
+                TipInfo(
+                    state = state,
+                    onTipSelect = { index ->
+                        viewModel.onEvent(CheckoutEvents.UpdateTip(index))
+                    },
+                    showOtherTipDialog = showOtherTipDialog
+                )
+
+                CancellationPolicy(
+                    distanceTraveled = if (state.calculateCheckoutDistanceModel != null)
+                        state.calculateCheckoutDistanceModel.distance.toString()
+                    else "0"
+                )
+
+                HeadingText("Price Details")
+
+                VerticalSpace(space = SpaceBetweenViewsAndSubViews)
+            }
+
+            items(
+                priceList
+            ) { price ->
+                val itemList = listOf<@Composable RowScope.() -> Unit> {
+                    Column {
+                        Text(
+                            text = price.title,
+                            fontWeight = FontWeight.Light, fontSize = fontSize
+                        )
+                        if (price.subTitle != null)
+                            Text(
+                                text = price.subTitle,
+                                fontSize = 12.sp,
+                            )
+                    }
+
+                    Text(
+                        text = if (price.isWeight) "${price.price}Kg" else "${price.sign}${price.price}",
+                        fontSize = fontSize
+                    )
+                }
+
+                SpaceBetweenRow(items = itemList)
+            }
+
+            item {
+                if (viewModel.walletEnabled)
+                    AppCheckBox(
+                        checked = viewModel.walletChecked,
+                        onCheckedChange = { viewModel.onEvent(CheckoutEvents.ChangeWalletCheckStatus) },
+                        text = "Check to use wallet discount"
+                    )
+
+                VerticalSpace(space = SpaceBetweenViewsAndSubViews)
+
+                SpaceBetweenRow(item1 = {
+                    Text(
+                        text = "Total Price",
+                        color = primaryColor.invoke(), fontSize = fontSize
+                    )
+
+                }, item2 = {
+                    Text(
+                        text = "${rupeeSign}${viewModel.totalPrice}",
+                        color = primaryColor.invoke(), fontSize = fontSize
+                    )
+                })
+
+                VerticalSpace(space = SpaceBetweenViewsAndSubViews)
+
+                DeliveryInfo(
+                    viewModel = viewModel,
+                    date = viewModel.selectedDate,
+                    timeSlot = viewModel.selectedTimeSlot,
+                    deliveryType = state.deliveryType,
+                    showDatePicker = { showDatePicker() },
+                    showTimeSlots = { showTimeSlots() },
+                    changeDeliveryType = changeDeliveryType
+                )
+
+                VerticalSpace(space = SpaceBetweenViews)
+
+                PaymentInfo(viewModel, changePaymentType = {
+                    viewModel.onEvent(CheckoutEvents.ChangePaymentType(it))
+                })
+            }
         }
+
+        if (state.buttonLoading)
+            ShowLoading()
+        else
+            AppButton(
+                text = "Continue",
+                modifier = Modifier.align(Alignment.BottomCenter)
+            ) {
+                onNavigateToOrderConfirmScreen()
+            }
     }
 }
 

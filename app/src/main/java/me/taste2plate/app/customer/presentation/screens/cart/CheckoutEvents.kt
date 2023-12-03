@@ -20,6 +20,7 @@ sealed class CheckoutEvents {
     ) : CheckoutEvents()
 
     object ChangeMyPlanValue : CheckoutEvents()
+    object CalculateCheckoutDistance : CheckoutEvents()
     object UpdateState : CheckoutEvents()
     data class ChangeDeliveryType(
         val deliveryType: DeliveryType

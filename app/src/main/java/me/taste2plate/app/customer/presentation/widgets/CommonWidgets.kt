@@ -204,11 +204,11 @@ fun VegNonVegFilter(
     onCheckChange: () -> Unit = {}
 ) {
     Row(
-        horizontalArrangement = Arrangement.Center,
+        horizontalArrangement = Arrangement.End,
         verticalAlignment = Alignment.CenterVertically,
-        modifier = modifier.padding(horizontal = LowPadding)
+        modifier = modifier.padding(start = LowPadding)
     ) {
-        Text(text = "Veg", fontSize = fontSize)
+        Text(text = "Veg/Non-veg", fontSize = fontSize)
 
         Switch(
             checked = checked, onCheckedChange = { onCheckChange() },
@@ -224,7 +224,7 @@ fun VegNonVegFilter(
             )
         )
 
-        Text(text = "Non-veg", fontSize = fontSize)
+       // Text(text = "Non-veg", fontSize = fontSize)
     }
 }
 

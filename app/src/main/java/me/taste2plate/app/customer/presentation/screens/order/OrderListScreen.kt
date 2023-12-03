@@ -62,7 +62,7 @@ fun OrderListScreen(
         }
     ) {
         if (state.isLoading)
-            ShowLoading()
+            ShowLoading(isButton = false)
         else if (state.orderList.isEmpty())
             AppEmptyView()
         else
