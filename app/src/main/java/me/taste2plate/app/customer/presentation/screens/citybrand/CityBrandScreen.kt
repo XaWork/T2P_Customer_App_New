@@ -139,7 +139,6 @@ fun ContentCityBrandScreen(
             contentPadding = PaddingValues(ScreenPadding),
             verticalArrangement = Arrangement.spacedBy(SpaceBetweenViews),
         ) {
-
             items(modifyList) { item ->
                 SingleCityBrand(
                     item,

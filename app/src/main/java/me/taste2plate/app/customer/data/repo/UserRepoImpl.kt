@@ -164,6 +164,10 @@ class UserRepoImpl @Inject constructor(
         return api.getOrders(userId)
     }
 
+    override suspend fun cancelOrder(orderId: String): CommonResponse {
+        return api.cancelOrder(orderId)
+    }
+
     override suspend fun getOrderUpdates(orderId: String): OrderUpdateModel {
         return api.getOrderUpdates(orderId)
     }

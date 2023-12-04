@@ -18,13 +18,6 @@ fun PriceDialog(
 ) {
     AlertDialog(
         containerColor = screenBackgroundColor.invoke(),
-        icon = {
-            Icon(
-                Icons.Default.Delete,
-                contentDescription = "Example Icon",
-                tint = primaryColor.invoke()
-            )
-        },
         title = {
             Text(text = "Alert!")
         },

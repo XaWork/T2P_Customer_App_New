@@ -170,6 +170,10 @@ interface UserApi {
     @GET("my-orders")
     suspend fun getOrders(@Query("id") userId: String): OrderListModel
 
+    @FormUrlEncoded
+    @POST("cancel-order")
+    suspend fun cancelOrder(@Field("id") orderId: String): CommonResponse
+
     @POST("bulk-order")
     @FormUrlEncoded
     suspend fun createBulkOrder(

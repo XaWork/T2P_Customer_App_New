@@ -126,6 +126,7 @@ interface UserRepo {
     ): CommonResponse
 
     suspend fun getOrders(userId: String): OrderListModel
+    suspend fun cancelOrder(orderId: String): CommonResponse
     suspend fun getOrderUpdates(orderId: String): OrderUpdateModel
     suspend fun createBulkOrder(
         name: String,

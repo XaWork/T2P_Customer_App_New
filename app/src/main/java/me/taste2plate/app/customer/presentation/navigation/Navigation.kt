@@ -248,6 +248,11 @@ fun Navigation() {
                 val viewModel =
                     entry.sharedViewModel<OrderViewModel>(navHostController = navController)
                 OrderDetailsScreen(viewModel,
+                    onNavigateToHomeScreen = {
+                        navController.navigate(Screens.HomeScreen.route) {
+                            popUpTo(0)
+                        }
+                    },
                     navigateBack = {
                         navController.popBackStack()
                     })
@@ -429,7 +434,7 @@ fun Navigation() {
             composable(route = Screens.DetailsScreen.route) { entry ->
                 val viewModel =
                     entry.sharedViewModel<CityBrandViewModel>(navHostController = navController)
-                DetailScreen(viewModel){
+                DetailScreen(viewModel) {
                     navController.popBackStack()
                 }
             }
@@ -438,7 +443,11 @@ fun Navigation() {
             composable(route = Screens.SubCategoryScreen.route) { entry ->
                 val viewModel =
                     entry.sharedViewModel<CityBrandViewModel>(navHostController = navController)
-                SubCategoryScreen(viewModel) {
+                SubCategoryScreen(viewModel,
+                        navigateBack = {
+                    navController.popBackStack()
+                }
+                ) {
                     val itemInfo = Gson().toJson(
                         it,
                         CommonForItem::class.java
@@ -495,12 +504,12 @@ fun Navigation() {
                 OrderConfirmScreen(
                     viewModel = viewModel,
                     onNavigateToHomeScreen = {
-                    navController.navigate(Screens.HomeScreen.route) {
-                        popUpTo(Screens.HomeScreen.route) {
-                            inclusive = true
+                        navController.navigate(Screens.HomeScreen.route) {
+                            popUpTo(Screens.HomeScreen.route) {
+                                inclusive = true
+                            }
                         }
-                    }
-                })
+                    })
             }
         }
 

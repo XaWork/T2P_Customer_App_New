@@ -10,6 +10,7 @@ import me.taste2plate.app.customer.domain.model.user.address.AddressListModel
 
 data class HomeState(
     val isLoading: Boolean = false,
+    val cartError: Boolean = false,
     val addressLoader: Boolean = false,
     val checked: Boolean = false,
     val user: User? = null,

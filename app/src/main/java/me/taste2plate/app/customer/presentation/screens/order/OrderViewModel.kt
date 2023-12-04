@@ -12,6 +12,7 @@ import me.taste2plate.app.customer.data.Resource
 import me.taste2plate.app.customer.data.Status
 import me.taste2plate.app.customer.data.UserPref
 import me.taste2plate.app.customer.domain.model.user.OrderListModel
+import me.taste2plate.app.customer.domain.use_case.user.order.CancelOrderUseCase
 import me.taste2plate.app.customer.domain.use_case.user.order.OrderListUseCase
 import me.taste2plate.app.customer.domain.use_case.user.order.OrderUpdateUseCase
 import okhttp3.Route
@@ -21,7 +22,8 @@ import javax.inject.Inject
 class OrderViewModel @Inject constructor(
     private val userPref: UserPref,
     private val orderListUseCase: OrderListUseCase,
-    private val orderUpdateUseCase: OrderUpdateUseCase
+    private val orderUpdateUseCase: OrderUpdateUseCase,
+    private val cancelOrderUseCase: CancelOrderUseCase
 ) : ViewModel() {
 
     var state by mutableStateOf(OrderState())
@@ -35,6 +37,14 @@ class OrderViewModel @Inject constructor(
     fun onEvent(event: OrderEvent) {
         when (event) {
             is OrderEvent.GetOrderList -> {}
+            is OrderEvent.UpdateState -> {
+                state = state.copy(
+                    cancelOrder = null
+                )
+            }
+            is OrderEvent.CancelOrder -> {
+                cancelOrder()
+            }
             is OrderEvent.GetOrderUpdate -> {
                 getOrderUpdates()
             }
@@ -97,6 +107,38 @@ class OrderViewModel @Inject constructor(
                                 isError = isError,
                                 message = if (isError) result.data.message else "",
                                 orderUpdates = data.result.ifEmpty { emptyList() }
+                            )
+                    }
+
+                    is Resource.Error -> {
+                        state = state.copy(
+                            isLoading = false,
+                            isError = true,
+                            message = result.message
+                        )
+                    }
+                }
+            }
+        }
+    }
+
+    private fun cancelOrder() {
+        viewModelScope.launch {
+            cancelOrderUseCase.execute(selectedOrder!!.id).collect { result ->
+                when (result) {
+                    is Resource.Loading -> {
+                        state = state.copy(isLoading = true)
+                    }
+
+                    is Resource.Success -> {
+                        val data = result.data!!
+                        val isError = data.status == Status.error.name
+                        state =
+                            state.copy(
+                                isLoading = false,
+                                isError = isError,
+                                message = if (isError) result.data.message else null,
+                                cancelOrder = data
                             )
                     }
 

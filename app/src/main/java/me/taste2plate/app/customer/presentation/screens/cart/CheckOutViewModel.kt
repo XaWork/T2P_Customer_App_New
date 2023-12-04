@@ -2,12 +2,10 @@ package me.taste2plate.app.customer.presentation.screens.cart
 
 import android.app.Activity
 import android.content.Context
-import android.icu.text.DecimalFormat
 import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableDoubleStateOf
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -18,7 +16,6 @@ import me.taste2plate.app.customer.T2PApp
 import me.taste2plate.app.customer.data.Resource
 import me.taste2plate.app.customer.data.Status
 import me.taste2plate.app.customer.data.UserPref
-import me.taste2plate.app.customer.domain.model.product.CalculateCheckoutDistanceModel
 import me.taste2plate.app.customer.domain.model.user.MyPlanModel
 import me.taste2plate.app.customer.domain.model.user.address.AddressListModel
 import me.taste2plate.app.customer.domain.use_case.ApplyCouponUseCase
@@ -34,6 +31,7 @@ import me.taste2plate.app.customer.domain.use_case.user.cart.DeleteCartUseCase
 import me.taste2plate.app.customer.domain.use_case.user.cart.UpdateCartUseCase
 import me.taste2plate.app.customer.presentation.screens.checkout.DeliveryType
 import me.taste2plate.app.customer.presentation.screens.checkout.PaymentType
+import me.taste2plate.app.customer.utils.toDecimal
 import org.json.JSONObject
 import javax.inject.Inject
 
@@ -55,11 +53,11 @@ class CheckOutViewModel @Inject constructor(
 
     var state by mutableStateOf(CheckoutState())
 
-    val decimalFormat = DecimalFormat("#.##")
     var walletChecked by mutableStateOf(false)
     var walletEnabled by mutableStateOf(false)
     var showDialogExpress by mutableStateOf(false)
     var showCustomDialog by mutableStateOf(false)
+    var validPaymentType by mutableStateOf(true)
     var showDigitalCODDialog by mutableStateOf(false)
     var customDialogMessage by mutableStateOf("")
     var codEnabled by mutableStateOf(true)
@@ -120,13 +118,16 @@ class CheckOutViewModel @Inject constructor(
             }
 
             is CheckoutEvents.ChangeDeliveryType -> {
-                state = state.copy(deliveryType = event.deliveryType)
+                state = state.copy(
+                    deliveryType = event.deliveryType,
+                    paymentType = PaymentType.Online
+                )
                 setPriceAfterChangeDeliveryType()
-
             }
 
             is CheckoutEvents.ChangePaymentType -> {
                 state = state.copy(paymentType = event.paymentType)
+                validPaymentType = true
                 checkPriceRequirements()
             }
 
@@ -202,17 +203,22 @@ class CheckOutViewModel @Inject constructor(
         }
         val minPrice =
             state.settings!!.minimumOrderValue.toFloat()
+
         if (selectedDate.isEmpty() && selectedTimeSlot.isEmpty())
             state = state.copy(isError = true, errorMessage = "Select data and time.")
         else if (priceToCheck < minPrice) {
             customDialogMessage = "Order can be placed for amount bigger than Rs. $minPrice"
             showCustomDialog = true
         } else {
-            initCheckout(context)
+            checkPriceRequirements(showCodDigitalDialog = false)
+            if (validPaymentType)
+                initCheckout(context)
         }
     }
 
-    private fun checkPriceRequirements() {
+    private fun checkPriceRequirements(
+        showCodDigitalDialog: Boolean = true,
+    ) {
         val priceToCheck = if (state.deliveryType == DeliveryType.Express) {
             state.cart!!.newFinalPrice.express.toFloat()
         } else {
@@ -225,18 +231,21 @@ class CheckOutViewModel @Inject constructor(
             PaymentType.Online -> {
                 if (priceToCheck < minPrice) {
                     showCustomDialog = true
+                    validPaymentType = false
                     customDialogMessage =
                         "Online payment order can be placed for minimum amount of Rs. $minPrice"
                 }
             }
 
             PaymentType.COD -> {
-                if (priceToCheck < minPrice) {
+                if (priceToCheck !in minPrice..maxPrice) {
+                    validPaymentType = false
                     customDialogMessage =
                         "COD order can be placed for amount between Rs. $minPrice - Rs. $maxPrice"
                     showCustomDialog = true
                 } else {
-                    showDigitalCODDialog = true
+                    showDigitalCODDialog = showCodDigitalDialog
+                    validPaymentType = true
                 }
             }
         }
@@ -254,7 +263,7 @@ class CheckOutViewModel @Inject constructor(
                     val tPrice =
                         if (walletChecked) couponResponse.new_final_price.withWallet!!.normal
                         else couponResponse.new_final_price.normal
-                    totalPrice = decimalFormat.format(tPrice.toDouble()).toDouble()
+                    totalPrice = tPrice.toDecimal()
 
                     igst =
                         if (walletChecked) couponResponse.gstWithWallet.normal.totalIgst.toDouble()
@@ -273,7 +282,7 @@ class CheckOutViewModel @Inject constructor(
                     val tPrice =
                         if (walletChecked) couponResponse.new_final_price.withWallet!!.express
                         else couponResponse.new_final_price.express
-                    totalPrice = decimalFormat.format(tPrice.toDouble()).toDouble()
+                    totalPrice = tPrice.toDecimal()
 
                     igst =
                         if (walletChecked) couponResponse.gstWithWallet.express.totalIgst.toDouble()
@@ -296,7 +305,7 @@ class CheckOutViewModel @Inject constructor(
 
                     val tPrice = if (walletChecked) cartData.newFinalPrice.withWallet!!.normal
                     else cartData.newFinalPrice.normal
-                    totalPrice = decimalFormat.format(tPrice.toDouble()).toDouble()
+                    totalPrice = tPrice.toDecimal()
 
                     igst = if (walletChecked) cartData.gstWithPoint.normal.totalIgst.toDouble()
                     else cartData.gst.normal.totalIgst.toDouble()
@@ -311,7 +320,7 @@ class CheckOutViewModel @Inject constructor(
 
                     val tPrice = if (walletChecked) cartData.newFinalPrice.withWallet!!.express
                     else cartData.newFinalPrice.express
-                    totalPrice = decimalFormat.format(tPrice.toDouble()).toDouble()
+                    totalPrice = tPrice.toDecimal()
 
                     igst = if (walletChecked) cartData.gstWithPoint.express.totalIgst.toDouble()
                     else cartData.gst.express.totalIgst.toDouble()
@@ -366,9 +375,9 @@ class CheckOutViewModel @Inject constructor(
                 if (state.applyCouponResponse != null) {
                     val couponResponse = state.applyCouponResponse
                     val tPrice =
-                        if (state.deliveryType == DeliveryType.Express) couponResponse!!.new_final_price.withWallet!!.express.toDouble()
-                        else couponResponse!!.new_final_price.withWallet!!.normal.toDouble()
-                    totalPrice = decimalFormat.format(tPrice).toDouble()
+                        if (state.deliveryType == DeliveryType.Express) couponResponse!!.new_final_price.withWallet!!.express
+                        else couponResponse!!.new_final_price.withWallet!!.normal
+                    totalPrice = tPrice.toDecimal()
                     igst =
                         if (state.deliveryType == DeliveryType.Express) couponResponse.gst.express.totalIgst.toDouble()
                         else couponResponse.gst.normal.totalIgst.toDouble()
@@ -381,9 +390,9 @@ class CheckOutViewModel @Inject constructor(
                 } else {
                     val cartItemResponse = state.cart
                     val tPrice =
-                        if (state.deliveryType == DeliveryType.Express) cartItemResponse!!.newFinalPrice.withWallet!!.express.toDouble()
-                        else cartItemResponse!!.newFinalPrice.withWallet!!.normal.toDouble()
-                    totalPrice = decimalFormat.format(tPrice).toDouble()
+                        if (state.deliveryType == DeliveryType.Express) cartItemResponse!!.newFinalPrice.withWallet!!.express
+                        else cartItemResponse!!.newFinalPrice.withWallet!!.normal
+                    totalPrice = tPrice.toDecimal()
                     igst =
                         if (state.deliveryType == DeliveryType.Express) cartItemResponse.gstWithPoint.express.totalIgst.toDouble()
                         else cartItemResponse.gstWithPoint.normal.totalIgst.toDouble()
@@ -398,9 +407,9 @@ class CheckOutViewModel @Inject constructor(
                 if (state.applyCouponResponse != null) {
                     val couponResponse = state.applyCouponResponse
                     val tPrice =
-                        if (state.deliveryType == DeliveryType.Express) couponResponse!!.new_final_price.express.toDouble()
-                        else couponResponse!!.new_final_price.normal.toDouble()
-                    totalPrice = decimalFormat.format(tPrice).toDouble()
+                        if (state.deliveryType == DeliveryType.Express) couponResponse!!.new_final_price.express
+                        else couponResponse!!.new_final_price.normal
+                    totalPrice = tPrice.toDecimal()
                     igst =
                         if (state.deliveryType == DeliveryType.Express) couponResponse.gst.express.totalIgst.toDouble()
                         else couponResponse.gst.normal.totalIgst.toDouble()
@@ -413,9 +422,9 @@ class CheckOutViewModel @Inject constructor(
                 } else {
                     val cartItemResponse = state.cart
                     val tPrice =
-                        if (state.deliveryType == DeliveryType.Express) cartItemResponse!!.newFinalPrice.express.toDouble()
-                        else cartItemResponse!!.newFinalPrice.normal.toDouble()
-                    totalPrice = decimalFormat.format(tPrice).toDouble()
+                        if (state.deliveryType == DeliveryType.Express) cartItemResponse!!.newFinalPrice.express
+                        else cartItemResponse!!.newFinalPrice.normal
+                    totalPrice = tPrice.toDecimal()
                     igst =
                         if (state.deliveryType == DeliveryType.Express) cartItemResponse.gst.express.totalIgst.toDouble()
                         else cartItemResponse.gst.normal.totalIgst.toDouble()
@@ -601,7 +610,7 @@ class CheckOutViewModel @Inject constructor(
                     )
 
                 //total
-                totalPrice = decimalFormat.format(newFinalPrice.normal.toDouble()).toDouble()
+                totalPrice = newFinalPrice.normal.toDecimal()
             }
     }
 

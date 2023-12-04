@@ -1,6 +1,7 @@
 package me.taste2plate.app.customer.presentation.screens.order
 
 import me.taste2plate.app.customer.domain.model.SettingsModel
+import me.taste2plate.app.customer.domain.model.user.CommonResponse
 import me.taste2plate.app.customer.domain.model.user.OrderListModel
 import me.taste2plate.app.customer.domain.model.user.OrderUpdateModel
 
@@ -12,5 +13,6 @@ data class OrderState(
     val setting: SettingsModel.Result? = null,
     val orderList: List<OrderListModel.Result> = emptyList(),
     val orderUpdates: List<OrderUpdateModel.Result> = emptyList(),
+    val cancelOrder: CommonResponse? = null,
 )
 

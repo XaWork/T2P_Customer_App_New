@@ -1,5 +1,6 @@
 package me.taste2plate.app.customer.presentation.screens.order
 
+import android.widget.Toast
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -43,6 +44,7 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import me.taste2plate.app.customer.domain.model.user.OrderListModel
+import me.taste2plate.app.customer.presentation.dialog.CustomDialog
 import me.taste2plate.app.customer.presentation.dialog.SettingDialogType
 import me.taste2plate.app.customer.presentation.dialog.SettingInfoDialog
 import me.taste2plate.app.customer.presentation.screens.Product
@@ -64,8 +66,10 @@ import me.taste2plate.app.customer.presentation.widgets.HorizontalSpace
 import me.taste2plate.app.customer.presentation.widgets.NetworkImage
 import me.taste2plate.app.customer.presentation.widgets.RatingInfoRow
 import me.taste2plate.app.customer.presentation.widgets.RoundedCornerCard
+import me.taste2plate.app.customer.presentation.widgets.ShowLoading
 import me.taste2plate.app.customer.presentation.widgets.SpaceBetweenRow
 import me.taste2plate.app.customer.presentation.widgets.VerticalSpace
+import me.taste2plate.app.customer.presentation.widgets.showToast
 import me.taste2plate.app.customer.utils.toDate
 import me.taste2plate.app.customer.utils.toDateObject
 
@@ -73,9 +77,15 @@ import me.taste2plate.app.customer.utils.toDateObject
 fun OrderDetailsScreen(
     viewModel: OrderViewModel,
     onNavigateToTrackOrderScreen: () -> Unit = {},
+    onNavigateToHomeScreen: () -> Unit,
     navigateBack: () -> Unit,
 ) {
     val state = viewModel.state
+
+    LaunchedEffect(Unit) {
+        viewModel.onEvent(OrderEvent.GetOrderUpdate)
+    }
+
 
     var showOrderTrackDialog by remember {
         mutableStateOf(false)
@@ -88,20 +98,48 @@ fun OrderDetailsScreen(
             onConfirmation = { showOrderTrackDialog = false }
         )
 
-    LaunchedEffect(Unit) {
-        viewModel.onEvent(OrderEvent.GetOrderUpdate)
+    var showCancelOrderDialog by remember {
+        mutableStateOf(false)
+    }
+    if (showCancelOrderDialog)
+        CustomDialog(
+            title = "Cancel Order",
+            text = "Are you sure, you want to cancel the order",
+            confirmButtonText = "Yes",
+            dismissButtonText = "No",
+            onDismiss = {
+                showCancelOrderDialog = false
+            }
+        ) {
+            showCancelOrderDialog = false
+            viewModel.onEvent(OrderEvent.CancelOrder)
+        }
+
+    if (state.cancelOrder != null) {
+        CustomDialog(
+            title = "",
+            text = if (state.isError) state.cancelOrder.message
+            else "Your order has been successfully cancelled"
+        ) {
+            viewModel.onEvent(OrderEvent.UpdateState)
+            if (!state.isError)
+                onNavigateToHomeScreen()
+        }
     }
 
     AppScaffold(topBar = {
         AppTopBar(
             title = viewModel.selectedOrder?.orderid ?: ""
-        ) {navigateBack()}
+        ) { navigateBack() }
     }) {
         if (viewModel.selectedOrder == null) AppEmptyView()
         else ContentOrderDetailsScreen(
             state, viewModel.selectedOrder!!,
             showOrderTrackDialog = {
                 showOrderTrackDialog = true
+            },
+            showCancelOrderDialog = {
+                showCancelOrderDialog = true
             },
             onNavigateToTrackOrderScreen = {
                 onNavigateToTrackOrderScreen()
@@ -114,6 +152,7 @@ fun OrderDetailsScreen(
 fun ContentOrderDetailsScreen(
     state: OrderState, order: OrderListModel.Result,
     showOrderTrackDialog: () -> Unit,
+    showCancelOrderDialog: () -> Unit,
     onNavigateToTrackOrderScreen: () -> Unit
 ) {
     LazyColumn(
@@ -190,7 +229,7 @@ fun ContentOrderDetailsScreen(
             }
         }
 
-        if (state.orderUpdates.isNotEmpty()) itemsIndexed(state.orderUpdates) { index, item ->
+        if (state.orderUpdates.isNotEmpty()) itemsIndexed(state.orderUpdates) { _, item ->
             SingleUpdateItem("${item.note}\n${item.createdDate.toDate()}")
         }
 
@@ -246,9 +285,11 @@ fun ContentOrderDetailsScreen(
             val serverTimeDate = state.serverTime!!.toDateObject("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
             val createdAt = order.createdDate.toDateObject("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
             val diffHours: Long = (serverTimeDate.time - createdAt.time) / (60 * 60 * 1000)
-            if (diffHours < 4 && !order.status.contentEquals("cancel")) AppButton(
-                text = "Cancel Order"
-            ) {}
+            if (diffHours < 4 && !order.status.contentEquals("cancel"))
+                if (state.isLoading) ShowLoading()
+                else AppButton(
+                    text = "Cancel Order"
+                ) { showCancelOrderDialog() }
         }
     }
 }
@@ -271,7 +312,6 @@ fun SingleOrderItem(
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier.padding(ScreenPadding)
             ) {
-                val product = Product()
                 NetworkImage(
                     image = item.product.file[0].location,
                     modifier = Modifier

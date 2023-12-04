@@ -2,7 +2,6 @@ package me.taste2plate.app.customer.presentation.screens.checkout
 
 import android.content.res.Configuration
 import android.os.Build
-import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -44,6 +43,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
@@ -95,7 +95,6 @@ import me.taste2plate.app.customer.presentation.widgets.DrawableImage
 import me.taste2plate.app.customer.presentation.widgets.HeadingText
 import me.taste2plate.app.customer.presentation.widgets.HorizontalSpace
 import me.taste2plate.app.customer.presentation.widgets.InfoWithIcon
-import me.taste2plate.app.customer.presentation.widgets.MaterialIcon
 import me.taste2plate.app.customer.presentation.widgets.MaterialIconButton
 import me.taste2plate.app.customer.presentation.widgets.RadioButtonInfo
 import me.taste2plate.app.customer.presentation.widgets.ShowLoading
@@ -103,11 +102,11 @@ import me.taste2plate.app.customer.presentation.widgets.SpaceBetweenRow
 import me.taste2plate.app.customer.presentation.widgets.TextInCircle
 import me.taste2plate.app.customer.presentation.widgets.VerticalSpace
 import me.taste2plate.app.customer.presentation.widgets.showToast
+import me.taste2plate.app.customer.utils.toDecimal
 import java.text.SimpleDateFormat
 import java.time.Instant
 import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter
-import java.time.temporal.ChronoUnit
 import java.util.Locale
 
 val fontSize = 14.sp
@@ -457,7 +456,7 @@ fun CheckoutScreenContent(
         ),
         PriceData(
             title = "Total Weight",
-            price = state.cart!!.shippingWeight.toString(),
+            price = state.cart!!.shippingWeight.toString().toDecimal().toString(),
             isWeight = true
         ),
     )
@@ -465,7 +464,12 @@ fun CheckoutScreenContent(
     Box {
 
         LazyColumn(
-            contentPadding = PaddingValues(ScreenPadding),
+            contentPadding = PaddingValues(
+                start = ScreenPadding,
+                end = ScreenPadding,
+                top = ScreenPadding,
+                bottom = 70.dp
+            ),
             verticalArrangement = Arrangement.spacedBy(SpaceBetweenViewsAndSubViews)
         ) {
             //user info
@@ -626,11 +630,29 @@ fun CheckoutScreenContent(
         }
 
         if (state.buttonLoading)
-            ShowLoading()
+            ShowLoading(boxModifier = Modifier.align(Alignment.BottomCenter))
         else
             AppButton(
-                text = "Continue",
-                modifier = Modifier.align(Alignment.BottomCenter)
+                customContent = true,
+                modifier = Modifier.align(Alignment.BottomCenter),
+                shape = RectangleShape,
+                customContentItems = {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            "Total\n$rupeeSign${viewModel.totalPrice}",
+                            textAlign = TextAlign.Center
+                        )
+
+                        Text(
+                            "Place Order",
+                            fontSize = 14.sp
+                        )
+                    }
+                }
             ) {
                 onNavigateToOrderConfirmScreen()
             }
@@ -923,7 +945,11 @@ fun DeliveryInfo(
 
         AppRadioButton(
             radioOptions,
-            if (deliveryType == DeliveryType.Express) radioOptions[0].text else radioOptions[1].text,
+            when (deliveryType) {
+                DeliveryType.Express -> radioOptions[0].text
+                DeliveryType.Standard -> radioOptions[1].text
+                else -> ""
+            },
             onOptionSelected = {
                 when (it.id) {
                     1 -> {
@@ -946,13 +972,13 @@ fun DeliveryInfo(
                 else state.cutOffTimeCheckModel.result.expressRemarks,
                 color = forestGreen.invoke()
             )
+        /*
+                VerticalSpace(space = SpaceBetweenViews)
 
-        VerticalSpace(space = SpaceBetweenViews)
-
-        Text(
-            text = "Delivery Info",
-            color = primaryColor.invoke(), fontSize = fontSize
-        )
+                Text(
+                    text = "Delivery Info",
+                    color = primaryColor.invoke(), fontSize = fontSize
+                )*/
 
         VerticalSpace(space = SpaceBetweenViews)
 

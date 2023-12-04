@@ -1,6 +1,5 @@
 package me.taste2plate.app.customer.presentation.screens.citybrand
 
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -37,6 +36,7 @@ import me.taste2plate.app.customer.presentation.widgets.ShowLoading
 @Composable
 fun SubCategoryScreen(
     viewModel: CityBrandViewModel,
+    navigateBack:() -> Unit,
     onNavigateToProductListScreen: (itemInfo: CommonForItem) -> Unit,
 ) {
     val state = viewModel.state
@@ -50,7 +50,7 @@ fun SubCategoryScreen(
         topBar = {
             AppTopBar(
                 title = viewModel.selectedItem.name
-            ) {}
+            ) {navigateBack()}
         }
     ) {
         if (state.isLoading)

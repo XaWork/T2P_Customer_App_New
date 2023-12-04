@@ -440,15 +440,16 @@ class HomeViewModel @Inject constructor(
                     }
 
                     is Resource.Success -> {
-                        getCart()
+                        val isError = result.data?.status == Status.error.name
                         state =
                             state.copy(
                                 isLoading = false,
                                 addToCartResponse = result.data,
-                                message = result.data?.message,
-                                isError = result.data?.status == Status.error.name,
                                 errorMessage = result.data?.message,
+                                message = result.data?.message,
+                                cartError = isError,
                             )
+                        getCart()
                     }
 
                     is Resource.Error -> {

@@ -536,20 +536,23 @@ fun CartAddRemove(
 ) {
     Row(
         modifier = modifier
+            .clip(RoundedCornerShape(MediumRoundedCorners))
             .background(color = primaryColor.invoke())
-            .padding(horizontal = MediumPadding, )
-            .clip(RoundedCornerShape(MediumRoundedCorners)),
+            .padding(horizontal = MediumPadding, vertical = LowPadding)
+        ,
         horizontalArrangement = Arrangement.Center,
         verticalAlignment = Alignment.CenterVertically
     ) {
         Text(
-            modifier = textInCircleModifier.noRippleClickable {
+            modifier = textInCircleModifier
+                .padding(horizontal = LowPadding)
+                .noRippleClickable {
                 if (cartItemLength > 0)
                     onUpdateCart(cartItemLength - 1)
             },
             text = "-",
             color = screenBackgroundColor.invoke(),
-            fontSize = fontSize,
+            fontSize = textInCircleFontSize,
         )
 
         Text(
@@ -564,12 +567,14 @@ fun CartAddRemove(
         )
 
         Text(
-            modifier = textInCircleModifier.noRippleClickable {
+            modifier = textInCircleModifier
+                .padding(horizontal = LowPadding)
+                .noRippleClickable {
                 onUpdateCart(cartItemLength + 1)
             },
             text = "+",
             color = screenBackgroundColor.invoke(),
-            fontSize = fontSize,
+            fontSize = textInCircleFontSize,
         )
     }
 }

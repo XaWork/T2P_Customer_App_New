@@ -39,6 +39,8 @@ import me.taste2plate.app.customer.domain.mapper.CommonForItem
 import me.taste2plate.app.customer.domain.model.SettingsModel
 import me.taste2plate.app.customer.domain.model.auth.User
 import me.taste2plate.app.customer.domain.use_case.product.ProductBy
+import me.taste2plate.app.customer.presentation.dialog.SettingDialogType
+import me.taste2plate.app.customer.presentation.dialog.SettingInfoDialog
 import me.taste2plate.app.customer.presentation.screens.address.AddressBottomSheet
 import me.taste2plate.app.customer.presentation.screens.home.navigation.DrawerAppScreen
 import me.taste2plate.app.customer.presentation.screens.home.navigation.NavigationDrawer
@@ -52,11 +54,8 @@ import me.taste2plate.app.customer.presentation.screens.home.widgets.SingleFeatu
 import me.taste2plate.app.customer.presentation.screens.home.widgets.TopBrands
 import me.taste2plate.app.customer.presentation.screens.home.widgets.TopList
 import me.taste2plate.app.customer.presentation.screens.home.widgets.TopOrderedFoodCityList
-import me.taste2plate.app.customer.presentation.theme.SpaceBetweenViews
-import me.taste2plate.app.customer.presentation.theme.SpaceBetweenViewsAndSubViews
 import me.taste2plate.app.customer.presentation.theme.T2PCustomerAppTheme
 import me.taste2plate.app.customer.presentation.theme.VeryLowSpacing
-import me.taste2plate.app.customer.presentation.theme.backgroundColor
 import me.taste2plate.app.customer.presentation.theme.screenBackgroundColor
 import me.taste2plate.app.customer.presentation.widgets.AppScaffold
 import me.taste2plate.app.customer.presentation.widgets.DrawableImage
@@ -84,18 +83,27 @@ fun HomeScreen(
     onNavigateLogoutScreen: () -> Unit,
     viewModel: HomeViewModel = hiltViewModel()
 ) {
-
-    //obser state
     val state = viewModel.state
+
+    var showSettingDialog by remember {
+        mutableStateOf(false)
+    }
+    if (showSettingDialog) {
+       SettingInfoDialog(setting = state.setting!!, type = SettingDialogType.Cart, onDismissRequest = { /*TODO*/ }) {
+           showSettingDialog = false
+       }
+    }
+
+    //observe state
     LaunchedEffect(state) {
         when {
-            state.message != null && state.addToWishlistResponse != null || state.addToCartResponse != null -> {
-                showToast(message = state.message!!)
+            !state.cartError && state.message != null && state.addToWishlistResponse != null || !state.cartError && state.message != null && state.addToCartResponse != null -> {
+                showToast(message = state.message)
                 viewModel.onEvent(HomeEvent.UpdateState(changeAddToWishlistResponse = true))
             }
 
-            state.addressListModel != null && state.addressListModel.result.isEmpty() -> {
-
+            state.cartError -> {
+                showSettingDialog = true
             }
         }
     }
@@ -268,7 +276,7 @@ fun HomeScreen(
                                     VerticalSpace(space = VeryLowSpacing)
                                     TopOrderedFoodCityList(
                                         onNavigateToProductListScreen = {
-                                             onNavigateToProductListScreen(it)
+                                            onNavigateToProductListScreen(it)
                                         },
                                         foodItems = home.topMostOrderedProducts,
                                     )

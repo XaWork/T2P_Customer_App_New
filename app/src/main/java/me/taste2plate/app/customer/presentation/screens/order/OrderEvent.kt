@@ -5,5 +5,7 @@ import me.taste2plate.app.customer.domain.model.user.address.AddressListModel
 
 sealed class OrderEvent {
     object GetOrderList : OrderEvent()
+    object UpdateState : OrderEvent()
     object GetOrderUpdate : OrderEvent()
+    object CancelOrder : OrderEvent()
 }

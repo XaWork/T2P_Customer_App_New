@@ -1,20 +1,17 @@
 package me.taste2plate.app.customer.presentation.widgets
 
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.tooling.preview.Preview
@@ -27,12 +24,14 @@ import me.taste2plate.app.customer.presentation.theme.primaryColor
 @Composable
 fun AppButton(
     modifier: Modifier = Modifier,
+    customContent: Boolean = false,
     text: String = "",
     maxLines: Int = 1,
     fontSize: TextUnit = TextUnit.Unspecified,
     shape: Shape = RoundedCornerShape(buttonRoundedShapeCornerRadius),
     buttonColors: ButtonColors = ButtonDefaults.buttonColors(),
     paddingValues: PaddingValues = PaddingValues(horizontal = 10.dp),
+    customContentItems: @Composable () -> Unit = {},
     onClick: () -> Unit
 ) {
     Button(
@@ -41,11 +40,14 @@ fun AppButton(
         shape = shape,
         colors = buttonColors,
         onClick = { onClick() }) {
-        Text(
-            text = text.uppercase(),
-            fontSize = fontSize,
-            maxLines = maxLines
-        )
+        if (customContent)
+            customContentItems()
+        else
+            Text(
+                text = text.uppercase(),
+                fontSize = fontSize,
+                maxLines = maxLines
+            )
     }
 }
 

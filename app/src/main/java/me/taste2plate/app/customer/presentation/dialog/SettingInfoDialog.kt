@@ -119,6 +119,7 @@ private fun getTitle(setting: SettingsModel.Result, type: SettingDialogType): St
         SettingDialogType.Track -> appSetting.order.orderTrackPopupTitle
         SettingDialogType.Express_Delivery -> appSetting.express.expressPopupTitle
         SettingDialogType.COD_Digital -> appSetting.cod.codPopupTitle
+        SettingDialogType.Cart -> appSetting.slider.servicePopupTitle
     }
 }
 
@@ -128,6 +129,7 @@ private fun getTitleColor(setting: SettingsModel.Result, type: SettingDialogType
         SettingDialogType.Track -> appSetting.order.orderTrackPopupTitleColor
         SettingDialogType.Express_Delivery -> appSetting.express.expressPopupBgColor
         SettingDialogType.COD_Digital -> appSetting.cod.codPopupTitle
+        SettingDialogType.Cart -> appSetting.cod.codPopupTitle
     }
 }
 
@@ -137,6 +139,7 @@ private fun getSubTitle(setting: SettingsModel.Result, type: SettingDialogType):
         SettingDialogType.Track -> appSetting.order.orderTrackPopupSubtitle
         SettingDialogType.Express_Delivery -> appSetting.express.expressPopupSubtitle
         SettingDialogType.COD_Digital -> appSetting.cod.codPopupSubtitle
+        SettingDialogType.Cart -> appSetting.slider.servicePopupSubtitle
     }
 }
 
@@ -146,6 +149,7 @@ private fun getSubTitleColor(setting: SettingsModel.Result, type: SettingDialogT
         SettingDialogType.Track -> appSetting.order.orderTrackSubtitleTitleColor
         SettingDialogType.Express_Delivery -> appSetting.order.orderTrackSubtitleTitleColor
         SettingDialogType.COD_Digital -> appSetting.cod.codPopupTitle
+        SettingDialogType.Cart -> appSetting.cod.codPopupTitle
     }
 }
 
@@ -155,6 +159,7 @@ private fun getDescription(setting: SettingsModel.Result, type: SettingDialogTyp
         SettingDialogType.Track -> appSetting.order.orderTrackPopupDesctiption
         SettingDialogType.Express_Delivery -> appSetting.express.expressPopupDesctiption
         SettingDialogType.COD_Digital -> appSetting.cod.codPopupDesctiption
+        SettingDialogType.Cart -> appSetting.slider.servicePopupDesctiption
     }
 }
 
@@ -164,6 +169,7 @@ private fun getDescriptionColor(setting: SettingsModel.Result, type: SettingDial
         SettingDialogType.Track -> appSetting.order.orderTrackSubtitleDesctiptionColor
         SettingDialogType.Express_Delivery -> appSetting.order.orderTrackSubtitleDesctiptionColor
         SettingDialogType.COD_Digital -> appSetting.cod.codPopupTitle
+        SettingDialogType.Cart -> appSetting.slider.serviceSubtitleDesctiptionColor
     }
 }
 
@@ -173,6 +179,7 @@ private fun getBgColor(setting: SettingsModel.Result, type: SettingDialogType): 
         SettingDialogType.Track -> appSetting.order.orderTrackPopupBgColor
         SettingDialogType.Express_Delivery -> appSetting.order.orderTrackPopupBgColor
         SettingDialogType.COD_Digital -> appSetting.cod.codPopupTitle
+        SettingDialogType.Cart -> appSetting.slider.servicePopupBgColor
     }
 }
 
@@ -188,5 +195,6 @@ fun SettingInfoDialogPreview() {
 enum class SettingDialogType {
     Track,
     Express_Delivery,
-    COD_Digital
+    COD_Digital,
+    Cart
 }

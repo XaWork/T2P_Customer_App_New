@@ -1,5 +1,6 @@
 package me.taste2plate.app.customer.utils
 
+import android.icu.text.DecimalFormat
 import android.text.Html
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -14,7 +15,7 @@ fun String.toDate(format: String = "dd-MM-yy HH:mm"): String {
     return formatter.format(converter.parse(this)!!)
 }
 
-fun String.fromHtml(): String{
+fun String.fromHtml(): String {
     return Html.fromHtml(this, 1).toString()
 }
 
@@ -22,4 +23,9 @@ fun String.fromHtml(): String{
 fun String.toDateObject(format: String = "dd-MM-yy HH:mm"): Date {
     val converter = SimpleDateFormat(format, Locale.getDefault())
     return converter.parse(this)!!
+}
+
+fun String.toDecimal(): Double {
+    val decimalFormat = DecimalFormat("#.##")
+    return decimalFormat.format(this.toDouble()).toDouble()
 }
