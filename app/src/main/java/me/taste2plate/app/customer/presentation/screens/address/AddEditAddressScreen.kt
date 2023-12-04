@@ -24,6 +24,7 @@ import me.taste2plate.app.customer.presentation.screens.countries
 import me.taste2plate.app.customer.presentation.theme.ExtraHighPadding
 import me.taste2plate.app.customer.presentation.theme.LowSpacing
 import me.taste2plate.app.customer.presentation.theme.ScreenPadding
+import me.taste2plate.app.customer.presentation.widgets.AppAutoComplete
 import me.taste2plate.app.customer.presentation.widgets.AppButton
 import me.taste2plate.app.customer.presentation.widgets.AppDropDown
 import me.taste2plate.app.customer.presentation.widgets.AppRadioButton
@@ -91,7 +92,6 @@ fun ContentAddEditAddressScreen(
     var countryExpanded by remember { mutableStateOf(false) }
     var stateExpanded by remember { mutableStateOf(false) }
     var cityExpanded by remember { mutableStateOf(false) }
-    var pinCodeExpanded by remember { mutableStateOf(false) }
 
     var selectedText by remember { mutableStateOf(countries[0]) }
 
@@ -181,44 +181,55 @@ fun ContentAddEditAddressScreen(
             )
 
             SpaceBetweenRow(item1 = {
-                AppDropDown(
-                    pinCodeExpanded,
-                    hint = "PinCode",
-                    items = state.zipList.map { it.name },
-                    onExpandedChange = {
-                        pinCodeExpanded = !pinCodeExpanded
-                    },
-                    selectedText = viewModel.pincodeA.value,
-                    onTextChanged = {
-                        viewModel.pincodeA.value = it
-                    },
+                AppAutoComplete(
+                     viewModel.filterPinList.isNotEmpty(),
+                     hint = "PinCode",
+                     items = viewModel.filterPinList,
+                     onExpandedChange = {
+                         viewModel.pinCodeExpanded = it
+                         viewModel.filterPinList.clear()
+                     },
+                     selectedText = viewModel.pincodeA.value,
+                     onTextChanged = {
+                         viewModel.pincodeA.value = it
+                         if (it.length >= 3)
+                             viewModel.onEvent(AddressEvents.SearchPin(it))
+                     },
+                    keyboardType = KeyboardType.Phone,
+                     modifier = Modifier
+                         .fillMaxWidth()
+                         .padding(end = LowSpacing)
+                         .weight(1f),
+                 )
+
+                /*Column(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(end = LowSpacing)
-                        .weight(1f),
-                )
-                /*Column {
+                        .weight(1f)
+                ) {
                     AnimatedVisibility(
                         viewModel.filterPinList.isNotEmpty(),
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(end = LowSpacing)
-                            .weight(1f)
                     ) {
                         viewModel.filterPinList.forEach {
-                            Row(
+                            LazyColumn(
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .padding(16.dp)
-                                    .clip(RectangleShape)
+                                    .height(200.dp)
                                     .noRippleClickable {
                                         viewModel.pincodeA.value = it
                                         viewModel.filterPinList.clear()
                                     }
                             ) {
-                                Text(it)
+                                items(viewModel.filterPinList) {
+                                    Column {
+                                        Text(it)
 
-                                Spacer(Modifier.height(16.dp))
+                                        Spacer(Modifier.height(16.dp))
+                                    }
+                                }
                             }
                         }
                     }
@@ -226,12 +237,14 @@ fun ContentAddEditAddressScreen(
                     OutlinedTextField(
                         value = viewModel.pincodeA.value, onValueChange = {
                             viewModel.pincodeA.value = it
-                            viewModel.onEvent(AddressEvents.SearchPin(it))
+                            if (it.length >= 3)
+                                viewModel.onEvent(AddressEvents.SearchPin(it))
                         }, modifier = Modifier
                             .fillMaxWidth(),
                         label = {
                             Text("PinCode")
-                        }
+                        },
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone)
                     )
                 }*/
             }) {

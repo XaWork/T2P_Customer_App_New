@@ -13,7 +13,7 @@ import javax.inject.Inject
 class SettingsUseCase @Inject constructor(
     private val customRepo: CustomRepo
 ) {
-    suspend fun settings(): Flow<Resource<SettingsModel>> {
+    suspend fun execute(): Flow<Resource<SettingsModel>> {
         return flow {
             emit(Resource.Loading(true))
             try {

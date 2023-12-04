@@ -23,10 +23,8 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import me.taste2plate.app.customer.presentation.screens.countries
 import me.taste2plate.app.customer.presentation.theme.GreyDark
 import me.taste2plate.app.customer.presentation.theme.GreyLight
-import me.taste2plate.app.customer.presentation.theme.cardContainerOnSecondaryColor
 import me.taste2plate.app.customer.presentation.theme.primaryColor
 
 
@@ -165,6 +163,57 @@ fun AppDropDown(
             value = selectedText,
             onValueChanged = {},
             readOnly = true,
+            hint = hint,
+            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
+        )
+
+        ExposedDropdownMenu(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(color = MaterialTheme.colorScheme.background),
+            expanded = expanded,
+            onDismissRequest = { onExpandedChange(false) }
+        ) {
+            items.forEach { item ->
+                DropdownMenuItem(
+                    text = { Text(text = item) },
+                    onClick = {
+                        onTextChanged(item)
+                        onExpandedChange(false)
+                    }
+                )
+            }
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun AppAutoComplete(
+    expanded: Boolean,
+    modifier: Modifier = Modifier,
+    onExpandedChange: (Boolean) -> Unit,
+    selectedText: String,
+    hint: String = "",
+    keyboardType: KeyboardType,
+    items: List<String> = emptyList(),
+    onTextChanged: (String) -> Unit,
+) {
+
+    ExposedDropdownMenuBox(
+        modifier = modifier,
+        expanded = expanded,
+        onExpandedChange = {
+            onExpandedChange(!expanded)
+        }
+    ) {
+        AppTextField(
+            modifier = Modifier.menuAnchor(),
+            value = selectedText,
+            keyboardType = keyboardType,
+            onValueChanged = {
+                onTextChanged(it)
+            },
             hint = hint,
             trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
         )

@@ -103,13 +103,14 @@ class AuthViewModel @Inject constructor(
                                 loading = false,
                                 loginModel = result.data,
                                 isError = false,
-                                message = ""
+                                shouldStartSMSRetrival =true,
+                                message = null
                             )
                         else
                             state.copy(
                                 loading = false,
                                 message = result.data?.message,
-                                isError = true
+                                isError = true,
                             )
                     }
 

@@ -127,7 +127,7 @@ class UserPref @Inject constructor(
 
         val setting: SettingsModel.Result =
             Gson().fromJson(flow.first(), SettingsModel.Result::class.java)
-        //Log.e("setting","Setting is ${flow.first()}")
+        Log.e("setting","Setting is ${flow.first()}")
 
         return setting
     }

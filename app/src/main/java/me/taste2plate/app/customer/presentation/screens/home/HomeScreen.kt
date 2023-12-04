@@ -89,7 +89,10 @@ fun HomeScreen(
         mutableStateOf(false)
     }
     if (showSettingDialog) {
-       SettingInfoDialog(setting = state.setting!!, type = SettingDialogType.Cart, onDismissRequest = { /*TODO*/ }) {
+       SettingInfoDialog(setting = state.setting!!, type = SettingDialogType.Cart, onDismissRequest = {
+           viewModel.onEvent(HomeEvent.UpdateState())
+           showSettingDialog = false }) {
+           viewModel.onEvent(HomeEvent.UpdateState())
            showSettingDialog = false
        }
     }

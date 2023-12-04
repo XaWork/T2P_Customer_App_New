@@ -138,7 +138,7 @@ class ProductViewModel @Inject constructor(
             }
 
             is ProductEvents.UpdateState -> {
-                state = state.copy(isError = false, message = null)
+                state = state.copy(isError = false, message = null, cartError = false)
             }
         }
     }
@@ -154,7 +154,8 @@ class ProductViewModel @Inject constructor(
     private fun getTaste() {
         viewModelScope.launch {
             val taste = userPrefs.getTaste()
-            state = state.copy(checked = taste == Taste.nonVeg)
+            val setting = userPrefs.getSettings()
+            state = state.copy(checked = taste == Taste.nonVeg, settings = setting)
         }
     }
 
@@ -444,11 +445,11 @@ class ProductViewModel @Inject constructor(
 
                     is Resource.Success -> {
                         getCart()
+                        val isError = result.data?.status == Status.error.name
                         state =
                             state.copy(
-                                // isLoading = false,
                                 message = result.data?.message,
-                                isError = result.data?.status == Status.error.name,
+                                cartError = isError
                             )
                     }
 

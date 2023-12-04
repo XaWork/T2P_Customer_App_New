@@ -14,6 +14,10 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
@@ -22,6 +26,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import me.taste2plate.app.customer.domain.mapper.CommonForItem
 import me.taste2plate.app.customer.domain.model.product.ProductListModel
+import me.taste2plate.app.customer.presentation.dialog.SettingDialogType
+import me.taste2plate.app.customer.presentation.dialog.SettingInfoDialog
+import me.taste2plate.app.customer.presentation.screens.home.HomeEvent
 import me.taste2plate.app.customer.presentation.screens.home.widgets.AppSearchBar
 import me.taste2plate.app.customer.presentation.screens.home.widgets.ProductPriceCard
 import me.taste2plate.app.customer.presentation.screens.product.ProductViewModel
@@ -52,16 +59,34 @@ fun ProductListScreen(
 ) {
     val state = viewModel.state
 
+    var showSettingDialog by remember {
+        mutableStateOf(false)
+    }
+    if (showSettingDialog) {
+        SettingInfoDialog(
+            setting = state.settings!!,
+            type = SettingDialogType.Cart,
+            onDismissRequest = {
+                showSettingDialog = false
+           viewModel.onEvent(ProductEvents.UpdateState)
+            }) {
+            showSettingDialog = false
+           viewModel.onEvent(ProductEvents.UpdateState)
+        }
+    }
+
     LaunchedEffect(Unit) {
         if (itemInfo.name != "Search")
             viewModel.onEvent(ProductEvents.GetProducts(itemInfo))
     }
 
     LaunchedEffect(key1 = state) {
-        if (state.message != null) {
+        if (state.message != null && !state.cartError) {
             showToast(state.message)
             viewModel.onEvent(ProductEvents.UpdateState)
         }
+        if (state.cartError)
+            showSettingDialog = true
     }
 
     AppScaffold(
@@ -192,18 +217,18 @@ fun SingleProductItem(
                 fontWeight = FontWeight.Bold,
                 fontSize = 14.sp
             )
-/*
-            VerticalSpace(space = VeryLowSpacing)
+            /*
+                        VerticalSpace(space = VeryLowSpacing)
 
-            InfoWithIcon(
-                icon = false,
-                id = R.drawable.delivery_bike,
-                info = "Estimate Delivery",
-                colorFilter = ColorFilter.tint(
-                    color = MaterialTheme.colorScheme.onSurface
-                ),
-                iconOrImageModifier = Modifier.size(20.dp)
-            )*/
+                        InfoWithIcon(
+                            icon = false,
+                            id = R.drawable.delivery_bike,
+                            info = "Estimate Delivery",
+                            colorFilter = ColorFilter.tint(
+                                color = MaterialTheme.colorScheme.onSurface
+                            ),
+                            iconOrImageModifier = Modifier.size(20.dp)
+                        )*/
 
             VerticalSpace(space = VeryLowSpacing)
 

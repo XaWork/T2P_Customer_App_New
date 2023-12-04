@@ -6,6 +6,7 @@ data class PriceData(
     val title: String,
     val isWeight: Boolean = false,
     val subTitle: String? = null,
+    val bold: Boolean = false,
     val price: String,
     val sign: String = rupeeSign
 )

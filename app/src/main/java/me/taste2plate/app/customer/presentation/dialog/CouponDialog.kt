@@ -58,7 +58,7 @@ fun CouponDialog(
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(70.dp)
-                        .weight(1.2f),
+                        .weight(1.5f),
                     onClick = {
                         applyCoupon(couponValue)
                     },

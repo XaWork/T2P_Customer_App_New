@@ -124,4 +124,8 @@ dependencies {
     //razorpay
     implementation("com.razorpay:checkout:1.6.25")
 
+    //SMSRetrieval API Dependencies for Auto OTP Verification
+    implementation("com.google.android.gms:play-services-auth-api-phone:18.0.1")
+    implementation("com.google.android.gms:play-services-auth:20.7.0")
+
 }

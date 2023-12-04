@@ -455,9 +455,10 @@ fun CheckoutScreenContent(
             subTitle = viewModel.pointConversionText.ifEmpty { null }
         ),
         PriceData(
-            title = "Total Weight",
+            title = "Total Food Weight",
             price = state.cart!!.shippingWeight.toString().toDecimal().toString(),
-            isWeight = true
+            isWeight = true,
+            bold = true
         ),
     )
 
@@ -519,14 +520,6 @@ fun CheckoutScreenContent(
                             .size(30.dp)
 
                     )
-
-
-                /***
-                if coupon applied successfully then update price according to apply coupon response
-                if not then take price as it is, that are inside cart
-                 ***/
-
-
                 /***
                 if coupon applied successfully then update price according to apply coupon response
                 if not then take price as it is, that are inside cart
@@ -568,8 +561,10 @@ fun CheckoutScreenContent(
                     Column {
                         Text(
                             text = price.title,
-                            fontWeight = FontWeight.Light, fontSize = fontSize
+                            fontWeight = if(price.bold) FontWeight.Bold else FontWeight.Light,
+                            fontSize = fontSize,
                         )
+
                         if (price.subTitle != null)
                             Text(
                                 text = price.subTitle,
@@ -579,7 +574,8 @@ fun CheckoutScreenContent(
 
                     Text(
                         text = if (price.isWeight) "${price.price}Kg" else "${price.sign}${price.price}",
-                        fontSize = fontSize
+                        fontSize = fontSize,
+                        fontWeight = if(price.bold) FontWeight.Bold else null
                     )
                 }
 
@@ -877,7 +873,6 @@ fun CancellationPolicy(
         Text(
             text = "Your food will travel ${distanceTraveled}kms by Air to reach Fresh to you :)",
             fontSize = 12.sp,
-            fontWeight = FontWeight.Light,
             textAlign = TextAlign.Center
         )
 
@@ -892,7 +887,6 @@ fun CancellationPolicy(
         Text(
             text = "We assure the same Freshness of Delivered Food as it is packed ‘Fresh’ at origin city. Please check the food at the time of Delivery and help.",
             fontSize = 12.sp,
-            fontWeight = FontWeight.Light,
             textAlign = TextAlign.Center
         )
 
@@ -907,7 +901,6 @@ fun CancellationPolicy(
         Text(
             text = "Order can be cancelled only up-to 4 hours of order confirmation or before the cutoff time, whichever will be earlier.",
             fontSize = 12.sp,
-            fontWeight = FontWeight.Light,
             textAlign = TextAlign.Center
         )
 

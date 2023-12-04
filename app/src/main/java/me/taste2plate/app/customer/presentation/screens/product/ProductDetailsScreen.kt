@@ -59,6 +59,8 @@ import androidx.compose.ui.unit.sp
 import me.taste2plate.app.customer.R
 import me.taste2plate.app.customer.data.Status
 import me.taste2plate.app.customer.domain.model.product.ProductDetailsModel
+import me.taste2plate.app.customer.presentation.dialog.SettingDialogType
+import me.taste2plate.app.customer.presentation.dialog.SettingInfoDialog
 import me.taste2plate.app.customer.presentation.screens.home.widgets.DotsIndicator
 import me.taste2plate.app.customer.presentation.screens.product.list.ProductEvents
 import me.taste2plate.app.customer.presentation.screens.product.list.ProductListState
@@ -109,6 +111,22 @@ fun ProductDetailsScreen(
 
     val state = viewModel.state
 
+    var showSettingDialog by remember {
+        mutableStateOf(false)
+    }
+    if (showSettingDialog) {
+        SettingInfoDialog(
+            setting = state.settings!!,
+            type = SettingDialogType.Cart,
+            onDismissRequest = {
+                showSettingDialog = false
+                viewModel.onEvent(ProductEvents.UpdateState)
+            }) {
+            showSettingDialog = false
+            viewModel.onEvent(ProductEvents.UpdateState)
+        }
+    }
+
     LaunchedEffect(Unit) {
         if (!productId.isNullOrEmpty())
             viewModel.selectedProductId = productId
@@ -117,10 +135,12 @@ fun ProductDetailsScreen(
     }
 
     LaunchedEffect(key1 = state) {
-        if (state.message != null) {
+        if (state.message != null && !state.cartError) {
             showToast(state.message, toastLength = Toast.LENGTH_LONG)
             viewModel.onEvent(ProductEvents.UpdateState)
         }
+        if (state.cartError)
+            showSettingDialog = true
     }
 
     var shoReviewBottomSheet by remember {
@@ -177,7 +197,7 @@ fun ProductDetailsScreen(
                                 viewModel.onEvent(
                                     ProductEvents.UpdateCart(
                                         quantity = it,
-                                        productId = productId!!
+                                        productId = state.productDetails.result[0].id
                                     )
                                 )
                             },
@@ -444,7 +464,6 @@ fun ProductImages(
     Box(
         modifier = Modifier.fillMaxWidth()
     ) {
-
         HorizontalPager(
             state = pagerState,
             pageSpacing = 10.dp
@@ -480,11 +499,11 @@ fun ProductImages(
         ) {
             if (isOnSale)
                 SaleBanner(
-                    text = "$rupeeSign ${details.sellingPrice}",
+                    text = "$rupeeSign ${details.price}",
                     textDecoration = TextDecoration.LineThrough,
                     backgroundColor = secondaryColor.invoke()
                 )
-            SaleBanner(text = "$rupeeSign ${details.price}")
+            SaleBanner(text = "$rupeeSign ${if(isOnSale) details.sellingPrice else details.price}")
         }
 
 
@@ -538,8 +557,7 @@ fun CartAddRemove(
         modifier = modifier
             .clip(RoundedCornerShape(MediumRoundedCorners))
             .background(color = primaryColor.invoke())
-            .padding(horizontal = MediumPadding, vertical = LowPadding)
-        ,
+            .padding(horizontal = MediumPadding, vertical = LowPadding),
         horizontalArrangement = Arrangement.Center,
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -547,9 +565,9 @@ fun CartAddRemove(
             modifier = textInCircleModifier
                 .padding(horizontal = LowPadding)
                 .noRippleClickable {
-                if (cartItemLength > 0)
-                    onUpdateCart(cartItemLength - 1)
-            },
+                    if (cartItemLength > 0)
+                        onUpdateCart(cartItemLength - 1)
+                },
             text = "-",
             color = screenBackgroundColor.invoke(),
             fontSize = textInCircleFontSize,
@@ -570,8 +588,8 @@ fun CartAddRemove(
             modifier = textInCircleModifier
                 .padding(horizontal = LowPadding)
                 .noRippleClickable {
-                onUpdateCart(cartItemLength + 1)
-            },
+                    onUpdateCart(cartItemLength + 1)
+                },
             text = "+",
             color = screenBackgroundColor.invoke(),
             fontSize = textInCircleFontSize,

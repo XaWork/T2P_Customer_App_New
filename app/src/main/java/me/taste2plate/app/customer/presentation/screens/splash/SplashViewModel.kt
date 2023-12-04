@@ -25,7 +25,7 @@ class SplashViewModel @Inject constructor(
     var state by mutableStateOf(SplashState())
 
     init {
-        getSettings()
+        isUserLogin()
     }
 
     fun onEvent(event: SplashEvents) {
@@ -58,7 +58,7 @@ class SplashViewModel @Inject constructor(
 
     private fun getSettings() {
         viewModelScope.launch {
-            settingsUseCase.settings().collect { result ->
+            settingsUseCase.execute().collect { result ->
                 when (result) {
                     is Resource.Loading -> {
                         state = state.copy(loading = true)
@@ -94,10 +94,10 @@ class SplashViewModel @Inject constructor(
                             val isError = result.data?.status == Status.error.name
                             state =
                                 state.copy(
-                                    loading = false,
                                     isError = isError,
                                     error = if (isError) result.data?.message else "",
-                                    addressListModel = result.data
+                                    addressListModel = result.data,
+                                    loading = false,
                                 )
                         }
 

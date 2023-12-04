@@ -13,8 +13,10 @@ import me.taste2plate.app.customer.data.Resource
 import me.taste2plate.app.customer.data.Status
 import me.taste2plate.app.customer.data.Taste
 import me.taste2plate.app.customer.data.UserPref
+import me.taste2plate.app.customer.domain.model.SettingsModel
 import me.taste2plate.app.customer.domain.model.user.address.AddressListModel
 import me.taste2plate.app.customer.domain.use_case.HomeUseCase
+import me.taste2plate.app.customer.domain.use_case.SettingsUseCase
 import me.taste2plate.app.customer.domain.use_case.user.address.AllAddressUseCase
 import me.taste2plate.app.customer.domain.use_case.user.cart.AddToCartUseCase
 import me.taste2plate.app.customer.domain.use_case.user.cart.CartUseCase
@@ -34,14 +36,14 @@ class HomeViewModel @Inject constructor(
     private val allAddressUseCase: AllAddressUseCase,
     private val updateCartUseCase: UpdateCartUseCase,
     private val deleteCartUseCase: DeleteCartUseCase,
-    private val addToCartUseCase: AddToCartUseCase
+    private val addToCartUseCase: AddToCartUseCase,
+    private val settingUseCase: SettingsUseCase
 ) : ViewModel() {
 
     var state by mutableStateOf(HomeState())
 
     init {
-        getTaste()
-        getHomeData()
+        getSettings()
     }
 
     fun onEvent(event: HomeEvent) {
@@ -104,12 +106,18 @@ class HomeViewModel @Inject constructor(
             }
 
             is HomeEvent.UpdateState -> {
-                when {
+                state = when {
                     event.changeAddToWishlistResponse -> {
-                        state = state.copy(
+                        state.copy(
                             message = null,
                             addToWishlistResponse = null,
                             addToCartResponse = null
+                        )
+                    }
+
+                    else -> {
+                        state.copy(
+                            cartError = false
                         )
                     }
                 }
@@ -129,8 +137,8 @@ class HomeViewModel @Inject constructor(
         viewModelScope.launch {
             val taste = userPref.getTaste()
             val user = userPref.getUser()
-            val setting = userPref.getSettings()
-            state = state.copy(checked = taste == Taste.nonVeg, user = user, setting = setting)
+           // val setting = userPref.getSettings()
+            state = state.copy(checked = taste == Taste.nonVeg, user = user)
         }
     }
 
@@ -143,6 +151,48 @@ class HomeViewModel @Inject constructor(
             state = state.copy(isLoading = isLoading, defaultAddress = address)
             getCart()
         }
+    }
+
+    private fun getSettings() {
+        viewModelScope.launch {
+            settingUseCase.execute().collect { result ->
+                when (result) {
+                    is Resource.Loading -> {
+                        state = state.copy(isLoading = true)
+                    }
+
+                    is Resource.Success -> {
+                        state = if (result.data?.status == Status.success.name) {
+                            saveSetting(result.data)
+                            state.copy(
+                                setting = result.data.result
+                            )
+                        } else
+                            state.copy(
+                                isLoading = false,
+                                isError = true,
+                                errorMessage = "Something Went wrong"
+                            )
+                    }
+
+                    is Resource.Error -> {
+                        state = state.copy(
+                            isLoading = false,
+                            isError = true,
+                            errorMessage = result.message
+                        )
+                    }
+                }
+            }
+        }
+    }
+
+    private fun saveSetting(setting: SettingsModel) {
+        viewModelScope.launch {
+            userPref.saveSettings(setting.result)
+        }
+        getTaste()
+        getHomeData()
     }
 
     private fun getHomeData() {

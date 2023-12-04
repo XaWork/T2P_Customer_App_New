@@ -7,6 +7,7 @@ import me.taste2plate.app.customer.domain.model.auth.VerifyOTPModel
 data class AuthState(
     val loading:Boolean = false,
     val isError: Boolean = false,
+    val shouldStartSMSRetrival: Boolean = false,
     val loginSuccess: Boolean = false,
     val registerSuccess: Boolean = false,
     val user: User? = null,

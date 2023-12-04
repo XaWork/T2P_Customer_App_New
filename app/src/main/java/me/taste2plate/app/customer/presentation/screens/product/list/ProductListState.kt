@@ -1,6 +1,7 @@
 package me.taste2plate.app.customer.presentation.screens.product.list
 
 import me.taste2plate.app.customer.domain.mapper.CommonForItem
+import me.taste2plate.app.customer.domain.model.SettingsModel
 import me.taste2plate.app.customer.domain.model.custom.CheckAvailabilityModel
 import me.taste2plate.app.customer.domain.model.product.ProductDetailsModel
 import me.taste2plate.app.customer.domain.model.product.ProductListModel
@@ -16,6 +17,7 @@ data class ProductListState(
     val buttonLoading: Boolean = false,
     val addToCartEnable: Boolean = true,
     val isError: Boolean = false,
+    val cartError: Boolean = false,
     val cartData: CartModel? = null,
     val message: String? = null,
     val defaultAddress: AddressListModel.Result? = null,
@@ -26,6 +28,7 @@ data class ProductListState(
     val itemInfo: CommonForItem? = null,
     val checked: Boolean = false,
     val wishListData: WishListModel? = null,
+    val settings: SettingsModel.Result? = null,
     val productList: List<ProductListModel.Result> = emptyList(),
     val productDetails: ProductDetailsModel? = null
 )

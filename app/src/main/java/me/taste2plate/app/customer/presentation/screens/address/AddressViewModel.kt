@@ -12,7 +12,6 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import me.taste2plate.app.customer.data.Resource
 import me.taste2plate.app.customer.data.Status
-import me.taste2plate.app.customer.domain.model.CityListModel
 import me.taste2plate.app.customer.domain.model.StateListModel
 import me.taste2plate.app.customer.domain.model.custom.City
 import me.taste2plate.app.customer.domain.use_case.CityListByStateUseCase
@@ -48,6 +47,7 @@ class AddressViewModel @Inject constructor(
     var stateA = mutableStateOf("")
     var cityA = mutableStateOf("")
     var pincodeA = mutableStateOf("")
+    var pinCodeExpanded by mutableStateOf(false)
     var filterPinList = mutableStateListOf<String>()
     var landmarkA = mutableStateOf("")
     val addressTypes = listOf(
@@ -121,11 +121,16 @@ class AddressViewModel @Inject constructor(
     }
 
     private fun searchPin(query: String) {
+        filterPinList.clear()
+        pinCodeExpanded = false
         Log.e("Search pin", "Query is $query")
         for (item in state.zipList) {
-            if (item.name.contains(query)) {
+            if (item.name.contains(query, ignoreCase = true)) {
+                pinCodeExpanded = true
                 Log.e("Search pin", "zip item  is ${item.name}")
                 filterPinList += item.name
+            }else{
+                pinCodeExpanded = false
             }
         }
     }

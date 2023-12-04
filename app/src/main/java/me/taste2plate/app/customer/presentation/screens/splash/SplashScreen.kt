@@ -23,9 +23,11 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import kotlinx.coroutines.delay
 import me.taste2plate.app.customer.R
 import me.taste2plate.app.customer.presentation.screens.permissions.RequestPermissions
 import me.taste2plate.app.customer.presentation.widgets.AppScaffold
+import me.taste2plate.app.customer.utils.AppSignatureHelper
 
 @Composable
 fun SplashScreen(
@@ -41,27 +43,42 @@ fun SplashScreen(
         mutableStateOf(true)
     }
 
+    val appSignatureHelper = AppSignatureHelper(context)
+    Log.e("Atiar OTP Hashkey: ", "key: ${appSignatureHelper.appSignatures}")
+    //VzqMQBwK7m1
+
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU)
         RequestPermissions(permission = listOf(
             Manifest.permission.POST_NOTIFICATIONS
         ), permissionStatus = {})
 
     LaunchedEffect(state) {
-        if (!state.loading && state.settings != null) {
-            appUpToDate = appUpToDate(context, state)
-            if (appUpToDate)
-                if (state.isLogin && state.user != null) {
-                    //if (!state.user.email.isNullOrEmpty())
-                        if (state.addressListModel != null && state.addressListModel.result.isNotEmpty())
-                            onNavigateToHomeScreen()
-                        else
-                            onNavigateToAddEditAddressScreenScreen()
-                    /*else
-                        onNavigateToSignUpScreen()*/
-                } else
-                    onNavigateToOnBoardingScreen()
+        if (!state.loading) {
+            if (state.isLogin && state.user != null) {
+                if (!state.user.email.isNullOrEmpty())
+                    if (state.addressListModel != null && state.addressListModel.result.isNotEmpty())
+                        onNavigateToHomeScreen()
+                    else
+                        onNavigateToAddEditAddressScreenScreen()
+                else
+                    onNavigateToSignUpScreen()
+            } else
+                onNavigateToOnBoardingScreen()
         }
     }
+
+    /*  LaunchedEffect(key1 = Unit) {
+          if (!state.loading && state.isLogin && state.user != null) {
+              if (!state.user.email.isNullOrEmpty())
+                  if (state.addressListModel != null && state.addressListModel.result.isNotEmpty())
+                      onNavigateToHomeScreen()
+                  else
+                      onNavigateToAddEditAddressScreenScreen()
+              else
+                  onNavigateToSignUpScreen()
+          } else
+              onNavigateToOnBoardingScreen()
+      }*/
 
     if (appUpToDate)
         AppScaffold(

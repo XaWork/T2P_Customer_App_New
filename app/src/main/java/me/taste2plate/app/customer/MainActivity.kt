@@ -9,6 +9,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import com.razorpay.Checkout
 import dagger.hilt.android.AndroidEntryPoint
@@ -23,6 +24,7 @@ class MainActivity : ComponentActivity() {
         Checkout.preload(applicationContext)
         val co = Checkout()
         co.setKeyID("rzp_live_ZLgzjgdHBJDlP8")
+
         setContent {
             T2PCustomerAppTheme {
                 Navigation()
