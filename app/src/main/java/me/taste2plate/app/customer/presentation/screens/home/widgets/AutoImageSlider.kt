@@ -95,10 +95,9 @@ fun AutoSlidingCarousel(
 
         Surface(
             modifier = Modifier
-                .padding(bottom = 8.dp)
                 .align(Alignment.BottomCenter),
             shape = CircleShape,
-            color = Color.Black.copy(alpha = 0.5f)
+            color = Color.Black.copy(alpha = 0f)
         ) {
             DotsIndicator(
                 modifier = Modifier.padding(horizontal = 8.dp, vertical = 6.dp),
@@ -158,6 +157,6 @@ fun IndicatorDot(
         modifier = modifier
             .size(size)
             .clip(CircleShape)
-            .background(color)
+            .background(color.copy(alpha = 0.6F))
     )
 }

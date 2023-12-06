@@ -1,9 +1,7 @@
 package me.taste2plate.app.customer.presentation.screens.citybrand
 
 import android.content.res.Configuration
-import android.util.Log
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -40,7 +38,6 @@ import me.taste2plate.app.customer.presentation.theme.LowElevation
 import me.taste2plate.app.customer.presentation.theme.LowPadding
 import me.taste2plate.app.customer.presentation.theme.ScreenPadding
 import me.taste2plate.app.customer.presentation.theme.SpaceBetweenViews
-import me.taste2plate.app.customer.presentation.theme.SpaceBetweenViewsAndSubViews
 import me.taste2plate.app.customer.presentation.theme.T2PCustomerAppTheme
 import me.taste2plate.app.customer.presentation.theme.backgroundColor
 import me.taste2plate.app.customer.presentation.theme.cardContainerOnSecondaryColor
@@ -53,7 +50,6 @@ import me.taste2plate.app.customer.presentation.widgets.NetworkImage
 import me.taste2plate.app.customer.presentation.widgets.RoundedCornerCard
 import me.taste2plate.app.customer.presentation.widgets.ShowLoading
 import me.taste2plate.app.customer.presentation.widgets.SpaceBetweenRow
-import me.taste2plate.app.customer.presentation.widgets.VerticalSpace
 
 @Composable
 fun CityBrandScreen(
@@ -166,7 +162,7 @@ fun SingleCityBrand(
                 NetworkImage(
                     image = item.image, modifier = Modifier
                         .fillMaxWidth()
-                        .height(150.dp),
+                        .height(200.dp),
                     contentScale = ContentScale.Crop
                 )
 

@@ -51,8 +51,8 @@ import me.taste2plate.app.customer.service.OTPReceiver
 import me.taste2plate.app.customer.service.startSMSRetrieverClient
 
 /***
-  * auto fetch otp vlog : https://www.linkedin.com/pulse/android-automatic-otp-retrieval-jetpackcompose-also-work-talukdar/
-  */
+ * auto fetch otp vlog : https://www.linkedin.com/pulse/android-automatic-otp-retrieval-jetpackcompose-also-work-talukdar/
+ */
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
@@ -76,24 +76,28 @@ fun OTPScreen(
         }
     }
 
-    LaunchedEffect(state.shouldStartSMSRetrival){
-        if (state.shouldStartSMSRetrival){
+    LaunchedEffect(state.shouldStartSMSRetrival) {
+        if (state.shouldStartSMSRetrival) {
             Log.e("OTP", "SMS Retrieval is Starting...")
             startSMSRetrieverClient(context)
         }
     }
 
     val verificationCode = remember { mutableStateOf("") }
-    LaunchedEffect(1){
+    LaunchedEffect(1) {
         val myOTPReceiver = OTPReceiver()
 
         //Registering Broadcast receiver here instead of manifest.
-        context.registerReceiver(myOTPReceiver, IntentFilter(SmsRetriever.SMS_RETRIEVED_ACTION), Context.RECEIVER_NOT_EXPORTED )
+        context.registerReceiver(
+            myOTPReceiver,
+            IntentFilter(SmsRetriever.SMS_RETRIEVED_ACTION),
+            Context.RECEIVER_NOT_EXPORTED
+        )
 
         //Receiving the OTP
         myOTPReceiver.init(object : OTPReceiver.OTPReceiveListener {
             override fun onOTPReceived(otp: String?) {
-                Log.e("OTP ", "OTP Received  $otp")
+                Log.e("OTP ", "OTP Received  ")
                 otp?.let { verificationCode.value = it }
 
                 // when its true automatically run the function which

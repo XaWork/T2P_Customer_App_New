@@ -5,6 +5,7 @@ import me.taste2plate.app.customer.domain.model.SettingsModel
 import me.taste2plate.app.customer.domain.model.auth.User
 import me.taste2plate.app.customer.domain.model.user.CartModel
 import me.taste2plate.app.customer.domain.model.user.CommonResponse
+import me.taste2plate.app.customer.domain.model.user.DeleteFromWishlistModel
 import me.taste2plate.app.customer.domain.model.user.WishListModel
 import me.taste2plate.app.customer.domain.model.user.address.AddressListModel
 
@@ -20,6 +21,7 @@ data class HomeState(
     val isError: Boolean = false,
     val homeData: HomeModel? = null,
     val wishListData: WishListModel? = null,
+    val deleteFromWishlistModel: DeleteFromWishlistModel? = null,
     val cartData: CartModel? = null,
     val addressListModel: AddressListModel? = null,
     val addToWishlistResponse: CommonResponse? = null,

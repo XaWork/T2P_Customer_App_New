@@ -23,6 +23,7 @@ import me.taste2plate.app.customer.domain.use_case.user.cart.CartUseCase
 import me.taste2plate.app.customer.domain.use_case.user.cart.DeleteCartUseCase
 import me.taste2plate.app.customer.domain.use_case.user.cart.UpdateCartUseCase
 import me.taste2plate.app.customer.domain.use_case.user.wishlist.AddToWishlistUseCase
+import me.taste2plate.app.customer.domain.use_case.user.wishlist.RemoveFromWishlistUseCase
 import me.taste2plate.app.customer.domain.use_case.user.wishlist.WishlistUseCase
 import javax.inject.Inject
 
@@ -33,6 +34,7 @@ class HomeViewModel @Inject constructor(
     private val wishlistUseCase: WishlistUseCase,
     private val cartUseCase: CartUseCase,
     private val addToWishlistUseCase: AddToWishlistUseCase,
+    private val removeFromWishlistUseCase: RemoveFromWishlistUseCase,
     private val allAddressUseCase: AllAddressUseCase,
     private val updateCartUseCase: UpdateCartUseCase,
     private val deleteCartUseCase: DeleteCartUseCase,
@@ -71,7 +73,13 @@ class HomeViewModel @Inject constructor(
             }
 
             is HomeEvent.AddToWishlist -> {
-                addToWishlist(event.productId)
+                val productId = event.productId
+                val alreadyWishListed =
+                    if (state.wishListData!!.result.isEmpty()) false else state.wishListData!!.result.any { it.product.id == productId }
+                if (alreadyWishListed)
+                    removeFromWishlist(productId)
+                else
+                    addToWishlist(event.productId)
             }
 
             is HomeEvent.UpdateCart -> {
@@ -264,7 +272,7 @@ class HomeViewModel @Inject constructor(
                             errorMessage = null,
                         )
 
-                        if (!isError)
+                        //if (!isError)
                             T2PApp.wishlistCount = data?.result?.size ?: 0
 
                         if (hasDefaultAddress())
@@ -278,6 +286,59 @@ class HomeViewModel @Inject constructor(
                             isLoading = false,
                             isError = true,
                             errorMessage = result.message
+                        )
+                    }
+                }
+
+            }
+        }
+    }
+
+
+    private fun removeFromWishlist(
+        productId: String
+    ) {
+        viewModelScope.launch {
+            removeFromWishlistUseCase.execute(
+                productId = productId
+            ).collect { result ->
+                when (result) {
+                    is Resource.Loading -> {
+                        state = state.copy(
+                            foodItemUpdateInfo = FoodItemUpdateInfo(
+                                id = productId,
+                                isLoading = true
+                            )
+                        )
+                    }
+
+                    is Resource.Success -> {
+                        val isError = result.data?.status == Status.error.name
+                        val data = result.data
+                        state = state.copy(
+                            isLoading = false,
+                            isError = isError,
+                            message = if (isError) data!!.message else null,
+                            deleteFromWishlistModel = result.data,
+                            foodItemUpdateInfo = state.foodItemUpdateInfo?.copy(
+                                isLoading = false,
+                                added = false
+                            )
+                        )
+
+                        getWishlist()
+
+                    }
+
+                    is Resource.Error -> {
+                        state = state.copy(
+                            isLoading = false,
+                            isError = true,
+                            message = result.message,
+                            foodItemUpdateInfo = state.foodItemUpdateInfo?.copy(
+                                isLoading = false,
+                                added = false
+                            )
                         )
                     }
                 }

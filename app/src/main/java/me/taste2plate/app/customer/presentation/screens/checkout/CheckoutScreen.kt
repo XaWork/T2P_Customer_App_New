@@ -499,18 +499,10 @@ fun CheckoutScreenContent(
             }
 
             item {
-                var youSave = 0.0F
-                state.cart.result.forEach {
-                    val sellingPrice = it.product.sellingPrice
-                    if (!sellingPrice.isNullOrEmpty()) {
-                        youSave += it.product.price.toFloat() - sellingPrice.toFloat()
-                    }
-                }
-
-                if (youSave != 0.0F)
+                if (viewModel.youSave != 0.0)
                     InfoWithIcon(
                         id = R.drawable.party,
-                        info = "You Saved $rupeeSign$youSave on this order",
+                        info = "You Saved $rupeeSign${viewModel.youSave} on this order",
                         modifier = Modifier
                             .fillMaxWidth()
                             .background(Color.Blue.copy(alpha = 0.1f))
@@ -561,7 +553,7 @@ fun CheckoutScreenContent(
                     Column {
                         Text(
                             text = price.title,
-                            fontWeight = if(price.bold) FontWeight.Bold else FontWeight.Light,
+                            fontWeight = if (price.bold) FontWeight.Bold else FontWeight.Light,
                             fontSize = fontSize,
                         )
 
@@ -575,7 +567,7 @@ fun CheckoutScreenContent(
                     Text(
                         text = if (price.isWeight) "${price.price}Kg" else "${price.sign}${price.price}",
                         fontSize = fontSize,
-                        fontWeight = if(price.bold) FontWeight.Bold else null
+                        fontWeight = if (price.bold) FontWeight.Bold else null
                     )
                 }
 
@@ -870,8 +862,19 @@ fun CancellationPolicy(
             modifier = Modifier.padding(vertical = LowPadding)
         )
 
+
         Text(
-            text = "Your food will travel ${distanceTraveled}kms by Air to reach Fresh to you :)",
+            text = buildAnnotatedString {
+                withStyle(SpanStyle(fontWeight = FontWeight.Light)) {
+                    append("Your food will travel ")
+                }
+                withStyle(SpanStyle(fontWeight = FontWeight.Bold)) {
+                    append("${distanceTraveled}kms by Air ")
+                }
+                withStyle(SpanStyle(fontWeight = FontWeight.Light)) {
+                    append("to reach Fresh to you :)")
+                }
+            },
             fontSize = 12.sp,
             textAlign = TextAlign.Center
         )
@@ -885,7 +888,17 @@ fun CancellationPolicy(
         )
 
         Text(
-            text = "We assure the same Freshness of Delivered Food as it is packed ‘Fresh’ at origin city. Please check the food at the time of Delivery and help.",
+            text =  buildAnnotatedString {
+                withStyle(SpanStyle(fontWeight = FontWeight.Light)) {
+                    append("We assure the same ")
+                }
+                withStyle(SpanStyle(fontWeight = FontWeight.Bold)) {
+                    append("Freshness of Delivered Food ")
+                }
+                withStyle(SpanStyle(fontWeight = FontWeight.Light)) {
+                    append("as it is packed ‘Fresh’ at origin city. Please check the food at the time of Delivery and help.")
+                }
+            },
             fontSize = 12.sp,
             textAlign = TextAlign.Center
         )
@@ -899,7 +912,17 @@ fun CancellationPolicy(
         )
 
         Text(
-            text = "Order can be cancelled only up-to 4 hours of order confirmation or before the cutoff time, whichever will be earlier.",
+            text =  buildAnnotatedString {
+                withStyle(SpanStyle(fontWeight = FontWeight.Light)) {
+                    append("Order can be cancelled ")
+                }
+                withStyle(SpanStyle(fontWeight = FontWeight.Bold)) {
+                    append("only up-to 4 hours ")
+                }
+                withStyle(SpanStyle(fontWeight = FontWeight.Light)) {
+                    append("of order confirmation or before the cutoff time, whichever will be earlier.")
+                }
+            },
             fontSize = 12.sp,
             textAlign = TextAlign.Center
         )

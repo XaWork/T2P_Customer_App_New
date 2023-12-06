@@ -73,6 +73,7 @@ class CheckOutViewModel @Inject constructor(
     var deliveryCharge by mutableDoubleStateOf(0.0)
     var packagingFee by mutableDoubleStateOf(0.0)
     var cgst by mutableDoubleStateOf(0.0)
+    var youSave by mutableDoubleStateOf(0.0)
     var sgst by mutableDoubleStateOf(0.0)
     var igst by mutableDoubleStateOf(0.0)
     var couponDiscount by mutableDoubleStateOf(0.0)
@@ -372,6 +373,7 @@ class CheckOutViewModel @Inject constructor(
     private fun setPriceAfterWalletStatusChange() {
         if (checkWalletDiscountValidation()) {
             if (walletChecked) {
+                youSave += discountWallet
                 if (state.applyCouponResponse != null) {
                     val couponResponse = state.applyCouponResponse
                     val tPrice =
@@ -404,6 +406,7 @@ class CheckOutViewModel @Inject constructor(
                         else cartItemResponse.gstWithPoint.normal.totalSgst.toDouble()
                 }
             } else {
+                youSave -= discountWallet
                 if (state.applyCouponResponse != null) {
                     val couponResponse = state.applyCouponResponse
                     val tPrice =
@@ -576,6 +579,13 @@ class CheckOutViewModel @Inject constructor(
     private fun setPrice() {
         if (state.cart != null && state.cart!!.result.isNotEmpty())
             state.cart!!.apply {
+                this.result.forEach {
+                    val sellingPrice = it.product.sellingPrice
+                    if (!sellingPrice.isNullOrEmpty()) {
+                        youSave += it.product.price.toFloat() - sellingPrice.toFloat()
+                    }
+                }
+
                 price = cartprice.toDouble()
                 deliveryCharge =
                     if (state.deliveryType == DeliveryType.Standard) shipping.normalShipping.toDouble()

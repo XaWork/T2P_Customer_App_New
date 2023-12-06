@@ -95,7 +95,7 @@ fun MostOrderedItemList(
                    )
                )*/
     ) {
-        HeadingChipWithLine("Most Ordered Item")
+        HeadingChipWithLine("Bestsellers")
         VerticalSpace(space = VeryLowSpacing)
         HorizontalPager(
             state = pagerState,

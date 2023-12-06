@@ -28,6 +28,7 @@ import me.taste2plate.app.customer.domain.mapper.CommonForItem
 import me.taste2plate.app.customer.domain.model.product.ProductListModel
 import me.taste2plate.app.customer.presentation.dialog.SettingDialogType
 import me.taste2plate.app.customer.presentation.dialog.SettingInfoDialog
+import me.taste2plate.app.customer.presentation.screens.home.FoodItemUpdateInfo
 import me.taste2plate.app.customer.presentation.screens.home.HomeEvent
 import me.taste2plate.app.customer.presentation.screens.home.widgets.AppSearchBar
 import me.taste2plate.app.customer.presentation.screens.home.widgets.ProductPriceCard
@@ -42,6 +43,7 @@ import me.taste2plate.app.customer.presentation.utils.noRippleClickable
 import me.taste2plate.app.customer.presentation.widgets.AppEmptyView
 import me.taste2plate.app.customer.presentation.widgets.AppScaffold
 import me.taste2plate.app.customer.presentation.widgets.AppTopBar
+import me.taste2plate.app.customer.presentation.widgets.ImageWithWishlistButton
 import me.taste2plate.app.customer.presentation.widgets.NetworkImage
 import me.taste2plate.app.customer.presentation.widgets.RatingInfoRow
 import me.taste2plate.app.customer.presentation.widgets.RoundedCornerCard
@@ -155,7 +157,7 @@ fun ContentProductListScreen(
         }
 
         if (state.productList.isEmpty())
-            AppEmptyView()
+            AppEmptyView(state.settings!!.productNotAvailableMessage)
         else
             LazyColumn(
                 modifier = Modifier.fillMaxSize(),
@@ -166,11 +168,18 @@ fun ContentProductListScreen(
                     SingleProductItem(
                         item,
                         state = state,
+                        alreadyWishListed = if (state.wishListData!!.result.isEmpty()) false else state.wishListData.result.any { it.product.id == item.id },
+                        foodItemUpdateInfo = if (state.foodItemUpdateInfo != null && state.foodItemUpdateInfo.id == item.id)
+                            state.foodItemUpdateInfo
+                        else null,
                         onNavigateToProductDetailsScreen = {
                             onNavigateToProductDetailsScreen(item.id)
                         },
                         updateCart = {
                             updateCart(it, item.id)
+                        },
+                        addToWishlist = {
+                            viewModel.onEvent(ProductEvents.AddToWishlist(item.id))
                         }
                     )
                 }
@@ -182,7 +191,10 @@ fun ContentProductListScreen(
 fun SingleProductItem(
     product: ProductListModel.Result,
     state: ProductListState,
+    alreadyWishListed:Boolean,
+    foodItemUpdateInfo: FoodItemUpdateInfo?,
     updateCart: (quantity: Int) -> Unit,
+    addToWishlist: () -> Unit,
     onNavigateToProductDetailsScreen: () -> Unit
 ) {
     RoundedCornerCard(
@@ -195,13 +207,18 @@ fun SingleProductItem(
         Column(
             modifier = Modifier.padding(ScreenPadding)
         ) {
-            NetworkImage(
+            ImageWithWishlistButton(
                 image = product.file[0].location,
+                alreadyWishListed = alreadyWishListed,
+                foodItemUpdateInfo = foodItemUpdateInfo,
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(200.dp)
                     .clip(RoundedCornerShape(MediumRoundedCorners)),
-                contentScale = ContentScale.Crop
+                contentScale = ContentScale.Crop,
+                onclick = {
+                    addToWishlist()
+                }
             )
 
             VerticalSpace(space = SpaceBetweenViewsAndSubViews)

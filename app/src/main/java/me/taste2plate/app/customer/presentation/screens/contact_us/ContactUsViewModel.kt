@@ -31,10 +31,6 @@ class ContactUsViewModel @Inject constructor(
         getSettings()
     }
 
-    fun onEvent(event: ContactUsEvents) {
-
-    }
-
     private fun getSettings() {
         viewModelScope.launch {
             state = state.copy(setting = userPref.getSettings())

@@ -116,7 +116,7 @@ fun Navigation() {
                         }
                     }, onNavigateToHomeScreen = {
                         navController.navigate(Screens.HomeScreen.route) {
-                            popUpTo(0)
+                            //popUpTo(0)
                         }
                     })
             }

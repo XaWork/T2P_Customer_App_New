@@ -11,8 +11,8 @@ import kotlinx.coroutines.launch
 import me.taste2plate.app.customer.T2PApp
 import me.taste2plate.app.customer.data.Resource
 import me.taste2plate.app.customer.data.Status
-import me.taste2plate.app.customer.data.UserPref
 import me.taste2plate.app.customer.data.Taste
+import me.taste2plate.app.customer.data.UserPref
 import me.taste2plate.app.customer.domain.use_case.custom.CheckAvalibilityUseCase
 import me.taste2plate.app.customer.domain.use_case.product.ProductBy
 import me.taste2plate.app.customer.domain.use_case.product.ProductDetailsUseCase
@@ -23,6 +23,7 @@ import me.taste2plate.app.customer.domain.use_case.user.cart.CartUseCase
 import me.taste2plate.app.customer.domain.use_case.user.cart.DeleteCartUseCase
 import me.taste2plate.app.customer.domain.use_case.user.cart.UpdateCartUseCase
 import me.taste2plate.app.customer.domain.use_case.user.wishlist.AddToWishlistUseCase
+import me.taste2plate.app.customer.domain.use_case.user.wishlist.RemoveFromWishlistUseCase
 import me.taste2plate.app.customer.domain.use_case.user.wishlist.WishlistUseCase
 import me.taste2plate.app.customer.presentation.screens.home.CityBrandScreens
 import me.taste2plate.app.customer.presentation.screens.home.FoodItemUpdateInfo
@@ -35,6 +36,7 @@ class ProductViewModel @Inject constructor(
     private val productListUseCase: ProductListUseCase,
     private val productDetailsUseCase: ProductDetailsUseCase,
     private val cartUseCase: CartUseCase,
+    private val removeFromWishlistUseCase: RemoveFromWishlistUseCase,
     private val wishlistUseCase: WishlistUseCase,
     private val addToWishlistUseCase: AddToWishlistUseCase,
     private val postReviewUseCase: PostReviewUseCase,
@@ -95,7 +97,13 @@ class ProductViewModel @Inject constructor(
             }
 
             is ProductEvents.AddToWishlist -> {
-                addToWishlist(event.productId)
+                val productId = event.productId
+                val alreadyWishListed =
+                    if (state.wishListData!!.result.isEmpty()) false else state.wishListData!!.result.any { it.product.id == productId }
+                if (alreadyWishListed)
+                    removeFromWishlist(productId)
+                else
+                    addToWishlist(event.productId)
             }
 
             is ProductEvents.CheckAvailibility -> {
@@ -196,6 +204,59 @@ class ProductViewModel @Inject constructor(
                                     added = result.data?.status == Status.success.name
                                 )
                             )
+                    }
+
+                    is Resource.Error -> {
+                        state = state.copy(
+                            isLoading = false,
+                            isError = true,
+                            message = result.message,
+                            foodItemUpdateInfo = state.foodItemUpdateInfo?.copy(
+                                isLoading = false,
+                                added = false
+                            )
+                        )
+                    }
+                }
+
+            }
+        }
+    }
+
+
+    private fun removeFromWishlist(
+        productId: String
+    ) {
+        viewModelScope.launch {
+            removeFromWishlistUseCase.execute(
+                productId = productId
+            ).collect { result ->
+                when (result) {
+                    is Resource.Loading -> {
+                        state = state.copy(
+                            foodItemUpdateInfo = FoodItemUpdateInfo(
+                                id = productId,
+                                isLoading = true
+                            )
+                        )
+                    }
+
+                    is Resource.Success -> {
+                        val isError = result.data?.status == Status.error.name
+                        val data = result.data
+                        state = state.copy(
+                            isLoading = false,
+                            isError = isError,
+                            message = if (isError) data!!.message else null,
+                            deleteFromWishlistModel = result.data,
+                            foodItemUpdateInfo = state.foodItemUpdateInfo?.copy(
+                                isLoading = false,
+                                added = false
+                            )
+                        )
+
+                        getWishlist()
+
                     }
 
                     is Resource.Error -> {

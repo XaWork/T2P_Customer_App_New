@@ -265,19 +265,21 @@ fun NetworkImage(
 
 @Composable
 fun ImageWithWishlistButton(
+    modifier: Modifier = Modifier,
     withButton: Boolean = true,
     alreadyWishListed: Boolean = false,
     image: String,
+    contentScale: ContentScale = ContentScale.Crop,
     foodItemUpdateInfo: FoodItemUpdateInfo? = null,
     onclick: () -> Unit
 ) {
     Box {
         NetworkImage(
             image = image,
-            modifier = Modifier
+            modifier = modifier
                 .fillMaxWidth()
                 .height(200.dp),
-            contentScale = ContentScale.Crop
+            contentScale = contentScale
         )
         val modifier = Modifier
             .align(Alignment.TopEnd)

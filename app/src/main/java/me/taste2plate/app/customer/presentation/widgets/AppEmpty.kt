@@ -13,12 +13,15 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import me.taste2plate.app.customer.presentation.theme.ScreenPadding
 import me.taste2plate.app.customer.presentation.theme.SpaceBetweenViewsAndSubViews
 
 @Composable
-fun AppEmptyView() {
+fun AppEmptyView(
+    text: String = "No Data Found"
+) {
 
     AppScaffold {
         Column(
@@ -41,8 +44,9 @@ fun AppEmptyView() {
             VerticalSpace(space = SpaceBetweenViewsAndSubViews)
 
             Text(
-                text = "No Data Found",
+                text = text,
                 style = MaterialTheme.typography.titleMedium,
+                textAlign = TextAlign.Center
             )
 
 

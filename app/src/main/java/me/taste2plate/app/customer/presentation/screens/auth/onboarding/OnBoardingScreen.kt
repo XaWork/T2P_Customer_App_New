@@ -1,10 +1,8 @@
 package me.taste2plate.app.customer.presentation.screens.auth.onboarding
 
 import android.app.Activity
-import android.app.PendingIntent
 import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.IntentSenderRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -28,7 +26,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.google.android.gms.auth.api.identity.GetPhoneNumberHintIntentRequest
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.google.android.gms.auth.api.identity.Identity
 import me.taste2plate.app.customer.R
 import me.taste2plate.app.customer.presentation.screens.auth.AuthEvents
@@ -50,7 +48,7 @@ import me.taste2plate.app.customer.presentation.widgets.VerticalSpace
 
 @Composable
 fun OnBoardingScreen(
-    viewModel: AuthViewModel,
+    viewModel: AuthViewModel = hiltViewModel(),
     onNavigateToOtpScreen: () -> Unit,
 ) {
 

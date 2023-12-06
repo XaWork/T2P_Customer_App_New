@@ -39,7 +39,7 @@ fun SplashScreen(
 ) {
     val state = viewModel.state
     val context = LocalContext.current
-    var appUpToDate by remember {
+    val appUpToDate by remember {
         mutableStateOf(true)
     }
 

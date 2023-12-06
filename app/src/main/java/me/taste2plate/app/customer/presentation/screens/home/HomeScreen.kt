@@ -5,17 +5,23 @@ import android.content.Context
 import android.content.Intent
 import android.content.res.Configuration
 import android.net.Uri
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.FloatingActionButtonDefaults
 import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.Text
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
@@ -27,6 +33,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
@@ -54,11 +61,17 @@ import me.taste2plate.app.customer.presentation.screens.home.widgets.SingleFeatu
 import me.taste2plate.app.customer.presentation.screens.home.widgets.TopBrands
 import me.taste2plate.app.customer.presentation.screens.home.widgets.TopList
 import me.taste2plate.app.customer.presentation.screens.home.widgets.TopOrderedFoodCityList
+import me.taste2plate.app.customer.presentation.theme.HighRoundedCorners
+import me.taste2plate.app.customer.presentation.theme.LowPadding
+import me.taste2plate.app.customer.presentation.theme.LowSpacing
+import me.taste2plate.app.customer.presentation.theme.MediumPadding
 import me.taste2plate.app.customer.presentation.theme.T2PCustomerAppTheme
 import me.taste2plate.app.customer.presentation.theme.VeryLowSpacing
 import me.taste2plate.app.customer.presentation.theme.screenBackgroundColor
+import me.taste2plate.app.customer.presentation.theme.whatsappColor
 import me.taste2plate.app.customer.presentation.widgets.AppScaffold
 import me.taste2plate.app.customer.presentation.widgets.DrawableImage
+import me.taste2plate.app.customer.presentation.widgets.HorizontalSpace
 import me.taste2plate.app.customer.presentation.widgets.ShowLoading
 import me.taste2plate.app.customer.presentation.widgets.VerticalSpace
 import me.taste2plate.app.customer.presentation.widgets.showToast
@@ -89,12 +102,16 @@ fun HomeScreen(
         mutableStateOf(false)
     }
     if (showSettingDialog) {
-       SettingInfoDialog(setting = state.setting!!, type = SettingDialogType.Cart, onDismissRequest = {
-           viewModel.onEvent(HomeEvent.UpdateState())
-           showSettingDialog = false }) {
-           viewModel.onEvent(HomeEvent.UpdateState())
-           showSettingDialog = false
-       }
+        SettingInfoDialog(
+            setting = state.setting!!,
+            type = SettingDialogType.Cart,
+            onDismissRequest = {
+                viewModel.onEvent(HomeEvent.UpdateState())
+                showSettingDialog = false
+            }) {
+            viewModel.onEvent(HomeEvent.UpdateState())
+            showSettingDialog = false
+        }
     }
 
     //observe state
@@ -233,7 +250,22 @@ fun HomeScreen(
                     containerColor = Color.Transparent,
                     elevation = FloatingActionButtonDefaults.elevation(0.dp)
                 ) {
-                    DrawableImage(id = R.drawable.whatsapp_sv)
+                    Row(
+                        modifier = Modifier
+                            .clip(RoundedCornerShape(30.dp))
+                            .background(whatsappColor)
+                            .padding(7.dp),
+                        horizontalArrangement = Arrangement.Center,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        DrawableImage(
+                            modifier = Modifier.size(25.dp),
+                            id = R.drawable.whatsapp_sv)
+
+                        HorizontalSpace(space = VeryLowSpacing)
+
+                        Text("Chat", color = Color.White)
+                    }
                 }
             }
         ) {
@@ -275,7 +307,7 @@ fun HomeScreen(
                             //top order item
                             if (home?.topMostOrderedProducts != null) {
                                 CenterColumn {
-                                    HeadingChip("Top Ordered Food/City")
+                                    HeadingChip("10 Most Ordered Food/City")
                                     VerticalSpace(space = VeryLowSpacing)
                                     TopOrderedFoodCityList(
                                         onNavigateToProductListScreen = {

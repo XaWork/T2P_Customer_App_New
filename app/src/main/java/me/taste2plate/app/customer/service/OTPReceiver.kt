@@ -23,7 +23,8 @@ class OTPReceiver : BroadcastReceiver() {
     }
 
     override fun onReceive(context: Context?, intent: Intent?) {
-        if (SmsRetriever.SMS_RETRIEVED_ACTION == intent?.action) {
+        Log.e("Message", "o")
+        if (intent?.action == SmsRetriever.SMS_RETRIEVED_ACTION) {
             val extras: Bundle? = intent.extras
             val status: Status = extras?.get(SmsRetriever.EXTRA_STATUS) as Status
 
@@ -36,6 +37,7 @@ class OTPReceiver : BroadcastReceiver() {
                     val smsCode = msg.let { "[0-9]{6}".toRegex().find(it) }
                     smsCode?.value?.let { otpReceiveListener?.onOTPReceived(it) }
                 }
+
                 CommonStatusCodes.TIMEOUT -> {
                     otpReceiveListener?.onOTPTimeOut()
                 }
@@ -51,7 +53,7 @@ class OTPReceiver : BroadcastReceiver() {
 
 fun startSMSRetrieverClient(context: Context) {
     val client: SmsRetrieverClient = SmsRetriever.getClient(context)
-    val task = client.startSmsRetriever()
+    val task = client.startSmsUserConsent(null)
     task.addOnSuccessListener { aVoid ->
         Log.e("Atiar OTP Receiver", "startSMSRetrieverClient addOnSuccessListener $aVoid")
     }
