@@ -506,7 +506,6 @@ fun ProductImages(
             SaleBanner(text = "$rupeeSign ${if(isOnSale) details.sellingPrice else details.price}")
         }
 
-
         Surface(
             modifier = Modifier
                 .padding(bottom = 8.dp)
