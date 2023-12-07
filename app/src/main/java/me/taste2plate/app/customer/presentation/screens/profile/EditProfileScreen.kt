@@ -22,6 +22,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.sp
 import me.taste2plate.app.customer.presentation.theme.LowElevation
@@ -49,10 +50,10 @@ fun EditProfileScreen(
         when {
             state.isError && state.message != null -> {
                 showToast(state.message)
+                viewModel.onEvent(ProfileEvents.UpdateState)
             }
 
-            state.message != null && state.editProfileResponse != null -> {
-               // showToast(state.message)
+            state.userUpdate -> {
                 onNavigateToHomeScreen()
             }
         }
@@ -113,7 +114,8 @@ fun ContentEditProfileScreen(
                     AppTextField(
                         value = viewModel.email,
                         onValueChanged = { viewModel.email = it },
-                        hint = "Email"
+                        hint = "Email",
+                        keyboardType = KeyboardType.Email
                     ) {
                         MaterialIcon(
                             imageVector = Icons.Outlined.Email
@@ -125,7 +127,8 @@ fun ContentEditProfileScreen(
                     AppTextField(
                         value = viewModel.mobile,
                         onValueChanged = { viewModel.mobile = it },
-                        hint = "Mobile"
+                        hint = "Mobile",
+                        keyboardType = KeyboardType.Phone
                     ) {
                         MaterialIcon(
                             imageVector = Icons.Outlined.Phone

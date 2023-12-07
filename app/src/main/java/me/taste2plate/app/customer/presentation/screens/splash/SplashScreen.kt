@@ -55,10 +55,10 @@ fun SplashScreen(
     LaunchedEffect(state) {
         if (!state.loading) {
             if (state.isLogin && state.user != null) {
-                if (!state.user.email.isNullOrEmpty())
                     onNavigateToHomeScreen()
+                /*if (!state.user.email.isNullOrEmpty())
                 else
-                    onNavigateToSignUpScreen()
+                    onNavigateToSignUpScreen()*/
             } else
                 onNavigateToOnBoardingScreen()
         }

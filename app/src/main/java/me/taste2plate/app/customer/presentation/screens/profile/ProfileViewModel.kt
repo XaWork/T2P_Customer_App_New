@@ -42,6 +42,10 @@ class ProfileViewModel @Inject constructor(
                         message = "Fill all fields"
                     )
             }
+
+            ProfileEvents.UpdateState -> {
+                state = state.copy(isError = false, message = null)
+            }
         }
     }
 
@@ -54,8 +58,8 @@ class ProfileViewModel @Inject constructor(
 
     private fun setData() {
         val user = state.user
-        fullName = user!!.fullName
-        email = user.email!!
+        fullName = user!!.fullName ?: ""
+        email = user.email ?: ""
         mobile = user.mobile
     }
 
@@ -76,7 +80,6 @@ class ProfileViewModel @Inject constructor(
                         state = state.copy(
                             isError = isError,
                             message = result.data?.message,
-                            editProfileResponse = result.data
                         )
 
                         if (!isError)
@@ -106,14 +109,17 @@ class ProfileViewModel @Inject constructor(
 
                     is Resource.Success -> {
                         val isError = result.data?.status == Status.error.name
+
+                        if (!isError) {
+                            userPref.saveUser(result.data!!.result)
+                            state = state.copy(userUpdate  = true)
+                        }
+
                         state = state.copy(
                             isLoading = false,
                             isError = isError,
                            // message = result.data?.message,
                         )
-
-                        if (!isError)
-                            userPref.saveUser(result.data!!.result)
                     }
 
                     is Resource.Error -> {

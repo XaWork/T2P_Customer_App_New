@@ -9,6 +9,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import me.taste2plate.app.customer.T2PApp
 import me.taste2plate.app.customer.data.UserPref
+import me.taste2plate.app.customer.data.api.AnalyticsApi
 import me.taste2plate.app.customer.data.api.CustomApi
 import me.taste2plate.app.customer.data.api.ProductApi
 import me.taste2plate.app.customer.data.api.UserApi
@@ -19,6 +20,7 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.create
 import java.util.concurrent.TimeUnit
+import javax.inject.Named
 import javax.inject.Singleton
 
 
@@ -53,6 +55,47 @@ object AppModule {
 
         return Retrofit.Builder()
             .baseUrl(Constants.baseUrl)
+            .client(client)
+            .addConverterFactory(GsonConverterFactory.create(gson))
+            .build()
+    }
+
+    @Provides
+    @Singleton
+    fun provideAnalyticsRetrofit(okHttpClient: OkHttpClient, authInterceptor: AuthInterceptor): Retrofit {
+        val gson = GsonBuilder()
+            .setDateFormat("yyyy-MM-dd'T'HH:mm:ss")
+            .setLenient()
+            .create()
+
+        val client = okHttpClient.newBuilder()
+            .addInterceptor(authInterceptor)
+            .build()
+
+        // Replace "newBaseUrl" with the actual new base URL you want to use
+        return Retrofit.Builder()
+            .baseUrl("https://api.trap2win.com/admin/")
+            .client(client)
+            .addConverterFactory(GsonConverterFactory.create(gson))
+            .build()
+    }
+
+
+    @Provides
+    @Singleton
+    fun provideGeoIpRetrofit(okHttpClient: OkHttpClient, authInterceptor: AuthInterceptor): Retrofit {
+        val gson = GsonBuilder()
+            .setDateFormat("yyyy-MM-dd'T'HH:mm:ss")
+            .setLenient()
+            .create()
+
+        val client = okHttpClient.newBuilder()
+            .addInterceptor(authInterceptor)
+            .build()
+
+        // Replace "newBaseUrl" with the actual new base URL you want to use
+        return Retrofit.Builder()
+            .baseUrl("https://api.ipify.org")
             .client(client)
             .addConverterFactory(GsonConverterFactory.create(gson))
             .build()
@@ -109,6 +152,18 @@ object AppModule {
     @Provides
     @Singleton
     fun provideProductApi(retrofit: Retrofit): ProductApi {
+        return retrofit.create()
+    }
+
+    @Provides
+    @Singleton
+    fun provideAnalyticsApi(@Named("analyticsBaseUrl") retrofit: Retrofit): AnalyticsApi {
+        return retrofit.create()
+    }
+
+    @Provides
+    @Singleton
+    fun provideGeoIpsApi(@Named("geoIpBaseUrl") retrofit: Retrofit): AnalyticsApi {
         return retrofit.create()
     }
 

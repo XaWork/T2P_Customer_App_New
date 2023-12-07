@@ -11,7 +11,7 @@ import kotlinx.coroutines.launch
 import me.taste2plate.app.customer.data.Resource
 import me.taste2plate.app.customer.data.Status
 import me.taste2plate.app.customer.data.UserPref
-import me.taste2plate.app.customer.domain.model.auth.User
+import me.taste2plate.app.customer.domain.model.auth.VerifyOTPModel
 import me.taste2plate.app.customer.domain.use_case.auth.LoginUseCase
 import me.taste2plate.app.customer.domain.use_case.auth.VerifyOTPUseCase
 import me.taste2plate.app.customer.domain.use_case.user.EditProfileUseCase
@@ -103,7 +103,7 @@ class AuthViewModel @Inject constructor(
                                 loading = false,
                                 loginModel = result.data,
                                 isError = false,
-                                shouldStartSMSRetrival =true,
+                                shouldStartSMSRetrival = true,
                                 message = null
                             )
                         else
@@ -151,19 +151,15 @@ class AuthViewModel @Inject constructor(
                     }
 
                     is Resource.Success -> {
-                        state = if (result.data?.status == Status.success.name) {
-                            saveUser(result.data.data)
-                            // delay(1000)
-                            state.copy(
-                                loading = false,
-                                verifyOTPModel = result.data,
-                            )
-                        } else
-                            state.copy(
-                                loading = false,
-                                message = result.data?.message,
-                                isError = true
-                            )
+                        val isError = result.data?.status == Status.error.name
+                        state = state.copy(
+                            loading = false,
+                            shouldStartSMSRetrival = false,
+                            verifyOTPModel = result.data,
+                            message = if(isError) result.data?.message else null,
+                            isError = isError,
+                        )
+                       saveUser(result.data!!)
                     }
 
                     is Resource.Error -> {
@@ -235,9 +231,9 @@ class AuthViewModel @Inject constructor(
                             loading = false,
                             isError = isError,
                         )
-
-                        if (!isError)
-                            saveUser(result.data!!.result, registerSuccess = true)
+                        /*
+                                                if (!isError)
+                                                    saveUser(result.data!!.result, registerSuccess = true)*/
                     }
 
                     is Resource.Error -> {
@@ -252,11 +248,11 @@ class AuthViewModel @Inject constructor(
         }
     }
 
-    private fun saveUser(user: User, registerSuccess: Boolean = false) {
+    private fun saveUser(verifyOtpModel: VerifyOTPModel, registerSuccess: Boolean = false) {
         viewModelScope.launch {
-            userPref.saveUser(user)
+            userPref.saveUser(verifyOtpModel.data)
         }
-        state = state.copy(loginSuccess = true, registerSuccess = registerSuccess)
+            state = state.copy(loginSuccess = true, registerSuccess = registerSuccess)
     }
 
 }

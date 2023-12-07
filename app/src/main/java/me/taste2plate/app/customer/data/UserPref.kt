@@ -30,6 +30,7 @@ class UserPref @Inject constructor(
         private val KEY_ADDRESS = stringPreferencesKey("address")
         private val KEY_TASTE = stringPreferencesKey("taste")
         private val KEY_IS_LOGIN = booleanPreferencesKey("isLogin")
+        private val KEY_IP = stringPreferencesKey("ip")
     }
 
     private val dataStore: DataStore<Preferences> = context.dataStore
@@ -85,6 +86,20 @@ class UserPref @Inject constructor(
         }
         // Log.e("user","User is Login${isLogin.first()}")
         return isLogin.first() ?: false
+    }
+
+    suspend fun saveIp(ip: String){
+        dataStore.edit { preferences ->
+            preferences[KEY_IP] = ip
+        }
+        getIp()
+    }
+
+    suspend fun getIp(): String{
+        val value = dataStore.data.map { preferences ->
+            preferences[KEY_IP]
+        }
+        return value.first() ?: ""
     }
 
 

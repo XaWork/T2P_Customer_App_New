@@ -8,6 +8,7 @@ import me.taste2plate.app.customer.domain.model.user.WishListModel
 
 data class ProfileState(
     val isLoading:Boolean = false,
+    val userUpdate:Boolean = false,
     val isError: Boolean = false,
     val message: String? = null,
     val user: User? = null,

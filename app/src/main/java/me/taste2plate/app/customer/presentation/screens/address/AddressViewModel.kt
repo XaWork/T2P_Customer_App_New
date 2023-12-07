@@ -77,6 +77,7 @@ class AddressViewModel @Inject constructor(
             }
 
             is AddressEvents.SetData -> {
+                Log.e("AddEditAddres", "set data called")
                 setData()
             }
 
@@ -180,14 +181,10 @@ class AddressViewModel @Inject constructor(
                         val data = result.data
                         val isError = data?.status == Status.error.name
 
-                        /* if (!isError) {
-                             stateA.value = data!!.result[0].name
-                         }*/
-
                         state.copy(
                             isLoading = false,
                             isError = isError,
-                            stateList = if (isError) emptyList() else data!!.result
+                            stateList = if (isError) emptyList() else data!!.result.sortedBy { it.name }
                         )
                     }
 

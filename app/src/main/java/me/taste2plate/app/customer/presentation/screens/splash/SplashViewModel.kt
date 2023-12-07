@@ -11,7 +11,10 @@ import me.taste2plate.app.customer.data.Resource
 import me.taste2plate.app.customer.data.Status
 import me.taste2plate.app.customer.data.UserPref
 import me.taste2plate.app.customer.domain.model.SettingsModel
+import me.taste2plate.app.customer.domain.model.custom.LogRequest
 import me.taste2plate.app.customer.domain.use_case.SettingsUseCase
+import me.taste2plate.app.customer.domain.use_case.analytics.AddLogUseCase
+import me.taste2plate.app.customer.domain.use_case.analytics.GeoIpUseCase
 import me.taste2plate.app.customer.domain.use_case.user.address.AllAddressUseCase
 import javax.inject.Inject
 
@@ -19,13 +22,15 @@ import javax.inject.Inject
 class SplashViewModel @Inject constructor(
     private val settingsUseCase: SettingsUseCase,
     private val allAddressUseCase: AllAddressUseCase,
+    private val geoIpUseCase: GeoIpUseCase,
+    private val addLogUseCase: AddLogUseCase,
     private val userPref: UserPref
 ) : ViewModel() {
 
     var state by mutableStateOf(SplashState())
 
     init {
-        isUserLogin()
+        geoIpUseCase()
     }
 
     fun onEvent(event: SplashEvents) {
@@ -39,6 +44,37 @@ class SplashViewModel @Inject constructor(
             }
         }
     }
+
+    private fun geoIpUseCase() {
+        viewModelScope.launch {
+            geoIpUseCase.execute().collect { result ->
+                when (result) {
+                    is Resource.Loading -> {
+                        state = state.copy(loading = true)
+                    }
+
+                    is Resource.Success -> {
+                        userPref.saveIp(result.data!!.ip)
+                        isUserLogin()
+                    }
+
+                    is Resource.Error -> {
+                        state = state.copy(error = result.message, loading = false)
+                    }
+                }
+            }
+        }
+    }
+
+   /* private fun addLog(){
+        viewModelScope.launch {
+            addLogUseCase.execute(
+                LogRequest(
+
+                )
+            )
+        }
+    }*/
 
     private fun isUserLogin() {
         viewModelScope.launch {

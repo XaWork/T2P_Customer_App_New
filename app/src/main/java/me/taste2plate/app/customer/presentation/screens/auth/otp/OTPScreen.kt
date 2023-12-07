@@ -66,20 +66,18 @@ fun OTPScreen(
     val context = LocalContext.current
     var seconds by remember { mutableIntStateOf(59) }
 
-    //Observe State
-    when {
-        state.loginSuccess && state.verifyOTPModel != null -> {
-            if (state.loginModel!!.newUser)
-                onNavigateToSignUPScreen()
-            else
-                onNavigateToHomeScreen()
-        }
-    }
 
-    LaunchedEffect(state.shouldStartSMSRetrival) {
-        if (state.shouldStartSMSRetrival) {
-            Log.e("OTP", "SMS Retrieval is Starting...")
-            startSMSRetrieverClient(context)
+    LaunchedEffect(state) {
+        when {
+            state.shouldStartSMSRetrival -> {
+                Log.e("OTP", "SMS Retrieval is Starting...")
+                startSMSRetrieverClient(context)
+            }
+
+            state.loginSuccess-> {
+                Log.e("verify ", state.verifyOTPModel.toString())
+                onNavigateToHomeScreen()
+            }
         }
     }
 

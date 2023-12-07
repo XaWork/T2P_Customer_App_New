@@ -49,9 +49,9 @@ fun AddEditAddressScreen(
         viewModel.latLng = latLng
     }
 
-    Log.e("AddEditScreen", "Lat long is $latLng")
 
-    LaunchedEffect(state.stateList.isEmpty()) {
+    LaunchedEffect(latLng == null && state.stateList.isEmpty()) {
+    Log.e("AddEditScreen", "Lat long is $latLng")
         viewModel.onEvent(AddressEvents.SetData)
     }
 

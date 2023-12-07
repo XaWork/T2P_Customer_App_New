@@ -88,7 +88,7 @@ data class User(
     @SerializedName("first_time")
     val firstTime: Int,
     @SerializedName("full_name")
-    val fullName: String,
+    val fullName: String?,
     @SerializedName("health_insurance_number")
     val healthInsuranceNumber: String,
     @SerializedName("_id")
