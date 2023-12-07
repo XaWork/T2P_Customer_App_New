@@ -13,6 +13,7 @@ data class HomeState(
     val isLoading: Boolean = false,
     val cartError: Boolean = false,
     val addressLoader: Boolean = false,
+    val noAddressFound: Boolean = false,
     val checked: Boolean = false,
     val user: User? = null,
     val setting: SettingsModel.Result? = null,

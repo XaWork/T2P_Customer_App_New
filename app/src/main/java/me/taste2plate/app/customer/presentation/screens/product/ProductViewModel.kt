@@ -375,9 +375,7 @@ class ProductViewModel @Inject constructor(
                         )
 
                         getCart()
-
-                        if (!isError)
-                            T2PApp.wishlistCount = data?.result?.size ?: 0
+                        T2PApp.wishlistCount = data?.result?.size ?: 0
 
                     }
 

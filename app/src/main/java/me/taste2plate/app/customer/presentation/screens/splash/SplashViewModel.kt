@@ -51,8 +51,8 @@ class SplashViewModel @Inject constructor(
     private fun getUser() {
         if (state.isLogin)
             viewModelScope.launch {
-                state = state.copy(user = userPref.getUser())
-                getAddress()
+                state = state.copy(user = userPref.getUser(), loading = false)
+                //getAddress()
             }
     }
 

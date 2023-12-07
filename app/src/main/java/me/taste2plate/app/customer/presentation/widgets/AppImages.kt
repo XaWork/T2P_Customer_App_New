@@ -50,6 +50,7 @@ import me.taste2plate.app.customer.presentation.theme.LowPadding
 import me.taste2plate.app.customer.presentation.theme.SpaceBetweenViewsAndSubViews
 import me.taste2plate.app.customer.presentation.theme.backgroundColor
 import me.taste2plate.app.customer.presentation.theme.primaryColor
+import me.taste2plate.app.customer.presentation.theme.screenBackgroundColor
 
 @Composable
 fun DrawableIcon(
@@ -193,7 +194,7 @@ fun CircleIconButton(
         modifier = modifier,
         shape = CircleShape,
         colors = CardDefaults.cardColors(
-            containerColor = backgroundColor.invoke()
+            containerColor = screenBackgroundColor.invoke()
         )
     ) {
         if (isDrawableIcon)
@@ -297,7 +298,7 @@ fun ImageWithWishlistButton(
                     else
                         Icons.Outlined.FavoriteBorder,
                     tint = if (alreadyWishListed || foodItemUpdateInfo != null && foodItemUpdateInfo.added) primaryColor.invoke() else LocalContentColor.current,
-                    modifier = modifier
+                    modifier = modifier,
                 ) {
                     onclick()
                 }

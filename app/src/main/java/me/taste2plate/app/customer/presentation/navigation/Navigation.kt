@@ -222,6 +222,11 @@ fun Navigation() {
                 },
                 onNavigateToAddressListScreen = {
                     navController.navigate(Screens.AddressListScreen.route)
+                },
+                onNavigateToAddAddressScreen = {
+                    navController.navigate(Screens.AddEditAddressScreen.route){
+                        popUpTo(0)
+                    }
                 }
             )
         }
@@ -357,6 +362,9 @@ fun Navigation() {
                     onNavigateToCartScreen = {
                         navController.navigate(Screens.CartScreen.route)
                     },
+                    onNavigateToWishlistScreen = {
+                        navController.navigate(Screens.WishlistScreen.route)
+                    },
                     navigateBack = {
                         navController.popBackStack()
                     })
@@ -444,9 +452,9 @@ fun Navigation() {
                 val viewModel =
                     entry.sharedViewModel<CityBrandViewModel>(navHostController = navController)
                 SubCategoryScreen(viewModel,
-                        navigateBack = {
-                    navController.popBackStack()
-                }
+                    navigateBack = {
+                        navController.popBackStack()
+                    }
                 ) {
                     val itemInfo = Gson().toJson(
                         it,

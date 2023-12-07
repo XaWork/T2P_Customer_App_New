@@ -145,7 +145,7 @@ class HomeViewModel @Inject constructor(
         viewModelScope.launch {
             val taste = userPref.getTaste()
             val user = userPref.getUser()
-           // val setting = userPref.getSettings()
+            // val setting = userPref.getSettings()
             state = state.copy(checked = taste == Taste.nonVeg, user = user)
         }
     }
@@ -273,7 +273,7 @@ class HomeViewModel @Inject constructor(
                         )
 
                         //if (!isError)
-                            T2PApp.wishlistCount = data?.result?.size ?: 0
+                        T2PApp.wishlistCount = data?.result?.size ?: 0
 
                         if (hasDefaultAddress())
                             getCart()
@@ -473,7 +473,9 @@ class HomeViewModel @Inject constructor(
                             if (state.defaultAddress == null && result.data != null && result.data.result.isNotEmpty()) {
                                 setDefaultAddress(result.data.result[0], isLoading = true)
                             } else {
-                                if (state.cartData == null)
+                                if (result.data != null && result.data.result.isEmpty()) {
+                                    state = state.copy(noAddressFound = true)
+                                } else if (state.cartData == null)
                                     getCart()
                             }
 

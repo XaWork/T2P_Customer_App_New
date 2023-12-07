@@ -85,6 +85,7 @@ fun HomeScreen(
     onNavigateToWishlistScreen: () -> Unit,
     onNavigateToProfileScreen: () -> Unit,
     onNavigateToAddressListScreen: () -> Unit,
+    onNavigateToAddAddressScreen: () -> Unit,
     onNavigateToProductListScreen: (item: CommonForItem) -> Unit,
     onNavigateToProductDetailsScreen: (productId: String) -> Unit,
     onNavigateToBulkOrdersScreen: () -> Unit,
@@ -124,6 +125,10 @@ fun HomeScreen(
 
             state.cartError -> {
                 showSettingDialog = true
+            }
+
+            state.noAddressFound ->{
+                onNavigateToAddAddressScreen()
             }
         }
     }

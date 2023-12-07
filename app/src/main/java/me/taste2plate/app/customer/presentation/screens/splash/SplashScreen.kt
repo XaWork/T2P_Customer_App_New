@@ -56,10 +56,7 @@ fun SplashScreen(
         if (!state.loading) {
             if (state.isLogin && state.user != null) {
                 if (!state.user.email.isNullOrEmpty())
-                    if (state.addressListModel != null && state.addressListModel.result.isNotEmpty())
-                        onNavigateToHomeScreen()
-                    else
-                        onNavigateToAddEditAddressScreenScreen()
+                    onNavigateToHomeScreen()
                 else
                     onNavigateToSignUpScreen()
             } else

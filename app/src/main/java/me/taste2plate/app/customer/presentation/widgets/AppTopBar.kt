@@ -4,6 +4,7 @@ import android.content.res.Configuration
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material.icons.outlined.ShoppingCart
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
@@ -27,10 +28,12 @@ fun AppTopBar(
     title: String = appNameWithFullForm,
     tasteVisible: Boolean = false,
     cartVisible: Boolean = false,
+    wishlistVisible: Boolean = false,
     checked: Boolean = false,
     title1: @Composable () -> Unit = {},
     onCheckChange: () -> Unit = {},
     onNavigateToCartScreen: () -> Unit = {},
+    onNavigateToWishlistScreen: () -> Unit = {},
     onBackClick: () -> Unit
 ) {
     TopAppBar(
@@ -62,6 +65,17 @@ fun AppTopBar(
                     onCheckChange = onCheckChange,
                     switchModifier = Modifier.padding(horizontal = SpaceBetweenViewsAndSubViews)
                 )
+
+            if (wishlistVisible)
+                MaterialIconButton(
+                    modifier = modifier,
+                    badge = true,
+                    badgeText = T2PApp.wishlistCount,
+                    imageVector = Icons.Outlined.FavoriteBorder
+                ) {
+                    onNavigateToWishlistScreen()
+                }
+
             if (cartVisible)
                 MaterialIconButton(
                     modifier = modifier,

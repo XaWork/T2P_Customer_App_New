@@ -57,6 +57,7 @@ fun ProductListScreen(
     viewModel: ProductViewModel,
     onNavigateToProductDetailsScreen: () -> Unit,
     onNavigateToCartScreen: () -> Unit,
+    onNavigateToWishlistScreen: () -> Unit,
     navigateBack: () -> Unit,
 ) {
     val state = viewModel.state
@@ -98,8 +99,12 @@ fun ProductListScreen(
                 tasteVisible = itemInfo.name != "Search",
                 checked = state.checked,
                 cartVisible = true,
+                wishlistVisible = true,
                 onNavigateToCartScreen = {
                     onNavigateToCartScreen()
+                },
+                onNavigateToWishlistScreen = {
+                    onNavigateToWishlistScreen()
                 },
                 onCheckChange = {
                     viewModel.onEvent(ProductEvents.ChangeTaste)
