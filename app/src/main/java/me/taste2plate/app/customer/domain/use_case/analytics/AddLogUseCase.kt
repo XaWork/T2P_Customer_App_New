@@ -12,11 +12,11 @@ class AddLogUseCase @Inject constructor(
     suspend fun execute(
         logRequest: LogRequest
     ) {
-        repo.addLog(
+        /*repo.addLog(
             logRequest.copy(
                 user_id = userPref.getUser().id,
                 geo_ip = userPref.getToken()
             )
-        )
+        )*/
     }
 }

@@ -72,16 +72,6 @@ fun Navigation() {
                         popUpTo(0)
                     }
                 },
-                onNavigateToAddEditAddressScreenScreen = {
-                    navController.navigate(Screens.LocationScreen.route) {
-                        popUpTo(0)
-                    }
-                },
-                onNavigateToSignUpScreen = {
-                    navController.navigate(Screens.SignUpScreen.route) {
-                        popUpTo(0)
-                    }
-                }
             )
         }
 
@@ -96,9 +86,7 @@ fun Navigation() {
                 OnBoardingScreen(
                     viewModel = viewModel
                 ) {
-                    navController.navigate(Screens.OTPScreen.route) {
-                        //popUpTo(0)
-                    }
+                    navController.navigate(Screens.OTPScreen.route)
                 }
             }
 
@@ -202,8 +190,8 @@ fun Navigation() {
                 onNavigateContactUsScreen = {
                     navController.navigate(Screens.ContactUsScreen.route)
                 },
-                onNavigateReferAndEarnScreen = {
-                    //navController.navigate(Screens.ProductListScreen.route)
+                navigateBack = {
+                    navController.popBackStack()
                 },
                 onNavigateToBulkOrdersScreen = {
                     navController.navigate(Screens.BulkOrderScreen.route)

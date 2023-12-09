@@ -5,6 +5,7 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -18,6 +19,8 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextRange
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.ImeOptions
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
@@ -37,6 +40,8 @@ fun AppTextField(
     errorMessage: String = "",
     readOnly: Boolean = false,
     isError: Boolean = false,
+    imeAction: ImeAction = ImeAction.Default,
+    keyboardActions: KeyboardActions = KeyboardActions.Default,
     keyboardType: KeyboardType = KeyboardType.Text,
     leadingIcon: @Composable (() -> Unit)? = null,
     trailingIcon: @Composable (() -> Unit)? = null,
@@ -49,9 +54,11 @@ fun AppTextField(
         leadingIcon = leadingIcon,
         trailingIcon = trailingIcon,
         keyboardOptions = KeyboardOptions(
-            keyboardType = keyboardType
+            keyboardType = keyboardType,
+            imeAction = imeAction
         ),
         isError = isError,
+        keyboardActions = keyboardActions,
         supportingText = {
             if (isError)
                 Text(
@@ -81,7 +88,8 @@ fun OtpTextField(
     modifier: Modifier = Modifier,
     otpText: String,
     otpCount: Int = 6,
-    onOtpTextChange: (String, Boolean) -> Unit
+    onDone:() -> Unit,
+    onOtpTextChange: (String, Boolean) -> Unit,
 ) {
     LaunchedEffect(Unit) {
         if (otpText.length > otpCount) {
@@ -97,7 +105,12 @@ fun OtpTextField(
                 onOtpTextChange.invoke(it.text, it.text.length == otpCount)
             }
         },
-        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.NumberPassword),
+        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.NumberPassword, imeAction = ImeAction.Done),
+        keyboardActions = KeyboardActions(
+            onDone = {
+                onDone()
+            }
+        ),
         decorationBox = {
             Row(horizontalArrangement = Arrangement.Center) {
                 repeat(otpCount) { index ->

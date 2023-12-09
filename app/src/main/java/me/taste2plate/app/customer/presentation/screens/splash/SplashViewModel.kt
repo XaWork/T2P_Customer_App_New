@@ -30,7 +30,7 @@ class SplashViewModel @Inject constructor(
     var state by mutableStateOf(SplashState())
 
     init {
-        geoIpUseCase()
+        isUserLogin()
     }
 
     fun onEvent(event: SplashEvents) {
@@ -44,7 +44,6 @@ class SplashViewModel @Inject constructor(
             }
         }
     }
-
     private fun geoIpUseCase() {
         viewModelScope.launch {
             geoIpUseCase.execute().collect { result ->

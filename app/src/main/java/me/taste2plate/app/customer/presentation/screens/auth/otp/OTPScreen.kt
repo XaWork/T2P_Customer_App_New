@@ -16,10 +16,15 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
@@ -65,6 +70,11 @@ fun OTPScreen(
     val state = viewModel.state
     val context = LocalContext.current
     var seconds by remember { mutableIntStateOf(59) }
+    val keyboardController = LocalSoftwareKeyboardController.current
+    val coroutineScope = rememberCoroutineScope()
+    val focusRequester = remember {
+        FocusRequester()
+    }
 
 
     LaunchedEffect(state) {
@@ -133,6 +143,12 @@ fun OTPScreen(
             modifier = Modifier
                 .padding(horizontal = ScreenPadding)
                 .fillMaxSize()
+                .onGloballyPositioned {
+                    coroutineScope.launch {
+                        keyboardController?.show()
+                        focusRequester.requestFocus()
+                    }
+                }
         ) {
             val mobileString = buildAnnotatedString {
                 withStyle(SpanStyle()) {
@@ -153,7 +169,12 @@ fun OTPScreen(
             VerticalSpace(space = HighSpacing)
 
             OtpTextField(
+                modifier = Modifier.focusRequester(focusRequester),
                 otpText = viewModel.otp,
+                onDone = {
+                    keyboardController?.hide()
+                    viewModel.onEvent(AuthEvents.VerifyOTP)
+                },
                 onOtpTextChange = { value, _ ->
                     viewModel.otp = value
                 }

@@ -791,8 +791,13 @@ class CheckOutViewModel @Inject constructor(
             options.put("prefill", preFill)
             val activity: Activity = context as Activity
             co.open(activity, options)
-
             Log.e("Payment", "Payment successful")
+            confirmOrder(
+                gateWay = "Online",
+                orderId = state.checkoutModel!!.orderId,
+                transactionId = "",
+                //context = context
+            )
         } catch (e: Exception) {
             state = state.copy(isError = true, errorMessage = "Error in payment: " + e.message)
             Log.e("Payment", "Error in payment")

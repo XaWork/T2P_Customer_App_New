@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Phone
@@ -21,7 +22,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -55,6 +58,7 @@ fun OnBoardingScreen(
     val state = viewModel.state
     val context = LocalContext.current
     val activity = context as Activity
+    val keyboardController = LocalSoftwareKeyboardController.current
 
     LaunchedEffect(key1 = state) {
         when {
@@ -145,6 +149,13 @@ fun OnBoardingScreen(
                     },
                     hint = mobileNumber,
                     keyboardType = KeyboardType.Phone,
+                    imeAction = ImeAction.Done,
+                    keyboardActions = KeyboardActions(
+                        onDone = {
+                            keyboardController?.hide()
+                            viewModel.onEvent(AuthEvents.Login)
+                        }
+                    ),
                     isError = state.isError,
                     errorMessage = if (state.isError) state.message!!
                     else "Limit: ${viewModel.mobile.length}/${viewModel.mobileLength}",
@@ -162,6 +173,7 @@ fun OnBoardingScreen(
                     AppButton(
                         text = getOtpString,
                     ) {
+                        keyboardController?.hide()
                         viewModel.onEvent(AuthEvents.Login)
                     }
 

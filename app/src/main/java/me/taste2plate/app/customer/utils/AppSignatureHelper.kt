@@ -12,6 +12,7 @@ import java.util.Arrays
 
 
 //TODO: Warning: Make sure to delete this class before release build for play store / production
+/*
 class AppSignatureHelper(context: Context?) :
     ContextWrapper(context) {
 
@@ -69,4 +70,4 @@ class AppSignatureHelper(context: Context?) :
             return null
         }
     }
-}
+}*/

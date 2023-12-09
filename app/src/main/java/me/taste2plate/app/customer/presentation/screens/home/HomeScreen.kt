@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.res.Configuration
 import android.net.Uri
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -93,7 +94,7 @@ fun HomeScreen(
     onNavigateToMembershipPlanScreen: () -> Unit,
     onNavigateToMyPlanScreen: () -> Unit,
     onNavigateContactUsScreen: () -> Unit,
-    onNavigateReferAndEarnScreen: () -> Unit,
+    navigateBack: () -> Unit,
     onNavigateLogoutScreen: () -> Unit,
     viewModel: HomeViewModel = hiltViewModel()
 ) {
@@ -112,6 +113,16 @@ fun HomeScreen(
             }) {
             viewModel.onEvent(HomeEvent.UpdateState())
             showSettingDialog = false
+        }
+    }
+
+    var doubleBackToExitPressedOnce = false
+    BackHandler {
+        if (doubleBackToExitPressedOnce) {
+            navigateBack()
+        }else{
+            showToast("Please click BACK again to exit")
+            doubleBackToExitPressedOnce = true
         }
     }
 

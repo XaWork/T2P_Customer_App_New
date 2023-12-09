@@ -7,7 +7,7 @@ import javax.inject.Inject
 import javax.inject.Named
 
 class AnalyticsRepoImpl @Inject constructor(
-    @Named("analyticsBaseUrl") private val api: AnalyticsApi
+     private val api: AnalyticsApi
 ) : AnalyticsRepo {
 
     override suspend fun addLog(logRequest: LogRequest) {

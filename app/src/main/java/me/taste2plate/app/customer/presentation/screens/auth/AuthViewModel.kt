@@ -159,6 +159,8 @@ class AuthViewModel @Inject constructor(
                             message = if(isError) result.data?.message else null,
                             isError = isError,
                         )
+
+
                        saveUser(result.data!!)
                     }
 

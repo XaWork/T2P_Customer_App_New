@@ -3,6 +3,9 @@ package me.taste2plate.app.customer.di
 import com.google.gson.GsonBuilder
 import dagger.Module
 import dagger.Provides
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedFactory
+import dagger.assisted.AssistedInject
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import kotlinx.coroutines.Dispatchers
@@ -11,6 +14,7 @@ import me.taste2plate.app.customer.T2PApp
 import me.taste2plate.app.customer.data.UserPref
 import me.taste2plate.app.customer.data.api.AnalyticsApi
 import me.taste2plate.app.customer.data.api.CustomApi
+import me.taste2plate.app.customer.data.api.GeoIpApi
 import me.taste2plate.app.customer.data.api.ProductApi
 import me.taste2plate.app.customer.data.api.UserApi
 import me.taste2plate.app.customer.utils.Constants
@@ -20,7 +24,6 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.create
 import java.util.concurrent.TimeUnit
-import javax.inject.Named
 import javax.inject.Singleton
 
 
@@ -41,9 +44,38 @@ object AppModule {
         return app!!
     }
 
-    @Provides
+    @AssistedFactory
+    interface RetrofitFactory {
+        fun create(baseUrl: String): RetrofitBuilder
+    }
+
+    class RetrofitBuilder @AssistedInject constructor(
+        @Assisted val baseUrl: String,
+        private val okHttpClient: OkHttpClient,
+        authInterceptor: AuthInterceptor
+    ) {
+        val gson = GsonBuilder()
+            .setDateFormat("yyyy-MM-dd'T'HH:mm:ss")
+            .setLenient()
+            .create()
+
+        val client = okHttpClient.newBuilder()
+            .addInterceptor(authInterceptor)
+            .build()
+
+        inline fun <reified T> build(): T {
+            return Retrofit.Builder()
+                .baseUrl(baseUrl)
+                .addConverterFactory(GsonConverterFactory.create(gson))
+                .client(client)
+                .build()
+                .create()
+        }
+    }
+
+  /*  @Provides
     @Singleton
-    fun provideRetrofit(okHttpClient: OkHttpClient, authInterceptor : AuthInterceptor): Retrofit {
+    fun provideRetrofit(okHttpClient: OkHttpClient, authInterceptor: AuthInterceptor): Retrofit {
         val gson = GsonBuilder()
             .setDateFormat("yyyy-MM-dd'T'HH:mm:ss")
             .setLenient()
@@ -59,31 +91,35 @@ object AppModule {
             .addConverterFactory(GsonConverterFactory.create(gson))
             .build()
     }
+    */
+    /*
+        @Provides
+        @Singleton
+        fun provideAnalyticsRetrofit(okHttpClient: OkHttpClient, authInterceptor: AuthInterceptor): Retrofit {
+            val gson = GsonBuilder()
+                .setDateFormat("yyyy-MM-dd'T'HH:mm:ss")
+                .setLenient()
+                .create()
 
-    @Provides
+            val client = okHttpClient.newBuilder()
+                .addInterceptor(authInterceptor)
+                .build()
+
+            // Replace "newBaseUrl" with the actual new base URL you want to use
+            return Retrofit.Builder()
+                .baseUrl("https://api.trap2win.com/admin/")
+                .client(client)
+                .addConverterFactory(GsonConverterFactory.create(gson))
+                .build()
+        }*/
+
+
+  /*  @Provides
     @Singleton
-    fun provideAnalyticsRetrofit(okHttpClient: OkHttpClient, authInterceptor: AuthInterceptor): Retrofit {
-        val gson = GsonBuilder()
-            .setDateFormat("yyyy-MM-dd'T'HH:mm:ss")
-            .setLenient()
-            .create()
-
-        val client = okHttpClient.newBuilder()
-            .addInterceptor(authInterceptor)
-            .build()
-
-        // Replace "newBaseUrl" with the actual new base URL you want to use
-        return Retrofit.Builder()
-            .baseUrl("https://api.trap2win.com/admin/")
-            .client(client)
-            .addConverterFactory(GsonConverterFactory.create(gson))
-            .build()
-    }
-
-
-    @Provides
-    @Singleton
-    fun provideGeoIpRetrofit(okHttpClient: OkHttpClient, authInterceptor: AuthInterceptor): Retrofit {
+    fun provideGeoIpRetrofit(
+        okHttpClient: OkHttpClient,
+        authInterceptor: AuthInterceptor
+    ): Retrofit {
         val gson = GsonBuilder()
             .setDateFormat("yyyy-MM-dd'T'HH:mm:ss")
             .setLenient()
@@ -99,7 +135,7 @@ object AppModule {
             .client(client)
             .addConverterFactory(GsonConverterFactory.create(gson))
             .build()
-    }
+    }*/
 
     @Provides
     @Singleton
@@ -136,41 +172,67 @@ object AppModule {
     }
 
 
-    @Provides
+  /*  @Provides
     @Singleton
     fun provideCustomApi(retrofit: Retrofit): CustomApi {
         return retrofit.create()
-    }
+    }*/
 
 
     @Provides
+    @Singleton
+    fun provideCustomApi(retrofitFactory: RetrofitFactory): CustomApi {
+        return retrofitFactory.create(Constants.baseUrl).build()
+    }
+
+
+   /* @Provides
     @Singleton
     fun provideUserApi(retrofit: Retrofit): UserApi {
         return retrofit.create()
-    }
+    }*/
+
 
     @Provides
+    @Singleton
+    fun provideUserApi(retrofitFactory: RetrofitFactory): UserApi {
+        return retrofitFactory.create(Constants.baseUrl).build()
+    }
+
+    /*@Provides
     @Singleton
     fun provideProductApi(retrofit: Retrofit): ProductApi {
         return retrofit.create()
+    }*/
+
+    @Provides
+    @Singleton
+    fun provideProductApi(retrofitFactory: RetrofitFactory): ProductApi {
+        return retrofitFactory.create(Constants.baseUrl).build()
+    }
+
+    /* @Provides
+     @Singleton
+     fun provideAnalyticsApi(@Named("analyticsBaseUrl") retrofit: Retrofit): AnalyticsApi {
+         return retrofit.create()
+     }*/
+
+    @Provides
+    @Singleton
+    fun provideAnalyticsApi(retrofitFactory: RetrofitFactory): AnalyticsApi {
+        return retrofitFactory.create(Constants.trap2WinBaseUrl).build()
     }
 
     @Provides
     @Singleton
-    fun provideAnalyticsApi(@Named("analyticsBaseUrl") retrofit: Retrofit): AnalyticsApi {
-        return retrofit.create()
-    }
-
-    @Provides
-    @Singleton
-    fun provideGeoIpsApi(@Named("geoIpBaseUrl") retrofit: Retrofit): AnalyticsApi {
-        return retrofit.create()
+    fun provideGeoIpsApi(retrofitFactory: RetrofitFactory): GeoIpApi {
+        return retrofitFactory.create(Constants.geoIpBaseUrl).build()
     }
 
     // --------------
-   /* @Singleton
-    @Provides
-    fun provideDataStore(@ApplicationContext context: Context): DataStore<Preferences> {
-        return context.dataStore
-    }*/
+    /* @Singleton
+     @Provides
+     fun provideDataStore(@ApplicationContext context: Context): DataStore<Preferences> {
+         return context.dataStore
+     }*/
 }

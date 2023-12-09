@@ -17,8 +17,8 @@ android {
         applicationId = "me.taste2plate.app.customer"
         minSdk = 24
         targetSdk = 34
-        versionCode = 1
-        versionName = "1.0"
+        versionCode = 192
+        versionName = "3.1"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
@@ -127,5 +127,8 @@ dependencies {
     //SMSRetrieval API Dependencies for Auto OTP Verification
     implementation("com.google.android.gms:play-services-auth-api-phone:18.0.1")
     implementation("com.google.android.gms:play-services-auth:20.7.0")
+
+    //facebook
+    implementation("com.facebook.android:facebook-android-sdk:13.0.0")
 
 }
