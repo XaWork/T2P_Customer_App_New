@@ -46,9 +46,9 @@ fun AppSearchBar(
         value = value,
         onValueChange = onValueChange,
         shape = CircleShape,
-        /*label = {
-            Text("Search")
-        },*/
+        label = {
+            Text("Search here...")
+        },
         leadingIcon = {
             MaterialIcon(imageVector = Icons.Outlined.Search)
         },

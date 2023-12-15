@@ -55,7 +55,7 @@ fun SettingInfoDialog(
 
     if (checkAvailability != null) {
         cut_of_time_first =
-            format.parse(checkAvailability!!.result.expressCutOfTimeFirst)
+            format.parse(checkAvailability.result.expressCutOfTimeFirst)
         cut_of_time_second =
             format.parse(checkAvailability.result.expressCutOfTimeSecond)
         val nightTwelve = format.parse("24:00")

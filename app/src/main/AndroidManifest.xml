@@ -44,7 +44,6 @@
             android:name="com.google.android.geo.API_KEY"
             android:value="AIzaSyBbpYO8zLmSh0-c5_MDiyPiQnMCl4Jc6ko" />
 
-
         <meta-data
             android:name="com.razorpay.ApiKey"
             android:value="rzp_live_ZLgzjgdHBJDlP8" />

@@ -51,7 +51,7 @@ fun AddEditAddressScreen(
 
 
     LaunchedEffect(latLng == null && state.stateList.isEmpty()) {
-    Log.e("AddEditScreen", "Lat long is $latLng")
+        Log.e("AddEditScreen", "Lat long is $latLng")
         viewModel.onEvent(AddressEvents.SetData)
     }
 
@@ -182,25 +182,26 @@ fun ContentAddEditAddressScreen(
 
             SpaceBetweenRow(item1 = {
                 AppAutoComplete(
-                     viewModel.filterPinList.isNotEmpty(),
-                     hint = "PinCode",
-                     items = viewModel.filterPinList,
-                     onExpandedChange = {
-                         viewModel.pinCodeExpanded = it
-                         viewModel.filterPinList.clear()
-                     },
-                     selectedText = viewModel.pincodeA.value,
-                     onTextChanged = {
-                         viewModel.pincodeA.value = it
-                         if (it.length >= 3)
-                             viewModel.onEvent(AddressEvents.SearchPin(it))
-                     },
+                    viewModel.filterPinList.isNotEmpty(),
+                    hint = "PinCode",
+                    items = viewModel.filterPinList,
+                    onExpandedChange = {
+                        viewModel.pinCodeExpanded = it
+                        viewModel.filterPinList.clear()
+                    },
+                    selectedText = viewModel.pincodeA.value,
+                    onTextChanged = {
+                        if (it.length <= 6)
+                            viewModel.pincodeA.value = it
+                        if (it.length >= 3)
+                            viewModel.onEvent(AddressEvents.SearchPin(it))
+                    },
                     keyboardType = KeyboardType.Phone,
-                     modifier = Modifier
-                         .fillMaxWidth()
-                         .padding(end = LowSpacing)
-                         .weight(1f),
-                 )
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(end = LowSpacing)
+                        .weight(1f),
+                )
 
                 /*Column(
                     modifier = Modifier

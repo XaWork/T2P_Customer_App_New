@@ -224,6 +224,7 @@ fun AppAutoComplete(
             modifier = Modifier.menuAnchor(),
             value = selectedText,
             keyboardType = keyboardType,
+
             onValueChanged = {
                 onTextChanged(it)
             },

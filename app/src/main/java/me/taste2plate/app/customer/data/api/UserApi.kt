@@ -195,7 +195,7 @@ interface UserApi {
         @Field("coupon") coupon: String,
         @Field("userid") userid: String,
         @Field("customer_city") cityId: String,
-        @Field("1") zipCode: String,
+        @Field("customer_zip") zipCode: String,
     ): ApplyCouponModel
 
 

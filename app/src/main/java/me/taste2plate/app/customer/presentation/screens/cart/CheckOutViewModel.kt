@@ -350,7 +350,7 @@ class CheckOutViewModel @Inject constructor(
         state.applyCouponResponse!!.run {
             price = cartprice.toDouble()
             packagingFee = total_packing_price.toDouble()
-            couponDiscount = coupon_discount.toDouble()
+            couponDiscount = coupon_discount.toString().toDecimal()
 
             when (state.deliveryType) {
                 DeliveryType.Express -> {
@@ -797,7 +797,6 @@ class CheckOutViewModel @Inject constructor(
                 gateWay = "Online",
                 orderId = state.checkoutModel!!.orderId,
                 transactionId = "",
-                //context = context
             )
         } catch (e: Exception) {
             state = state.copy(isError = true, errorMessage = "Error in payment: " + e.message)
