@@ -120,7 +120,7 @@ fun HomeScreen(
     BackHandler {
         if (doubleBackToExitPressedOnce) {
             navigateBack()
-        }else{
+        } else {
             showToast("Please click BACK again to exit")
             doubleBackToExitPressedOnce = true
         }
@@ -128,19 +128,20 @@ fun HomeScreen(
 
     //observe state
     LaunchedEffect(state) {
-        when {
-            !state.cartError && state.message != null && state.addToWishlistResponse != null || !state.cartError && state.message != null && state.addToCartResponse != null -> {
-                showToast(message = state.message)
-                viewModel.onEvent(HomeEvent.UpdateState(changeAddToWishlistResponse = true))
-            }
-
-            state.cartError -> {
-                showSettingDialog = true
-            }
-
-            state.noAddressFound ->{
-                onNavigateToAddAddressScreen()
-            }
+        if (!state.cartError && state.message != null &&
+            state.addToWishlistResponse != null ||
+            !state.cartError && state.message != null &&
+            state.addToCartResponse != null
+        ) {
+            showToast(message = state.message)
+            viewModel.onEvent(HomeEvent.UpdateState(changeAddToWishlistResponse = true))
+        }
+        if (state.cartError) {
+            showSettingDialog = true
+        }
+        if (state.noAddressFound) {
+            showToast(message = "Please add your address")
+            onNavigateToAddAddressScreen()
         }
     }
 
@@ -276,7 +277,8 @@ fun HomeScreen(
                     ) {
                         DrawableImage(
                             modifier = Modifier.size(25.dp),
-                            id = R.drawable.whatsapp_sv)
+                            id = R.drawable.whatsapp_sv
+                        )
 
                         HorizontalSpace(space = VeryLowSpacing)
 

@@ -156,12 +156,12 @@ class AuthViewModel @Inject constructor(
                             loading = false,
                             shouldStartSMSRetrival = false,
                             verifyOTPModel = result.data,
-                            message = if(isError) result.data?.message else null,
+                            message = if (isError) result.data?.message else null,
                             isError = isError,
                         )
 
-
-                       saveUser(result.data!!)
+                        if (!isError)
+                            saveUser(result.data!!)
                     }
 
                     is Resource.Error -> {
@@ -253,8 +253,8 @@ class AuthViewModel @Inject constructor(
     private fun saveUser(verifyOtpModel: VerifyOTPModel, registerSuccess: Boolean = false) {
         viewModelScope.launch {
             userPref.saveUser(verifyOtpModel.data)
-        }
             state = state.copy(loginSuccess = true, registerSuccess = registerSuccess)
+        }
     }
 
 }

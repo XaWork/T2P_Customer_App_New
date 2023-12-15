@@ -1,5 +1,6 @@
 package me.taste2plate.app.customer.presentation.dialog
 
+import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -54,18 +55,27 @@ fun SettingInfoDialog(
 
     if (checkAvailability != null) {
         cut_of_time_first =
-            format.parse(checkAvailability.result.expressCutOfTimeFirst)
+            format.parse(checkAvailability!!.result.expressCutOfTimeFirst)
         cut_of_time_second =
             format.parse(checkAvailability.result.expressCutOfTimeSecond)
         val nightTwelve = format.parse("24:00")
+
+        Log.e(
+            "TAG",
+            "showDialogExpress: $currentTime - $cut_of_time_first - $cut_of_time_second"
+        )
+
         if (currentTime.before(cut_of_time_first)) {
+            Log.e("TAG", "showDialogExpress: less than cut of time first")
             setDate(formatter.format(Date()), checkAvailability.result.timeslotFirst)
         } else if (currentTime > cut_of_time_first && currentTime < cut_of_time_second) {
+            Log.e("TAG", "showDialogExpress: between cut of time first and second")
             calendar.add(Calendar.DAY_OF_MONTH + 1, 1)
             setDate(formatter.format(calendar.time), checkAvailability.result.timeslotSecond)
         } else if (currentTime > cut_of_time_second && currentTime < nightTwelve) {
+            Log.e("TAG", "showDialogExpress: between cut of time second and night twelve")
             calendar.add(Calendar.DAY_OF_MONTH + 1, 1)
-            setDate(formatter.format(Date()), "Night")
+            setDate(formatter.format(calendar.time), "Night")
         }
     }
 

@@ -44,13 +44,18 @@ fun SplashScreen(
 
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU)
         RequestPermissions(permission = listOf(
-            Manifest.permission.POST_NOTIFICATIONS
+            Manifest.permission.POST_NOTIFICATIONS, Manifest.permission.RECEIVE_SMS
         ), permissionStatus = {})
+    else
+        RequestPermissions(permission = listOf(
+            Manifest.permission.RECEIVE_SMS
+        ), permissionStatus = {})
+
 
     LaunchedEffect(state) {
         if (!state.loading) {
             if (state.isLogin && state.user != null) {
-                    onNavigateToHomeScreen()
+                onNavigateToHomeScreen()
             } else
                 onNavigateToOnBoardingScreen()
         }

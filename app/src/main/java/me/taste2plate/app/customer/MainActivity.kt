@@ -23,7 +23,7 @@ import me.taste2plate.app.customer.presentation.screens.splash.SplashScreen
 import me.taste2plate.app.customer.presentation.theme.T2PCustomerAppTheme
 
 @AndroidEntryPoint
-class MainActivity : ComponentActivity(), PaymentResultListener {
+class MainActivity : ComponentActivity(){
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         Checkout.preload(applicationContext)
@@ -37,13 +37,6 @@ class MainActivity : ComponentActivity(), PaymentResultListener {
         }
     }
 
-    override fun onPaymentSuccess(p0: String?) {
-        TODO("Not yet implemented")
-    }
-
-    override fun onPaymentError(p0: Int, p1: String?) {
-        TODO("Not yet implemented")
-    }
 
     private var doubleBackToExitPressedOnce = false
 }

@@ -1,20 +1,11 @@
 package me.taste2plate.app.customer.service
 
-import android.content.BroadcastReceiver
-import android.content.Context
-import android.content.Intent
-import android.os.Bundle
-import android.util.Log
-import com.google.android.gms.auth.api.phone.SmsRetriever
-import com.google.android.gms.auth.api.phone.SmsRetrieverClient
-import com.google.android.gms.common.api.CommonStatusCodes
-import com.google.android.gms.common.api.Status
-
 /**
  * BroadcastReceiver to wait for SMS messages. This can be registered either
  * in the AndroidManifest or at runtime.  Should filter Intents on
  * SmsRetriever.SMS_RETRIEVED_ACTION.
  */
+/*
 class OTPReceiver : BroadcastReceiver() {
     private var otpReceiveListener: OTPReceiveListener? = null
 
@@ -60,4 +51,4 @@ fun startSMSRetrieverClient(context: Context) {
     task.addOnFailureListener { e ->
         Log.e("Atiar OTP Receiver", "startSMSRetrieverClient addOnFailureListener" + e.stackTrace)
     }
-}
+}*/

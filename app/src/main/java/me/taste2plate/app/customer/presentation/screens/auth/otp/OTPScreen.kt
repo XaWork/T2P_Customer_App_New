@@ -1,7 +1,5 @@
 package me.taste2plate.app.customer.presentation.screens.auth.otp
 
-import android.content.Context
-import android.content.IntentFilter
 import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresApi
@@ -14,7 +12,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
@@ -31,8 +28,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.core.content.ContextCompat
-import com.google.android.gms.auth.api.phone.SmsRetriever
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import me.taste2plate.app.customer.presentation.screens.auth.AuthEvents
@@ -52,8 +47,6 @@ import me.taste2plate.app.customer.presentation.widgets.AppTopBar
 import me.taste2plate.app.customer.presentation.widgets.OtpTextField
 import me.taste2plate.app.customer.presentation.widgets.ShowLoading
 import me.taste2plate.app.customer.presentation.widgets.VerticalSpace
-import me.taste2plate.app.customer.service.OTPReceiver
-import me.taste2plate.app.customer.service.startSMSRetrieverClient
 
 /***
  * auto fetch otp vlog : https://www.linkedin.com/pulse/android-automatic-otp-retrieval-jetpackcompose-also-work-talukdar/
@@ -78,20 +71,11 @@ fun OTPScreen(
 
 
     LaunchedEffect(state) {
-        when {
-            state.shouldStartSMSRetrival -> {
-                Log.e("OTP", "SMS Retrieval is Starting...")
-                startSMSRetrieverClient(context)
-            }
-
-            state.loginSuccess-> {
-                Log.e("verify ", state.verifyOTPModel.toString())
-                onNavigateToHomeScreen()
-            }
-        }
+        if(state.loginSuccess)
+            onNavigateToHomeScreen()
     }
 
-    val verificationCode = remember { mutableStateOf("") }
+   /* val verificationCode = remember { mutableStateOf("") }
     LaunchedEffect(1) {
         val myOTPReceiver = OTPReceiver()
 
@@ -119,7 +103,7 @@ fun OTPScreen(
                 Log.e("OTP ", "Timeout")
             }
         })
-    }
+    }*/
 
     if (seconds > 0) {
         LaunchedEffect(Unit) {

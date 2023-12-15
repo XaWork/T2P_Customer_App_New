@@ -141,10 +141,14 @@ class LocationViewModel @Inject constructor(
     var text by mutableStateOf("")
 
     fun getAddress(latLng: LatLng) {
-        currentLatLong = latLng
-        viewModelScope.launch {
-            val address = geoCoder.getFromLocation(latLng.latitude, latLng.longitude, 1)
-            text = address?.get(0)?.getAddressLine(0).toString()
+        try{
+            currentLatLong = latLng
+            viewModelScope.launch {
+                val address = geoCoder.getFromLocation(latLng.latitude, latLng.longitude, 1)
+                text = address?.get(0)?.getAddressLine(0).toString()
+            }
+        }catch (e: Exception){
+            Log.e("Error", e.printStackTrace().toString())
         }
     }
 }

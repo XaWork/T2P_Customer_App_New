@@ -235,7 +235,6 @@ interface UserApi {
         @Field("browser") browser: String,
     ): CheckoutModel
 
-
     @FormUrlEncoded
     @POST("checkout-confirm")
     suspend fun confirmOrder(

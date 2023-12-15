@@ -61,11 +61,11 @@ fun CartScreen(
     val state = viewModel.state
 
     LaunchedEffect(state) {
-        if (state.isError || state.normalMessage != null) {
+        if (state.isError && (state.normalMessage != null || state.errorMessage != null)) {
             showToast(
-                message = if (state.isError)
-                    state.errorMessage!!
-                else state.normalMessage!!
+                message = if (state.isError && state.errorMessage != null)
+                    state.errorMessage
+                else state.normalMessage ?: ""
             )
 
             viewModel.onEvent(CheckoutEvents.UpdateState)
@@ -195,7 +195,10 @@ fun SingleCartAndWishlistItem(
                         updateCart(quantity)
                     }
 
-                Text(text = "${rupeeSign}${item.price!!.toInt() * item.quantity!!}", fontSize = fontSize)
+                Text(
+                    text = "${rupeeSign}${item.price!!.toInt() * item.quantity!!}",
+                    fontSize = fontSize
+                )
             }
             SpaceBetweenRow(items = innerItems)
         }

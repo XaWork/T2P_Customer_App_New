@@ -466,7 +466,6 @@ class CheckOutViewModel @Inject constructor(
                             minOrder = pointSettings.pointRedeemMinimumOrderValue
                             maxOrder = pointSettings.pointRedeemMaximumOrderValue
                             walletPoint = pointSettings.maxRedeemPointPerOrder
-
                         }
                     }
 
@@ -579,12 +578,14 @@ class CheckOutViewModel @Inject constructor(
     private fun setPrice() {
         if (state.cart != null && state.cart!!.result.isNotEmpty())
             state.cart!!.apply {
+                youSave = 0.0
                 this.result.forEach {
                     val sellingPrice = it.product.sellingPrice
                     if (!sellingPrice.isNullOrEmpty()) {
                         youSave += it.product.price.toFloat() - sellingPrice.toFloat()
                     }
                 }
+                youSave *= result[0].quantity
 
                 price = cartprice.toDouble()
                 deliveryCharge =

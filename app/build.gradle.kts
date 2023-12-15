@@ -17,8 +17,8 @@ android {
         applicationId = "me.taste2plate.app.customer"
         minSdk = 24
         targetSdk = 34
-        versionCode = 192
-        versionName = "3.1"
+        versionCode = 194
+        versionName = "3.4"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
@@ -79,7 +79,6 @@ dependencies {
     debugImplementation("androidx.compose.ui:ui-test-manifest")
 
     //UI
-    implementation("me.onebone:toolbar-compose:2.3.5")
     implementation("io.coil-kt:coil-compose:2.4.0")
 
     //navigation destination
