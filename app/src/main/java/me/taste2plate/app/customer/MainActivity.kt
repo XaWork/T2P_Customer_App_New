@@ -3,6 +3,7 @@ package me.taste2plate.app.customer
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.util.Log
 import android.widget.Toast
 import android.window.OnBackInvokedDispatcher
 import androidx.activity.ComponentActivity
@@ -23,12 +24,12 @@ import me.taste2plate.app.customer.presentation.screens.splash.SplashScreen
 import me.taste2plate.app.customer.presentation.theme.T2PCustomerAppTheme
 
 @AndroidEntryPoint
-class MainActivity : ComponentActivity(){
+class MainActivity : ComponentActivity(), PaymentResultListener {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         Checkout.preload(applicationContext)
         val co = Checkout()
-        co.setKeyID("rzp_live_ZLgzjgdHBJDlP8")
+        co.setKeyID("rzp_test_2wlA7A5Vpf1BDo")
 
         setContent {
             T2PCustomerAppTheme {
@@ -37,6 +38,22 @@ class MainActivity : ComponentActivity(){
         }
     }
 
+    lateinit var onPayment: RazorpayPaymentSuccess
+    override fun onPaymentSuccess(p0: String?) {
+        Log.e("Payment", "Payment success $p0")
+        onPayment.onPaymentSuccess(p0)
+    }
 
-    private var doubleBackToExitPressedOnce = false
+    override fun onPaymentError(p0: Int, p1: String?) {
+        Log.e("Payment", "Payment error $p0\n$p1")
+    }
+
+
+    interface RazorpayPaymentSuccess {
+        fun onPaymentSuccess(p0: String?)
+    }
+
+    fun setRazorpayPaymentSuccess(onSuccess: RazorpayPaymentSuccess) {
+        this.onPayment = onSuccess
+    }
 }

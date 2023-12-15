@@ -12,6 +12,7 @@ import androidx.lifecycle.viewModelScope
 import com.razorpay.Checkout
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
+import me.taste2plate.app.customer.MainActivity
 import me.taste2plate.app.customer.T2PApp
 import me.taste2plate.app.customer.data.Resource
 import me.taste2plate.app.customer.data.Status
@@ -772,10 +773,10 @@ class CheckOutViewModel @Inject constructor(
     }
 
     private fun startPayment(context: Context, price: Double) {
-
+        var activity: MainActivity = context as MainActivity
         Checkout.preload(T2PApp.applicationContext())
         val co = Checkout()
-        co.setKeyID("rzp_live_ZLgzjgdHBJDlP8")
+        co.setKeyID("rzp_test_2wlA7A5Vpf1BDo")
 
         try {
             val options = JSONObject();
@@ -790,14 +791,18 @@ class CheckOutViewModel @Inject constructor(
             preFill.put("email", user.email)
             preFill.put("contact", address.contactMobile)
             options.put("prefill", preFill)
-            val activity: Activity = context as Activity
             co.open(activity, options)
-            Log.e("Payment", "Payment successful")
-            confirmOrder(
-                gateWay = "Online",
-                orderId = state.checkoutModel!!.orderId,
-                transactionId = "",
-            )
+
+            activity.setRazorpayPaymentSuccess(object:MainActivity.RazorpayPaymentSuccess{
+                override fun onPaymentSuccess(p0: String?) {
+                    Log.e("Payment", "Payment success in viewModel $p0")
+                    confirmOrder(
+                        gateWay = "Online",
+                        orderId = state.checkoutModel!!.orderId,
+                        transactionId = p0!!,
+                    )
+                }
+            })
         } catch (e: Exception) {
             state = state.copy(isError = true, errorMessage = "Error in payment: " + e.message)
             Log.e("Payment", "Error in payment")

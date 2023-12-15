@@ -44,9 +44,14 @@
             android:name="com.google.android.geo.API_KEY"
             android:value="AIzaSyBbpYO8zLmSh0-c5_MDiyPiQnMCl4Jc6ko" />
 
+<!-- key_id
+        rzp_test_2wlA7A5Vpf1BDo
+        key_secret
+        CVAMy4l7EJ0jbpks9mMwOx8b-->
+
         <meta-data
             android:name="com.razorpay.ApiKey"
-            android:value="rzp_live_ZLgzjgdHBJDlP8" />
+            android:value="rzp_test_2wlA7A5Vpf1BDo" />
 
         <receiver
             android:name="com.razorpay.RzpTokenReceiver"
