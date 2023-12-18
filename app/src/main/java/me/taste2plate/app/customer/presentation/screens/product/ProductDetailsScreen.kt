@@ -48,6 +48,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
@@ -66,7 +67,6 @@ import me.taste2plate.app.customer.presentation.screens.product.list.ProductEven
 import me.taste2plate.app.customer.presentation.screens.product.list.ProductListState
 import me.taste2plate.app.customer.presentation.theme.ExtraLowElevation
 import me.taste2plate.app.customer.presentation.theme.LowPadding
-import me.taste2plate.app.customer.presentation.theme.LowRoundedCorners
 import me.taste2plate.app.customer.presentation.theme.MediumPadding
 import me.taste2plate.app.customer.presentation.theme.MediumRoundedCorners
 import me.taste2plate.app.customer.presentation.theme.ScreenPadding
@@ -94,7 +94,6 @@ import me.taste2plate.app.customer.presentation.widgets.NetworkImage
 import me.taste2plate.app.customer.presentation.widgets.RoundedCornerCard
 import me.taste2plate.app.customer.presentation.widgets.ShowLoading
 import me.taste2plate.app.customer.presentation.widgets.SpaceBetweenRow
-import me.taste2plate.app.customer.presentation.widgets.TextInCircle
 import me.taste2plate.app.customer.presentation.widgets.VerticalSpace
 import me.taste2plate.app.customer.presentation.widgets.showToast
 import me.taste2plate.app.customer.utils.fromHtml
@@ -110,6 +109,7 @@ fun ProductDetailsScreen(
 ) {
 
     val state = viewModel.state
+    val context = LocalContext.current
 
     var showSettingDialog by remember {
         mutableStateOf(false)
@@ -197,7 +197,8 @@ fun ProductDetailsScreen(
                                 viewModel.onEvent(
                                     ProductEvents.UpdateCart(
                                         quantity = it,
-                                        productId = state.productDetails.result[0].id
+                                        productId = state.productDetails.result[0].id,
+                                        context = context
                                     )
                                 )
                             },
@@ -332,7 +333,7 @@ fun ProductDetails(
 
             val items = listOf<@Composable RowScope.() -> Unit> {
                 Text(
-                    text = details.name,
+                    text = details.name ?: "",
                     maxLines = 5,
                     fontWeight = FontWeight.W500,
                     modifier = Modifier
@@ -348,7 +349,7 @@ fun ProductDetails(
                         cartItemLength = it.quantity
                 }
 
-                if (state.addToCartEnable)
+                if (cartData != null &&state.addToCartEnable)
                     CartAddRemove(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -481,7 +482,7 @@ fun ProductImages(
             SaleBanner(modifier = Modifier.align(Alignment.TopStart))
 
         val alreadyWishListed =
-            if (state.wishListData!!.result.isEmpty()) false
+            if (state.wishListData!!.result == null ||state.wishListData.result.isEmpty()) false
             else state.wishListData.result.any { it.product.id == details.id }
 
         CircleIconButton(

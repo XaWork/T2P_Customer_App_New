@@ -26,6 +26,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -66,6 +67,7 @@ fun MostOrderedItemList(
     viewModel: HomeViewModel
 ) {
     val state = viewModel.state
+    val context = LocalContext.current
     val foodItems = state.homeData!!.mostOrderdItem
     val wishlistItems = state.wishListData!!.result
 
@@ -101,7 +103,7 @@ fun MostOrderedItemList(
             state = pagerState,
         ) { page ->
             val wishlistIdList: List<String> =
-                if (wishlistItems.isNotEmpty()) wishlistItems.map { it.product.id }
+                if (wishlistItems != null && wishlistItems.isNotEmpty()) wishlistItems.map { it.product.id }
                     .toList() else emptyList()
 
             val alreadyInWishlist =
@@ -127,7 +129,7 @@ fun MostOrderedItemList(
                     viewModel.onEvent(HomeEvent.AddToWishlist(foodItems[page].id))
                 },
                 updateCart = {
-                    viewModel.onEvent(HomeEvent.UpdateCart(it, foodItems[page].id))
+                    viewModel.onEvent(HomeEvent.UpdateCart(context,it, foodItems[page].id))
                 }
             )
         }

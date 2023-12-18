@@ -1,11 +1,15 @@
 package me.taste2plate.app.customer.presentation.screens.product
 
+import android.content.Context
+import android.os.Bundle
 import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.facebook.appevents.AppEventsConstants
+import com.facebook.appevents.AppEventsLogger
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import me.taste2plate.app.customer.T2PApp
@@ -121,7 +125,7 @@ class ProductViewModel @Inject constructor(
                         deleteCart(event.productId)
                     }
 
-                    state.cartData != null && state.cartData!!.result.isNotEmpty() -> {
+                    state.cartData != null && state.cartData!!.result != null && state.cartData!!.result.isNotEmpty() -> {
                         var itemInCart = false
                         state.cartData!!.result.forEach {
                             if (it.product.id == event.productId)
@@ -129,14 +133,18 @@ class ProductViewModel @Inject constructor(
                         }
 
                         if (itemInCart) {
-                            updateCart(productId = event.productId, quantity = event.quantity)
+                            updateCart(
+                                productId = event.productId,
+                                quantity = event.quantity,
+                                event.context
+                            )
                         } else {
-                            addToCart(event.productId)
+                            addToCart(event.productId, event.context)
                         }
                     }
 
                     else -> {
-                        addToCart(event.productId)
+                        addToCart(event.productId, event.context)
                     }
                 }
             }
@@ -401,7 +409,8 @@ class ProductViewModel @Inject constructor(
                     }
 
                     is Resource.Success -> {
-                        T2PApp.cartCount = result.data!!.result.size
+                        if (result.data?.status == Status.success.name)
+                            T2PApp.cartCount = result.data.result.size
                         state =
                             state.copy(
                                 isLoading = false,
@@ -428,7 +437,8 @@ class ProductViewModel @Inject constructor(
 
     private fun updateCart(
         productId: String,
-        quantity: Int
+        quantity: Int,
+        context: Context
     ) {
         viewModelScope.launch {
             updateCartUseCase.execute(
@@ -439,6 +449,9 @@ class ProductViewModel @Inject constructor(
                     is Resource.Success -> {
                         val data = result.data
                         val isError = data?.status == Status.error.name
+
+                        if (!isError)
+                            addAppEvent(context, productId, quantity)
                         getCart()
 
                         state.copy(
@@ -493,7 +506,7 @@ class ProductViewModel @Inject constructor(
     }
 
 
-    private fun addToCart(productId: String) {
+    private fun addToCart(productId: String, context: Context) {
         viewModelScope.launch {
             addToCartUseCase.execute(
                 productId
@@ -505,6 +518,9 @@ class ProductViewModel @Inject constructor(
                     is Resource.Success -> {
                         getCart()
                         val isError = result.data?.status == Status.error.name
+
+                        if (!isError)
+                            addAppEvent(context, productId, 1)
                         state =
                             state.copy(
                                 message = result.data?.message,
@@ -592,5 +608,20 @@ class ProductViewModel @Inject constructor(
         }
     }
 
+    private fun addAppEvent(context: Context, productId: String, quantity: Int) {
+        //facebbook
+        val logger = AppEventsLogger.newLogger(context)
+        val params = Bundle()
+
+        params.putString(AppEventsConstants.EVENT_PARAM_CURRENCY, "INR");
+        params.putString(AppEventsConstants.EVENT_PARAM_CONTENT_TYPE, "product");
+        params.putString(AppEventsConstants.EVENT_PARAM_CONTENT_ID, productId);
+        params.putString(AppEventsConstants.EVENT_PARAM_NUM_ITEMS, quantity.toString());
+
+        logger.logEvent(
+            AppEventsConstants.EVENT_NAME_ADDED_TO_CART,
+            params
+        )
+    }
 
 }

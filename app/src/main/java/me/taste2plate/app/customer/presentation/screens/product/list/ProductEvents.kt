@@ -1,5 +1,6 @@
 package me.taste2plate.app.customer.presentation.screens.product.list
 
+import android.content.Context
 import me.taste2plate.app.customer.domain.mapper.CommonForItem
 import me.taste2plate.app.customer.presentation.screens.home.HomeEvent
 
@@ -14,6 +15,7 @@ sealed class ProductEvents {
     data class PostReview(val rating: Float, val review: String): ProductEvents()
 
     data class UpdateCart(
+        val context: Context,
         val quantity: Int,
         val productId: String,
     ) : ProductEvents()

@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.res.Configuration
 import android.net.Uri
+import android.util.Log
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -47,6 +48,7 @@ import me.taste2plate.app.customer.domain.mapper.CommonForItem
 import me.taste2plate.app.customer.domain.model.SettingsModel
 import me.taste2plate.app.customer.domain.model.auth.User
 import me.taste2plate.app.customer.domain.use_case.product.ProductBy
+import me.taste2plate.app.customer.presentation.dialog.CustomDialog
 import me.taste2plate.app.customer.presentation.dialog.SettingDialogType
 import me.taste2plate.app.customer.presentation.dialog.SettingInfoDialog
 import me.taste2plate.app.customer.presentation.screens.address.AddressBottomSheet
@@ -62,10 +64,6 @@ import me.taste2plate.app.customer.presentation.screens.home.widgets.SingleFeatu
 import me.taste2plate.app.customer.presentation.screens.home.widgets.TopBrands
 import me.taste2plate.app.customer.presentation.screens.home.widgets.TopList
 import me.taste2plate.app.customer.presentation.screens.home.widgets.TopOrderedFoodCityList
-import me.taste2plate.app.customer.presentation.theme.HighRoundedCorners
-import me.taste2plate.app.customer.presentation.theme.LowPadding
-import me.taste2plate.app.customer.presentation.theme.LowSpacing
-import me.taste2plate.app.customer.presentation.theme.MediumPadding
 import me.taste2plate.app.customer.presentation.theme.T2PCustomerAppTheme
 import me.taste2plate.app.customer.presentation.theme.VeryLowSpacing
 import me.taste2plate.app.customer.presentation.theme.screenBackgroundColor
@@ -98,8 +96,22 @@ fun HomeScreen(
     onNavigateLogoutScreen: () -> Unit,
     viewModel: HomeViewModel = hiltViewModel()
 ) {
+    val context = LocalContext.current
     val state = viewModel.state
 
+    val scrollState = rememberLazyListState()
+
+    val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
+
+    //bottom sheet
+    val scope = rememberCoroutineScope()
+    var showBottomSheet by remember { mutableStateOf(false) }
+    val sheetState = rememberModalBottomSheetState()
+
+
+    var showCustomDialog by remember {
+        mutableStateOf(false)
+    }
     var showSettingDialog by remember {
         mutableStateOf(false)
     }
@@ -143,21 +155,29 @@ fun HomeScreen(
             showToast(message = "Please add your address")
             onNavigateToAddAddressScreen()
         }
+        //check app version
+        if (state.setting != null) {
+            if (!appUpToDate(context, state.setting)) {
+                showCustomDialog = true
+            }
+        }
+    }
+
+    if (showCustomDialog) {
+        CustomDialog(
+            title = "Update App",
+            text = "Please update your app to get new features.",
+            confirmButtonText = "Update",
+            dismissAllowed = false
+        ) {
+            //showCustomDialog = false
+            moveToPlayStore(context)
+        }
     }
 
     LaunchedEffect(Unit) {
         viewModel.onEvent(HomeEvent.GetWishlist)
     }
-
-    val context = LocalContext.current
-    val scrollState = rememberLazyListState()
-
-    val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
-
-    //bottom sheet
-    val scope = rememberCoroutineScope()
-    var showBottomSheet by remember { mutableStateOf(false) }
-    val sheetState = rememberModalBottomSheetState()
 
     if (showBottomSheet) {
         ModalBottomSheet(
@@ -398,7 +418,7 @@ fun HomeScreen(
                                         viewModel.onEvent(HomeEvent.AddToWishlist(product.id))
                                     },
                                     updateCart = {
-                                        viewModel.onEvent(HomeEvent.UpdateCart(it, product.id))
+                                        viewModel.onEvent(HomeEvent.UpdateCart(context, it, product.id))
                                     }
                                 )
                             }
@@ -430,6 +450,39 @@ fun rateApp(context: Context) {
         )
     }
 }
+
+private fun appUpToDate(context: Context, state: SettingsModel.Result): Boolean {
+    val storedVersion = state.customerAndroidVersion
+    val packageManager = context.packageManager
+    val packageInfo = packageManager.getPackageInfo(context.packageName, 0)
+    val currentVersion = packageInfo.versionName
+    Log.e(
+        "version",
+        "Current App Version : $currentVersion\nStored App version : $storedVersion"
+    )
+    return storedVersion == currentVersion
+}
+
+
+private fun moveToPlayStore(context: Context) {
+    val appPackageName = context.packageName
+    try {
+        context.startActivity(
+            Intent(
+                Intent.ACTION_VIEW,
+                Uri.parse("market://details?id=$appPackageName")
+            )
+        )
+    } catch (anfe: ActivityNotFoundException) {
+        context.startActivity(
+            Intent(
+                Intent.ACTION_VIEW,
+                Uri.parse("https://play.google.com/store/apps/details?id=$appPackageName")
+            )
+        )
+    }
+}
+
 
 fun referAndEarn(context: Context, setting: SettingsModel.Result, user: User) {
     val pointSettings = setting.point

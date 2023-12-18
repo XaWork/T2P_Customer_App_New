@@ -40,6 +40,4 @@ interface AnalyticsApi {
         @Query("type") type: String = "checkout",
     ): Call<TrackerResponse>
 
-    @GET("/?format=json")
-    fun getIpAddress(): IpAddressResponse
 }

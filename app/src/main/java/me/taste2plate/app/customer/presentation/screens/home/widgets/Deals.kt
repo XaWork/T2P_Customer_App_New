@@ -15,6 +15,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import me.taste2plate.app.customer.R
@@ -43,6 +44,7 @@ fun Deals(
 ) {
 
     val state = viewModel.state
+    val context = LocalContext.current
     val deals = state.homeData!!.productDeal
     val wishlistItems = state.wishListData!!.result
 
@@ -77,7 +79,7 @@ fun Deals(
                     state.foodItemUpdateInfo
                 else null,
                 updateCart = {
-                    viewModel.onEvent(HomeEvent.UpdateCart(it, deal.id))
+                    viewModel.onEvent(HomeEvent.UpdateCart(context, it, deal.id))
                 },
                 addToWishlist = {
                     viewModel.onEvent(HomeEvent.AddToWishlist(deal.id))

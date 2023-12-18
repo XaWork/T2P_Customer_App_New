@@ -31,6 +31,8 @@ class UserPref @Inject constructor(
         private val KEY_TASTE = stringPreferencesKey("taste")
         private val KEY_IS_LOGIN = booleanPreferencesKey("isLogin")
         private val KEY_IP = stringPreferencesKey("ip")
+        private val KEY_REFERRAL_ID = stringPreferencesKey("referralId")
+        private val KEY_REFERRAL_TOKEN = stringPreferencesKey("referralToken")
     }
 
     private val dataStore: DataStore<Preferences> = context.dataStore
@@ -102,6 +104,19 @@ class UserPref @Inject constructor(
         return value.first() ?: ""
     }
 
+    suspend fun saveReferralInfo(id: String, token: String){
+        dataStore.edit { preferences ->
+            preferences[KEY_REFERRAL_ID] = id
+            preferences[KEY_REFERRAL_TOKEN] = token
+        }
+    }
+
+    suspend fun getReferralInfo(): String{
+        val value = dataStore.data.map { preferences ->
+            preferences[KEY_IP]
+        }
+        return value.first() ?: ""
+    }
 
     //=====================> User <=================
     suspend fun saveUser(user: User) {

@@ -32,7 +32,8 @@ sealed class CheckoutEvents {
 
     data class UpdateCart(
         val productId: String,
-        val quantity: Int
+        val quantity: Int,
+        val context: Context
     ) : CheckoutEvents()
 
     data class UpdateTip(val index: Int, val otherTipPrice: Int = 0) : CheckoutEvents()

@@ -14,9 +14,10 @@ import me.taste2plate.app.customer.presentation.theme.screenBackgroundColor
 fun CustomDialog(
     title: String,
     text: String,
+    dismissAllowed: Boolean = true,
     confirmButtonText: String = "Ok",
     dismissButtonText: String = "",
-    onDismiss:() -> Unit  = {},
+    onDismiss: () -> Unit = {},
     onConfirmation: () -> Unit,
 ) {
     AlertDialog(
@@ -30,7 +31,8 @@ fun CustomDialog(
             )
         },
         onDismissRequest = {
-            onConfirmation()
+            if (dismissAllowed)
+                onConfirmation()
         },
         confirmButton = {
             TextButton(

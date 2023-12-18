@@ -33,10 +33,6 @@ fun SplashScreen(
     viewModel: SplashViewModel = hiltViewModel()
 ) {
     val state = viewModel.state
-    val context = LocalContext.current
-    val appUpToDate by remember {
-        mutableStateOf(true)
-    }
 
     /*val appSignatureHelper = AppSignatureHelper(context)
     Log.e("Atiar OTP Hashkey: ", "key: ${appSignatureHelper.appSignatures}")*/
@@ -56,54 +52,20 @@ fun SplashScreen(
         if (!state.loading) {
             if (state.isLogin && state.user != null) {
                 onNavigateToHomeScreen()
-            } else
+            } else{
                 onNavigateToOnBoardingScreen()
+            }
         }
     }
 
-    if (appUpToDate)
-        AppScaffold(
-            paddingValues = PaddingValues(0.dp)
-        ) {
-            Image(
-                modifier = Modifier.fillMaxSize(),
-                painter = painterResource(id = R.drawable.splash_background),
-                contentDescription = "",
-                contentScale = ContentScale.Crop
-            )
-        }
-    else
-        UpdateAppScreen {
-            moveToPlayStore(context)
-        }
-}
-
-private fun appUpToDate(context: Context, state: SplashState): Boolean {
-    val version = state.settings!!.result.customerAndroidVersion
-    val packageManager = context.packageManager
-    val packageInfo = packageManager.getPackageInfo(context.packageName, 0)
-    Log.e(
-        "version",
-        "Current App Version : ${packageInfo.versionName}\nStored App version : $version"
-    )
-    return true
-}
-
-private fun moveToPlayStore(context: Context) {
-    val appPackageName = context.packageName
-    try {
-        context.startActivity(
-            Intent(
-                Intent.ACTION_VIEW,
-                Uri.parse("market://details?id=$appPackageName")
-            )
-        )
-    } catch (anfe: android.content.ActivityNotFoundException) {
-        context.startActivity(
-            Intent(
-                Intent.ACTION_VIEW,
-                Uri.parse("https://play.google.com/store/apps/details?id=$appPackageName")
-            )
+    AppScaffold(
+        paddingValues = PaddingValues(0.dp)
+    ) {
+        Image(
+            modifier = Modifier.fillMaxSize(),
+            painter = painterResource(id = R.drawable.splash_background),
+            contentDescription = "",
+            contentScale = ContentScale.Crop
         )
     }
 }

@@ -29,7 +29,7 @@ class MainActivity : ComponentActivity(), PaymentResultListener {
         super.onCreate(savedInstanceState)
         Checkout.preload(applicationContext)
         val co = Checkout()
-        co.setKeyID("rzp_test_2wlA7A5Vpf1BDo")
+        co.setKeyID("rzp_live_ZLgzjgdHBJDlP8")
 
         setContent {
             T2PCustomerAppTheme {

@@ -380,7 +380,7 @@ fun CheckoutScreen(
                 viewModel.onEvent(CheckoutEvents.Checkout(context))
             },
             updateCart = { id, quantity ->
-                viewModel.onEvent(CheckoutEvents.UpdateCart(id, quantity))
+                viewModel.onEvent(CheckoutEvents.UpdateCart(id, quantity, context))
             },
             showOtherTipDialog = {
                 showOtherTipDialog = true

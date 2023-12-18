@@ -1,7 +1,7 @@
 package me.taste2plate.app.customer.presentation.screens.cart
 
-import android.app.Activity
 import android.content.Context
+import android.os.Bundle
 import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableDoubleStateOf
@@ -9,6 +9,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.facebook.appevents.AppEventsConstants
+import com.facebook.appevents.AppEventsLogger
 import com.razorpay.Checkout
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
@@ -34,6 +36,7 @@ import me.taste2plate.app.customer.presentation.screens.checkout.DeliveryType
 import me.taste2plate.app.customer.presentation.screens.checkout.PaymentType
 import me.taste2plate.app.customer.utils.toDecimal
 import org.json.JSONObject
+import java.util.Currency
 import javax.inject.Inject
 
 @HiltViewModel
@@ -189,7 +192,8 @@ class CheckOutViewModel @Inject constructor(
                 if (event.quantity > 0)
                     updateCart(
                         event.productId,
-                        event.quantity
+                        event.quantity,
+                        event.context
                     )
                 else
                     deleteCart(event.productId)
@@ -448,7 +452,7 @@ class CheckOutViewModel @Inject constructor(
 
     private fun checkWalletDiscountValidation(): Boolean {
         val priceProduct = state.cart!!.cartprice
-        return !(priceProduct.toDouble() < 990 || priceProduct.toDouble() > 15000)
+        return !(priceProduct.toDouble() < 900 || priceProduct.toDouble() > 15000)
     }
 
     private fun walletDiscountInfo() {
@@ -491,7 +495,11 @@ class CheckOutViewModel @Inject constructor(
                     is Resource.Loading -> state = state.copy(isLoading = isLoading)
                     is Resource.Success -> {
                         val data = result.data
-                        T2PApp.cartCount = if (data!!.result.isEmpty()) 0 else data.result.size
+                        val isError = data!!.status == Status.error.name
+
+                        T2PApp.cartCount =
+                            if (isError || data.result.isEmpty()) 0 else data.result.size
+
                         state = state.copy(
                             isLoading = false,
                             cart = data
@@ -517,15 +525,8 @@ class CheckOutViewModel @Inject constructor(
         gateWay: String,
         orderId: String,
         transactionId: String,
-        // context: Context
+        context: Context
     ) {
-        /* //added in application for conversion
-         val bundle = Bundle()
-         val mFirebaseAnalytics = FirebaseAnalytics.getInstance(context)
-         bundle.putString(FirebaseAnalytics.Param.COUPON, appliedCoupon)
-         bundle.putString(FirebaseAnalytics.Param.CURRENCY, "INR")
-         bundle.putString(FirebaseAnalytics.Param.PAYMENT_TYPE, gateWay)
-         mFirebaseAnalytics.logEvent(FirebaseAnalytics.Event.ADD_PAYMENT_INFO, bundle)*/
 
         viewModelScope.launch {
             orderConfirmUseCase.execute(
@@ -545,13 +546,13 @@ class CheckOutViewModel @Inject constructor(
                             errorMessage = if (isError) data.message else null
                         )
 
+
+
                         if (!isError) {
-                            /*val bundle1 = Bundle()
-                            bundle1.putString(FirebaseAnalytics.Param.AFFILIATION, "affiliation")
-                            bundle1.putString(FirebaseAnalytics.Param.COUPON, appliedCoupon)
-                            bundle1.putString(FirebaseAnalytics.Param.CURRENCY, "INR")
-                            bundle1.putString(FirebaseAnalytics.Param.TRANSACTION_ID, transactionId)
-                            mFirebaseAnalytics.logEvent(FirebaseAnalytics.Event.PURCHASE, bundle)*/
+                            logPurchasedEvent(
+                                state.cart!!.result[0].quantity, state.cart!!.result[0].product.id,
+                                state.cart!!.finalPrice.toDouble(), context
+                            )
 
                             state = state.copy(
                                 isError = true,
@@ -575,6 +576,26 @@ class CheckOutViewModel @Inject constructor(
             }
         }
     }
+
+    private fun logPurchasedEvent(
+        numItems: Int,
+        contentId: String?,
+        price: Double,
+        context: Context
+    ) {
+        Log.e(
+            "facebook",
+            "Facebook log purchase event \nnumItems: $numItems, contentId: $contentId, price: $price"
+        )
+        val logger = AppEventsLogger.newLogger(context)
+        val params = Bundle()
+        params.putInt(AppEventsConstants.EVENT_PARAM_NUM_ITEMS, numItems)
+        params.putString(AppEventsConstants.EVENT_PARAM_CONTENT_TYPE, "product")
+        params.putString(AppEventsConstants.EVENT_PARAM_CONTENT_ID, contentId)
+        params.putString(AppEventsConstants.EVENT_PARAM_CURRENCY, "INR")
+        logger.logPurchase(price.toBigDecimal(), Currency.getInstance("INR"), params)
+    }
+
 
     private fun setPrice() {
         if (state.cart != null && state.cart!!.result.isNotEmpty())
@@ -753,7 +774,7 @@ class CheckOutViewModel @Inject constructor(
                                     gateWay = "COD",
                                     orderId = state.checkoutModel!!.orderId,
                                     transactionId = "",
-                                    //context = context
+                                    context = context
                                 )
                             }
                         }
@@ -773,10 +794,10 @@ class CheckOutViewModel @Inject constructor(
     }
 
     private fun startPayment(context: Context, price: Double) {
-        var activity: MainActivity = context as MainActivity
+        val activity: MainActivity = context as MainActivity
         Checkout.preload(T2PApp.applicationContext())
         val co = Checkout()
-        co.setKeyID("rzp_test_2wlA7A5Vpf1BDo")
+        co.setKeyID("rzp_live_ZLgzjgdHBJDlP8")
 
         try {
             val options = JSONObject();
@@ -793,13 +814,14 @@ class CheckOutViewModel @Inject constructor(
             options.put("prefill", preFill)
             co.open(activity, options)
 
-            activity.setRazorpayPaymentSuccess(object:MainActivity.RazorpayPaymentSuccess{
+            activity.setRazorpayPaymentSuccess(object : MainActivity.RazorpayPaymentSuccess {
                 override fun onPaymentSuccess(p0: String?) {
                     Log.e("Payment", "Payment success in viewModel $p0")
                     confirmOrder(
                         gateWay = "Online",
                         orderId = state.checkoutModel!!.orderId,
                         transactionId = p0!!,
+                        context
                     )
                 }
             })
@@ -838,7 +860,8 @@ class CheckOutViewModel @Inject constructor(
 
     private fun updateCart(
         productId: String,
-        quantity: Int
+        quantity: Int,
+        context: Context
     ) {
         viewModelScope.launch {
             updateCartUseCase.execute(
@@ -850,8 +873,10 @@ class CheckOutViewModel @Inject constructor(
                         val data = result.data
                         val isError = data?.status == Status.error.name
 
-                        if (!isError)
+                        if (!isError) {
+                            addAppEvent(context, productId, quantity)
                             getCart(isLoading = false)
+                        }
 
                         state.copy(
                             isLoading = false,
@@ -873,6 +898,22 @@ class CheckOutViewModel @Inject constructor(
 
             }
         }
+    }
+
+    private fun addAppEvent(context: Context, productId: String, quantity: Int) {
+        //facebbook
+        val logger = AppEventsLogger.newLogger(context)
+        val params = Bundle()
+
+        params.putString(AppEventsConstants.EVENT_PARAM_CURRENCY, "INR");
+        params.putString(AppEventsConstants.EVENT_PARAM_CONTENT_TYPE, "product");
+        params.putString(AppEventsConstants.EVENT_PARAM_CONTENT_ID, productId);
+        params.putString(AppEventsConstants.EVENT_PARAM_NUM_ITEMS, quantity.toString());
+
+        logger.logEvent(
+            AppEventsConstants.EVENT_NAME_ADDED_TO_CART,
+            params
+        )
     }
 
     private fun calculateCheckoutDistance() {

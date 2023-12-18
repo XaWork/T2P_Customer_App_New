@@ -51,7 +51,7 @@
 
         <meta-data
             android:name="com.razorpay.ApiKey"
-            android:value="rzp_test_2wlA7A5Vpf1BDo" />
+            android:value="rzp_live_ZLgzjgdHBJDlP8" />
 
         <receiver
             android:name="com.razorpay.RzpTokenReceiver"

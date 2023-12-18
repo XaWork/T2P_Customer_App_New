@@ -1,11 +1,15 @@
 package me.taste2plate.app.customer.presentation.screens.home
 
+import android.content.Context
+import android.os.Bundle
 import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.facebook.appevents.AppEventsConstants
+import com.facebook.appevents.AppEventsLogger
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import me.taste2plate.app.customer.T2PApp
@@ -89,7 +93,8 @@ class HomeViewModel @Inject constructor(
                         deleteCart(event.productId)
                     }
 
-                    state.cartData != null && state.cartData!!.result.isNotEmpty() -> {
+                    state.cartData != null && state.cartData!!.result != null && state.cartData!!.result.isNotEmpty()
+                    -> {
                         var itemInCart = false
                         state.cartData!!.result.forEach {
                             if (it.product.id == event.productId)
@@ -97,14 +102,18 @@ class HomeViewModel @Inject constructor(
                         }
 
                         if (itemInCart) {
-                            updateCart(productId = event.productId, quantity = event.quantity)
+                            updateCart(
+                                productId = event.productId,
+                                quantity = event.quantity,
+                                context = event.context
+                            )
                         } else {
-                            addToCart(event.productId)
+                            addToCart(event.context, event.productId)
                         }
                     }
 
                     else -> {
-                        addToCart(event.productId)
+                        addToCart(event.context, event.productId)
                     }
                 }
             }
@@ -350,7 +359,8 @@ class HomeViewModel @Inject constructor(
 
     private fun updateCart(
         productId: String,
-        quantity: Int
+        quantity: Int,
+        context: Context
     ) {
         viewModelScope.launch {
             updateCartUseCase.execute(
@@ -363,6 +373,9 @@ class HomeViewModel @Inject constructor(
                         val isError = data?.status == Status.error.name
                         getCart()
 
+                        if (!isError) {
+                            addAppEvent(context, productId, quantity)
+                        }
                         state.copy(
                             isLoading = false,
                             isError = isError,
@@ -543,7 +556,7 @@ class HomeViewModel @Inject constructor(
         }
     }
 
-    private fun addToCart(productId: String) {
+    private fun addToCart(context: Context, productId: String) {
         viewModelScope.launch {
             addToCartUseCase.execute(
                 productId
@@ -562,6 +575,8 @@ class HomeViewModel @Inject constructor(
                                 message = result.data?.message,
                                 cartError = isError,
                             )
+                        if (!isError)
+                            addAppEvent(context, productId, 1)
                         getCart()
                     }
 
@@ -576,6 +591,22 @@ class HomeViewModel @Inject constructor(
 
             }
         }
+    }
+
+    private fun addAppEvent(context: Context, productId: String, quantity: Int) {
+        //facebbook
+        val logger = AppEventsLogger.newLogger(context)
+        val params = Bundle()
+
+        params.putString(AppEventsConstants.EVENT_PARAM_CURRENCY, "INR");
+        params.putString(AppEventsConstants.EVENT_PARAM_CONTENT_TYPE, "product");
+        params.putString(AppEventsConstants.EVENT_PARAM_CONTENT_ID, productId);
+        params.putString(AppEventsConstants.EVENT_PARAM_NUM_ITEMS, quantity.toString());
+
+        logger.logEvent(
+            AppEventsConstants.EVENT_NAME_ADDED_TO_CART,
+            params
+        )
     }
 
 }

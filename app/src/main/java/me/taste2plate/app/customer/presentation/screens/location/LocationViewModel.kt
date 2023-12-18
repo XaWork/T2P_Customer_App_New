@@ -25,9 +25,12 @@ import com.google.android.libraries.places.api.net.FetchPlaceRequest
 import com.google.android.libraries.places.api.net.FindAutocompletePredictionsRequest
 import com.google.android.libraries.places.api.net.PlacesClient
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import me.taste2plate.app.customer.data.UserPref
+import java.io.IOException
 import javax.inject.Inject
 
 @HiltViewModel
@@ -76,7 +79,7 @@ class LocationViewModel @Inject constructor(
                         override fun isCancellationRequested() = false
                     })
                     .addOnSuccessListener {
-                        Log.e("location","success to get location $it")
+                        Log.e("location", "success to get location $it")
 
                         state = if (it != null) {
                             state.copy(isLoading = false, location = it)
@@ -88,7 +91,7 @@ class LocationViewModel @Inject constructor(
                         }
                     }
                     .addOnFailureListener {
-                        Log.e("location","Failed to get location $it")
+                        Log.e("location", "Failed to get location $it")
                         state = state.copy(isLoading = false, location = null)
                     }
             } else {
@@ -141,13 +144,20 @@ class LocationViewModel @Inject constructor(
     var text by mutableStateOf("")
 
     fun getAddress(latLng: LatLng) {
-        try{
+        try {
             currentLatLong = latLng
             viewModelScope.launch {
-                val address = geoCoder.getFromLocation(latLng.latitude, latLng.longitude, 1)
-                text = address?.get(0)?.getAddressLine(0).toString()
+                withContext(Dispatchers.IO) {
+                    try {
+                        val address = geoCoder.getFromLocation(latLng.latitude, latLng.longitude, 1)
+                        text = address?.get(0)?.getAddressLine(0).toString()
+                    } catch (e: IOException) {
+                        // Handle IOException appropriately
+                        Log.e("Error", e.toString())
+                    }
+                }
             }
-        }catch (e: Exception){
+        } catch (e: Exception) {
             Log.e("Error", e.printStackTrace().toString())
         }
     }

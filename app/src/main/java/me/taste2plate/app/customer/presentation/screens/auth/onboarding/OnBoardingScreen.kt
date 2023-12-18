@@ -1,6 +1,7 @@
 package me.taste2plate.app.customer.presentation.screens.auth.onboarding
 
 import android.app.Activity
+import android.content.Context
 import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -29,7 +30,10 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.core.content.ContentProviderCompat
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.facebook.appevents.AppEventsConstants
+import com.facebook.appevents.AppEventsLogger
 import com.google.android.gms.auth.api.identity.Identity
 import me.taste2plate.app.customer.R
 import me.taste2plate.app.customer.presentation.screens.auth.AuthEvents
@@ -63,6 +67,8 @@ fun OnBoardingScreen(
     LaunchedEffect(key1 = state) {
         when {
             state.loginModel != null && !state.isError -> {
+                if (state.loginModel.newUser)
+                    addAppEvent(context)
                 onNavigateToOtpScreen()
             }
         }
@@ -74,32 +80,33 @@ fun OnBoardingScreen(
     val phoneNumberHintIntentResultLauncher =
         rememberLauncherForActivityResult(ActivityResultContracts.StartIntentSenderForResult()) { result ->
             try {
-                val phoneNumber = Identity.getSignInClient(activity).getPhoneNumberFromIntent(result.data)
+                val phoneNumber =
+                    Identity.getSignInClient(activity).getPhoneNumberFromIntent(result.data)
                 Log.e(TAG, "Phone Number is $phoneNumber")
                 viewModel.mobile = phoneNumber.takeLast(10)
-            } catch(e: Exception) {
+            } catch (e: Exception) {
                 Log.e(TAG, "Phone Number Hint failed")
             }
         }
-/*
-    LaunchedEffect(key1 = Unit){
-        val request: GetPhoneNumberHintIntentRequest = GetPhoneNumberHintIntentRequest.builder().build()
+    /*
+        LaunchedEffect(key1 = Unit){
+            val request: GetPhoneNumberHintIntentRequest = GetPhoneNumberHintIntentRequest.builder().build()
 
-        Identity.getSignInClient(activity)
-            .getPhoneNumberHintIntent(request)
-            .addOnSuccessListener { result: PendingIntent ->
-                try {
-                    phoneNumberHintIntentResultLauncher.launch(
-                        IntentSenderRequest.Builder(result).build()
-                    )
-                } catch (e: Exception) {
-                    Log.e(TAG, "Launching the PendingIntent failed")
+            Identity.getSignInClient(activity)
+                .getPhoneNumberHintIntent(request)
+                .addOnSuccessListener { result: PendingIntent ->
+                    try {
+                        phoneNumberHintIntentResultLauncher.launch(
+                            IntentSenderRequest.Builder(result).build()
+                        )
+                    } catch (e: Exception) {
+                        Log.e(TAG, "Launching the PendingIntent failed")
+                    }
                 }
-            }
-            .addOnFailureListener {
-                Log.e(TAG, "Phone Number Hint failed")
-            }
-    }*/
+                .addOnFailureListener {
+                    Log.e(TAG, "Phone Number Hint failed")
+                }
+        }*/
 
     AppScaffold {
         Column(
@@ -187,6 +194,11 @@ fun OnBoardingScreen(
             }
         }
     }
+}
+
+fun addAppEvent(context: Context) {
+    val logger = AppEventsLogger.newLogger(context)
+    logger.logEvent(AppEventsConstants.EVENT_NAME_COMPLETED_REGISTRATION);
 }
 
 @Preview

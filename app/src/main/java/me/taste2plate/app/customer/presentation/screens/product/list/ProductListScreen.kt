@@ -21,6 +21,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -29,7 +30,6 @@ import me.taste2plate.app.customer.domain.model.product.ProductListModel
 import me.taste2plate.app.customer.presentation.dialog.SettingDialogType
 import me.taste2plate.app.customer.presentation.dialog.SettingInfoDialog
 import me.taste2plate.app.customer.presentation.screens.home.FoodItemUpdateInfo
-import me.taste2plate.app.customer.presentation.screens.home.HomeEvent
 import me.taste2plate.app.customer.presentation.screens.home.widgets.AppSearchBar
 import me.taste2plate.app.customer.presentation.screens.home.widgets.ProductPriceCard
 import me.taste2plate.app.customer.presentation.screens.product.ProductViewModel
@@ -44,7 +44,6 @@ import me.taste2plate.app.customer.presentation.widgets.AppEmptyView
 import me.taste2plate.app.customer.presentation.widgets.AppScaffold
 import me.taste2plate.app.customer.presentation.widgets.AppTopBar
 import me.taste2plate.app.customer.presentation.widgets.ImageWithWishlistButton
-import me.taste2plate.app.customer.presentation.widgets.NetworkImage
 import me.taste2plate.app.customer.presentation.widgets.RatingInfoRow
 import me.taste2plate.app.customer.presentation.widgets.RoundedCornerCard
 import me.taste2plate.app.customer.presentation.widgets.ShowLoading
@@ -61,6 +60,7 @@ fun ProductListScreen(
     navigateBack: () -> Unit,
 ) {
     val state = viewModel.state
+    val context =LocalContext.current
 
     var showSettingDialog by remember {
         mutableStateOf(false)
@@ -123,7 +123,7 @@ fun ProductListScreen(
                     onNavigateToProductDetailsScreen()
                 },
                 updateCart = { quantity, productId ->
-                    viewModel.onEvent(ProductEvents.UpdateCart(quantity, productId))
+                    viewModel.onEvent(ProductEvents.UpdateCart(context, quantity, productId))
                 }
             )
         }

@@ -2,6 +2,8 @@ package me.taste2plate.app.customer
 
 import android.app.Application
 import android.content.Context
+import com.facebook.FacebookSdk
+import com.facebook.appevents.AppEventsLogger
 import com.google.android.libraries.places.api.Places
 import dagger.hilt.android.HiltAndroidApp
 import me.taste2plate.app.customer.presentation.utils.mapApiKey
@@ -26,7 +28,7 @@ class T2PApp: Application() {
 
     override fun onCreate() {
         super.onCreate()
-
+        AppEventsLogger.activateApp(this)
         Places.initialize(this.applicationContext, mapApiKey)
     }
 }
