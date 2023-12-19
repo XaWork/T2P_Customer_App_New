@@ -333,7 +333,7 @@ fun ProductDetails(
 
             val items = listOf<@Composable RowScope.() -> Unit> {
                 Text(
-                    text = details.name ?: "",
+                    text = details.name,
                     maxLines = 5,
                     fontWeight = FontWeight.W500,
                     modifier = Modifier

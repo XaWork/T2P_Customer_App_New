@@ -13,7 +13,7 @@ import retrofit2.http.Url
 
 interface AnalyticsApi {
     @POST
-    suspend fun addLog(@Url url: String, @Body request: LogRequest): Void
+    suspend fun addLog(@Url url: String, @Body request: LogRequest): LogCreatedResponse
 
     @POST("add-log")
     suspend fun addLog1(@Body request: LogRequest): LogCreatedResponse

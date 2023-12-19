@@ -11,10 +11,12 @@ import me.taste2plate.app.customer.data.Resource
 import me.taste2plate.app.customer.data.Status
 import me.taste2plate.app.customer.data.UserPref
 import me.taste2plate.app.customer.domain.model.SettingsModel
+import me.taste2plate.app.customer.domain.model.custom.LogCreatedResponse
 import me.taste2plate.app.customer.domain.model.custom.LogRequest
 import me.taste2plate.app.customer.domain.use_case.SettingsUseCase
 import me.taste2plate.app.customer.domain.use_case.analytics.AddLogUseCase
 import me.taste2plate.app.customer.domain.use_case.analytics.GeoIpUseCase
+import me.taste2plate.app.customer.domain.use_case.analytics.InstallUseCase
 import me.taste2plate.app.customer.domain.use_case.user.address.AllAddressUseCase
 import javax.inject.Inject
 
@@ -24,6 +26,7 @@ class SplashViewModel @Inject constructor(
     private val allAddressUseCase: AllAddressUseCase,
     private val geoIpUseCase: GeoIpUseCase,
     private val addLogUseCase: AddLogUseCase,
+    private val installUseCase: InstallUseCase,
     private val userPref: UserPref
 ) : ViewModel() {
 
@@ -44,6 +47,7 @@ class SplashViewModel @Inject constructor(
             }
         }
     }
+
     private fun geoIpUseCase() {
         viewModelScope.launch {
             geoIpUseCase.execute().collect { result ->
@@ -54,6 +58,36 @@ class SplashViewModel @Inject constructor(
 
                     is Resource.Success -> {
                         userPref.saveIp(result.data!!.ip)
+                        addLog()
+                    }
+
+                    is Resource.Error -> {
+                        state = state.copy(error = result.message, loading = false)
+                    }
+                }
+            }
+        }
+    }
+
+    private fun addLog() {
+        viewModelScope.launch {
+            addLogUseCase.execute(
+                LogRequest(
+                    type = "splash",
+                    event = "enter in splash screen",
+                    page_name = "/splash",
+                )
+            ).collect { result ->
+                when (result) {
+                    is Resource.Loading -> {
+                        //  state = state.copy(loading = true)
+                    }
+
+                    is Resource.Success -> {
+                        val data = result.data
+                        if (data != null)
+                            addInstallEvent(data)
+
                         isUserLogin()
                     }
 
@@ -65,15 +99,14 @@ class SplashViewModel @Inject constructor(
         }
     }
 
-   /* private fun addLog(){
+    private fun addInstallEvent(data: LogCreatedResponse) {
         viewModelScope.launch {
-            addLogUseCase.execute(
-                *//*LogRequest(
-
-                )*//*
+            installUseCase.execute(
+                clickId = data.result._id,
+                gaid = data.result.createdAt
             )
         }
-    }*/
+    }
 
     private fun isUserLogin() {
         viewModelScope.launch {
