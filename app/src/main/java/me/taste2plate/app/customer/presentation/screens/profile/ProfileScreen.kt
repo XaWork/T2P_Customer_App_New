@@ -8,6 +8,7 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
@@ -17,6 +18,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import me.taste2plate.app.customer.domain.model.auth.User
+import me.taste2plate.app.customer.domain.model.custom.LogRequest
+import me.taste2plate.app.customer.domain.model.custom.LogType
+import me.taste2plate.app.customer.presentation.screens.home.HomeEvent
 import me.taste2plate.app.customer.presentation.theme.HighSpacing
 import me.taste2plate.app.customer.presentation.theme.LowElevation
 import me.taste2plate.app.customer.presentation.theme.ScreenPadding
@@ -40,6 +44,20 @@ fun ProfileScreen(
     navigateBack: () -> Unit,
 
     ) {
+
+
+    LaunchedEffect(true){
+        viewModel.onEvent(
+            ProfileEvents.AddLog(
+                LogRequest(
+                    type = LogType.pageVisit,
+                    event = "enter in profile screen",
+                    page_name = "/profile"
+                )
+            ))
+    }
+
+
     AppScaffold(
         topBar = {
             AppTopBar(

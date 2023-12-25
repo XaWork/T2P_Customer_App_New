@@ -19,10 +19,13 @@ import me.taste2plate.app.customer.T2PApp
 import me.taste2plate.app.customer.data.Resource
 import me.taste2plate.app.customer.data.Status
 import me.taste2plate.app.customer.data.UserPref
+import me.taste2plate.app.customer.domain.model.custom.LogRequest
+import me.taste2plate.app.customer.domain.model.custom.LogType
 import me.taste2plate.app.customer.domain.model.user.MyPlanModel
 import me.taste2plate.app.customer.domain.model.user.address.AddressListModel
 import me.taste2plate.app.customer.domain.use_case.ApplyCouponUseCase
 import me.taste2plate.app.customer.domain.use_case.CouponByCityUseCase
+import me.taste2plate.app.customer.domain.use_case.analytics.AddLogUseCase
 import me.taste2plate.app.customer.domain.use_case.product.CalculateCheckoutDistanceUseCase
 import me.taste2plate.app.customer.domain.use_case.product.CutOffTimeCheckUseCase
 import me.taste2plate.app.customer.domain.use_case.user.InitCheckoutUseCase
@@ -42,6 +45,7 @@ import javax.inject.Inject
 @HiltViewModel
 class CheckOutViewModel @Inject constructor(
     private val userPref: UserPref,
+    private val addLogUseCase: AddLogUseCase,
     private val cartUseCase: CartUseCase,
     private val updateCartUseCase: UpdateCartUseCase,
     private val calculateCheckoutDistanceUseCase: CalculateCheckoutDistanceUseCase,
@@ -103,6 +107,10 @@ class CheckOutViewModel @Inject constructor(
 
             is CheckoutEvents.Checkout -> {
                 allDetailFilled(event.context)
+            }
+
+            is CheckoutEvents.AddLog -> {
+                addLog(event.logRequest)
             }
 
             is CheckoutEvents.ChangeMyPlanValue -> {
@@ -198,6 +206,12 @@ class CheckOutViewModel @Inject constructor(
                 else
                     deleteCart(event.productId)
             }
+        }
+    }
+
+    private fun addLog(logRequest: LogRequest) {
+        viewModelScope.launch {
+            addLogUseCase.execute(logRequest)
         }
     }
 
@@ -554,6 +568,15 @@ class CheckOutViewModel @Inject constructor(
                                 state.cart!!.finalPrice.toDouble(), context
                             )
 
+                            addLog(
+                                LogRequest(
+                                    type = LogType.checkout,
+                                    event = "order confirmed",
+                                    page_name = "/checkout",
+                                    order_id = orderId
+                                )
+                            )
+
                             state = state.copy(
                                 isError = true,
                                 errorMessage = "Order placed",
@@ -609,7 +632,8 @@ class CheckOutViewModel @Inject constructor(
                 }
                 youSave *= result[0].quantity
 
-                price = cartprice.toDouble()
+                //by doing this no crash is found otherwise sometime cart price is null
+                price = "${ cartprice ?: ""}".toDouble()
                 deliveryCharge =
                     if (state.deliveryType == DeliveryType.Standard) shipping.normalShipping.toDouble()
                     else shipping.expressShipping.toDouble()
@@ -875,6 +899,14 @@ class CheckOutViewModel @Inject constructor(
 
                         if (!isError) {
                             addAppEvent(context, productId, quantity)
+                            addLog(
+                                LogRequest(
+                                    type = LogType.addToCart,
+                                    event = "update Cart",
+                                    page_name = "/cart",
+                                    product_id = productId
+                                )
+                            )
                             getCart(isLoading = false)
                         }
 
@@ -963,8 +995,17 @@ class CheckOutViewModel @Inject constructor(
                         val data = result.data
                         val isError = data?.status == Status.error.name
 
-                        if (!isError)
+                        if (!isError) {
                             getCart(isLoading = false)
+                            addLog(
+                                LogRequest(
+                                    type = LogType.actionPerform,
+                                    event = "delete Cart",
+                                    page_name = "/cart",
+                                    product_id = productId
+                                )
+                            )
+                        }
 
                         state.copy(
                             isLoading = false,
@@ -1105,6 +1146,14 @@ class CheckOutViewModel @Inject constructor(
                         if (!isError) {
                             appliedCoupon = couponCode
                             setPriceAfterApplyCoupon()
+                            addLog(
+                                LogRequest(
+                                    type = LogType.actionPerform,
+                                    event = "coupon applied",
+                                    page_name = "/checkout",
+                                    event_data = couponCode
+                                )
+                            )
                         }
 
                     }

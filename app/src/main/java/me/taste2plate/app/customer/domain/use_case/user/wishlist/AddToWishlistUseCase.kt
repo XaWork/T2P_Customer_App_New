@@ -22,7 +22,7 @@ class AddToWishlistUseCase @Inject constructor(
             emit(Resource.Loading(true))
             try {
                 val response = repo.addToWishlist(
-                    userId = userPref.getUser().id,
+                    userId = userPref.getUser()!!.id,
                     productId = productId
                 )
                 emit(Resource.Success(response))

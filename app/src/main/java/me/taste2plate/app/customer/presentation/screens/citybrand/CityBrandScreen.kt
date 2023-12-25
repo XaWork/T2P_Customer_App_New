@@ -30,7 +30,10 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import me.taste2plate.app.customer.domain.mapper.CommonForItem
+import me.taste2plate.app.customer.domain.model.custom.LogRequest
+import me.taste2plate.app.customer.domain.model.custom.LogType
 import me.taste2plate.app.customer.presentation.screens.home.CityBrandScreens
+import me.taste2plate.app.customer.presentation.screens.home.HomeEvent
 import me.taste2plate.app.customer.presentation.screens.home.widgets.AppSearchBar
 import me.taste2plate.app.customer.presentation.theme.HighPadding
 import me.taste2plate.app.customer.presentation.theme.HighRoundedCorners
@@ -62,9 +65,19 @@ fun CityBrandScreen(
 ) {
     val state = viewModel.state
 
-    LaunchedEffect(key1 = Unit) {
+    LaunchedEffect(true) {
         viewModel.onEvent(CityBrandEvents.GetData(screen))
+        viewModel.onEvent(
+            CityBrandEvents.AddLog(
+                LogRequest(
+                    type = LogType.pageVisit,
+                    event = "enter in city brand screen",
+                    page_name = "/cityBrand"
+                )
+            ))
     }
+
+
 
 
     AppScaffold(

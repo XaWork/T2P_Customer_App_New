@@ -1,14 +1,16 @@
 package me.taste2plate.app.customer.presentation.screens.location
 
 import android.Manifest
+import android.app.Activity
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.content.res.Configuration
 import android.location.Geocoder
 import android.net.Uri
+import android.os.Looper
 import android.provider.Settings
 import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -30,6 +32,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -38,12 +41,22 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.core.app.ActivityCompat
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import com.google.android.gms.location.LocationCallback
+import com.google.android.gms.location.LocationRequest
+import com.google.android.gms.location.LocationResult
+import com.google.android.gms.location.LocationServices
+import com.google.android.gms.location.Priority
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
@@ -52,16 +65,21 @@ import com.google.maps.android.compose.GoogleMap
 import com.google.maps.android.compose.MapProperties
 import com.google.maps.android.compose.MapUiSettings
 import com.google.maps.android.compose.rememberCameraPositionState
+import me.taste2plate.app.customer.presentation.screens.permissions.GPSEnableScreen
 import me.taste2plate.app.customer.presentation.screens.permissions.LocationPermissionScreen
 import me.taste2plate.app.customer.presentation.screens.permissions.RequestPermissions
 import me.taste2plate.app.customer.presentation.theme.ScreenPadding
+import me.taste2plate.app.customer.presentation.theme.SpaceBetweenViewsAndSubViews
 import me.taste2plate.app.customer.presentation.theme.T2PCustomerAppTheme
 import me.taste2plate.app.customer.presentation.theme.primaryColor
 import me.taste2plate.app.customer.presentation.utils.noRippleClickable
 import me.taste2plate.app.customer.presentation.widgets.AppButton
 import me.taste2plate.app.customer.presentation.widgets.AppScaffold
 import me.taste2plate.app.customer.presentation.widgets.RoundedCornerCard
+import me.taste2plate.app.customer.presentation.widgets.ShowLoading
+import me.taste2plate.app.customer.presentation.widgets.VerticalSpace
 import me.taste2plate.app.customer.presentation.widgets.showToast
+import java.util.Locale
 
 /**
 -> Check location permission
@@ -91,6 +109,9 @@ fun LocationScreen(
     var permissionGranted by remember {
         mutableStateOf(false)
     }
+    var gpsEnabled by remember {
+        mutableStateOf(false)
+    }
 
     val context = LocalContext.current
 
@@ -101,20 +122,93 @@ fun LocationScreen(
         permissionGranted = it
     })
 
-    if (permissionGranted)
-        LocationScreenContent(
-            screen = screen,
-            onNavigateToAddEditAddressScreen = {
-                onNavigateToAddEditAddressScreen()
-            },
-            onNavigateToNotificationScreen = {
-                if (screen == null)
-                    onNavigateToNotificationScreen()
-                else
-                    onNavigateBackToAddEditAddressScreen(viewModel.currentLatLong)
-            },
-            viewModel = viewModel
+    var isLoading by remember {
+        mutableStateOf(false)
+    }
+    LaunchedEffect(
+        permissionGranted && gpsEnabled && viewModel.currentLatLong == LatLng(
+            28.64,
+            77.27
         )
+    ) {
+        isLoading = true
+        val locationRequest = LocationRequest.Builder(
+            Priority.PRIORITY_HIGH_ACCURACY,
+            10000L,
+        ).build()
+        val fusedLocationClient =
+            LocationServices.getFusedLocationProviderClient(context as Activity)
+        val locationCallback = object : LocationCallback() {
+            override fun onLocationResult(p0: LocationResult) {
+                for (lo in p0.locations) {
+                    if (viewModel.currentLatLong == LatLng(28.64, 77.27))
+                        viewModel.currentLatLong = LatLng(lo.latitude, lo.longitude)
+                }
+                isLoading = false
+            }
+        }
+
+        if (ActivityCompat.checkSelfPermission(
+                context,
+                Manifest.permission.ACCESS_FINE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
+                context,
+                Manifest.permission.ACCESS_COARSE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
+
+        }
+        fusedLocationClient.requestLocationUpdates(
+            locationRequest,
+            locationCallback,
+            Looper.getMainLooper()
+        )
+    }
+
+    val lifecycleOwner = LocalLifecycleOwner.current
+    DisposableEffect(key1 = lifecycleOwner, effect = {
+        val observer = LifecycleEventObserver { _, event ->
+            if (event == Lifecycle.Event.ON_START) {
+                gpsEnabled = gpsEnabled(context)
+            }
+        }
+        lifecycleOwner.lifecycle.addObserver(observer)
+
+        onDispose {
+            lifecycleOwner.lifecycle.removeObserver(observer)
+        }
+    })
+
+    if (permissionGranted)
+        if (gpsEnabled)
+            if (isLoading)
+                Column(
+                    modifier = Modifier.fillMaxSize(),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center
+                ) {
+                    ShowLoading()
+                    VerticalSpace(space = SpaceBetweenViewsAndSubViews)
+                    Text("Fetching your location. Please Wait...", color = Color.Black)
+                }
+            else
+                LocationScreenContent(
+                    screen = screen,
+                    onNavigateToAddEditAddressScreen = {
+                        onNavigateToAddEditAddressScreen()
+                    },
+                    onNavigateToNotificationScreen = {
+                        if (screen == null)
+                            onNavigateToNotificationScreen()
+                        else
+                            onNavigateBackToAddEditAddressScreen(viewModel.currentLatLong)
+                    },
+                    viewModel = viewModel
+                )
+        else
+            GPSEnableScreen {
+                context.startActivity(Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS))
+            }
     else
         LocationPermissionScreen {
             val intent = Intent(
@@ -142,7 +236,7 @@ fun LocationScreenContent(
 
     LaunchedEffect(Unit) {
         viewModel.placesClient = Places.createClient(context)
-        viewModel.geoCoder = Geocoder(context)
+        viewModel.geoCoder = Geocoder(context, Locale.getDefault())
     }
 
     LaunchedEffect(cameraPositionState.isMoving) {
@@ -191,7 +285,7 @@ fun LocationScreenContent(
                     }
                 },
                 onMyLocationClick = { location ->
-                    Log.e("location","Current Location is $location")
+                    Log.e("location", "Current Location is $location")
                     val latLng = LatLng(location.latitude, location.longitude)
                     viewModel.currentLatLong = latLng
                 }
@@ -205,6 +299,7 @@ fun LocationScreenContent(
                     .size(24.dp)
                     .align(Alignment.Center)
             )
+
 
         }
     }

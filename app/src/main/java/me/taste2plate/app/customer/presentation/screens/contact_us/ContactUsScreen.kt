@@ -17,6 +17,7 @@ import androidx.compose.material.icons.outlined.LocationOn
 import androidx.compose.material.icons.outlined.Phone
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -25,6 +26,8 @@ import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat.startActivity
 import androidx.hilt.navigation.compose.hiltViewModel
 import me.taste2plate.app.customer.R
+import me.taste2plate.app.customer.domain.model.custom.LogRequest
+import me.taste2plate.app.customer.domain.model.custom.LogType
 import me.taste2plate.app.customer.presentation.theme.MediumSpacing
 import me.taste2plate.app.customer.presentation.theme.ScreenPadding
 import me.taste2plate.app.customer.presentation.theme.SpaceBetweenViewsAndSubViews
@@ -44,6 +47,15 @@ fun ContactUsScreen(
     navigateBack: () -> Unit,
 ) {
     val state = viewModel.state
+    LaunchedEffect(true) {
+        viewModel.addLog(
+            LogRequest(
+                type = LogType.pageVisit,
+                event = "enter in contact us screen",
+                page_name = "/contactUs"
+            )
+        )
+    }
 
     AppScaffold(
         topBar = {

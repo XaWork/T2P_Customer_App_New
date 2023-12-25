@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -59,6 +58,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import me.taste2plate.app.customer.R
 import me.taste2plate.app.customer.data.Status
+import me.taste2plate.app.customer.domain.model.custom.LogRequest
+import me.taste2plate.app.customer.domain.model.custom.LogType
 import me.taste2plate.app.customer.domain.model.product.ProductDetailsModel
 import me.taste2plate.app.customer.presentation.dialog.SettingDialogType
 import me.taste2plate.app.customer.presentation.dialog.SettingInfoDialog
@@ -130,6 +131,17 @@ fun ProductDetailsScreen(
     LaunchedEffect(Unit) {
         if (!productId.isNullOrEmpty())
             viewModel.selectedProductId = productId
+
+        viewModel.onEvent(
+            ProductEvents.AddLog(
+                LogRequest(
+                    type = LogType.pageVisit,
+                    event = "enter in product details screen",
+                    page_name = "/home",
+                    product_id = viewModel.selectedProductId
+                )
+            )
+        )
 
         viewModel.onEvent(ProductEvents.GetProductDetails)
     }
@@ -326,14 +338,48 @@ fun ProductDetails(
                 .fillMaxWidth()
                 .padding(ScreenPadding)
         ) {
-
-            Text("Total Weight : ${details.weight} kg", color = secondaryColor.invoke())
+            Text("Total Weight : ${details.weight ?: ""} kg", color = secondaryColor.invoke())
 
             VerticalSpace(space = SpaceBetweenViewsAndSubViews)
 
-            val items = listOf<@Composable RowScope.() -> Unit> {
+            Row(
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.fillMaxWidth()
+            ) {
                 Text(
-                    text = details.name,
+                    text = "${details.name} ",
+                    maxLines = 5,
+                    fontWeight = FontWeight.W500,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .weight(2f)
+                )
+
+                //get cart item length
+                var cartItemLength = 0
+                if(cartData != null){
+                    cartData.result.forEach {
+                        if (it.product.id == details.id)
+                            cartItemLength = it.quantity
+                    }
+                    if (state.addToCartEnable)
+                        CartAddRemove(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .weight(1f),
+                            cartItemLength = cartItemLength,
+                        ) {
+                            updateCart(it)
+                        }
+                    else
+                        Text("")
+                }
+            }
+
+            /*val items = listOf<@Composable RowScope.() -> Unit> {
+                Text(
+                    text = details.name ?: "",
                     maxLines = 5,
                     fontWeight = FontWeight.W500,
                     modifier = Modifier
@@ -348,8 +394,7 @@ fun ProductDetails(
                     if (it.product.id == details.id)
                         cartItemLength = it.quantity
                 }
-
-                if (cartData != null &&state.addToCartEnable)
+                if (state.addToCartEnable)
                     CartAddRemove(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -358,9 +403,11 @@ fun ProductDetails(
                     ) {
                         updateCart(it)
                     }
+                else
+                    Text("")
             }
 
-            SpaceBetweenRow(items = items)
+            SpaceBetweenRow(items = items)*/
 
             VerticalSpace(space = SpaceBetweenViews)
 
@@ -482,7 +529,7 @@ fun ProductImages(
             SaleBanner(modifier = Modifier.align(Alignment.TopStart))
 
         val alreadyWishListed =
-            if (state.wishListData!!.result == null ||state.wishListData.result.isEmpty()) false
+            if (state.wishListData!!.result == null || state.wishListData.result.isEmpty()) false
             else state.wishListData.result.any { it.product.id == details.id }
 
         CircleIconButton(
@@ -504,7 +551,7 @@ fun ProductImages(
                     textDecoration = TextDecoration.LineThrough,
                     backgroundColor = secondaryColor.invoke()
                 )
-            SaleBanner(text = "$rupeeSign ${if(isOnSale) details.sellingPrice else details.price}")
+            SaleBanner(text = "$rupeeSign ${if (isOnSale) details.sellingPrice else details.price}")
         }
 
         Surface(

@@ -52,7 +52,7 @@ object AppModule {
     class RetrofitBuilder @AssistedInject constructor(
         @Assisted val baseUrl: String,
         private val okHttpClient: OkHttpClient,
-        authInterceptor: AuthInterceptor
+        //authInterceptor: AuthInterceptor
     ) {
         val gson = GsonBuilder()
             .setDateFormat("yyyy-MM-dd'T'HH:mm:ss")
@@ -60,7 +60,7 @@ object AppModule {
             .create()
 
         val client = okHttpClient.newBuilder()
-            .addInterceptor(authInterceptor)
+            //.addInterceptor(authInterceptor)
             .build()
 
         inline fun <reified T> build(): T {
@@ -162,14 +162,14 @@ object AppModule {
         return httpClientBuilder.build()
     }
 
-    @Provides
+  /*  @Provides
     @Singleton
     fun provideAuthInterceptor(userPref: UserPref): AuthInterceptor {
         val authToken: String = runBlocking(Dispatchers.IO) {
             userPref.getToken()
         }
         return AuthInterceptor(authToken)
-    }
+    }*/
 
 
   /*  @Provides

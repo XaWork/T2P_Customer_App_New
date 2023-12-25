@@ -22,7 +22,7 @@ class DeleteCartUseCase @Inject constructor(
             emit(Resource.Loading(true))
             try {
                 val response = repo.deleteCart(
-                    userId = userPref.getUser().id,
+                    userId = userPref.getUser()!!.id,
                     productID = productId,
                 )
                 emit(Resource.Success(response))

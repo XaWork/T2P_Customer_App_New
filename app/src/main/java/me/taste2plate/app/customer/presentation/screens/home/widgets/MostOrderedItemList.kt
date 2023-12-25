@@ -102,9 +102,18 @@ fun MostOrderedItemList(
         HorizontalPager(
             state = pagerState,
         ) { page ->
-            val wishlistIdList: List<String> =
-                if (wishlistItems != null && wishlistItems.isNotEmpty()) wishlistItems.map { it.product.id }
-                    .toList() else emptyList()
+            var wishlistIdList: List<String> = emptyList()
+            if (wishlistItems.isNotEmpty()) {
+                for (item in wishlistItems) {
+                    //by checking null crash are stopped
+                    if (item.product != null && !item.product.id.isNullOrEmpty()) {
+                        wishlistIdList = wishlistItems.map { it.product.id }
+                            .toList()
+                    }
+                }
+            } else {
+                wishlistIdList = emptyList()
+            }
 
             val alreadyInWishlist =
                 if (wishlistIdList.isEmpty())
@@ -129,7 +138,7 @@ fun MostOrderedItemList(
                     viewModel.onEvent(HomeEvent.AddToWishlist(foodItems[page].id))
                 },
                 updateCart = {
-                    viewModel.onEvent(HomeEvent.UpdateCart(context,it, foodItems[page].id))
+                    viewModel.onEvent(HomeEvent.UpdateCart(context, it, foodItems[page].id))
                 }
             )
         }
@@ -236,18 +245,18 @@ fun SingleMostOrderedItem(
                       imageVector = Icons.Outlined.LocationOn,
                       info = product.city.name
                   )*/
-/*
-                VerticalSpace(space = VeryLowSpacing)
+                /*
+                                VerticalSpace(space = VeryLowSpacing)
 
-                InfoWithIcon(
-                    icon = false,
-                    id = R.drawable.delivery_bike,
-                    info = "Estimate Delivery",
-                    colorFilter = ColorFilter.tint(
-                        color = MaterialTheme.colorScheme.onSurface
-                    ),
-                    iconOrImageModifier = Modifier.size(20.dp)
-                )*/
+                                InfoWithIcon(
+                                    icon = false,
+                                    id = R.drawable.delivery_bike,
+                                    info = "Estimate Delivery",
+                                    colorFilter = ColorFilter.tint(
+                                        color = MaterialTheme.colorScheme.onSurface
+                                    ),
+                                    iconOrImageModifier = Modifier.size(20.dp)
+                                )*/
 
                 VerticalSpace(space = VeryLowSpacing)
 

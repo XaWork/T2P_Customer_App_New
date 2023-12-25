@@ -6,6 +6,7 @@ import android.content.Context
 import android.content.pm.PackageManager
 import android.location.Geocoder
 import android.location.LocationRequest
+import android.os.Build
 import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
@@ -26,6 +27,7 @@ import com.google.android.libraries.places.api.net.FindAutocompletePredictionsRe
 import com.google.android.libraries.places.api.net.PlacesClient
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -43,8 +45,7 @@ class LocationViewModel @Inject constructor(
     val locationAutofill = mutableStateListOf<AutocompleteResult>()
     lateinit var placesClient: PlacesClient
     lateinit var geoCoder: Geocoder
-    var currentLatLong by mutableStateOf(LatLng(28.646938, 77.274676))
-
+    var currentLatLong by mutableStateOf(LatLng(28.64, 77.27))
 
     fun onEvent(event: LocationEvent) {
         when (event) {
@@ -149,8 +150,16 @@ class LocationViewModel @Inject constructor(
             viewModelScope.launch {
                 withContext(Dispatchers.IO) {
                     try {
-                        val address = geoCoder.getFromLocation(latLng.latitude, latLng.longitude, 1)
-                        text = address?.get(0)?.getAddressLine(0).toString()
+                       if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU){
+                           geoCoder.getFromLocation(latLng.latitude, latLng.longitude, 1){
+                               text = it[0].getAddressLine(0)
+                           }
+                       }else{
+                           val address = geoCoder.getFromLocation(latLng.latitude, latLng.longitude, 1)
+                           if (address?.isNotEmpty() == true) {
+                               text = address[0]?.getAddressLine(0).toString()
+                           }
+                       }
                     } catch (e: IOException) {
                         // Handle IOException appropriately
                         Log.e("Error", e.toString())

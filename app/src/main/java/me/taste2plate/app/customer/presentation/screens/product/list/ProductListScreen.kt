@@ -26,6 +26,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import me.taste2plate.app.customer.domain.mapper.CommonForItem
+import me.taste2plate.app.customer.domain.model.custom.LogRequest
+import me.taste2plate.app.customer.domain.model.custom.LogType
 import me.taste2plate.app.customer.domain.model.product.ProductListModel
 import me.taste2plate.app.customer.presentation.dialog.SettingDialogType
 import me.taste2plate.app.customer.presentation.dialog.SettingInfoDialog
@@ -60,7 +62,7 @@ fun ProductListScreen(
     navigateBack: () -> Unit,
 ) {
     val state = viewModel.state
-    val context =LocalContext.current
+    val context = LocalContext.current
 
     var showSettingDialog by remember {
         mutableStateOf(false)
@@ -71,14 +73,25 @@ fun ProductListScreen(
             type = SettingDialogType.Cart,
             onDismissRequest = {
                 showSettingDialog = false
-           viewModel.onEvent(ProductEvents.UpdateState)
+                viewModel.onEvent(ProductEvents.UpdateState)
             }) {
             showSettingDialog = false
-           viewModel.onEvent(ProductEvents.UpdateState)
+            viewModel.onEvent(ProductEvents.UpdateState)
         }
     }
 
-    LaunchedEffect(Unit) {
+    LaunchedEffect(true) {
+        viewModel.onEvent(
+            ProductEvents.AddLog(
+                LogRequest(
+                    type = LogType.pageVisit,
+                    event = "enter in product list screen",
+                    page_name = "/productList"
+                )
+            )
+        )
+
+
         if (itemInfo.name != "Search")
             viewModel.onEvent(ProductEvents.GetProducts(itemInfo))
     }
@@ -162,7 +175,10 @@ fun ContentProductListScreen(
         }
 
         if (state.productList.isEmpty())
-            AppEmptyView(state.settings!!.productNotAvailableMessage)
+            AppEmptyView(
+                state.settings?.productNotAvailableMessage
+                    ?: "We have only Delivery Service in the city. No Restaurant/Outlet is added from city yet. Thanks!"
+            )
         else
             LazyColumn(
                 modifier = Modifier.fillMaxSize(),
@@ -196,7 +212,7 @@ fun ContentProductListScreen(
 fun SingleProductItem(
     product: ProductListModel.Result,
     state: ProductListState,
-    alreadyWishListed:Boolean,
+    alreadyWishListed: Boolean,
     foodItemUpdateInfo: FoodItemUpdateInfo?,
     updateCart: (quantity: Int) -> Unit,
     addToWishlist: () -> Unit,

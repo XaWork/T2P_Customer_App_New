@@ -1,10 +1,12 @@
 package me.taste2plate.app.customer.presentation.screens.cart
 
 import android.content.Context
+import me.taste2plate.app.customer.domain.model.custom.LogRequest
 import me.taste2plate.app.customer.domain.model.user.address.AddressListModel
 import me.taste2plate.app.customer.presentation.screens.checkout.DeliveryType
 import me.taste2plate.app.customer.presentation.screens.checkout.PaymentType
 import me.taste2plate.app.customer.presentation.screens.checkout.TipData
+import me.taste2plate.app.customer.presentation.screens.citybrand.CityBrandEvents
 
 sealed class CheckoutEvents {
     object GetCart : CheckoutEvents()
@@ -12,6 +14,12 @@ sealed class CheckoutEvents {
     object ChangeWalletCheckStatus : CheckoutEvents()
     object GetUser : CheckoutEvents()
     object GetCoupons : CheckoutEvents()
+
+
+    data class AddLog(
+        val logRequest: LogRequest
+    ) : CheckoutEvents()
+
     object GetAddressList : CheckoutEvents()
     object GetDefaultAddress : CheckoutEvents()
     data class Checkout(val context: Context) : CheckoutEvents()

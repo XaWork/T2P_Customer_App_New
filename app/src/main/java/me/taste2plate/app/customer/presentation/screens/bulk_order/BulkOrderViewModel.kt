@@ -9,13 +9,18 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import me.taste2plate.app.customer.data.Resource
 import me.taste2plate.app.customer.data.Status
+import me.taste2plate.app.customer.domain.model.custom.LogRequest
+import me.taste2plate.app.customer.domain.model.custom.LogType
 import me.taste2plate.app.customer.domain.use_case.CityListUseCase
+import me.taste2plate.app.customer.domain.use_case.analytics.AddLogUseCase
 import me.taste2plate.app.customer.domain.use_case.user.order.BulkOrderUseCase
+import me.taste2plate.app.customer.presentation.screens.home.HomeEvent
 import javax.inject.Inject
 
 @HiltViewModel
 class BulkOrderViewModel @Inject constructor(
     private val cityListUseCase: CityListUseCase,
+    private val addLogUseCase: AddLogUseCase,
     private val bulkOrderUseCase: BulkOrderUseCase,
 ) : ViewModel() {
 
@@ -43,6 +48,16 @@ class BulkOrderViewModel @Inject constructor(
             is BulkOrderEvents.UpdateState -> {
                 state = state.copy(isError = false, message = null)
             }
+            is BulkOrderEvents.AddLog -> {
+                addLog(event.logRequest)
+            }
+        }
+    }
+
+
+    private fun addLog(logRequest: LogRequest) {
+        viewModelScope.launch {
+            addLogUseCase.execute(logRequest)
         }
     }
 
@@ -101,6 +116,15 @@ class BulkOrderViewModel @Inject constructor(
                     is Resource.Success -> {
                         val data = result.data!!
                         val isError = data.status == Status.error.name
+                        if (!isError) {
+                            addLog(
+                                LogRequest(
+                                    type = LogType.actionPerform,
+                                    event = "bulk order conirmed",
+                                    page_name = "/bulk order",
+                                )
+                            )
+                        }
 
                         state = state.copy(
                             isLoading = false,

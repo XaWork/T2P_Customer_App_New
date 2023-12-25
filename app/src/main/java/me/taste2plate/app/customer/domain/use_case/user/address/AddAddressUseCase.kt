@@ -31,7 +31,7 @@ class AddAddressUseCase @Inject constructor(
         return flow {
             emit(Resource.Loading(true))
             try {
-                val userId = userPref.getUser().id
+                val userId = userPref.getUser()!!.id
                 val response = repo.addAddress(
                     userId,
                     name,

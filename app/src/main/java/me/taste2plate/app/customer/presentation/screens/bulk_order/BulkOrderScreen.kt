@@ -21,6 +21,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import me.taste2plate.app.customer.domain.model.custom.LogRequest
+import me.taste2plate.app.customer.domain.model.custom.LogType
+import me.taste2plate.app.customer.presentation.screens.home.HomeEvent
 import me.taste2plate.app.customer.presentation.theme.LowElevation
 import me.taste2plate.app.customer.presentation.theme.ScreenPadding
 import me.taste2plate.app.customer.presentation.theme.SpaceBetweenViewsAndSubViews
@@ -54,6 +57,17 @@ fun BulkOrderScreen(
                 onNavigateToHomeScreen()
             }
         }
+    }
+
+    LaunchedEffect(true){
+        viewModel.onEvent(
+            BulkOrderEvents.AddLog(
+                LogRequest(
+                    type = LogType.pageVisit,
+                    event = "enter in bulk order screen",
+                    page_name = "/bulkOrder"
+                )
+            ))
     }
 
 

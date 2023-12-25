@@ -25,6 +25,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.sp
+import me.taste2plate.app.customer.domain.model.custom.LogRequest
+import me.taste2plate.app.customer.domain.model.custom.LogType
 import me.taste2plate.app.customer.presentation.theme.LowElevation
 import me.taste2plate.app.customer.presentation.theme.ScreenPadding
 import me.taste2plate.app.customer.presentation.theme.SpaceBetweenViews
@@ -57,6 +59,17 @@ fun EditProfileScreen(
                 onNavigateToHomeScreen()
             }
         }
+    }
+
+    LaunchedEffect(true){
+        viewModel.onEvent(
+            ProfileEvents.AddLog(
+                LogRequest(
+                    type = LogType.pageVisit,
+                    event = "enter in edit profile screen",
+                    page_name = "/profile"
+                )
+            ))
     }
 
     AppScaffold(

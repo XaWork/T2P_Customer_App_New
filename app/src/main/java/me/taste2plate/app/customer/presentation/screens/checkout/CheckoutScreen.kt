@@ -57,6 +57,8 @@ import androidx.compose.ui.unit.sp
 import me.taste2plate.app.customer.R
 import me.taste2plate.app.customer.domain.mapper.toCommonForWishAndCartItem
 import me.taste2plate.app.customer.domain.model.auth.User
+import me.taste2plate.app.customer.domain.model.custom.LogRequest
+import me.taste2plate.app.customer.domain.model.custom.LogType
 import me.taste2plate.app.customer.domain.model.user.address.AddressListModel
 import me.taste2plate.app.customer.presentation.dialog.CouponDialog
 import me.taste2plate.app.customer.presentation.dialog.CustomDialog
@@ -133,6 +135,10 @@ fun CheckoutScreen(
 
     LaunchedEffect(state) {
         when {
+            (state.cart!!.result.isEmpty()) -> {
+                navigateBack()
+            }
+
             state.defaultAddress == null -> {
                 viewModel.onEvent(CheckoutEvents.GetDefaultAddress)
             }
@@ -153,6 +159,18 @@ fun CheckoutScreen(
                 viewModel.onEvent(CheckoutEvents.CalculateCheckoutDistance)
             }
         }
+    }
+
+    LaunchedEffect(true) {
+        viewModel.onEvent(
+            CheckoutEvents.AddLog(
+                LogRequest(
+                    type = LogType.pageVisit,
+                    event = "enter in checkout screen",
+                    page_name = "/checkout"
+                )
+            )
+        )
     }
 
     val sheetState = rememberModalBottomSheetState()
@@ -311,53 +329,55 @@ fun CheckoutScreen(
     }
 
     //date picker dialog
-    val simpleDateFormatter = SimpleDateFormat("yyyy/MM/dd", Locale.getDefault())
-    val startFromDate =
-        simpleDateFormatter.parse(state.cart!!.normalDeliveryDate)!!.time
-    val datePickerState =
-        rememberDatePickerState()
     var showDatePickerDialog by rememberSaveable { mutableStateOf(false) }
-    if (showDatePickerDialog) {
-        DatePickerDialog(
-            colors = DatePickerDefaults.colors(
-                containerColor = screenBackgroundColor.invoke()
-            ),
-            onDismissRequest = { showDatePickerDialog = false }, confirmButton = {
-            }) {
-            DatePicker(state = datePickerState, dateValidator = {
-                val instant = Instant.ofEpochMilli(startFromDate)
-                it >= instant.toEpochMilli()
-            })
+    if (state.cart != null && showDatePickerDialog) {
+        val simpleDateFormatter = SimpleDateFormat("yyyy/MM/dd", Locale.getDefault())
+        val startFromDate =
+            simpleDateFormatter.parse(state.cart.normalDeliveryDate)!!.time
+        val datePickerState =
+            rememberDatePickerState()
+        if (showDatePickerDialog) {
+            DatePickerDialog(
+                colors = DatePickerDefaults.colors(
+                    containerColor = screenBackgroundColor.invoke()
+                ),
+                onDismissRequest = { showDatePickerDialog = false }, confirmButton = {
+                }) {
+                DatePicker(state = datePickerState, dateValidator = {
+                    val instant = Instant.ofEpochMilli(startFromDate)
+                    it >= instant.toEpochMilli()
+                })
 
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = ScreenPadding)
-                    .align(Alignment.End),
-                horizontalArrangement = Arrangement.End
-            ) {
-                TextButton(onClick = {
-                    val selectedDate = datePickerState.selectedDateMillis?.let {
-                        Instant.ofEpochMilli(it).atOffset(ZoneOffset.UTC)
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = ScreenPadding)
+                        .align(Alignment.End),
+                    horizontalArrangement = Arrangement.End
+                ) {
+                    TextButton(onClick = {
+                        val selectedDate = datePickerState.selectedDateMillis?.let {
+                            Instant.ofEpochMilli(it).atOffset(ZoneOffset.UTC)
+                        }
+                        if (selectedDate != null)
+                            viewModel.selectedDate =
+                                selectedDate.format(DateTimeFormatter.ISO_LOCAL_DATE).toString()
+                        showDatePickerDialog = false
+                    }) {
+                        Text("OK")
                     }
-                    if (selectedDate != null)
-                        viewModel.selectedDate =
-                            selectedDate.format(DateTimeFormatter.ISO_LOCAL_DATE).toString()
-                    showDatePickerDialog = false
-                }) {
-                    Text("OK")
+
+                    HorizontalSpace(space = SpaceBetweenViewsAndSubViews)
+
+                    TextButton(onClick = {
+                        showDatePickerDialog = false
+                    }) {
+                        Text("CANCEL")
+                    }
                 }
 
-                HorizontalSpace(space = SpaceBetweenViewsAndSubViews)
-
-                TextButton(onClick = {
-                    showDatePickerDialog = false
-                }) {
-                    Text("CANCEL")
-                }
+                AppDivider()
             }
-
-            AppDivider()
         }
     }
 
@@ -456,7 +476,8 @@ fun CheckoutScreenContent(
         ),
         PriceData(
             title = "Total Food Weight",
-            price = state.cart!!.shippingWeight.toString().toDecimal().toString(),
+            price = if (state.cart != null && state.cart.shippingWeight != null) state.cart.shippingWeight.toString()
+                .toDecimal().toString() else "",
             isWeight = true,
             bold = true
         ),
@@ -484,7 +505,7 @@ fun CheckoutScreenContent(
             }
 
             //cart items
-            val items = state.cart.result.map { it.toCommonForWishAndCartItem() }.toList()
+            val items = state.cart!!.result.map { it.toCommonForWishAndCartItem() }.toList()
             items(items) { item ->
                 SingleCartAndWishlistItem(
                     isWishList = false, item,
@@ -888,7 +909,7 @@ fun CancellationPolicy(
         )
 
         Text(
-            text =  buildAnnotatedString {
+            text = buildAnnotatedString {
                 withStyle(SpanStyle(fontWeight = FontWeight.Light)) {
                     append("We assure the same ")
                 }
@@ -912,7 +933,7 @@ fun CancellationPolicy(
         )
 
         Text(
-            text =  buildAnnotatedString {
+            text = buildAnnotatedString {
                 withStyle(SpanStyle(fontWeight = FontWeight.Light)) {
                     append("Order can be cancelled ")
                 }

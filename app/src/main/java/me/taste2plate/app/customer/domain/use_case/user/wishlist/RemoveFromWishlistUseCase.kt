@@ -22,7 +22,7 @@ class RemoveFromWishlistUseCase @Inject constructor(
             emit(Resource.Loading(true))
             try {
                 val response = repo.deleteFromWishlist(
-                    userId = userPref.getUser().id,
+                    userId = userPref.getUser()!!.id,
                     productId = productId
                 )
                 emit(Resource.Success(response))

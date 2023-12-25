@@ -22,7 +22,7 @@ class AddToCartUseCase @Inject constructor(
             emit(Resource.Loading(true))
             try {
                 val response = repo.addToCart(
-                    userId = userPref.getUser().id,
+                    userId = userPref.getUser()!!.id,
                     pId = productId,
                     quantity = 1
 

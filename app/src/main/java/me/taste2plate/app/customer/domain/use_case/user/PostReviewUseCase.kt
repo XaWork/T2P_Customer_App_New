@@ -25,7 +25,7 @@ class PostReviewUseCase @Inject constructor(
             try {
                 val user = userPref.getUser()
                 val response = repo.postReview(
-                    userId = user.id,
+                    userId = user!!.id,
                     productId = productId,
                     name = user.fullName?:"",
                     email = user.email?:"",

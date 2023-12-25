@@ -14,9 +14,12 @@ import me.taste2plate.app.customer.data.Resource
 import me.taste2plate.app.customer.data.Status
 import me.taste2plate.app.customer.domain.model.StateListModel
 import me.taste2plate.app.customer.domain.model.custom.City
+import me.taste2plate.app.customer.domain.model.custom.LogRequest
+import me.taste2plate.app.customer.domain.model.custom.LogType
 import me.taste2plate.app.customer.domain.use_case.CityListByStateUseCase
 import me.taste2plate.app.customer.domain.use_case.StateListUseCase
 import me.taste2plate.app.customer.domain.use_case.ZipListUseCase
+import me.taste2plate.app.customer.domain.use_case.analytics.AddLogUseCase
 import me.taste2plate.app.customer.domain.use_case.user.address.AddAddressUseCase
 import me.taste2plate.app.customer.domain.use_case.user.address.AllAddressUseCase
 import me.taste2plate.app.customer.domain.use_case.user.address.DeleteAddressUseCase
@@ -32,6 +35,7 @@ class AddressViewModel @Inject constructor(
     private val cityListUseCase: CityListByStateUseCase,
     private val zipListUseCase: ZipListUseCase,
     private val addAddressUseCase: AddAddressUseCase,
+    private val addLogUseCase: AddLogUseCase,
     private val editAddressUseCase: EditAddressUseCase
 ) : ViewModel() {
 
@@ -85,15 +89,29 @@ class AddressViewModel @Inject constructor(
                 getCityList()
             }
 
+            is AddressEvents.AddLog -> {
+                addLog(event.logRequest)
+            }
+
             is AddressEvents.AddAddress -> {
-                if (validateFrom())
+                if (!state.zipList.map { it.name }.toList().contains(pincodeA.value)) {
+                    state = state.copy(
+                        isError = true,
+                        message = "Enter valid pinCode. Please select from dropdown."
+                    )
+                } else if (validateFrom())
                     addAddress()
                 else
                     state = state.copy(isError = true, message = "Fill all mandatory fields.")
             }
 
             is AddressEvents.EditAddress -> {
-                if (validateFrom())
+                if (!state.zipList.map { it.name }.toList().contains(pincodeA.value)) {
+                    state = state.copy(
+                        isError = true,
+                        message = "Enter valid pinCode. Please select from dropdown."
+                    )
+                } else if (validateFrom())
                     editAddress()
                 else
                     state = state.copy(isError = true, message = "Fill all mandatory fields.")
@@ -121,6 +139,12 @@ class AddressViewModel @Inject constructor(
         }
     }
 
+    private fun addLog(logRequest: LogRequest) {
+        viewModelScope.launch {
+            addLogUseCase.execute(logRequest)
+        }
+    }
+
     private fun searchPin(query: String) {
         filterPinList.clear()
         pinCodeExpanded = false
@@ -130,7 +154,7 @@ class AddressViewModel @Inject constructor(
                 pinCodeExpanded = true
                 Log.e("Search pin", "zip item  is ${item.name}")
                 filterPinList += item.name
-            }else{
+            } else {
                 pinCodeExpanded = false
             }
         }
@@ -175,21 +199,24 @@ class AddressViewModel @Inject constructor(
     ) {
         viewModelScope.launch {
             stateListUseCase.execute().collect { result ->
-                state = when (result) {
-                    is Resource.Loading -> state.copy(isLoading = isLoading)
+                when (result) {
+                    is Resource.Loading -> state = state.copy(isLoading = isLoading)
                     is Resource.Success -> {
                         val data = result.data
                         val isError = data?.status == Status.error.name
 
-                        state.copy(
+                        state = state.copy(
                             isLoading = false,
                             isError = isError,
                             stateList = if (isError) emptyList() else data!!.result.sortedBy { it.name }
                         )
+
+                        if (!isError && addressIndex != -1)
+                            getCityList()
                     }
 
                     is Resource.Error ->
-                        state.copy(
+                        state = state.copy(
                             isLoading = false,
                             isError = true,
                             message = result.message
@@ -211,30 +238,35 @@ class AddressViewModel @Inject constructor(
 
     }
 
-    private fun getCityList(
-    ) {
+    private fun getCityList() {
         //change value
-        cityA.value = ""
-        pincodeA.value = ""
+        if (addressIndex == -1) {
+            cityA.value = ""
+            pincodeA.value = ""
+        }
 
         val stateId = getItemId(stateList = state.stateList)
 
         viewModelScope.launch {
             cityListUseCase.execute(stateId).collect { result ->
-                state = when (result) {
-                    is Resource.Loading -> state.copy(isLoading = false)
+                when (result) {
+                    is Resource.Loading -> state = state.copy(isLoading = false)
                     is Resource.Success -> {
                         val data = result.data
                         val isError = data?.status == Status.error.name
-                        state.copy(
+
+                        state = state.copy(
                             isLoading = false,
                             isError = isError,
                             cityList = if (isError) emptyList() else data!!.result
                         )
+
+                        if (!isError && addressIndex != -1)
+                            getZipList()
                     }
 
                     is Resource.Error ->
-                        state.copy(
+                        state = state.copy(
                             isLoading = false,
                             isError = true,
                             message = result.message
@@ -246,7 +278,8 @@ class AddressViewModel @Inject constructor(
     }
 
     private fun getZipList() {
-        pincodeA.value = ""
+        if (addressIndex == -1)
+            pincodeA.value = ""
 
         val cityId = getItemId(
             city = true,
@@ -331,8 +364,16 @@ class AddressViewModel @Inject constructor(
                         val data = result.data
                         val isError = data?.status == Status.error.name
 
-                        if (!isError)
+                        if (!isError) {
+                            addLog(
+                                LogRequest(
+                                    type = LogType.actionPerform,
+                                    event = "User delete address successfully",
+                                    page_name = "/address"
+                                )
+                            )
                             getAddressList(isLoading = false)
+                        }
 
                         state.copy(
                             isLoading = false,
@@ -375,6 +416,15 @@ class AddressViewModel @Inject constructor(
                         val data = result.data
                         val isError = data?.status == Status.error.name
 
+                        if (!isError) {
+                            addLog(
+                                LogRequest(
+                                    type = LogType.actionPerform,
+                                    event = "User add address successfully",
+                                    page_name = "/address"
+                                )
+                            )
+                        }
                         state.copy(
                             isLoading = false,
                             isError = isError,
@@ -416,6 +466,14 @@ class AddressViewModel @Inject constructor(
                     is Resource.Success -> {
                         val data = result.data
                         val isError = data?.status == Status.error.name
+
+                        addLog(
+                            LogRequest(
+                                type = LogType.actionPerform,
+                                event = "User edit address successfully",
+                                page_name = "/address"
+                            )
+                        )
 
                         state.copy(
                             isLoading = false,

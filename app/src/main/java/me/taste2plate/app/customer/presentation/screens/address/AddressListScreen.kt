@@ -22,8 +22,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import me.taste2plate.app.customer.domain.model.custom.LogRequest
+import me.taste2plate.app.customer.domain.model.custom.LogType
 import me.taste2plate.app.customer.domain.model.user.address.AddressListModel
 import me.taste2plate.app.customer.presentation.dialog.DeleteAddressDialog
+import me.taste2plate.app.customer.presentation.screens.auth.AuthEvents
 import me.taste2plate.app.customer.presentation.theme.LowElevation
 import me.taste2plate.app.customer.presentation.theme.ScreenPadding
 import me.taste2plate.app.customer.presentation.theme.SpaceBetweenViews
@@ -53,6 +56,17 @@ fun AddressListScreen(
         mutableStateOf(false)
     }
 
+    LaunchedEffect(true){
+        viewModel.onEvent(
+            AddressEvents.AddLog(
+            LogRequest(
+                type = LogType.pageVisit,
+                event = "enter in address list screen",
+                page_name = "/address"
+            )
+        ))
+    }
+
     if (showDeleteDialog)
         DeleteAddressDialog(onDismissRequest = {
             showDeleteDialog = false
@@ -73,6 +87,8 @@ fun AddressListScreen(
             }
         }
     }
+
+
 
 
     AppScaffold(

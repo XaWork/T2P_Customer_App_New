@@ -10,10 +10,14 @@ import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
 import me.taste2plate.app.customer.presentation.theme.ScreenPadding
 import me.taste2plate.app.customer.presentation.theme.SpaceBetweenViewsAndSubViews
 import me.taste2plate.app.customer.presentation.theme.primaryColor
@@ -26,6 +30,7 @@ import me.taste2plate.app.customer.presentation.widgets.VerticalSpace
 fun GPSEnableScreen(
     onNavigateToGpsSetting: () -> Unit
 ) {
+
     AppScaffold {
         Box(
             modifier = Modifier

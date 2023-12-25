@@ -18,9 +18,12 @@ import me.taste2plate.app.customer.data.Status
 import me.taste2plate.app.customer.data.Taste
 import me.taste2plate.app.customer.data.UserPref
 import me.taste2plate.app.customer.domain.model.SettingsModel
+import me.taste2plate.app.customer.domain.model.custom.LogRequest
+import me.taste2plate.app.customer.domain.model.custom.LogType
 import me.taste2plate.app.customer.domain.model.user.address.AddressListModel
 import me.taste2plate.app.customer.domain.use_case.HomeUseCase
 import me.taste2plate.app.customer.domain.use_case.SettingsUseCase
+import me.taste2plate.app.customer.domain.use_case.analytics.AddLogUseCase
 import me.taste2plate.app.customer.domain.use_case.user.address.AllAddressUseCase
 import me.taste2plate.app.customer.domain.use_case.user.cart.AddToCartUseCase
 import me.taste2plate.app.customer.domain.use_case.user.cart.CartUseCase
@@ -43,6 +46,7 @@ class HomeViewModel @Inject constructor(
     private val updateCartUseCase: UpdateCartUseCase,
     private val deleteCartUseCase: DeleteCartUseCase,
     private val addToCartUseCase: AddToCartUseCase,
+    private val addLogUseCase: AddLogUseCase,
     private val settingUseCase: SettingsUseCase
 ) : ViewModel() {
 
@@ -60,6 +64,10 @@ class HomeViewModel @Inject constructor(
 
             is HomeEvent.GetWishlist -> {
                 getWishlist()
+            }
+
+            is HomeEvent.AddLog -> {
+                addLog(event.logRequest)
             }
 
             is HomeEvent.LogOut -> {
@@ -139,6 +147,12 @@ class HomeViewModel @Inject constructor(
                     }
                 }
             }
+        }
+    }
+
+    private fun addLog(logRequest: LogRequest) {
+        viewModelScope.launch {
+            addLogUseCase.execute(logRequest)
         }
     }
 
@@ -323,6 +337,16 @@ class HomeViewModel @Inject constructor(
 
                     is Resource.Success -> {
                         val isError = result.data?.status == Status.error.name
+                        if (!isError) {
+                            addLog(
+                                LogRequest(
+                                    type = LogType.actionPerform,
+                                    event = "remove from wishlist",
+                                    page_name = "/home",
+                                    product_id = productId
+                                )
+                            )
+                        }
                         val data = result.data
                         state = state.copy(
                             isLoading = false,
@@ -375,6 +399,14 @@ class HomeViewModel @Inject constructor(
 
                         if (!isError) {
                             addAppEvent(context, productId, quantity)
+                            addLog(
+                                LogRequest(
+                                    type = LogType.addToCart,
+                                    event = "update Cart",
+                                    page_name = "/home",
+                                    product_id = productId
+                                )
+                            )
                         }
                         state.copy(
                             isLoading = false,
@@ -408,6 +440,17 @@ class HomeViewModel @Inject constructor(
                     is Resource.Success -> {
                         val data = result.data
                         val isError = data?.status == Status.error.name
+
+                        if (!isError)
+                            addLog(
+                                LogRequest(
+                                    type = LogType.actionPerform,
+                                    event = "delete Cart",
+                                    page_name = "/home",
+                                    product_id = productId
+                                )
+                            )
+
                         getCart()
 
                         state.copy(
@@ -524,13 +567,26 @@ class HomeViewModel @Inject constructor(
                     }
 
                     is Resource.Success -> {
+                        val isError = result.data?.status == Status.error.name
+
+                        if (!isError)
+                            addLog(
+                                LogRequest(
+                                    type = LogType.addToWishlist,
+                                    event = "Add to wishlist",
+                                    page_name = "/home",
+                                    product_id = productId
+                                )
+                            )
+
+
                         getWishlist()
                         state =
                             state.copy(
                                 isLoading = false,
                                 addToWishlistResponse = result.data,
                                 message = result.data?.message,
-                                isError = result.data?.status == Status.error.name,
+                                isError = isError,
                                 errorMessage = result.data?.message,
                                 foodItemUpdateInfo = state.foodItemUpdateInfo?.copy(
                                     isLoading = false,
@@ -567,6 +623,15 @@ class HomeViewModel @Inject constructor(
 
                     is Resource.Success -> {
                         val isError = result.data?.status == Status.error.name
+                        if (!isError)
+                            addLog(
+                                LogRequest(
+                                    type = LogType.addToCart,
+                                    event = "Add to cart",
+                                    page_name = "/home",
+                                    product_id = productId
+                                )
+                            )
                         state =
                             state.copy(
                                 isLoading = false,

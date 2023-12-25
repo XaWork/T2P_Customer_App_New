@@ -20,7 +20,7 @@ class AllAddressUseCase @Inject constructor(
         return flow {
             emit(Resource.Loading(true))
             try {
-                val userId = userPref.getUser().id
+                val userId = userPref.getUser()!!.id
                 val response = repo.allAddress(userId)
                 emit(Resource.Success(response))
             } catch (io: IOException) {

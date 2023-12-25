@@ -37,7 +37,7 @@ class InitCheckoutUseCase @Inject constructor(
         return flow {
             emit(Resource.Loading(true))
             try {
-                val userId = userPref.getUser().id
+                val userId = userPref.getUser()!!.id
                 val addressId = userPref.getDefaultAddress()!!.id
                 val customerCity = userPref.getDefaultAddress()!!.city.id
                 val zip = userPref.getDefaultAddress()!!.pincode

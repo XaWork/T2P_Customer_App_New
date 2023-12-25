@@ -11,11 +11,13 @@ import me.taste2plate.app.customer.data.Resource
 import me.taste2plate.app.customer.data.Status
 import me.taste2plate.app.customer.domain.mapper.CommonForItem
 import me.taste2plate.app.customer.domain.mapper.toCommonItem
+import me.taste2plate.app.customer.domain.model.custom.LogRequest
 import me.taste2plate.app.customer.domain.use_case.BrandListUseCase
 import me.taste2plate.app.customer.domain.use_case.CategoryUseCase
 import me.taste2plate.app.customer.domain.use_case.CityListUseCase
 import me.taste2plate.app.customer.domain.use_case.CuisineUseCase
 import me.taste2plate.app.customer.domain.use_case.SubCategoryUseCase
+import me.taste2plate.app.customer.domain.use_case.analytics.AddLogUseCase
 import me.taste2plate.app.customer.presentation.screens.home.CityBrandScreens
 import javax.inject.Inject
 
@@ -24,6 +26,7 @@ class CityBrandViewModel @Inject constructor(
     private val cityListUseCase: CityListUseCase,
     private val brandListUseCase: BrandListUseCase,
     private val cuisineUseCase: CuisineUseCase,
+    private val addLogUseCase: AddLogUseCase,
     private val categoryUseCase: CategoryUseCase,
     private val subCategoryUseCase: SubCategoryUseCase
 ) : ViewModel() {
@@ -61,9 +64,20 @@ class CityBrandViewModel @Inject constructor(
                 selectedItem = event.item
             }
 
+            is CityBrandEvents.AddLog -> {
+                addLog(event.logRequest)
+            }
+
             is CityBrandEvents.GetSubCategory -> {
                 getAllSubCategories()
             }
+        }
+    }
+
+
+    private fun addLog(logRequest: LogRequest) {
+        viewModelScope.launch {
+            addLogUseCase.execute(logRequest)
         }
     }
 

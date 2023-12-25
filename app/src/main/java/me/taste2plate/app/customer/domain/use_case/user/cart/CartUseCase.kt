@@ -19,7 +19,7 @@ class CartUseCase @Inject constructor(
     ): Flow<Resource<CartModel>> {
         val defaultAddress = userPref.getDefaultAddress()!!
         val city = defaultAddress.city.id
-        val userId = userPref.getUser().id
+        val userId = userPref.getUser()!!.id
         val zip = defaultAddress.pincode
 
         return flow {

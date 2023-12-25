@@ -135,15 +135,12 @@ class UserPref @Inject constructor(
         getUser()
     }
 
-    suspend fun getUser(): User {
+    suspend fun getUser(): User? {
         val userFlow = dataStore.data.map { preferences ->
             preferences[KEY_USER]
         }
 
-        val user: User = Gson().fromJson(userFlow.first(), User::class.java)
-        //Log.e("user","User is ${userFlow.first()}")
-
-        return user
+        return Gson().fromJson(userFlow.first(), User::class.java) ?: null
     }
 
 
@@ -196,6 +193,7 @@ class UserPref @Inject constructor(
     suspend fun logOut() {
         val setting = getSettings()
         val token = getToken()
+        val ipAddress = getIp();
 
         dataStore.edit {
             it.clear()
@@ -203,6 +201,7 @@ class UserPref @Inject constructor(
 
         saveSettings(setting)
         saveToken(token)
+        saveIp(ipAddress)
     }
 
 }

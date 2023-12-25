@@ -18,19 +18,22 @@ class AddLogUseCase @Inject constructor(
 ) {
     suspend fun execute(
         logRequest: LogRequest
-    ): Flow<Resource<LogCreatedResponse>> {
-        return flow {
+    )//: Flow<Resource<LogCreatedResponse>>
+    {
+        val user = userPref.getUser()
+        val response = repo.addLog(
+            logRequest.copy(
+                category = userPref.getReferralInfo()[0],
+                token = userPref.getReferralInfo()[1],
+                user_id = user?.id ?: "",
+                geo_ip = userPref.getIp(),
+                source = "android"
+            )
+        )
+      /*  return flow {
             emit(Resource.Loading(true))
             try {
-                val response = repo.addLog(
-                    logRequest.copy(
-                        category = userPref.getReferralInfo()[0],
-                        token = userPref.getReferralInfo()[1],
-                        user_id = userPref.getUser().id,
-                        geo_ip = userPref.getIp(),
-                        source = "android"
-                    )
-                )
+
                 emit(Resource.Success(response))
             } catch (io: IOException) {
                 io.printStackTrace()
@@ -42,6 +45,6 @@ class AddLogUseCase @Inject constructor(
                 http.printStackTrace()
                 emit(Resource.Error(message = ApiErrorMessages.eException))
             }
-        }
+        }*/
     }
 }

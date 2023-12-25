@@ -15,6 +15,9 @@ import me.taste2plate.app.customer.data.Resource
 import me.taste2plate.app.customer.data.Status
 import me.taste2plate.app.customer.data.UserPref
 import me.taste2plate.app.customer.domain.model.auth.VerifyOTPModel
+import me.taste2plate.app.customer.domain.model.custom.LogRequest
+import me.taste2plate.app.customer.domain.model.custom.LogType
+import me.taste2plate.app.customer.domain.use_case.analytics.AddLogUseCase
 import me.taste2plate.app.customer.domain.use_case.auth.LoginUseCase
 import me.taste2plate.app.customer.domain.use_case.auth.VerifyOTPUseCase
 import me.taste2plate.app.customer.domain.use_case.user.EditProfileUseCase
@@ -28,6 +31,7 @@ class AuthViewModel @Inject constructor(
     private val verifyOTPUseCase: VerifyOTPUseCase,
     private val getProfileUseCase: GetProfileUseCase,
     private val editProfileUseCase: EditProfileUseCase,
+    private val addLogUseCase: AddLogUseCase,
     private val userPref: UserPref
 ) : ViewModel() {
 
@@ -42,27 +46,32 @@ class AuthViewModel @Inject constructor(
 
     fun onEvent(event: AuthEvents) {
         when (event) {
-            AuthEvents.Login -> {
+            is AuthEvents.Login -> {
                 validateMobile()
             }
 
-            AuthEvents.VerifyOTP -> {
+            is AuthEvents.VerifyOTP -> {
                 validateOTP()
             }
 
-            AuthEvents.GetUser -> {
+            is AuthEvents.GetUser -> {
                 getUser()
             }
 
-            AuthEvents.ResendOTP -> {
+            is AuthEvents.ResendOTP -> {
                 login()
             }
 
-            AuthEvents.UpdateState -> {
+
+            is AuthEvents.AddLog -> {
+                addLog(event.logRequest)
+            }
+
+            is AuthEvents.UpdateState -> {
                 state = state.copy(loading = false, isError = false, message = null)
             }
 
-            AuthEvents.SignUp -> {
+            is AuthEvents.SignUp -> {
                 if (signUpFormValidate() && state.user != null)
                     editProfile()
                 else
@@ -163,8 +172,16 @@ class AuthViewModel @Inject constructor(
                             isError = isError,
                         )
 
-                        if (!isError)
+                        if (!isError) {
+                            addLog(
+                                LogRequest(
+                                    type = LogType.login,
+                                    event = if(state.loginModel!!.newUser) "Sign up successfully" else "login successfully",
+                                    page_name = "/onboarding"
+                                )
+                            )
                             saveUser(result.data!!)
+                        }
                     }
 
                     is Resource.Error -> {
@@ -260,4 +277,9 @@ class AuthViewModel @Inject constructor(
         }
     }
 
+    private fun addLog(logRequest: LogRequest) {
+        viewModelScope.launch {
+            addLogUseCase.execute(logRequest)
+        }
+    }
 }

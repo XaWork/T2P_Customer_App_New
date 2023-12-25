@@ -23,7 +23,7 @@ class UpdateCartUseCase @Inject constructor(
             emit(Resource.Loading(true))
             try {
                 val response = repo.updateCart(
-                    userId = userPref.getUser().id,
+                    userId = userPref.getUser()!!.id,
                     productID = productId,
                     quantity = quantity
                 )

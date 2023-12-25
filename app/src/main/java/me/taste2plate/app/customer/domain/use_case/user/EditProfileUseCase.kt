@@ -23,7 +23,7 @@ class EditProfileUseCase @Inject constructor(
         return flow {
             emit(Resource.Loading(true))
             try {
-                val userId = userPref.getUser().id
+                val userId = userPref.getUser()!!.id
                 val response = repo.editProfile(userId, fullName, mobile, email)
                 emit(Resource.Success(response))
             } catch (io: IOException) {

@@ -36,6 +36,8 @@ import com.facebook.appevents.AppEventsConstants
 import com.facebook.appevents.AppEventsLogger
 import com.google.android.gms.auth.api.identity.Identity
 import me.taste2plate.app.customer.R
+import me.taste2plate.app.customer.domain.model.custom.LogRequest
+import me.taste2plate.app.customer.domain.model.custom.LogType
 import me.taste2plate.app.customer.presentation.screens.auth.AuthEvents
 import me.taste2plate.app.customer.presentation.screens.auth.AuthViewModel
 import me.taste2plate.app.customer.presentation.screens.home.widgets.HeadingChipWithLine
@@ -72,6 +74,16 @@ fun OnBoardingScreen(
                 onNavigateToOtpScreen()
             }
         }
+    }
+
+    LaunchedEffect(true){
+        viewModel.onEvent(AuthEvents.AddLog(
+            LogRequest(
+                type =LogType.pageVisit,
+                event = "enter in onboarding screen",
+                page_name = "/onboarding"
+            )
+        ))
     }
 
 

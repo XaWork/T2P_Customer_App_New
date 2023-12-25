@@ -16,6 +16,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.AnnotatedString
@@ -27,8 +28,11 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import me.taste2plate.app.customer.domain.model.custom.LogRequest
+import me.taste2plate.app.customer.domain.model.custom.LogType
 import me.taste2plate.app.customer.domain.model.user.MyPlanModel
 import me.taste2plate.app.customer.domain.model.user.WalletTransactionModel
+import me.taste2plate.app.customer.presentation.screens.home.HomeEvent
 import me.taste2plate.app.customer.presentation.theme.ScreenPadding
 import me.taste2plate.app.customer.presentation.theme.SpaceBetweenViewsAndSubViews
 import me.taste2plate.app.customer.presentation.theme.T2PCustomerAppTheme
@@ -51,6 +55,16 @@ fun WalletScreen(
     navigateBack: () -> Unit,
 ) {
     val state = viewModel.state
+    LaunchedEffect(true){
+        viewModel.onEvent(
+            WalletEvents.AddLog(
+                LogRequest(
+                    type = LogType.pageVisit,
+                    event = "enter in wallet screen",
+                    page_name = "/wallet"
+                )
+            ))
+    }
 
     AppScaffold(
         topBar = {

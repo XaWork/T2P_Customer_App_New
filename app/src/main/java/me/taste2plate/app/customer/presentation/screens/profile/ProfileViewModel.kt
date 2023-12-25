@@ -10,6 +10,9 @@ import kotlinx.coroutines.launch
 import me.taste2plate.app.customer.data.Resource
 import me.taste2plate.app.customer.data.Status
 import me.taste2plate.app.customer.data.UserPref
+import me.taste2plate.app.customer.domain.model.custom.LogRequest
+import me.taste2plate.app.customer.domain.model.custom.LogType
+import me.taste2plate.app.customer.domain.use_case.analytics.AddLogUseCase
 import me.taste2plate.app.customer.domain.use_case.user.EditProfileUseCase
 import me.taste2plate.app.customer.domain.use_case.user.GetProfileUseCase
 import javax.inject.Inject
@@ -17,6 +20,7 @@ import javax.inject.Inject
 @HiltViewModel
 class ProfileViewModel @Inject constructor(
     private val userPref: UserPref,
+    private val addLogUseCase: AddLogUseCase,
     private val editProfileUseCase: EditProfileUseCase,
     private val getProfileUseCase: GetProfileUseCase
 ) : ViewModel() {
@@ -46,6 +50,16 @@ class ProfileViewModel @Inject constructor(
             ProfileEvents.UpdateState -> {
                 state = state.copy(isError = false, message = null)
             }
+
+            is ProfileEvents.AddLog -> {
+                addLog(event.logRequest)
+            }
+        }
+    }
+
+    private fun addLog(logRequest: LogRequest) {
+        viewModelScope.launch {
+            addLogUseCase.execute(logRequest)
         }
     }
 
@@ -82,8 +96,16 @@ class ProfileViewModel @Inject constructor(
                             message = result.data?.message,
                         )
 
-                        if (!isError)
+                        if (!isError) {
                             getProfile()
+                            addLog(
+                                LogRequest(
+                                    type = LogType.actionPerform,
+                                    event = "profile update successfully",
+                                    page_name = "/profile",
+                                )
+                            )
+                        }
                     }
 
                     is Resource.Error -> {
@@ -112,13 +134,13 @@ class ProfileViewModel @Inject constructor(
 
                         if (!isError) {
                             userPref.saveUser(result.data!!.result)
-                            state = state.copy(userUpdate  = true)
+                            state = state.copy(userUpdate = true)
                         }
 
                         state = state.copy(
                             isLoading = false,
                             isError = isError,
-                           // message = result.data?.message,
+                            // message = result.data?.message,
                         )
                     }
 

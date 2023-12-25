@@ -9,6 +9,8 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import me.taste2plate.app.customer.data.Resource
 import me.taste2plate.app.customer.data.Status
+import me.taste2plate.app.customer.domain.model.custom.LogRequest
+import me.taste2plate.app.customer.domain.use_case.analytics.AddLogUseCase
 import me.taste2plate.app.customer.domain.use_case.custom.AllPlanUseCase
 import me.taste2plate.app.customer.domain.use_case.user.MyPlanUseCase
 import me.taste2plate.app.customer.presentation.screens.membership_plan.MembershipState
@@ -16,7 +18,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class MyPlanViewModel @Inject constructor(
-    private val myPlanUseCase: MyPlanUseCase
+    private val myPlanUseCase: MyPlanUseCase,
+    private val addLogUseCase: AddLogUseCase,
 ) : ViewModel() {
 
     var state by mutableStateOf(MyPlanState())
@@ -24,6 +27,11 @@ class MyPlanViewModel @Inject constructor(
 
     init {
         getMyPlan()
+    }
+      fun addLog(logRequest: LogRequest) {
+        viewModelScope.launch {
+            addLogUseCase.execute(logRequest)
+        }
     }
 
     private fun getMyPlan() {

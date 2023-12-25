@@ -32,7 +32,7 @@ class EditAddressUseCase @Inject constructor(
         return flow {
             emit(Resource.Loading(true))
             try {
-                val userId = userPref.getUser().id
+                val userId = userPref.getUser()!!.id
                 val response = repo.editAddress(
                     addressId,
                     name,

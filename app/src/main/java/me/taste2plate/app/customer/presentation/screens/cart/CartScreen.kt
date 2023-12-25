@@ -31,6 +31,8 @@ import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import me.taste2plate.app.customer.domain.mapper.CommonForItem
 import me.taste2plate.app.customer.domain.mapper.toCommonForWishAndCartItem
+import me.taste2plate.app.customer.domain.model.custom.LogRequest
+import me.taste2plate.app.customer.domain.model.custom.LogType
 import me.taste2plate.app.customer.presentation.screens.product.CartAddRemove
 import me.taste2plate.app.customer.presentation.theme.ExtraHighPadding
 import me.taste2plate.app.customer.presentation.theme.LowRoundedCorners
@@ -72,6 +74,17 @@ fun CartScreen(
 
             viewModel.onEvent(CheckoutEvents.UpdateState)
         }
+    }
+
+    LaunchedEffect(true){
+        viewModel.onEvent(
+            CheckoutEvents.AddLog(
+                LogRequest(
+                    type = LogType.pageVisit,
+                    event = "enter in cart screen",
+                    page_name = "/cart"
+                )
+            ))
     }
 
     AppScaffold(

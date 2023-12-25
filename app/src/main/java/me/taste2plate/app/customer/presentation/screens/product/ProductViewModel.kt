@@ -17,6 +17,9 @@ import me.taste2plate.app.customer.data.Resource
 import me.taste2plate.app.customer.data.Status
 import me.taste2plate.app.customer.data.Taste
 import me.taste2plate.app.customer.data.UserPref
+import me.taste2plate.app.customer.domain.model.custom.LogRequest
+import me.taste2plate.app.customer.domain.model.custom.LogType
+import me.taste2plate.app.customer.domain.use_case.analytics.AddLogUseCase
 import me.taste2plate.app.customer.domain.use_case.custom.CheckAvalibilityUseCase
 import me.taste2plate.app.customer.domain.use_case.product.ProductBy
 import me.taste2plate.app.customer.domain.use_case.product.ProductDetailsUseCase
@@ -44,6 +47,7 @@ class ProductViewModel @Inject constructor(
     private val wishlistUseCase: WishlistUseCase,
     private val addToWishlistUseCase: AddToWishlistUseCase,
     private val postReviewUseCase: PostReviewUseCase,
+    private val addLogUseCase: AddLogUseCase,
     private val userPrefs: UserPref,
     private val checkAvalibilityUseCase: CheckAvalibilityUseCase,
     private val updateCartUseCase: UpdateCartUseCase,
@@ -89,12 +93,18 @@ class ProductViewModel @Inject constructor(
                         getProductList(ProductBy.Slider, itemId)
                     }
 
+
                 }
             }
 
             is ProductEvents.ChangeTaste -> {
                 setTaste()
             }
+
+            is ProductEvents.AddLog -> {
+                addLog(event.logRequest)
+            }
+
 
             is ProductEvents.PostReview -> {
                 postReview(event.rating, event.review)
@@ -159,6 +169,14 @@ class ProductViewModel @Inject constructor(
         }
     }
 
+
+    private fun addLog(logRequest: LogRequest) {
+        viewModelScope.launch {
+            addLogUseCase.execute(logRequest)
+        }
+    }
+
+
     private fun setTaste() {
         viewModelScope.launch {
             userPrefs.setTaste()
@@ -200,13 +218,23 @@ class ProductViewModel @Inject constructor(
                     }
 
                     is Resource.Success -> {
+                        val isError = result.data?.status == Status.error.name
                         getWishlist()
+                        if (!isError)
+                            addLog(
+                                LogRequest(
+                                    type = LogType.addToWishlist,
+                                    event = "Add to wishlist",
+                                    page_name = "/productList",
+                                    product_id = productId
+                                )
+                            )
                         state =
                             state.copy(
                                 isLoading = false,
                                 addToWishlistResponse = result.data,
                                 message = result.data?.message,
-                                isError = result.data?.status == Status.error.name,
+                                isError = isError,
                                 foodItemUpdateInfo = state.foodItemUpdateInfo?.copy(
                                     isLoading = false,
                                     added = result.data?.status == Status.success.name
@@ -251,6 +279,16 @@ class ProductViewModel @Inject constructor(
 
                     is Resource.Success -> {
                         val isError = result.data?.status == Status.error.name
+                        if (!isError) {
+                            addLog(
+                                LogRequest(
+                                    type = LogType.actionPerform,
+                                    event = "remove from wishlist",
+                                    page_name = "/productList",
+                                    product_id = productId
+                                )
+                            )
+                        }
                         val data = result.data
                         state = state.copy(
                             isLoading = false,
@@ -306,6 +344,14 @@ class ProductViewModel @Inject constructor(
                                 message = result.data?.message,
                                 isError = result.data?.status == Status.error.name,
                             )
+                        addLog(
+                            LogRequest(
+                                type = LogType.actionPerform,
+                                event = "post review",
+                                page_name = "/productDetails",
+                                product_id = selectedProductId
+                            )
+                        )
 
                         getProductDetails()
                     }
@@ -324,41 +370,56 @@ class ProductViewModel @Inject constructor(
     }
 
     private fun checkAvalibility(zipCode: String) {
-        val vendorId = state.productDetails!!.result[0].vendor.id
-        viewModelScope.launch {
-            checkAvalibilityUseCase.execute(
-                zipCode,
-                vendorId
-            ).collect { result ->
-                when (result) {
-                    is Resource.Loading -> {
-                        state = state.copy(
-                            buttonLoading = true
-                        )
-                    }
-
-                    is Resource.Success -> {
-                        val isError = result.data?.status == Status.error.name
-                        state =
-                            state.copy(
-                                buttonLoading = false,
-                                message = if (result.data?.message.isNullOrEmpty()) "Great!! We are servicing in you area." else result.data?.message,
-                                isError = isError,
-                                addToCartEnable = !isError,
-                                checkAvailabilityModel = result.data
+        if (state.productDetails != null && state.productDetails?.result?.isNotEmpty() == true) {
+            val vendorId = state.productDetails!!.result[0].vendor.id
+            viewModelScope.launch {
+                checkAvalibilityUseCase.execute(
+                    zipCode,
+                    vendorId
+                ).collect { result ->
+                    when (result) {
+                        is Resource.Loading -> {
+                            state = state.copy(
+                                buttonLoading = true
                             )
+                        }
+
+                        is Resource.Success -> {
+                            val isError = result.data?.status == Status.error.name
+
+                            if (!isError) {
+                                addLog(
+                                    LogRequest(
+                                        type = LogType.actionPerform,
+                                        event = "check availability",
+                                        page_name = "/productList",
+                                        product_id = selectedProductId
+                                    )
+                                )
+                            }
+                            state =
+                                state.copy(
+                                    buttonLoading = false,
+                                    message = if (result.data?.message.isNullOrEmpty()) "Great!! We are servicing in you area." else result.data?.message,
+                                    isError = isError,
+                                    addToCartEnable = !isError,
+                                    checkAvailabilityModel = result.data
+                                )
+                        }
+
+                        is Resource.Error -> {
+                            state = state.copy(
+                                isLoading = false,
+                                isError = true,
+                                message = result.message,
+                            )
+                        }
                     }
 
-                    is Resource.Error -> {
-                        state = state.copy(
-                            isLoading = false,
-                            isError = true,
-                            message = result.message,
-                        )
-                    }
                 }
-
             }
+        } else {
+            state = state.copy(isError = true, message = "Something went wrong. Please try again.")
         }
     }
 
@@ -450,8 +511,20 @@ class ProductViewModel @Inject constructor(
                         val data = result.data
                         val isError = data?.status == Status.error.name
 
-                        if (!isError)
+
+
+                        if (!isError) {
                             addAppEvent(context, productId, quantity)
+                            addLog(
+                                LogRequest(
+                                    type = LogType.addToCart,
+                                    event = "update Cart",
+                                    page_name = "/productList",
+                                    product_id = productId
+                                )
+                            )
+                        }
+
                         getCart()
 
                         state.copy(
@@ -487,6 +560,16 @@ class ProductViewModel @Inject constructor(
                         val isError = data?.status == Status.error.name
                         getCart()
 
+                        if (!isError)
+                            addLog(
+                                LogRequest(
+                                    type = LogType.actionPerform,
+                                    event = "delete Cart",
+                                    page_name = "/productList",
+                                    product_id = productId
+                                )
+                            )
+
                         state.copy(
                             // isLoading = false,
                             isError = isError,
@@ -519,8 +602,17 @@ class ProductViewModel @Inject constructor(
                         getCart()
                         val isError = result.data?.status == Status.error.name
 
-                        if (!isError)
+                        if (!isError) {
                             addAppEvent(context, productId, 1)
+                            addLog(
+                                LogRequest(
+                                    type = LogType.addToCart,
+                                    event = "Add to cart",
+                                    page_name = "/home",
+                                    product_id = productId
+                                )
+                            )
+                        }
                         state =
                             state.copy(
                                 message = result.data?.message,

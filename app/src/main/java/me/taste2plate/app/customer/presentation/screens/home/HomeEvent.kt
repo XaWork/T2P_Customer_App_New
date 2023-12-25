@@ -1,11 +1,14 @@
 package me.taste2plate.app.customer.presentation.screens.home
 
 import android.content.Context
+import me.taste2plate.app.customer.domain.model.custom.LogRequest
 import me.taste2plate.app.customer.domain.model.user.address.AddressListModel
+import me.taste2plate.app.customer.presentation.screens.auth.AuthEvents
 
 sealed class HomeEvent {
     object GetHome : HomeEvent()
     object GetWishlist : HomeEvent()
+    data class AddLog(val logRequest: LogRequest) : HomeEvent()
     object LogOut : HomeEvent()
     object GetAddress : HomeEvent()
     object ChangeTaste : HomeEvent()

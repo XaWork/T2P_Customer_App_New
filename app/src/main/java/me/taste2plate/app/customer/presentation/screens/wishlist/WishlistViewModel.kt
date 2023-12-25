@@ -11,7 +11,10 @@ import me.taste2plate.app.customer.T2PApp
 import me.taste2plate.app.customer.data.Resource
 import me.taste2plate.app.customer.data.Status
 import me.taste2plate.app.customer.data.UserPref
+import me.taste2plate.app.customer.domain.model.custom.LogRequest
+import me.taste2plate.app.customer.domain.model.custom.LogType
 import me.taste2plate.app.customer.domain.model.user.DeleteFromWishlistModel
+import me.taste2plate.app.customer.domain.use_case.analytics.AddLogUseCase
 import me.taste2plate.app.customer.domain.use_case.user.wishlist.RemoveFromWishlistUseCase
 import me.taste2plate.app.customer.domain.use_case.user.wishlist.WishlistUseCase
 import javax.inject.Inject
@@ -19,6 +22,7 @@ import javax.inject.Inject
 @HiltViewModel
 class WishlistViewModel @Inject constructor(
     private val wishlistUseCase: WishlistUseCase,
+    private val addLogUseCase: AddLogUseCase,
     private val removeFromWishlistUseCase: RemoveFromWishlistUseCase,
     private val userPref: UserPref
 ) : ViewModel() {
@@ -33,9 +37,16 @@ class WishlistViewModel @Inject constructor(
             }
 
             is WishlistEvents.RemoveFromWishlist -> removeFromWishlist(event.productId)
+            is WishlistEvents.AddLog -> addLog(event.logRequest)
         }
     }
 
+
+    private fun addLog(logRequest: LogRequest) {
+        viewModelScope.launch {
+            addLogUseCase.execute(logRequest)
+        }
+    }
 
     private fun getWishlist(isLoading: Boolean = true) {
         viewModelScope.launch {
@@ -85,6 +96,17 @@ class WishlistViewModel @Inject constructor(
                     }
 
                     is Resource.Success -> {
+                        val isError = result.data?.status == Status.error.name
+                        if (!isError) {
+                            addLog(
+                                LogRequest(
+                                    type = LogType.actionPerform,
+                                    event = "remove from wishlist",
+                                    page_name = "/wishlist",
+                                    product_id = productId
+                                )
+                            )
+                        }
                         state = state.copy(
                             isLoading = false,
                             isError = result.data?.status == Status.error.name,

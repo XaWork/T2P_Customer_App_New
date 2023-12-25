@@ -43,6 +43,8 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import me.taste2plate.app.customer.domain.model.custom.LogRequest
+import me.taste2plate.app.customer.domain.model.custom.LogType
 import me.taste2plate.app.customer.domain.model.user.OrderListModel
 import me.taste2plate.app.customer.presentation.dialog.CustomDialog
 import me.taste2plate.app.customer.presentation.dialog.SettingDialogType
@@ -82,10 +84,19 @@ fun OrderDetailsScreen(
 ) {
     val state = viewModel.state
 
-    LaunchedEffect(Unit) {
-        viewModel.onEvent(OrderEvent.GetOrderUpdate)
-    }
 
+    LaunchedEffect(true){
+        viewModel.onEvent(OrderEvent.GetOrderUpdate)
+        viewModel.onEvent(
+            OrderEvent.AddLog(
+                LogRequest(
+                    type = LogType.pageVisit,
+                    event = "enter in order details screen",
+                    page_name = "/order",
+                    order_id = viewModel.selectedOrder?.id ?: ""
+                )
+            ))
+    }
 
     var showOrderTrackDialog by remember {
         mutableStateOf(false)

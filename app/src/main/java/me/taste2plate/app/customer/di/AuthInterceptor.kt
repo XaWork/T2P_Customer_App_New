@@ -1,5 +1,6 @@
 package me.taste2plate.app.customer.di
 
+/*
 import android.text.TextUtils
 import okhttp3.Interceptor
 import okhttp3.Request
@@ -16,4 +17,4 @@ class AuthInterceptor(private val authToken: String) : Interceptor {
 
         return chain.proceed(builder.build())
     }
-}
+}*/

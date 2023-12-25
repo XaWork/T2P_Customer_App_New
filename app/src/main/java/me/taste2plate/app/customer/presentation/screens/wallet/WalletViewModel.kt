@@ -10,6 +10,8 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import me.taste2plate.app.customer.data.Resource
 import me.taste2plate.app.customer.data.Status
+import me.taste2plate.app.customer.domain.model.custom.LogRequest
+import me.taste2plate.app.customer.domain.use_case.analytics.AddLogUseCase
 import me.taste2plate.app.customer.domain.use_case.user.MyPlanUseCase
 import me.taste2plate.app.customer.domain.use_case.user.WalletTransactionUseCase
 import javax.inject.Inject
@@ -17,6 +19,7 @@ import javax.inject.Inject
 @HiltViewModel
 class WalletViewModel @Inject constructor(
     private val myPlanUseCase: MyPlanUseCase,
+    private val addLogUseCase: AddLogUseCase,
     private val walletTransactionUseCase: WalletTransactionUseCase
 ) : ViewModel() {
 
@@ -32,10 +35,18 @@ class WalletViewModel @Inject constructor(
             is WalletEvents.GetWalletData -> {
                 getWalletData()
             }
+            is WalletEvents.AddLog -> {
+                addLog(event.logRequest)
+            }
 
             is WalletEvents.GetWalletTransaction -> {
                 getWalletTransaction()
             }
+        }
+    }
+    private fun addLog(logRequest: LogRequest) {
+        viewModelScope.launch {
+            addLogUseCase.execute(logRequest)
         }
     }
 

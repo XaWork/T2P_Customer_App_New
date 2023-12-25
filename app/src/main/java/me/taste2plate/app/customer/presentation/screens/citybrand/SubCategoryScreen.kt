@@ -18,6 +18,8 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import me.taste2plate.app.customer.domain.mapper.CommonForItem
+import me.taste2plate.app.customer.domain.model.custom.LogRequest
+import me.taste2plate.app.customer.domain.model.custom.LogType
 import me.taste2plate.app.customer.presentation.screens.home.CityBrandScreens
 import me.taste2plate.app.customer.presentation.theme.LowElevation
 import me.taste2plate.app.customer.presentation.theme.ScreenPadding
@@ -43,6 +45,17 @@ fun SubCategoryScreen(
 
     LaunchedEffect(!state.showSubCategories) {
         viewModel.onEvent(CityBrandEvents.GetSubCategory)
+    }
+
+    LaunchedEffect(true) {
+        viewModel.onEvent(
+            CityBrandEvents.AddLog(
+                LogRequest(
+                    type = LogType.pageVisit,
+                    event = "enter in sub category screen",
+                    page_name = "/subCategory"
+                )
+            ))
     }
 
 

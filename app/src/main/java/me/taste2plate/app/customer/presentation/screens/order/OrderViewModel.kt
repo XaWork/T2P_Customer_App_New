@@ -6,21 +6,23 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import me.taste2plate.app.customer.data.Resource
 import me.taste2plate.app.customer.data.Status
 import me.taste2plate.app.customer.data.UserPref
+import me.taste2plate.app.customer.domain.model.custom.LogRequest
+import me.taste2plate.app.customer.domain.model.custom.LogType
 import me.taste2plate.app.customer.domain.model.user.OrderListModel
+import me.taste2plate.app.customer.domain.use_case.analytics.AddLogUseCase
 import me.taste2plate.app.customer.domain.use_case.user.order.CancelOrderUseCase
 import me.taste2plate.app.customer.domain.use_case.user.order.OrderListUseCase
 import me.taste2plate.app.customer.domain.use_case.user.order.OrderUpdateUseCase
-import okhttp3.Route
 import javax.inject.Inject
 
 @HiltViewModel
 class OrderViewModel @Inject constructor(
     private val userPref: UserPref,
+    private val addLogUseCase: AddLogUseCase,
     private val orderListUseCase: OrderListUseCase,
     private val orderUpdateUseCase: OrderUpdateUseCase,
     private val cancelOrderUseCase: CancelOrderUseCase
@@ -42,12 +44,24 @@ class OrderViewModel @Inject constructor(
                     cancelOrder = null
                 )
             }
+
             is OrderEvent.CancelOrder -> {
                 cancelOrder()
             }
+
             is OrderEvent.GetOrderUpdate -> {
                 getOrderUpdates()
             }
+
+            is OrderEvent.AddLog -> {
+                addLog(event.logRequest)
+            }
+        }
+    }
+
+    private fun addLog(logRequest: LogRequest) {
+        viewModelScope.launch {
+            addLogUseCase.execute(logRequest)
         }
     }
 
@@ -91,31 +105,33 @@ class OrderViewModel @Inject constructor(
     }
 
     private fun getOrderUpdates() {
-        viewModelScope.launch {
-            orderUpdateUseCase.execute(selectedOrder!!.id).collect { result ->
-                when (result) {
-                    is Resource.Loading -> {
-                        state = state.copy(isLoading = true)
-                    }
+        if(selectedOrder!=null){
+            viewModelScope.launch {
+                orderUpdateUseCase.execute(selectedOrder!!.id).collect { result ->
+                    when (result) {
+                        is Resource.Loading -> {
+                            state = state.copy(isLoading = true)
+                        }
 
-                    is Resource.Success -> {
-                        val data = result.data!!
-                        val isError = data.status == Status.error.name
-                        state =
-                            state.copy(
+                        is Resource.Success -> {
+                            val data = result.data!!
+                            val isError = data.status == Status.error.name
+                            state =
+                                state.copy(
+                                    isLoading = false,
+                                    isError = isError,
+                                    message = if (isError) result.data.message else "",
+                                    orderUpdates = data.result.ifEmpty { emptyList() }
+                                )
+                        }
+
+                        is Resource.Error -> {
+                            state = state.copy(
                                 isLoading = false,
-                                isError = isError,
-                                message = if (isError) result.data.message else "",
-                                orderUpdates = data.result.ifEmpty { emptyList() }
+                                isError = true,
+                                message = result.message
                             )
-                    }
-
-                    is Resource.Error -> {
-                        state = state.copy(
-                            isLoading = false,
-                            isError = true,
-                            message = result.message
-                        )
+                        }
                     }
                 }
             }
@@ -133,6 +149,17 @@ class OrderViewModel @Inject constructor(
                     is Resource.Success -> {
                         val data = result.data!!
                         val isError = data.status == Status.error.name
+
+                        if (!isError) {
+                            addLog(
+                                LogRequest(
+                                    type = LogType.actionPerform,
+                                    event = "cancel order",
+                                    page_name = "/order",
+                                    order_id = selectedOrder?.id ?: ""
+                                )
+                            )
+                        }
                         state =
                             state.copy(
                                 isLoading = false,

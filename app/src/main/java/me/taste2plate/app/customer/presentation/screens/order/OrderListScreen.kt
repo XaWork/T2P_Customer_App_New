@@ -21,6 +21,7 @@ import androidx.compose.material3.Divider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
@@ -28,7 +29,10 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import me.taste2plate.app.customer.R
+import me.taste2plate.app.customer.domain.model.custom.LogRequest
+import me.taste2plate.app.customer.domain.model.custom.LogType
 import me.taste2plate.app.customer.domain.model.user.OrderListModel
+import me.taste2plate.app.customer.presentation.screens.home.HomeEvent
 import me.taste2plate.app.customer.presentation.theme.ForestGreen
 import me.taste2plate.app.customer.presentation.theme.LowPadding
 import me.taste2plate.app.customer.presentation.theme.ScreenPadding
@@ -53,6 +57,17 @@ fun OrderListScreen(
     navigateBack: () -> Unit,
 ) {
     val state = viewModel.state
+
+    LaunchedEffect(true){
+        viewModel.onEvent(
+            OrderEvent.AddLog(
+                LogRequest(
+                    type = LogType.pageVisit,
+                    event = "enter in order list screen",
+                    page_name = "/order"
+                )
+            ))
+    }
 
     AppScaffold(
         topBar = {

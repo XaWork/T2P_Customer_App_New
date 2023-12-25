@@ -24,7 +24,7 @@ class WalletTransactionUseCase @Inject constructor(
         return flow {
             emit(Resource.Loading(true))
             try {
-                val userId = userPref.getUser().id
+                val userId = userPref.getUser()!!.id
                 val response = repo.getWalletTransaction(userId)
                 emit(Resource.Success(response))
             } catch (io: IOException) {

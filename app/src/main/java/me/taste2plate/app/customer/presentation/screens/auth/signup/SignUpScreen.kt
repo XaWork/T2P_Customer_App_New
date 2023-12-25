@@ -42,7 +42,7 @@ fun SignUpScreen(
         viewModel.onEvent(AuthEvents.UpdateState)
     }
 
-    LaunchedEffect(key1 = Unit) {
+    LaunchedEffect(true) {
         viewModel.onEvent(AuthEvents.GetUser)
     }
 

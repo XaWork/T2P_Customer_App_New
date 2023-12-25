@@ -47,11 +47,14 @@ import me.taste2plate.app.customer.T2PApp
 import me.taste2plate.app.customer.domain.mapper.CommonForItem
 import me.taste2plate.app.customer.domain.model.SettingsModel
 import me.taste2plate.app.customer.domain.model.auth.User
+import me.taste2plate.app.customer.domain.model.custom.LogRequest
+import me.taste2plate.app.customer.domain.model.custom.LogType
 import me.taste2plate.app.customer.domain.use_case.product.ProductBy
 import me.taste2plate.app.customer.presentation.dialog.CustomDialog
 import me.taste2plate.app.customer.presentation.dialog.SettingDialogType
 import me.taste2plate.app.customer.presentation.dialog.SettingInfoDialog
 import me.taste2plate.app.customer.presentation.screens.address.AddressBottomSheet
+import me.taste2plate.app.customer.presentation.screens.address.AddressEvents
 import me.taste2plate.app.customer.presentation.screens.home.navigation.DrawerAppScreen
 import me.taste2plate.app.customer.presentation.screens.home.navigation.NavigationDrawer
 import me.taste2plate.app.customer.presentation.screens.home.widgets.AddressBar
@@ -175,8 +178,15 @@ fun HomeScreen(
         }
     }
 
-    LaunchedEffect(Unit) {
-        viewModel.onEvent(HomeEvent.GetWishlist)
+    LaunchedEffect(true){
+        viewModel.onEvent(
+            HomeEvent.AddLog(
+                LogRequest(
+                    type = LogType.pageVisit,
+                    event = "enter in home screen",
+                    page_name = "/home"
+                )
+            ))
     }
 
     if (showBottomSheet) {
@@ -313,7 +323,7 @@ fun HomeScreen(
                 )
             else
                 Column {
-                    AddressBar(state.defaultAddress!!.address,
+                    AddressBar(state.defaultAddress?.address ?: "",
                         checked = state.checked,
                         onCheckChange = { viewModel.onEvent(HomeEvent.ChangeTaste) }) {
                         viewModel.onEvent(HomeEvent.GetAddress)

@@ -23,7 +23,7 @@ class ApplyCouponUseCase @Inject constructor(
         return flow {
             emit(Resource.Loading(true))
             try {
-                val userId = userPref.getUser().id
+                val userId = userPref.getUser()!!.id
                 val city = userPref.getDefaultAddress()!!.city.id
                 val zip = userPref.getDefaultAddress()!!.pincode
                 val response = repo.applyCoupon(coupon, userId, city, zip)
