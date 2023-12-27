@@ -19,6 +19,10 @@ enum class DrawerAppScreen {
     Profile,
     BulkOrders,
     Wallet,
+    About,
+    Refund,
+    Terms,
+    Privacy,
     MembershipPlan,
     MyPlan,
     RateApp,
@@ -77,6 +81,30 @@ val drawerItems = listOf(
         id = DrawerAppScreen.Wallet.name,
         icon = R.drawable.wallet,
         title = walletString,
+    ),
+
+    DrawerItem(
+        id = DrawerAppScreen.About.name,
+        icon = R.drawable.about,
+        title = "About Us",
+    ),
+
+    DrawerItem(
+        id = DrawerAppScreen.Refund.name,
+        icon = R.drawable.refund,
+        title = "Refund Policy",
+    ),
+
+    DrawerItem(
+        id = DrawerAppScreen.Terms.name,
+        icon = R.drawable.terms,
+        title = "Terms & Conditions",
+    ),
+
+    DrawerItem(
+        id = DrawerAppScreen.Privacy.name,
+        icon = R.drawable.privacy_policy,
+        title = "Privacy & Policies",
     ),
 
     DrawerItem(

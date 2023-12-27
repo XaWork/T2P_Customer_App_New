@@ -20,16 +20,20 @@ class AddLogUseCase @Inject constructor(
         logRequest: LogRequest
     )//: Flow<Resource<LogCreatedResponse>>
     {
-        val user = userPref.getUser()
-        val response = repo.addLog(
-            logRequest.copy(
-                category = userPref.getReferralInfo()[0],
-                token = userPref.getReferralInfo()[1],
-                user_id = user?.id ?: "",
-                geo_ip = userPref.getIp(),
-                source = "android"
+        try{
+            val user = userPref.getUser()
+            val response = repo.addLog(
+                logRequest.copy(
+                    category = userPref.getReferralInfo()[0],
+                    token = userPref.getReferralInfo()[1],
+                    user_id = user?.id ?: "",
+                    geo_ip = userPref.getIp(),
+                    source = "android"
+                )
             )
-        )
+        }catch (e: Exception) {
+            e.printStackTrace()
+        }
       /*  return flow {
             emit(Resource.Loading(true))
             try {

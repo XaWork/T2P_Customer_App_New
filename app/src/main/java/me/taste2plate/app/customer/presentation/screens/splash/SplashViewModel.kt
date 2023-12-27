@@ -10,6 +10,7 @@ import kotlinx.coroutines.launch
 import me.taste2plate.app.customer.data.Resource
 import me.taste2plate.app.customer.data.UserPref
 import me.taste2plate.app.customer.domain.model.custom.LogRequest
+import me.taste2plate.app.customer.domain.model.custom.LogType
 import me.taste2plate.app.customer.domain.use_case.analytics.AddLogUseCase
 import me.taste2plate.app.customer.domain.use_case.analytics.GeoIpUseCase
 import javax.inject.Inject
@@ -24,8 +25,7 @@ class SplashViewModel @Inject constructor(
     var state by mutableStateOf(SplashState())
 
     init {
-        geoIpUseCase()
-        isUserLogin()
+        checkIp()
     }
 
     fun onEvent(event: SplashEvents) {
@@ -40,12 +40,24 @@ class SplashViewModel @Inject constructor(
         }
     }
 
-    private fun geoIpUseCase() {
+    private fun checkIp() {
+        state = state.copy(loading = true)
+        viewModelScope.launch {
+            val ip = userPref.getIp()
+            if (ip.isEmpty()) {
+                getIpAddress()
+            } else {
+                addLog()
+            }
+        }
+    }
+
+    private fun getIpAddress() {
         viewModelScope.launch {
             geoIpUseCase.execute().collect { result ->
                 when (result) {
                     is Resource.Loading -> {
-                        state = state.copy(loading = true)
+                        //state = state.copy(loading = true)
                     }
 
                     is Resource.Success -> {
@@ -65,12 +77,13 @@ class SplashViewModel @Inject constructor(
         viewModelScope.launch {
             addLogUseCase.execute(
                 LogRequest(
-                    type = "splash",
+                    type = LogType.pageVisit,
                     event = "enter in splash screen",
                     page_name = "/splash",
                 )
             )
         }
+        isUserLogin()
     }
 
     private fun isUserLogin() {

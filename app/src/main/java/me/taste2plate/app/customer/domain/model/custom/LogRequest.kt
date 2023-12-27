@@ -16,12 +16,12 @@ data class LogRequest(
 
 class LogType {
     companion object {
-        var pageVisit: String = "Page visit"
-        var login: String = "Login"
-        var addToCart: String = "Add To Cart"
-        var addToWishlist: String = "Add To Wishlist"
-        var checkout: String = "Checkout"
-        var actionPerform: String = "Action Perform"
+        var pageVisit: String = "page visit"
+        var login: String = "login"
+        var addToCart: String = "add to cart"
+        var addToWishlist: String = "add to wishlist"
+        var checkout: String = "checkout"
+        var actionPerform: String = "action perform"
     }
 }
 

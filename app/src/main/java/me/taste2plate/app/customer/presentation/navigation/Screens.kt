@@ -26,6 +26,7 @@ sealed class Screens(val route: String) {
     object EditProfileScreen : Screens(route = Routes.editProfileRoute)
     object AddressListScreen : Screens(route = Routes.addressListRoute)
     object AddEditAddressScreen : Screens(route = Routes.addEditAddressRoute)
+    object AboutScreen : Screens(route = Routes.AboutScreenRoute)
     object NotificationScreen : Screens(route = Routes.notificationRoute)
     object LocationPermissionScreen : Screens(route = Routes.locationPermissionRoute)
     object OrderDetailsScreen : Screens(route = Routes.orderDetailsRoute)

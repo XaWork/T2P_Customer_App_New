@@ -16,6 +16,7 @@ import androidx.navigation.navigation
 import com.google.android.gms.maps.model.LatLng
 import com.google.gson.Gson
 import me.taste2plate.app.customer.domain.mapper.CommonForItem
+import me.taste2plate.app.customer.presentation.screens.about.AboutScreen
 import me.taste2plate.app.customer.presentation.screens.address.AddEditAddressScreen
 import me.taste2plate.app.customer.presentation.screens.address.AddressListScreen
 import me.taste2plate.app.customer.presentation.screens.address.AddressViewModel
@@ -153,11 +154,11 @@ fun Navigation() {
                         ?.set("latLng", args)
                     navController.popBackStack()
 
-                   /* navController.navigate(Screens.AddEditAddressScreen.route + "?latLng=$args") {
-                        popUpTo(Screens.AddressListScreen.route) {
-                            inclusive = true
-                        }
-                    }*/
+                    /* navController.navigate(Screens.AddEditAddressScreen.route + "?latLng=$args") {
+                         popUpTo(Screens.AddressListScreen.route) {
+                             inclusive = true
+                         }
+                     }*/
                 }
             )
         }
@@ -216,9 +217,12 @@ fun Navigation() {
                     navController.navigate(Screens.AddressListScreen.route)
                 },
                 onNavigateToAddAddressScreen = {
-                    navController.navigate(Screens.AddEditAddressScreen.route){
+                    navController.navigate(Screens.AddEditAddressScreen.route) {
                         popUpTo(0)
                     }
+                },
+                onNavigateAboutScreen = {
+                    navController.navigate(Screens.AboutScreen.route + "?screen=$it")
                 }
             )
         }
@@ -261,6 +265,22 @@ fun Navigation() {
             NotificationPermissionScreen(
                 onNavigateToHomeScreen = {
                     navController.navigate(Screens.HomeScreen.route)
+                }
+            )
+        }
+
+        // ----------------------------> About <--------------------------------------
+        composable(route = Screens.AboutScreen.route + "?screen={screen}", arguments = listOf(
+            navArgument("screen") {
+                type = NavType.StringType
+                defaultValue = ""
+                nullable = true
+            }
+        )) { entry ->
+            AboutScreen(
+                screen = entry.arguments?.getString("screen")!!,
+                onBackClick = {
+                    navController.popBackStack()
                 }
             )
         }
@@ -573,16 +593,21 @@ fun Navigation() {
             }
 
             // ----------------------------> Add Edit Address <--------------------------------------
-            composable(route = Screens.AddEditAddressScreen.route/* + "?latLng={latLng}"*//*,
+            composable(
+                route = Screens.AddEditAddressScreen.route/* + "?latLng={latLng}"*//*,
                 arguments = listOf(
                     navArgument(name = "latLng") {
                         type = NavType.StringType
                         defaultValue = ""
                         nullable = true
                     }
-                )*/) { entry ->
+                )*/
+            ) { entry ->
                 val latLng =
-                    Gson().fromJson(entry.savedStateHandle.get<String>("latLng"), LatLng::class.java)
+                    Gson().fromJson(
+                        entry.savedStateHandle.get<String>("latLng"),
+                        LatLng::class.java
+                    )
                 val viewModel =
                     entry.sharedViewModel<AddressViewModel>(navHostController = navController)
 
@@ -591,7 +616,7 @@ fun Navigation() {
                     latLng = latLng,
                     onNavigateToLocationScreen = { args ->
                         navController.navigate(Screens.LocationScreen.route + "?screen=$args") {
-                           // popUpTo(Screens.LocationScreen.route)
+                            // popUpTo(Screens.LocationScreen.route)
                         }
                     },
                     onNavigateToHomeScreen = {

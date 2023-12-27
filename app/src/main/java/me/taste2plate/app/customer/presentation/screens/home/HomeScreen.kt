@@ -95,6 +95,7 @@ fun HomeScreen(
     onNavigateToMembershipPlanScreen: () -> Unit,
     onNavigateToMyPlanScreen: () -> Unit,
     onNavigateContactUsScreen: () -> Unit,
+    onNavigateAboutScreen: (screen: String) -> Unit,
     navigateBack: () -> Unit,
     onNavigateLogoutScreen: () -> Unit,
     viewModel: HomeViewModel = hiltViewModel()
@@ -161,7 +162,7 @@ fun HomeScreen(
         //check app version
         if (state.setting != null) {
             if (!appUpToDate(context, state.setting)) {
-                showCustomDialog = true
+                // showCustomDialog = true
             }
         }
     }
@@ -178,7 +179,7 @@ fun HomeScreen(
         }
     }
 
-    LaunchedEffect(true){
+    LaunchedEffect(true) {
         viewModel.onEvent(
             HomeEvent.AddLog(
                 LogRequest(
@@ -186,7 +187,8 @@ fun HomeScreen(
                     event = "enter in home screen",
                     page_name = "/home"
                 )
-            ))
+            )
+        )
     }
 
     if (showBottomSheet) {
@@ -247,6 +249,24 @@ fun HomeScreen(
 
                 DrawerAppScreen.RateApp.name -> {
                     rateApp(context)
+                }
+
+                DrawerAppScreen.About.name -> {
+                    onNavigateAboutScreen(id)
+                }
+
+                DrawerAppScreen.Refund.name -> {
+                    onNavigateAboutScreen(id)
+
+                }
+
+                DrawerAppScreen.Terms.name -> {
+                    onNavigateAboutScreen(id)
+                }
+
+                DrawerAppScreen.Privacy.name -> {
+                    onNavigateAboutScreen(id)
+
                 }
 
                 DrawerAppScreen.ReferAndEarn.name -> {
@@ -428,7 +448,13 @@ fun HomeScreen(
                                         viewModel.onEvent(HomeEvent.AddToWishlist(product.id))
                                     },
                                     updateCart = {
-                                        viewModel.onEvent(HomeEvent.UpdateCart(context, it, product.id))
+                                        viewModel.onEvent(
+                                            HomeEvent.UpdateCart(
+                                                context,
+                                                it,
+                                                product.id
+                                            )
+                                        )
                                     }
                                 )
                             }
