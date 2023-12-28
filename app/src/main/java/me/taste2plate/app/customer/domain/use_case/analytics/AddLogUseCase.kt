@@ -1,15 +1,8 @@
 package me.taste2plate.app.customer.domain.use_case.analytics
 
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flow
-import me.taste2plate.app.customer.data.ApiErrorMessages
-import me.taste2plate.app.customer.data.Resource
 import me.taste2plate.app.customer.data.UserPref
-import me.taste2plate.app.customer.domain.model.custom.LogCreatedResponse
 import me.taste2plate.app.customer.domain.model.custom.LogRequest
 import me.taste2plate.app.customer.domain.repo.AnalyticsRepo
-import retrofit2.HttpException
-import java.io.IOException
 import javax.inject.Inject
 
 class AddLogUseCase @Inject constructor(

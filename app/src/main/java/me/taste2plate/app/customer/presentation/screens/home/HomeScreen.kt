@@ -162,7 +162,7 @@ fun HomeScreen(
         //check app version
         if (state.setting != null) {
             if (!appUpToDate(context, state.setting)) {
-                // showCustomDialog = true
+                 showCustomDialog = true
             }
         }
     }
