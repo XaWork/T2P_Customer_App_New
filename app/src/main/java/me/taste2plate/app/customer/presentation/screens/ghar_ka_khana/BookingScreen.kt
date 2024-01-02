@@ -3,6 +3,7 @@ package me.taste2plate.app.customer.presentation.screens.ghar_ka_khana
 import android.content.res.Configuration
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
@@ -12,23 +13,42 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material3.DatePicker
+import androidx.compose.material3.DatePickerDefaults
+import androidx.compose.material3.DatePickerDialog
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.rememberDatePickerState
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import me.taste2plate.app.customer.R
+import me.taste2plate.app.customer.domain.model.user.GharKaKhanaFetchCartModel
+import me.taste2plate.app.customer.domain.model.user.address.AddressListModel
+import me.taste2plate.app.customer.presentation.dialog.TimePickerDialog
+import me.taste2plate.app.customer.presentation.screens.address.AddressBottomSheet
+import me.taste2plate.app.customer.presentation.screens.checkout.fontSize
 import me.taste2plate.app.customer.presentation.theme.ExtraLowElevation
+import me.taste2plate.app.customer.presentation.theme.LowPadding
 import me.taste2plate.app.customer.presentation.theme.LowSpacing
 import me.taste2plate.app.customer.presentation.theme.MediumPadding
 import me.taste2plate.app.customer.presentation.theme.ScreenPadding
@@ -38,22 +58,46 @@ import me.taste2plate.app.customer.presentation.theme.VeryLowSpacing
 import me.taste2plate.app.customer.presentation.theme.cardContainerOnSecondaryColor
 import me.taste2plate.app.customer.presentation.theme.primaryColor
 import me.taste2plate.app.customer.presentation.theme.screenBackgroundColor
+import me.taste2plate.app.customer.presentation.utils.noRippleClickable
 import me.taste2plate.app.customer.presentation.widgets.AppButton
 import me.taste2plate.app.customer.presentation.widgets.AppCheckBox
 import me.taste2plate.app.customer.presentation.widgets.AppDivider
 import me.taste2plate.app.customer.presentation.widgets.AppDropDown
-import me.taste2plate.app.customer.presentation.widgets.AppOutlineButton
 import me.taste2plate.app.customer.presentation.widgets.AppScaffold
 import me.taste2plate.app.customer.presentation.widgets.AppTextField
 import me.taste2plate.app.customer.presentation.widgets.AppTopBar
 import me.taste2plate.app.customer.presentation.widgets.HorizontalSpace
 import me.taste2plate.app.customer.presentation.widgets.InfoWithIcon
 import me.taste2plate.app.customer.presentation.widgets.RoundedCornerCard
+import me.taste2plate.app.customer.presentation.widgets.ShowLoading
 import me.taste2plate.app.customer.presentation.widgets.SpaceBetweenRow
+import me.taste2plate.app.customer.presentation.widgets.TextInCircle
 import me.taste2plate.app.customer.presentation.widgets.VerticalSpace
+import me.taste2plate.app.customer.presentation.widgets.showToast
+import java.time.Instant
+import java.time.ZoneOffset
+import java.time.format.DateTimeFormatter
 
 @Composable
-fun BookingScreen() {
+fun BookingScreen(
+    viewModel: GharKaKhanaViewModel,
+    onNavigateToAddressListScreen: () -> Unit,
+    onNavigateToCheckoutScreen: () -> Unit,
+    navigateBack: () -> Unit,
+) {
+    val state = viewModel.state
+    LaunchedEffect(state) {
+        //Log.e("Booking screen", "Error : ${state.isError} and message : ${state.message}")
+        if (state.isError && state.message != null) {
+            showToast(state.message!!)
+            viewModel.onEvent(GharKaKhanaEvent.UpdateState)
+        }
+        if (state.moveToCheckout) {
+            onNavigateToCheckoutScreen()
+            viewModel.onEvent(GharKaKhanaEvent.UpdateState)
+        }
+    }
+
     AppScaffold(
         topBar = {
             AppTopBar(
@@ -61,46 +105,102 @@ fun BookingScreen() {
             ) {}
         }
     ) {
-        ContentBookingScreen()
+        if (state.isLoading)
+            ShowLoading()
+        else
+            ContentBookingScreen(
+                viewModel, onNavigateToAddressListScreen
+            )
     }
 }
 
 @Composable
-fun ContentBookingScreen() {
+fun ContentBookingScreen(
+    viewModel: GharKaKhanaViewModel,
+    onNavigateToAddressListScreen: () -> Unit,
+) {
+    val state = viewModel.state
     LazyColumn(
         modifier = Modifier.padding(ScreenPadding)
     ) {
         item {
-            PdLocation()
+            PdLocation(viewModel, onNavigateToAddressListScreen = onNavigateToAddressListScreen)
 
             AppDivider(thickness = 2.dp)
 
-            FoodInfo()
+            FoodInfo(viewModel)
 
             AppDivider(thickness = 2.dp)
         }
 
-        items(4) {
-            SingleFoodItem()
+        items(state.cartItems) {
+            SingleFoodItem(it,
+                buttonVisible = !state.buttonLoader,
+                onDelete = {
+                    viewModel.onEvent(GharKaKhanaEvent.DeleteCart(it.id))
+                })
         }
 
         item {
             AppDivider(thickness = 2.dp)
 
-            DeliveryInfo()
+            GKKDeliveryInfo(viewModel)
 
-            AppButton(text = "Book Now") {}
+            AppButton(text = "Book Now") {
+                viewModel.onEvent(GharKaKhanaEvent.BookNow)
+            }
         }
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun PdLocation() {
+fun PdLocation(
+    viewModel: GharKaKhanaViewModel,
+    onNavigateToAddressListScreen: () -> Unit,
+) {
+    val state = viewModel.state
+    var pdLocation by remember {
+        mutableStateOf(PDLocation.Destination)
+    }
+    var showBottomSheet by remember { mutableStateOf(false) }
+    if (showBottomSheet) {
+        ModalBottomSheet(
+            containerColor = screenBackgroundColor.invoke(),
+            onDismissRequest = {
+                showBottomSheet = false
+            },
+            sheetState = rememberModalBottomSheetState()
+        ) {
+            AddressBottomSheet(
+                isLoading = state.addressLoader,
+                state.addressListModel,
+                setDefaultAddress = {
+                    showBottomSheet = false
+                    viewModel.onEvent(
+                        GharKaKhanaEvent.SetPDLocation(
+                            location = it,
+                            pdLocationType = pdLocation
+                        )
+                    )
+                },
+                onNavigateToAddressListScreen = {
+                    showBottomSheet = false
+                    onNavigateToAddressListScreen()
+                }
+            )
+        }
+    }
     SinglePdLocation(
         backgroundColor = primaryColor.invoke(),
         title = "Pickup Location",
         iconId = R.drawable.pickuplocation_icon,
-        onClick = {}
+        address = state.pickupLocation,
+        onClick = {
+            pdLocation = PDLocation.Pickup
+            showBottomSheet = true
+            viewModel.onEvent(GharKaKhanaEvent.GetAddress)
+        }
     )
 
     VerticalSpace(space = SpaceBetweenViewsAndSubViews)
@@ -109,7 +209,12 @@ fun PdLocation() {
         backgroundColor = MaterialTheme.colorScheme.onPrimaryContainer,
         title = "Destination Location",
         iconId = R.drawable.destination_icon,
-        onClick = {}
+        address = state.destinationLocation,
+        onClick = {
+            pdLocation = PDLocation.Destination
+            showBottomSheet = true
+            viewModel.onEvent(GharKaKhanaEvent.GetAddress)
+        }
     )
 }
 
@@ -118,6 +223,7 @@ fun SinglePdLocation(
     backgroundColor: Color,
     title: String = "",
     iconId: Int,
+    address: AddressListModel.Result?,
     onClick: () -> Unit
 ) {
     RoundedCornerCard(
@@ -145,7 +251,7 @@ fun SinglePdLocation(
                 )
 
             Text(
-                "Address",
+                if (address != null) "${address.address}, ${address.city.name}, ${address.state.name} - ${address.pincode}" else "",
                 modifier = Modifier
                     .fillMaxWidth()
                     .weight(1f)
@@ -158,19 +264,25 @@ fun SinglePdLocation(
 }
 
 @Composable
-fun FoodInfo() {
-    var productName by remember { mutableStateOf("") }
-    var weight by remember { mutableStateOf("") }
+fun FoodInfo(viewModel: GharKaKhanaViewModel) {
+    val state = viewModel.state
+    var categoryExpanded by remember { mutableStateOf(false) }
+    var subCategoryExpanded by remember { mutableStateOf(false) }
     val items = listOf<@Composable RowScope.() -> Unit> {
         AppDropDown(
             modifier = Modifier
                 .fillMaxWidth()
                 .weight(1f),
-            expanded = false,
+            expanded = categoryExpanded,
             hint = "Category",
-            onExpandedChange = {},
-            selectedText = "",
-            onTextChanged = {})
+            items = state.category.map { it.name },
+            onExpandedChange = {
+                categoryExpanded = !categoryExpanded
+            },
+            selectedText = viewModel.category,
+            onTextChanged = {
+                viewModel.category = it
+            })
 
         HorizontalSpace(space = SpaceBetweenViewsAndSubViews)
 
@@ -178,55 +290,70 @@ fun FoodInfo() {
             .fillMaxWidth()
             .weight(1f),
             hint = "Sub Category",
-            expanded = false,
-            onExpandedChange = {},
-            selectedText = "",
-            onTextChanged = {})
+            expanded = subCategoryExpanded,
+            items = state.subCategory.map { it.name },
+            onExpandedChange = {
+                subCategoryExpanded = !subCategoryExpanded
+            },
+            selectedText = viewModel.subCategory,
+            onTextChanged = {
+                viewModel.subCategory = it
+            })
     }
 
     Column {
         SpaceBetweenRow(items = items)
 
         AppTextField(
-            value = productName,
+            value = viewModel.productName,
             onValueChanged = {
-                productName = it
+                viewModel.productName = it
             },
             hint = "Product Name"
         )
 
-        val items = listOf<@Composable RowScope.() -> Unit> {
+        val rowItems = listOf<@Composable RowScope.() -> Unit> {
             AppTextField(
                 modifier = Modifier
                     .fillMaxWidth()
                     .weight(1f),
-                value = weight,
+                value = viewModel.weight,
+                keyboardType = KeyboardType.Number,
                 onValueChanged = {
-                    weight = it
+                    viewModel.weight = it
                 },
                 hint = "Weight(Kg)"
             )
 
             HorizontalSpace(space = SpaceBetweenViewsAndSubViews)
 
-            AppButton(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .weight(1f),
-                text = "Add"
-            ) {
-
-            }
+            if (state.buttonLoader)
+                ShowLoading(
+                    boxModifier = Modifier
+                        .fillMaxWidth()
+                        .weight(1f)
+                )
+            else
+                AppButton(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .weight(1f),
+                    text = "Add"
+                ) {
+                    viewModel.onEvent(GharKaKhanaEvent.AddToCart)
+                }
         }
 
-        SpaceBetweenRow(items = items)
+        SpaceBetweenRow(items = rowItems)
     }
 
 }
 
 @Composable
 fun SingleFoodItem(
-    buttonVisible: Boolean = true
+    item: GharKaKhanaFetchCartModel.Result,
+    buttonVisible: Boolean = true,
+    onDelete: () -> Unit = {}
 ) {
     RoundedCornerCard(
         modifier = Modifier
@@ -240,7 +367,7 @@ fun SingleFoodItem(
                 .fillMaxWidth(),
         ) {
             Text(
-                "Homemade food (biryani",
+                item.name,
                 fontSize = 16.sp,
                 fontWeight = FontWeight.Bold
             )
@@ -248,26 +375,19 @@ fun SingleFoodItem(
             VerticalSpace(space = SpaceBetweenViewsAndSubViews)
 
             val items = listOf<@Composable RowScope.() -> Unit> {
-                Text("Weight : 0.5 kg")
+                Text("Weight : ${item.weight} kg")
 
                 if (buttonVisible)
                     Row {
-                        AppOutlineButton(
+                        /*AppOutlineButton(
                             modifier = Modifier
                                 .height(35.dp)
-                                .width(80.dp),/*
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = Color.Blue.copy(alpha = 0.1f),
-                            contentColor = Color.Blue,
-                            disabledContainerColor = Color.Blue,
-                            disabledContentColor = Color.Blue
-                        ),
-                        textColor = Color.Blue,*/
+                                .width(80.dp),
                             text = "Edit",
                             shape = CircleShape
                         ) {}
 
-                        HorizontalSpace(space = VeryLowSpacing)
+                        HorizontalSpace(space = VeryLowSpacing)*/
 
                         AppButton(
                             modifier = Modifier
@@ -275,7 +395,7 @@ fun SingleFoodItem(
                                 .width(100.dp),
                             text = "Delete",
                             shape = CircleShape
-                        ) {}
+                        ) { onDelete() }
                     }
             }
 
@@ -284,56 +404,127 @@ fun SingleFoodItem(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DeliveryInfo() {
+fun GKKDeliveryInfo(viewModel: GharKaKhanaViewModel) {
+    var state = viewModel.state
+    var showDatePickerDialog by rememberSaveable { mutableStateOf(false) }
+    var timePickerExpanded by rememberSaveable { mutableStateOf(false) }
+    val datePickerState = rememberDatePickerState()
+    if (showDatePickerDialog) {
+        DatePickerDialog(
+            colors = DatePickerDefaults.colors(
+                containerColor = screenBackgroundColor.invoke()
+            ),
+            onDismissRequest = { showDatePickerDialog = false }, confirmButton = {
+            }) {
+            DatePicker(state = datePickerState, dateValidator = {
+                val instant = Instant.now()
+                it >= instant.toEpochMilli()
+            })
 
-    var remarks by remember {
-        mutableStateOf("")
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = ScreenPadding)
+                    .align(Alignment.End),
+                horizontalArrangement = Arrangement.End
+            ) {
+                TextButton(onClick = {
+                    val selectedDate = datePickerState.selectedDateMillis?.let {
+                        Instant.ofEpochMilli(it).atOffset(ZoneOffset.UTC)
+                    }
+                    if (selectedDate != null)
+                        viewModel.selectedDate =
+                            selectedDate.format(DateTimeFormatter.ISO_LOCAL_DATE).toString()
+                    showDatePickerDialog = false
+                }) {
+                    Text("OK")
+                }
+
+                HorizontalSpace(space = SpaceBetweenViewsAndSubViews)
+
+                TextButton(onClick = {
+                    showDatePickerDialog = false
+                }) {
+                    Text("CANCEL")
+                }
+            }
+
+            AppDivider()
+        }
     }
+
+    var showTimeSlotDialog by remember {
+        mutableStateOf(false)
+    }
+    if (showTimeSlotDialog) {
+        TimePickerDialog(viewModel.pickupTimeSlots,
+            onDismiss = {
+                showTimeSlotDialog = false
+            },
+            onItemSelected = {
+                viewModel.selectedTimeSlot = viewModel.pickupTimeSlots[it]
+                showTimeSlotDialog = false
+            }
+        )
+    }
+
     Column {
+        var weight = 0.0f
+        state.cartItems.forEach { weight += it.weight.toFloat() }
         AppTextField(
-            value = "2",
+            value = weight.toString(),
             onValueChanged = {},
             hint = "Total Weight (kg)",
             readOnly = true
         )
 
         AppTextField(
-            value = remarks,
+            value = viewModel.remarks,
             onValueChanged = {
-                remarks = it
+                viewModel.remarks = it
             },
             hint = "Remarks",
-            readOnly = true
+            readOnly = false
         )
 
 
         val items = listOf<@Composable RowScope.() -> Unit> {
-            AppDropDown(modifier = Modifier
-                .fillMaxWidth()
-                .weight(1f),
-                hint = "Pickup Date",
-                expanded = false,
-                onExpandedChange = {},
-                selectedText = "",
-                onTextChanged = {})
+            TextInCircle(
+                text = viewModel.selectedDate.ifEmpty { "Pickup Date" },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(1f)
+                    .padding(end = LowPadding)
+                    .noRippleClickable {
+                        showDatePickerDialog = true
+                    }, fontSize = fontSize
+            )
 
             HorizontalSpace(space = LowSpacing)
 
-            AppDropDown(modifier = Modifier
-                .fillMaxWidth()
-                .weight(1f),
-                hint = "Pickup Time",
-                expanded = false,
-                onExpandedChange = {},
-                selectedText = "",
-                onTextChanged = {})
+            TextInCircle(
+                text = viewModel.selectedTimeSlot.ifEmpty { "Pickup Time" },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(1f)
+                    .padding(start = LowPadding)
+                    .noRippleClickable {
+                        showTimeSlotDialog = true
+                    }, fontSize = fontSize
+            )
         }
 
         SpaceBetweenRow(items = items)
 
+        VerticalSpace(space = SpaceBetweenViewsAndSubViews)
+
         AppCheckBox(
-            onCheckedChange = {},
+            checked = viewModel.checked,
+            onCheckedChange = {
+                viewModel.checked = !viewModel.checked
+            },
             text = "I agree with Terms conditions and Privacy Policy"
         )
 
@@ -346,6 +537,6 @@ fun DeliveryInfo() {
 @Composable
 fun HomePreview() {
     T2PCustomerAppTheme {
-        BookingScreen()
+        //BookingScreen()
     }
 }

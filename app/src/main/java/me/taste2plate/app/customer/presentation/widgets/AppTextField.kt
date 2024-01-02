@@ -39,6 +39,7 @@ fun AppTextField(
     hint: String = "",
     errorMessage: String = "",
     readOnly: Boolean = false,
+    enabled: Boolean = true,
     isError: Boolean = false,
     imeAction: ImeAction = ImeAction.Default,
     keyboardActions: KeyboardActions = KeyboardActions.Default,
@@ -50,6 +51,7 @@ fun AppTextField(
         modifier = modifier
             .fillMaxWidth(),
         value = value,
+        enabled = enabled,
         onValueChange = { onValueChanged(it) },
         leadingIcon = leadingIcon,
         trailingIcon = trailingIcon,

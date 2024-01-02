@@ -10,6 +10,8 @@ import me.taste2plate.app.customer.domain.model.user.CheckoutModel
 import me.taste2plate.app.customer.domain.model.user.CommonResponse
 import me.taste2plate.app.customer.domain.model.user.DeleteFromWishlistModel
 import me.taste2plate.app.customer.domain.model.user.GetProfileModel
+import me.taste2plate.app.customer.domain.model.user.GharKaKhanaAddToCartModel
+import me.taste2plate.app.customer.domain.model.user.GharKaKhanaFetchCartModel
 import me.taste2plate.app.customer.domain.model.user.MyPlanModel
 import me.taste2plate.app.customer.domain.model.user.OrderConfirmModel
 import me.taste2plate.app.customer.domain.model.user.OrderListModel
@@ -251,5 +253,23 @@ class UserRepoImpl @Inject constructor(
         transactionId: String
     ): OrderConfirmModel {
         return api.confirmOrder(isWalletApplied, gateWay, orderId, transactionId)
+    }
+
+    override suspend fun gharKaKhanaAddToCart(
+        userId: String,
+        product: String,
+        category: String,
+        subCategory: String,
+        weight: String
+    ): GharKaKhanaAddToCartModel {
+        return api.gharKaKhanaAddToCart(userId, product, category, subCategory, weight)
+    }
+
+    override suspend fun gharKaKhanaFetchCart(userId: String): GharKaKhanaFetchCartModel {
+        return api.gharKaKhanaFetchCart(userId)
+    }
+
+    override suspend fun gharKaKhanaDeleteCart(itemId: String): CommonResponse {
+        return api.gharKaKhanaDeleteCart(itemId)
     }
 }

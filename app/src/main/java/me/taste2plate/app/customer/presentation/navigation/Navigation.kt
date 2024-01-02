@@ -34,6 +34,9 @@ import me.taste2plate.app.customer.presentation.screens.citybrand.CityBrandViewM
 import me.taste2plate.app.customer.presentation.screens.citybrand.DetailScreen
 import me.taste2plate.app.customer.presentation.screens.citybrand.SubCategoryScreen
 import me.taste2plate.app.customer.presentation.screens.contact_us.ContactUsScreen
+import me.taste2plate.app.customer.presentation.screens.ghar_ka_khana.BookingScreen
+import me.taste2plate.app.customer.presentation.screens.ghar_ka_khana.ConfirmBookingScreen
+import me.taste2plate.app.customer.presentation.screens.ghar_ka_khana.GharKaKhanaViewModel
 import me.taste2plate.app.customer.presentation.screens.home.CityBrandScreens
 import me.taste2plate.app.customer.presentation.screens.home.HomeScreen
 import me.taste2plate.app.customer.presentation.screens.location.LocationScreen
@@ -191,6 +194,9 @@ fun Navigation() {
                 onNavigateContactUsScreen = {
                     navController.navigate(Screens.ContactUsScreen.route)
                 },
+                onNavigateToGharKaKhanaBookingScreen = {
+                    navController.navigate(Screens.GharKaKhanaBookingScreen.route)
+                },
                 navigateBack = {
                     navController.popBackStack()
                 },
@@ -267,6 +273,41 @@ fun Navigation() {
                     navController.navigate(Screens.HomeScreen.route)
                 }
             )
+        }
+
+        // ----------------------------> Ghar ka Khana <--------------------------------------
+
+        navigation(
+            startDestination = Screens.GharKaKhanaBookingScreen.route,
+            route = "gharkakhana"
+        ) {
+            composable(route = Screens.GharKaKhanaBookingScreen.route) { entry ->
+                val viewModel =
+                    entry.sharedViewModel<GharKaKhanaViewModel>(navHostController = navController)
+                BookingScreen(
+                    viewModel = viewModel,
+                    onNavigateToAddressListScreen = {
+                        navController.navigate(Screens.AddressListScreen.route)
+                    },
+                    onNavigateToCheckoutScreen = {
+                        navController.navigate(Screens.GharKaKhanaCheckoutScreen.route)
+                    },
+                    navigateBack = {
+                        navController.popBackStack()
+                    }
+                )
+            }
+
+            composable(route = Screens.GharKaKhanaCheckoutScreen.route) { entry ->
+                val viewModel =
+                    entry.sharedViewModel<GharKaKhanaViewModel>(navHostController = navController)
+                ConfirmBookingScreen(
+                    viewModel = viewModel,
+                    navigateBack = {
+                        navController.popBackStack()
+                    }
+                )
+            }
         }
 
         // ----------------------------> About <--------------------------------------

@@ -9,6 +9,8 @@ import me.taste2plate.app.customer.domain.model.user.CheckoutModel
 import me.taste2plate.app.customer.domain.model.user.CommonResponse
 import me.taste2plate.app.customer.domain.model.user.DeleteFromWishlistModel
 import me.taste2plate.app.customer.domain.model.user.GetProfileModel
+import me.taste2plate.app.customer.domain.model.user.GharKaKhanaAddToCartModel
+import me.taste2plate.app.customer.domain.model.user.GharKaKhanaFetchCartModel
 import me.taste2plate.app.customer.domain.model.user.MyPlanModel
 import me.taste2plate.app.customer.domain.model.user.OrderConfirmModel
 import me.taste2plate.app.customer.domain.model.user.OrderListModel
@@ -180,4 +182,20 @@ interface UserRepo {
         orderId: String,
         transactionId: String,
     ): OrderConfirmModel
+
+    suspend fun gharKaKhanaAddToCart(
+        userId: String,
+        product: String,
+        category: String,
+        subCategory: String,
+        weight: String,
+    ): GharKaKhanaAddToCartModel
+
+    suspend fun gharKaKhanaFetchCart(
+        userId: String,
+    ): GharKaKhanaFetchCartModel
+
+    suspend fun gharKaKhanaDeleteCart(
+        itemId: String,
+    ): CommonResponse
 }

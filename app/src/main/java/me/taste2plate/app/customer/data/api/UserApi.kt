@@ -9,6 +9,8 @@ import me.taste2plate.app.customer.domain.model.user.CheckoutModel
 import me.taste2plate.app.customer.domain.model.user.CommonResponse
 import me.taste2plate.app.customer.domain.model.user.DeleteFromWishlistModel
 import me.taste2plate.app.customer.domain.model.user.GetProfileModel
+import me.taste2plate.app.customer.domain.model.user.GharKaKhanaAddToCartModel
+import me.taste2plate.app.customer.domain.model.user.GharKaKhanaFetchCartModel
 import me.taste2plate.app.customer.domain.model.user.MyPlanModel
 import me.taste2plate.app.customer.domain.model.user.OrderConfirmModel
 import me.taste2plate.app.customer.domain.model.user.OrderListModel
@@ -243,4 +245,27 @@ interface UserApi {
         @Field("orderid") orderId: String,
         @Field("transactionid") transactionId: String,
     ): OrderConfirmModel
+
+    //-------------------- Ghar Ka Kahna -------------------
+
+    @FormUrlEncoded
+    @POST("gharkakhana-add-to-cart")
+    suspend fun gharKaKhanaAddToCart(
+        @Field("userId") userId: String,
+        @Field("product") product: String,
+        @Field("category") category: String,
+        @Field("sub_category") subCategory: String,
+        @Field("weight") weight: String,
+    ): GharKaKhanaAddToCartModel
+
+    @FormUrlEncoded
+    @POST("gharkakhana-fetch-cart")
+    suspend fun gharKaKhanaFetchCart(
+        @Field("user") userId: String,
+    ): GharKaKhanaFetchCartModel
+    @FormUrlEncoded
+    @POST("gharkakhana-delete-cart")
+    suspend fun gharKaKhanaDeleteCart(
+        @Field("id") itemId: String,
+    ): CommonResponse
 }

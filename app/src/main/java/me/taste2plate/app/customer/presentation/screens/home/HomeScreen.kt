@@ -54,7 +54,6 @@ import me.taste2plate.app.customer.presentation.dialog.CustomDialog
 import me.taste2plate.app.customer.presentation.dialog.SettingDialogType
 import me.taste2plate.app.customer.presentation.dialog.SettingInfoDialog
 import me.taste2plate.app.customer.presentation.screens.address.AddressBottomSheet
-import me.taste2plate.app.customer.presentation.screens.address.AddressEvents
 import me.taste2plate.app.customer.presentation.screens.home.navigation.DrawerAppScreen
 import me.taste2plate.app.customer.presentation.screens.home.navigation.NavigationDrawer
 import me.taste2plate.app.customer.presentation.screens.home.widgets.AddressBar
@@ -71,6 +70,7 @@ import me.taste2plate.app.customer.presentation.theme.T2PCustomerAppTheme
 import me.taste2plate.app.customer.presentation.theme.VeryLowSpacing
 import me.taste2plate.app.customer.presentation.theme.screenBackgroundColor
 import me.taste2plate.app.customer.presentation.theme.whatsappColor
+import me.taste2plate.app.customer.presentation.utils.noRippleClickable
 import me.taste2plate.app.customer.presentation.widgets.AppScaffold
 import me.taste2plate.app.customer.presentation.widgets.DrawableImage
 import me.taste2plate.app.customer.presentation.widgets.HorizontalSpace
@@ -95,6 +95,7 @@ fun HomeScreen(
     onNavigateToMembershipPlanScreen: () -> Unit,
     onNavigateToMyPlanScreen: () -> Unit,
     onNavigateContactUsScreen: () -> Unit,
+    onNavigateToGharKaKhanaBookingScreen: () -> Unit,
     onNavigateAboutScreen: (screen: String) -> Unit,
     navigateBack: () -> Unit,
     onNavigateLogoutScreen: () -> Unit,
@@ -162,7 +163,7 @@ fun HomeScreen(
         //check app version
         if (state.setting != null) {
             if (!appUpToDate(context, state.setting)) {
-                 showCustomDialog = true
+                showCustomDialog = true
             }
         }
     }
@@ -364,8 +365,11 @@ fun HomeScreen(
 
                             //slider
                             if (home?.slider != null)
-                                CenterColumn {
+                                CenterColumn{
                                     AutoSlidingCarousel(
+                                        modifier = Modifier.noRippleClickable {
+                                            onNavigateToGharKaKhanaBookingScreen()
+                                        },
                                         pages = home.slider
                                     )
                                     VerticalSpace(space = VeryLowSpacing)

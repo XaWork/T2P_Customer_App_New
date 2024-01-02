@@ -9,6 +9,8 @@ import me.taste2plate.app.customer.domain.model.StateListModel
 import me.taste2plate.app.customer.domain.model.SubCategoryModel
 import me.taste2plate.app.customer.domain.model.ZipListModel
 import me.taste2plate.app.customer.domain.model.custom.AllPlanListModel
+import me.taste2plate.app.customer.domain.model.custom.GharKaKhanaCategoryModel
+import me.taste2plate.app.customer.domain.model.custom.GharKaKhanaSubCategoryModel
 
 interface CustomRepo {
     suspend fun settings(): SettingsModel
@@ -35,6 +37,8 @@ interface CustomRepo {
     suspend fun brandList(): CityBrandModel
 
     suspend fun allCategories(): CategoryModel
+    suspend fun gharKaKhanaCategory(): GharKaKhanaCategoryModel
+    suspend fun gharKaKhanaSubCategory(): GharKaKhanaSubCategoryModel
 
     suspend fun allSubCategories(
         categoryId: String

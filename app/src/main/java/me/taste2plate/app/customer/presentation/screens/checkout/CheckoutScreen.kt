@@ -59,6 +59,7 @@ import me.taste2plate.app.customer.domain.mapper.toCommonForWishAndCartItem
 import me.taste2plate.app.customer.domain.model.auth.User
 import me.taste2plate.app.customer.domain.model.custom.LogRequest
 import me.taste2plate.app.customer.domain.model.custom.LogType
+import me.taste2plate.app.customer.domain.model.product.CutOffTimeCheckModel
 import me.taste2plate.app.customer.domain.model.user.address.AddressListModel
 import me.taste2plate.app.customer.presentation.dialog.CouponDialog
 import me.taste2plate.app.customer.presentation.dialog.CustomDialog
@@ -621,13 +622,14 @@ fun CheckoutScreenContent(
                 VerticalSpace(space = SpaceBetweenViewsAndSubViews)
 
                 DeliveryInfo(
-                    viewModel = viewModel,
+                    cutOffTimeCheckModel = state.cutOffTimeCheckModel,
                     date = viewModel.selectedDate,
                     timeSlot = viewModel.selectedTimeSlot,
                     deliveryType = state.deliveryType,
                     showDatePicker = { showDatePicker() },
                     showTimeSlots = { showTimeSlots() },
-                    changeDeliveryType = changeDeliveryType
+                    changeDeliveryType = changeDeliveryType,
+                    expressEnabled = viewModel.expressEnabled
                 )
 
                 VerticalSpace(space = SpaceBetweenViews)
@@ -954,15 +956,16 @@ fun CancellationPolicy(
 
 @Composable
 fun DeliveryInfo(
-    viewModel: CheckOutViewModel,
+    // viewModel: CheckOutViewModel,
     date: String,
     timeSlot: String,
+    expressEnabled: Boolean,
+    cutOffTimeCheckModel: CutOffTimeCheckModel?,
     deliveryType: DeliveryType,
     changeDeliveryType: (DeliveryType) -> Unit,
     showDatePicker: () -> Unit,
     showTimeSlots: () -> Unit
 ) {
-    val state = viewModel.state
     Column {
         HeadingText("Delivery Options")
 
@@ -972,7 +975,7 @@ fun DeliveryInfo(
             RadioButtonInfo(
                 id = 1,
                 text = "Express Delivery",
-                enable = viewModel.expressEnabled
+                enable = expressEnabled
             ),
             RadioButtonInfo(
                 id = 2,
@@ -1003,10 +1006,10 @@ fun DeliveryInfo(
 
         VerticalSpace(space = SpaceBetweenViews)
 
-        if (state.cutOffTimeCheckModel != null)
+        if (cutOffTimeCheckModel != null)
             Text(
-                if (state.deliveryType == DeliveryType.Standard) state.cutOffTimeCheckModel.result.remarks
-                else state.cutOffTimeCheckModel.result.expressRemarks,
+                if (deliveryType == DeliveryType.Standard) cutOffTimeCheckModel.result.remarks
+                else cutOffTimeCheckModel.result.expressRemarks,
                 color = forestGreen.invoke()
             )
         /*
@@ -1031,11 +1034,12 @@ fun DeliveryInfo(
                     .weight(1f)
                     .padding(end = LowPadding)
                     .noRippleClickable {
-                        if (state.deliveryType != DeliveryType.Express)
+                        if (deliveryType != DeliveryType.Express)
                             showDatePicker()
                     }, fontSize = fontSize
             )
-        }) {
+        })
+        {
             TextInCircle(
                 text = timeSlot.ifEmpty { "Time" },
                 modifier = Modifier
@@ -1043,7 +1047,7 @@ fun DeliveryInfo(
                     .weight(1f)
                     .padding(start = LowPadding)
                     .noRippleClickable {
-                        if (state.deliveryType != DeliveryType.Express)
+                        if (deliveryType != DeliveryType.Express)
                             showTimeSlots()
                     }, fontSize = fontSize
             )

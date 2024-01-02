@@ -21,6 +21,8 @@ class Routes{
         const val productDetailsRoute: String = "productDetails"
         const val walletRoute: String = "walletRoute"
         const val contactUsRoute: String = "contactUsRoute"
+        const val GharKaKhanaBookingRoute: String = "GharKaKhanaBookingRoute"
+        const val GharKaKhanaCheckoutRoute: String = "GharKaKhanaCheckoutRoute"
         const val wishlistRoute: String = "wishlistRoute"
         const val cartRoute: String = "cartRoute"
         const val editProfileRoute: String = "editprofile"
