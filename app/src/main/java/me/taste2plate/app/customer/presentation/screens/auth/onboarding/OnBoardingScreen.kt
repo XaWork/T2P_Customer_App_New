@@ -30,7 +30,6 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.core.content.ContentProviderCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.facebook.appevents.AppEventsConstants
 import com.facebook.appevents.AppEventsLogger
@@ -45,6 +44,7 @@ import me.taste2plate.app.customer.presentation.theme.HighSpacing
 import me.taste2plate.app.customer.presentation.theme.ScreenPadding
 import me.taste2plate.app.customer.presentation.theme.SpaceBetweenViews
 import me.taste2plate.app.customer.presentation.theme.T2PCustomerAppTheme
+import me.taste2plate.app.customer.presentation.theme.primaryColor
 import me.taste2plate.app.customer.presentation.utils.getOtpString
 import me.taste2plate.app.customer.presentation.utils.mobileNumber
 import me.taste2plate.app.customer.presentation.widgets.AppButton
@@ -76,14 +76,16 @@ fun OnBoardingScreen(
         }
     }
 
-    LaunchedEffect(true){
-        viewModel.onEvent(AuthEvents.AddLog(
-            LogRequest(
-                type =LogType.pageVisit,
-                event = "enter in onboarding screen",
-                page_name = "/onboarding"
+    LaunchedEffect(true) {
+        viewModel.onEvent(
+            AuthEvents.AddLog(
+                LogRequest(
+                    type = LogType.pageVisit,
+                    event = "enter in onboarding screen",
+                    page_name = "/onboarding"
+                )
             )
-        ))
+        )
     }
 
 
@@ -176,8 +178,13 @@ fun OnBoardingScreen(
                         }
                     ),
                     isError = state.isError,
-                    errorMessage = if (state.isError) state.message!!
-                    else "Limit: ${viewModel.mobile.length}/${viewModel.mobileLength}",
+                    supportingText = {
+                        if (state.isError) Text(
+                            state.message!!,
+                            color = primaryColor.invoke()
+                        )
+                        else Text("Limit: ${viewModel.mobile.length}/${viewModel.mobileLength}")
+                    },
                     leadingIcon = {
                         MaterialIcon(
                             imageVector = Icons.Outlined.Phone

@@ -17,10 +17,11 @@ class CartUseCase @Inject constructor(
 ) {
     suspend fun execute(
     ): Flow<Resource<CartModel>> {
-        val defaultAddress = userPref.getDefaultAddress()!!
-        val city = defaultAddress.city.id
+        val defaultAddress = userPref.getDefaultAddress()
+        val localAddress = userPref.getAddress()
+        val city = defaultAddress?.city?.id ?: localAddress?.cityId ?: ""
         val userId = userPref.getUser()!!.id
-        val zip = defaultAddress.pincode
+        val zip = defaultAddress?.pincode ?: localAddress?.pinCode ?: ""
 
         return flow {
             emit(Resource.Loading(true))

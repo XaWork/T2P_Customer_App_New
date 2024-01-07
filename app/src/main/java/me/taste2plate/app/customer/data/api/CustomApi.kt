@@ -11,6 +11,9 @@ import me.taste2plate.app.customer.domain.model.ZipListModel
 import me.taste2plate.app.customer.domain.model.custom.AllPlanListModel
 import me.taste2plate.app.customer.domain.model.custom.GharKaKhanaCategoryModel
 import me.taste2plate.app.customer.domain.model.custom.GharKaKhanaSubCategoryModel
+import me.taste2plate.app.customer.domain.model.user.GetCityFromZipModel
+import retrofit2.http.Field
+import retrofit2.http.FormUrlEncoded
 import retrofit2.http.GET
 import retrofit2.http.POST
 import retrofit2.http.Query
@@ -57,12 +60,16 @@ interface CustomApi {
 
 
     @GET("all-plan-list")
-    suspend fun getPlans(@Query("city") cityId: String): AllPlanListModel
+    suspend fun getPlans(@Query("city") cityId: String?): AllPlanListModel
 
     @POST("gharkakhana-category")
     suspend fun gharKaKhanaCategory(): GharKaKhanaCategoryModel
 
     @POST("gharkakhana-subcategory")
     suspend fun gharKaKhanaSubCategory(): GharKaKhanaSubCategoryModel
+
+    @FormUrlEncoded
+    @POST("fetch-city-using-zip")
+    suspend fun fetchCityUsingZip(@Field("name")zip: String): GetCityFromZipModel
 
 }

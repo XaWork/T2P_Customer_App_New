@@ -45,8 +45,13 @@ class ProductRepoImpl @Inject constructor(
         return api.productsBySlider(name, taste)
     }
 
-    override suspend fun productDetails(id: String,address: String): ProductDetailsModel {
-        return api.productDetails(id, address)
+    override suspend fun productDetails(
+        id: String,
+        lat: String?,
+        lng: String?,
+        city: String?,
+    ): ProductDetailsModel {
+        return api.productDetails(id, lat, lng, city)
     }
 
     override suspend fun getOfferByCity(id: String): CouponModel {

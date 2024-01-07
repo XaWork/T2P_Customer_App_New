@@ -45,7 +45,9 @@ interface ProductRepo {
 
     suspend fun productDetails(
         id: String,
-        address: String
+        lat: String?,
+        lng: String?,
+        city: String?,
     ): ProductDetailsModel
 
     suspend fun getOfferByCity(

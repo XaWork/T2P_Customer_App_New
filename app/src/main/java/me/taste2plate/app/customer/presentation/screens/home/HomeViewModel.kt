@@ -136,7 +136,10 @@ class HomeViewModel @Inject constructor(
                         state.copy(
                             message = null,
                             addToWishlistResponse = null,
-                            addToCartResponse = null
+                            addToCartResponse = null,
+                            errorMessage = null,
+                            isError = false,
+                            showErrorMessage = false
                         )
                     }
 
@@ -147,6 +150,8 @@ class HomeViewModel @Inject constructor(
                     }
                 }
             }
+
+            HomeEvent.CheckDefaultAddress -> hasDefaultAddress()
         }
     }
 
@@ -266,9 +271,18 @@ class HomeViewModel @Inject constructor(
         var hasDefaultAddress = false
 
         viewModelScope.launch {
+            val localAddress = userPref.getAddress()
             val defaultAddress = userPref.getDefaultAddress()
-            if (defaultAddress != null) {
-                state = state.copy(defaultAddress = defaultAddress)
+            if (localAddress != null || defaultAddress != null) {
+                state = state.copy(
+                    defaultAddress = defaultAddress,
+                    localAddress = localAddress,
+                    noAddressFound = false
+                )
+                Log.e(
+                    "Address",
+                    "default address is not null && Address not found is ${state.noAddressFound}"
+                )
                 hasDefaultAddress = true
             }
         }
@@ -298,10 +312,21 @@ class HomeViewModel @Inject constructor(
                         //if (!isError)
                         T2PApp.wishlistCount = data?.result?.size ?: 0
 
-                        if (hasDefaultAddress())
+                        if (hasDefaultAddress()) {
+                            Log.e(
+                                "Address",
+                                "Address not found is ${state.noAddressFound}"
+                            )
+                            state = state.copy(noAddressFound = false)
                             getCart()
-                        else
-                            getAddress()
+                        } else {
+                            state = state.copy(noAddressFound = true)
+                            Log.e(
+                                "Address",
+                                "Address not found is in else case${state.noAddressFound}"
+                            )
+                        }
+                            //getLocalAddress()
                     }
 
                     is Resource.Error -> {
@@ -420,7 +445,8 @@ class HomeViewModel @Inject constructor(
                         state.copy(
                             isLoading = false,
                             isError = true,
-                            errorMessage = result.message
+                            errorMessage = result.message,
+                            showErrorMessage = true
                         )
                 }
 
@@ -488,7 +514,8 @@ class HomeViewModel @Inject constructor(
                                 isLoading = false,
                                 cartData = result.data,
                                 isError = isError,
-                                errorMessage = if (isError) "Something Went wrong" else ""
+                                errorMessage = if (isError) "Something Went wrong" else "",
+                                noAddressFound = false
                             )
 
                     }
@@ -502,6 +529,23 @@ class HomeViewModel @Inject constructor(
                     }
                 }
 
+            }
+        }
+    }
+
+    private fun getLocalAddress() {
+        viewModelScope.launch {
+            val localAddress = userPref.getAddress()
+            val defaultAddress = userPref.getDefaultAddress()
+            if (localAddress != null || defaultAddress != null) {
+                state = state.copy(
+                    defaultAddress = defaultAddress,
+                    localAddress = localAddress,
+                    isLoading = true
+                )
+                getCart()
+            } else {
+                state = state.copy(noAddressFound = true)
             }
         }
     }
@@ -525,17 +569,16 @@ class HomeViewModel @Inject constructor(
                                 addressListModel = result.data
                             )
 
-                        if (!isError) {
-                            if (state.defaultAddress == null && result.data != null && result.data.result.isNotEmpty()) {
-                                setDefaultAddress(result.data.result[0], isLoading = true)
-                            } else {
-                                if (result.data != null && result.data.result.isEmpty()) {
-                                    state = state.copy(noAddressFound = true)
-                                } else if (state.cartData == null)
-                                    getCart()
-                            }
+                        /* if (!isError) {
+                             if (state.defaultAddress == null && result.data != null && result.data.result.isNotEmpty()) {
+                             } else {
+                                 if (result.data != null && result.data.result.isEmpty()) {
+                                     state = state.copy(noAddressFound = true)
+                                 } else if (state.cartData == null)
+                                     getCart()
+                             }
 
-                        }
+                         }*/
                     }
 
                     is Resource.Error -> {
@@ -650,6 +693,7 @@ class HomeViewModel @Inject constructor(
                             isLoading = false,
                             isError = true,
                             errorMessage = result.message,
+                            showErrorMessage = true
                         )
                     }
                 }

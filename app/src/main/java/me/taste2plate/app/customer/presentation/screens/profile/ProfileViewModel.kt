@@ -13,6 +13,7 @@ import me.taste2plate.app.customer.data.UserPref
 import me.taste2plate.app.customer.domain.model.custom.LogRequest
 import me.taste2plate.app.customer.domain.model.custom.LogType
 import me.taste2plate.app.customer.domain.use_case.analytics.AddLogUseCase
+import me.taste2plate.app.customer.domain.use_case.user.DeleteUserUseCase
 import me.taste2plate.app.customer.domain.use_case.user.EditProfileUseCase
 import me.taste2plate.app.customer.domain.use_case.user.GetProfileUseCase
 import javax.inject.Inject
@@ -22,7 +23,8 @@ class ProfileViewModel @Inject constructor(
     private val userPref: UserPref,
     private val addLogUseCase: AddLogUseCase,
     private val editProfileUseCase: EditProfileUseCase,
-    private val getProfileUseCase: GetProfileUseCase
+    private val getProfileUseCase: GetProfileUseCase,
+    private val deleteUserUseCase: DeleteUserUseCase
 ) : ViewModel() {
 
     var state by mutableStateOf(ProfileState())
@@ -53,6 +55,10 @@ class ProfileViewModel @Inject constructor(
 
             is ProfileEvents.AddLog -> {
                 addLog(event.logRequest)
+            }
+
+            is ProfileEvents.DeleteUser -> {
+                deleteUser()
             }
         }
     }
@@ -141,6 +147,40 @@ class ProfileViewModel @Inject constructor(
                             isLoading = false,
                             isError = isError,
                             // message = result.data?.message,
+                        )
+                    }
+
+                    is Resource.Error -> {
+                        state = state.copy(
+                            isLoading = false,
+                            isError = true,
+                            message = result.message
+                        )
+                    }
+                }
+
+            }
+        }
+    }
+
+    private fun deleteUser() {
+        viewModelScope.launch {
+            deleteUserUseCase.execute().collect { result ->
+                when (result) {
+                    is Resource.Loading -> {
+                        state = state.copy(isLoading = true)
+                    }
+
+                    is Resource.Success -> {
+                        val isError = result.data?.status == Status.error.name
+
+                        if(!isError)
+                            userPref.logOut()
+
+                        state = state.copy(
+                            isLoading = false,
+                            isError = isError,
+                            userDeleted = !isError
                         )
                     }
 

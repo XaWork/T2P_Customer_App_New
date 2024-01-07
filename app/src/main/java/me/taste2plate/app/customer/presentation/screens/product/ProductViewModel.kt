@@ -197,8 +197,12 @@ class ProductViewModel @Inject constructor(
         Log.e("tag", "Default address called")
         viewModelScope.launch {
             val address = userPrefs.getDefaultAddress()
-            state = state.copy(defaultAddress = address)
-            checkAvalibility(state.defaultAddress!!.pincode)
+            val localAddress = userPrefs.getAddress()
+            state = state.copy(defaultAddress = address, localAddress = localAddress)
+            checkAvalibility(
+                zipCode = if (address == null) localAddress?.pinCode
+                    ?: "" else state.defaultAddress?.pincode ?: ""
+            )
         }
     }
 
@@ -479,7 +483,7 @@ class ProductViewModel @Inject constructor(
                                 //isError = isError,
                             )
 
-                        if (selectedProductId.isNotEmpty() && state.defaultAddress == null)
+                        if (selectedProductId.isNotEmpty() && (state.defaultAddress == null || state.localAddress == null))
                             getDefaultAddress()
 
                     }
@@ -623,6 +627,7 @@ class ProductViewModel @Inject constructor(
                     is Resource.Error -> {
                         state = state.copy(
                             isError = true,
+                            message = result.message
                         )
                     }
                 }

@@ -326,7 +326,7 @@ fun ProductDetails(
     val details = state.productDetails!!.result[0]
 
     var pincode by remember {
-        mutableStateOf(if (state.defaultAddress == null) "" else state.defaultAddress.pincode)
+        mutableStateOf(state.defaultAddress?.pincode ?: state.localAddress?.pinCode ?: "")
     }
 
     RoundedCornerCard(
@@ -358,7 +358,7 @@ fun ProductDetails(
 
                 //get cart item length
                 var cartItemLength = 0
-                if(cartData != null){
+                if (cartData != null && cartData.result != null && cartData.result.isNotEmpty()) {
                     cartData.result.forEach {
                         if (it.product.id == details.id)
                             cartItemLength = it.quantity

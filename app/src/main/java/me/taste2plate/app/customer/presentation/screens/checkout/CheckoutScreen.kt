@@ -418,6 +418,9 @@ fun CheckoutScreen(
             },
             changeDeliveryType = {
                 viewModel.onEvent(CheckoutEvents.ChangeDeliveryType(it))
+            },
+            navigateBack= {
+                navigateBack()
             }
         )
     }
@@ -433,6 +436,7 @@ fun CheckoutScreenContent(
     showDatePicker: () -> Unit,
     showTimeSlots: () -> Unit,
     showOtherTipDialog: () -> Unit,
+    navigateBack: () -> Unit,
     changeDeliveryType: (DeliveryType) -> Unit,
 ) {
     val state = viewModel.state
@@ -506,18 +510,22 @@ fun CheckoutScreenContent(
             }
 
             //cart items
-            val items = state.cart!!.result.map { it.toCommonForWishAndCartItem() }.toList()
-            items(items) { item ->
-                SingleCartAndWishlistItem(
-                    isWishList = false, item,
-                    updateCart = {
-                        updateCart(
-                            item.id,
-                            it
-                        )
-                    },
-                    fontSize = fontSize,
-                )
+            if (state.cart != null) {
+                val items = state.cart.result.map { it.toCommonForWishAndCartItem() }.toList()
+                items(items) { item ->
+                    SingleCartAndWishlistItem(
+                        isWishList = false, item,
+                        updateCart = {
+                            updateCart(
+                                item.id,
+                                it
+                            )
+                        },
+                        fontSize = fontSize,
+                    )
+                }
+            } else {
+                navigateBack()
             }
 
             item {

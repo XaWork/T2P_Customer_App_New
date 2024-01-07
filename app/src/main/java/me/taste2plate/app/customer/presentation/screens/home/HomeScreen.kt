@@ -27,6 +27,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -38,9 +39,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
 import kotlinx.coroutines.launch
 import me.taste2plate.app.customer.R
 import me.taste2plate.app.customer.T2PApp
@@ -120,6 +124,10 @@ fun HomeScreen(
     var showSettingDialog by remember {
         mutableStateOf(false)
     }
+    var showLocationDialog by remember {
+        mutableStateOf(false)
+    }
+
     if (showSettingDialog) {
         SettingInfoDialog(
             setting = state.setting!!,
@@ -153,18 +161,50 @@ fun HomeScreen(
             showToast(message = state.message)
             viewModel.onEvent(HomeEvent.UpdateState(changeAddToWishlistResponse = true))
         }
+        if (state.errorMessage != null && state.isError && state.showErrorMessage) {
+            showToast(message = state.errorMessage)
+            viewModel.onEvent(HomeEvent.UpdateState(changeAddToWishlistResponse = true))
+        }
         if (state.cartError) {
             showSettingDialog = true
         }
         if (state.noAddressFound) {
-            showToast(message = "Please add your address")
-            onNavigateToAddAddressScreen()
+            Log.e("Address", "No address found ${state.noAddressFound}")
+            showLocationDialog = true
         }
         //check app version
         if (state.setting != null) {
             if (!appUpToDate(context, state.setting)) {
                 showCustomDialog = true
             }
+        }
+    }
+
+    //observer lifecycle
+    val lifecycleOwner = LocalLifecycleOwner.current
+    DisposableEffect(key1 = lifecycleOwner, effect = {
+        val observer = LifecycleEventObserver { _, event ->
+            if (event == Lifecycle.Event.ON_START) {
+                viewModel.onEvent(HomeEvent.GetWishlist)
+            }
+        }
+
+        lifecycleOwner.lifecycle.addObserver(observer)
+
+        onDispose {
+            lifecycleOwner.lifecycle.removeObserver(observer)
+        }
+    })
+
+
+    if (showLocationDialog && !showCustomDialog) {
+        CustomDialog(
+            title = "Select Location",
+            text = "Please select a delivery location.",
+            confirmButtonText = "Select",
+            dismissAllowed = !state.noAddressFound
+        ) {
+            onNavigateToAddAddressScreen()
         }
     }
 
@@ -344,12 +384,13 @@ fun HomeScreen(
                 )
             else
                 Column {
-                    AddressBar(state.defaultAddress?.address ?: "",
+                    AddressBar(
+                        address = if (state.defaultAddress == null) state.localAddress!!.cityName!! else state.defaultAddress.address,
                         checked = state.checked,
                         onCheckChange = { viewModel.onEvent(HomeEvent.ChangeTaste) }) {
+                        //onNavigateToAddAddressScreen()
                         viewModel.onEvent(HomeEvent.GetAddress)
                         showBottomSheet = true
-
                     }
                     LazyColumn(
                         state = scrollState,
@@ -365,7 +406,7 @@ fun HomeScreen(
 
                             //slider
                             if (home?.slider != null)
-                                CenterColumn{
+                                CenterColumn {
                                     AutoSlidingCarousel(
                                         modifier = Modifier.noRippleClickable {
                                             onNavigateToGharKaKhanaBookingScreen()

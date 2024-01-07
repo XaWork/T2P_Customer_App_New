@@ -95,6 +95,7 @@ class CheckOutViewModel @Inject constructor(
     init {
         getCart()
         getSettings()
+        getDefaultAddress(applyCouponAndSetPrice = false)
     }
 
     fun onEvent(event: CheckoutEvents) {
@@ -633,7 +634,7 @@ class CheckOutViewModel @Inject constructor(
                 youSave *= result[0].quantity
 
                 //by doing this no crash is found otherwise sometime cart price is null
-                price = "${ cartprice ?: ""}".toDouble()
+                price = "${cartprice ?: "0"}".toDouble()
                 deliveryCharge =
                     if (state.deliveryType == DeliveryType.Standard) shipping.normalShipping.toDouble()
                     else shipping.expressShipping.toDouble()
@@ -1028,13 +1029,15 @@ class CheckOutViewModel @Inject constructor(
         }
     }
 
-    private fun getDefaultAddress() {
+    private fun getDefaultAddress(applyCouponAndSetPrice: Boolean = true) {
         viewModelScope.launch {
             state = state.copy(defaultAddress = userPref.getDefaultAddress())
             getUser()
         }
-        setPrice()
-        getCoupons()
+        if (applyCouponAndSetPrice) {
+            setPrice()
+            getCoupons()
+        }
     }
 
     private fun setDefaultAddress(address: AddressListModel.Result) {

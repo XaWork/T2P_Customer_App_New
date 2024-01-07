@@ -6,4 +6,6 @@ sealed class LocationEvent{
     data class GetCurrentLocation(
         val context: Context
     ): LocationEvent()
+
+    object GetCityFromZip: LocationEvent()
 }

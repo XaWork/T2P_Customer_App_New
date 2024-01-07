@@ -12,6 +12,7 @@ import me.taste2plate.app.customer.domain.model.ZipListModel
 import me.taste2plate.app.customer.domain.model.custom.AllPlanListModel
 import me.taste2plate.app.customer.domain.model.custom.GharKaKhanaCategoryModel
 import me.taste2plate.app.customer.domain.model.custom.GharKaKhanaSubCategoryModel
+import me.taste2plate.app.customer.domain.model.user.GetCityFromZipModel
 import me.taste2plate.app.customer.domain.repo.CustomRepo
 import javax.inject.Inject
 
@@ -60,7 +61,7 @@ class CustomRepoImpl @Inject constructor(
         return api.subCategories(categoryId)
     }
 
-    override suspend fun getPlans(cityId: String): AllPlanListModel {
+    override suspend fun getPlans(cityId: String?): AllPlanListModel {
         return api.getPlans(cityId)
     }
 
@@ -70,5 +71,9 @@ class CustomRepoImpl @Inject constructor(
 
     override suspend fun gharKaKhanaSubCategory(): GharKaKhanaSubCategoryModel {
         return api.gharKaKhanaSubCategory()
+    }
+
+    override suspend fun fetchCityUsingZip(zip: String): GetCityFromZipModel {
+        return api.fetchCityUsingZip(zip)
     }
 }

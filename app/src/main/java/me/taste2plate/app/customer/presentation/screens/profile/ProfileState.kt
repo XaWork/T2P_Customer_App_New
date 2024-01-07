@@ -10,6 +10,7 @@ data class ProfileState(
     val isLoading:Boolean = false,
     val userUpdate:Boolean = false,
     val isError: Boolean = false,
+    val userDeleted: Boolean = false,
     val message: String? = null,
     val user: User? = null,
     val editProfileResponse: CommonResponse? = null

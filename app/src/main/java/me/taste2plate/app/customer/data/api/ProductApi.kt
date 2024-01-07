@@ -65,7 +65,10 @@ interface ProductApi {
     @GET("product-details")
     suspend fun productDetails(
         @Query("id") id: String,
-        @Query("address") address: String
+       // @Query("address") address: String?,
+        @Query("lat") lat: String?,
+        @Query("lng") lng: String?,
+        @Query("city") city: String?,
     ): ProductDetailsModel
 
     @GET("offer-deal")

@@ -7,6 +7,7 @@ import me.taste2plate.app.customer.presentation.screens.auth.AuthEvents
 
 sealed class HomeEvent {
     object GetHome : HomeEvent()
+    object CheckDefaultAddress : HomeEvent()
     object GetWishlist : HomeEvent()
     data class AddLog(val logRequest: LogRequest) : HomeEvent()
     object LogOut : HomeEvent()

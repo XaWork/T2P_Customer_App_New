@@ -11,6 +11,7 @@ import me.taste2plate.app.customer.domain.model.ZipListModel
 import me.taste2plate.app.customer.domain.model.custom.AllPlanListModel
 import me.taste2plate.app.customer.domain.model.custom.GharKaKhanaCategoryModel
 import me.taste2plate.app.customer.domain.model.custom.GharKaKhanaSubCategoryModel
+import me.taste2plate.app.customer.domain.model.user.GetCityFromZipModel
 
 interface CustomRepo {
     suspend fun settings(): SettingsModel
@@ -45,6 +46,10 @@ interface CustomRepo {
     ): SubCategoryModel
 
     suspend fun getPlans(
-        cityId: String
+        cityId: String?
     ): AllPlanListModel
+
+    suspend fun fetchCityUsingZip(
+        zip: String
+    ): GetCityFromZipModel
 }

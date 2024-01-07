@@ -8,6 +8,7 @@ import me.taste2plate.app.customer.domain.model.product.ProductListModel
 import me.taste2plate.app.customer.domain.model.user.CartModel
 import me.taste2plate.app.customer.domain.model.user.CommonResponse
 import me.taste2plate.app.customer.domain.model.user.DeleteFromWishlistModel
+import me.taste2plate.app.customer.domain.model.user.LocalAddress
 import me.taste2plate.app.customer.domain.model.user.WishListModel
 import me.taste2plate.app.customer.domain.model.user.address.AddressListModel
 import me.taste2plate.app.customer.presentation.screens.home.FoodItemUpdateInfo
@@ -22,6 +23,7 @@ data class ProductListState(
     val cartData: CartModel? = null,
     val message: String? = null,
     val defaultAddress: AddressListModel.Result? = null,
+    val localAddress: LocalAddress? = null,
     val foodItemUpdateInfo: FoodItemUpdateInfo? = null,
     val checkAvailabilityModel: CheckAvailabilityModel? = null,
     val addToWishlistResponse: CommonResponse? = null,

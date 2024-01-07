@@ -195,7 +195,7 @@ fun SingleMostOrderedItem(
                             color = MaterialTheme.colorScheme.tertiary
                         )
 
-                    Row(
+                   /* Row(
                         modifier = Modifier
                             .clip(RoundedCornerShape(LowRoundedCorners))
                             .clip(RoundedCornerShape(LowRoundedCorners))
@@ -218,7 +218,7 @@ fun SingleMostOrderedItem(
                             tint = MaterialTheme.colorScheme.background,
                             modifier = Modifier.size(15.dp)
                         )
-                    }
+                    }*/
                 }
 
                 VerticalSpace(space = VeryLowSpacing)

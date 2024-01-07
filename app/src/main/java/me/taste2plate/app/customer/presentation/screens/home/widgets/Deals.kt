@@ -74,7 +74,7 @@ fun Deals(
                 pagerState = pagerState,
                 modifier = Modifier.noRippleClickable { onNavigateToProductDetailsScreen(deal.id) },
                 deal = deal,
-                alreadyWishListed = if (wishlistItems.isEmpty()) false else wishlistItems.any { it.product.id == deal.id },
+                alreadyWishListed = if (wishlistItems.isEmpty() || wishlistItems[0].product == null) false else wishlistItems.any { it.product.id == deal.id },
                 foodItemUpdateInfo = if (state.foodItemUpdateInfo != null && state.foodItemUpdateInfo.id == deal.id)
                     state.foodItemUpdateInfo
                 else null,

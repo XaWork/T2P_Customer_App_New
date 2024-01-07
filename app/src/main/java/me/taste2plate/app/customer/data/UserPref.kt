@@ -14,6 +14,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import me.taste2plate.app.customer.domain.model.SettingsModel
 import me.taste2plate.app.customer.domain.model.auth.User
+import me.taste2plate.app.customer.domain.model.user.LocalAddress
 import me.taste2plate.app.customer.domain.model.user.address.AddressListModel
 import javax.inject.Inject
 
@@ -29,6 +30,7 @@ class UserPref @Inject constructor(
         private val KEY_SETTINGS = stringPreferencesKey("settings")
         private val KEY_ADDRESS = stringPreferencesKey("address")
         private val KEY_TASTE = stringPreferencesKey("taste")
+        private val KEY_SAVED_ADDRESS = stringPreferencesKey("saved_address")
         private val KEY_IS_LOGIN = booleanPreferencesKey("isLogin")
         private val KEY_IP = stringPreferencesKey("ip")
         private val KEY_REFERRAL_ID = stringPreferencesKey("referralId")
@@ -165,8 +167,31 @@ class UserPref @Inject constructor(
         return setting
     }
 
-
     //=====================> Default address <=================
+
+    suspend fun saveAddress(address: LocalAddress) {
+        val stringAddress = Gson().toJson(address, LocalAddress::class.java)
+        dataStore.edit { preferences ->
+            preferences[KEY_SAVED_ADDRESS] = stringAddress
+        }
+        getAddress()
+    }
+
+    suspend fun getAddress(): LocalAddress? {
+        val addressFlow = dataStore.data.map { preferences ->
+            preferences[KEY_SAVED_ADDRESS]
+        }
+
+        return if (addressFlow.first() == null)
+            null
+        else {
+            val address: LocalAddress =
+                Gson().fromJson(addressFlow.first(), LocalAddress::class.java)
+            Log.e("address","address is ${addressFlow.first()}")
+            address
+        }
+    }
+
     suspend fun saveDefaultAddress(address: AddressListModel.Result) {
         val stringAddress = Gson().toJson(address)
         dataStore.edit { preferences ->

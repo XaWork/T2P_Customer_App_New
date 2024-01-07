@@ -24,6 +24,7 @@ import me.taste2plate.app.customer.presentation.screens.countries
 import me.taste2plate.app.customer.presentation.theme.ExtraHighPadding
 import me.taste2plate.app.customer.presentation.theme.LowSpacing
 import me.taste2plate.app.customer.presentation.theme.ScreenPadding
+import me.taste2plate.app.customer.presentation.theme.SpaceBetweenViewsAndSubViews
 import me.taste2plate.app.customer.presentation.widgets.AppAutoComplete
 import me.taste2plate.app.customer.presentation.widgets.AppButton
 import me.taste2plate.app.customer.presentation.widgets.AppDropDown
@@ -33,6 +34,7 @@ import me.taste2plate.app.customer.presentation.widgets.AppTextField
 import me.taste2plate.app.customer.presentation.widgets.AppTopBar
 import me.taste2plate.app.customer.presentation.widgets.ShowLoading
 import me.taste2plate.app.customer.presentation.widgets.SpaceBetweenRow
+import me.taste2plate.app.customer.presentation.widgets.VerticalSpace
 import me.taste2plate.app.customer.presentation.widgets.showToast
 
 @Composable
@@ -253,12 +255,15 @@ fun ContentAddEditAddressScreen(
                     modifier = Modifier
                         .padding()
                         .weight(1f),
-                    value = viewModel.landmarkA.value, onValueChanged = {
+                    value = viewModel.landmarkA.value ?: "",
+                    onValueChanged = {
                         viewModel.landmarkA.value = it
                     },
                     hint = "Landmark(Optional)"
                 )
             }
+
+            VerticalSpace(space = SpaceBetweenViewsAndSubViews)
 
             AppRadioButton(
                 viewModel.addressTypes,

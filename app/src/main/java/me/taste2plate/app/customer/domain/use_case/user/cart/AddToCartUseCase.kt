@@ -1,5 +1,6 @@
 package me.taste2plate.app.customer.domain.use_case.user.cart
 
+import android.util.Log
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import me.taste2plate.app.customer.data.ApiErrorMessages
@@ -21,13 +22,22 @@ class AddToCartUseCase @Inject constructor(
         return flow {
             emit(Resource.Loading(true))
             try {
-                val response = repo.addToCart(
-                    userId = userPref.getUser()!!.id,
-                    pId = productId,
-                    quantity = 1
+                val defaultAddress = userPref.getDefaultAddress()
+                val localAddress = userPref.getAddress()
 
-                )
-                emit(Resource.Success(response))
+              //  Log.e("Address", "City id is ${localAddress?.cityId}")
+
+                if (defaultAddress != null || localAddress?.cityId != null) {
+                    val response = repo.addToCart(
+                        userId = userPref.getUser()!!.id,
+                        pId = productId,
+                        quantity = 1
+
+                    )
+                    emit(Resource.Success(response))
+                }else{
+                    emit(Resource.Error(message = "Sorry!! We didn't delivered in your city."))
+                }
             } catch (io: IOException) {
                 io.printStackTrace()
                 emit(Resource.Error(message = ApiErrorMessages.errorIOException))

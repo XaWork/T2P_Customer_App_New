@@ -65,6 +65,7 @@ import com.google.maps.android.compose.GoogleMap
 import com.google.maps.android.compose.MapProperties
 import com.google.maps.android.compose.MapUiSettings
 import com.google.maps.android.compose.rememberCameraPositionState
+import me.taste2plate.app.customer.presentation.navigation.Screens
 import me.taste2plate.app.customer.presentation.screens.permissions.GPSEnableScreen
 import me.taste2plate.app.customer.presentation.screens.permissions.LocationPermissionScreen
 import me.taste2plate.app.customer.presentation.screens.permissions.RequestPermissions
@@ -99,7 +100,7 @@ source : https://blog.sanskar10100.dev/integrating-google-maps-places-api-and-re
 fun LocationScreen(
     screen: String? = null,
     onNavigateToNotificationScreen: () -> Unit,
-    onNavigateToAddEditAddressScreen: () -> Unit,
+    onNavigateToHomeScreen: () -> Unit,
     onNavigateBackToAddEditAddressScreen: (latLng: LatLng) -> Unit,
     viewModel: LocationViewModel = hiltViewModel()
 ) {
@@ -125,6 +126,12 @@ fun LocationScreen(
     var isLoading by remember {
         mutableStateOf(false)
     }
+
+    LaunchedEffect(key1 = viewModel.state) {
+        if (viewModel.state.addressSavedLocally)
+            onNavigateToHomeScreen()
+    }
+
     LaunchedEffect(
         permissionGranted && gpsEnabled && viewModel.currentLatLong == LatLng(
             28.64,
@@ -193,15 +200,12 @@ fun LocationScreen(
                 }
             else
                 LocationScreenContent(
-                    screen = screen,
-                    onNavigateToAddEditAddressScreen = {
-                        onNavigateToAddEditAddressScreen()
-                    },
                     onNavigateToNotificationScreen = {
-                        if (screen == null)
-                            onNavigateToNotificationScreen()
-                        else
-                            onNavigateBackToAddEditAddressScreen(viewModel.currentLatLong)
+                        when (screen) {
+                            null -> onNavigateToNotificationScreen()
+                            Screens.HomeScreen.route -> viewModel.onEvent(LocationEvent.GetCityFromZip)
+                            else -> onNavigateBackToAddEditAddressScreen(viewModel.currentLatLong)
+                        }
                     },
                     viewModel = viewModel
                 )
@@ -221,8 +225,6 @@ fun LocationScreen(
 
 @Composable
 fun LocationScreenContent(
-    screen: String? = null,
-    onNavigateToAddEditAddressScreen: () -> Unit,
     onNavigateToNotificationScreen: () -> Unit,
     viewModel: LocationViewModel
 ) {
@@ -249,16 +251,14 @@ fun LocationScreenContent(
         cameraPositionState.animate(CameraUpdateFactory.newLatLng(viewModel.currentLatLong))
     }
 
+
     AppScaffold(
         topBar = {
             MapAppBar(viewModel)
         },
         bottomBar = {
             MapBottomSheet(
-                screen = screen,
-                onNavigateToAddEditAddressScreen = {
-                    onNavigateToAddEditAddressScreen()
-                },
+                viewModel = viewModel,
                 onNavigateToNotificationScreen = {
                     onNavigateToNotificationScreen()
                 }
@@ -361,8 +361,7 @@ fun MapAppBar(
 @Composable
 fun MapBottomSheet(
     modifier: Modifier = Modifier,
-    screen: String? = null,
-    onNavigateToAddEditAddressScreen: () -> Unit,
+    viewModel: LocationViewModel,
     onNavigateToNotificationScreen: () -> Unit,
 ) {
     RoundedCornerCard(
@@ -372,21 +371,24 @@ fun MapBottomSheet(
             modifier = Modifier
                 .padding(ScreenPadding)
         ) {
-            AppButton(
-                text = "Confirm Location"
-            ) {
-                onNavigateToNotificationScreen()
-            }
-
-            if (screen == null)
-                TextButton(
-                    modifier = Modifier.fillMaxWidth(),
-                    onClick = { onNavigateToAddEditAddressScreen() }) {
-                    Text(
-                        text = "Enter Location Manually",
-                        textAlign = TextAlign.Center,
-                    )
+            if (viewModel.state.isLoading)
+                ShowLoading()
+            else
+                AppButton(
+                    text = "Confirm Location"
+                ) {
+                    onNavigateToNotificationScreen()
                 }
+
+            /* if (screen == null)
+                 TextButton(
+                     modifier = Modifier.fillMaxWidth(),
+                     onClick = {  }) {
+                     Text(
+                         text = "Enter Location Manually",
+                         textAlign = TextAlign.Center,
+                     )
+                 }*/
         }
     }
 }

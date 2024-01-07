@@ -20,7 +20,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.text.input.ImeOptions
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
@@ -37,7 +36,7 @@ fun AppTextField(
     value: String,
     onValueChanged: (String) -> Unit,
     hint: String = "",
-    errorMessage: String = "",
+    supportingText: @Composable (() -> Unit)? = null,
     readOnly: Boolean = false,
     enabled: Boolean = true,
     isError: Boolean = false,
@@ -49,6 +48,7 @@ fun AppTextField(
 ) {
     OutlinedTextField(
         modifier = modifier
+            .padding(bottom = 5.dp)
             .fillMaxWidth(),
         value = value,
         enabled = enabled,
@@ -61,18 +61,7 @@ fun AppTextField(
         ),
         isError = isError,
         keyboardActions = keyboardActions,
-        supportingText = {
-            if (isError)
-                Text(
-                    errorMessage,
-                    color = primaryColor.invoke()
-                )
-            else
-                Text(
-                    errorMessage,
-                )
-
-        },
+        supportingText = supportingText,
         readOnly = readOnly,
         label = {
             Text(

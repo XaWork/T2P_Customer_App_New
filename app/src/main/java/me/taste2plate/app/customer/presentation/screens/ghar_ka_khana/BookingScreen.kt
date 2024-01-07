@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDefaults
 import androidx.compose.material3.DatePickerDialog
@@ -46,7 +47,9 @@ import me.taste2plate.app.customer.domain.model.user.GharKaKhanaFetchCartModel
 import me.taste2plate.app.customer.domain.model.user.address.AddressListModel
 import me.taste2plate.app.customer.presentation.dialog.TimePickerDialog
 import me.taste2plate.app.customer.presentation.screens.address.AddressBottomSheet
+import me.taste2plate.app.customer.presentation.screens.checkout.DeliveryType
 import me.taste2plate.app.customer.presentation.screens.checkout.fontSize
+import me.taste2plate.app.customer.presentation.screens.checkout.fontSize1
 import me.taste2plate.app.customer.presentation.theme.ExtraLowElevation
 import me.taste2plate.app.customer.presentation.theme.LowPadding
 import me.taste2plate.app.customer.presentation.theme.LowSpacing
@@ -56,6 +59,7 @@ import me.taste2plate.app.customer.presentation.theme.SpaceBetweenViewsAndSubVie
 import me.taste2plate.app.customer.presentation.theme.T2PCustomerAppTheme
 import me.taste2plate.app.customer.presentation.theme.VeryLowSpacing
 import me.taste2plate.app.customer.presentation.theme.cardContainerOnSecondaryColor
+import me.taste2plate.app.customer.presentation.theme.forestGreen
 import me.taste2plate.app.customer.presentation.theme.primaryColor
 import me.taste2plate.app.customer.presentation.theme.screenBackgroundColor
 import me.taste2plate.app.customer.presentation.utils.noRippleClickable
@@ -63,11 +67,13 @@ import me.taste2plate.app.customer.presentation.widgets.AppButton
 import me.taste2plate.app.customer.presentation.widgets.AppCheckBox
 import me.taste2plate.app.customer.presentation.widgets.AppDivider
 import me.taste2plate.app.customer.presentation.widgets.AppDropDown
+import me.taste2plate.app.customer.presentation.widgets.AppRadioButton
 import me.taste2plate.app.customer.presentation.widgets.AppScaffold
 import me.taste2plate.app.customer.presentation.widgets.AppTextField
 import me.taste2plate.app.customer.presentation.widgets.AppTopBar
 import me.taste2plate.app.customer.presentation.widgets.HorizontalSpace
 import me.taste2plate.app.customer.presentation.widgets.InfoWithIcon
+import me.taste2plate.app.customer.presentation.widgets.RadioButtonInfo
 import me.taste2plate.app.customer.presentation.widgets.RoundedCornerCard
 import me.taste2plate.app.customer.presentation.widgets.ShowLoading
 import me.taste2plate.app.customer.presentation.widgets.SpaceBetweenRow
@@ -102,7 +108,7 @@ fun BookingScreen(
         topBar = {
             AppTopBar(
                 title = "Ghar ka khana"
-            ) {}
+            ) { navigateBack() }
         }
     ) {
         if (state.isLoading)
@@ -144,11 +150,14 @@ fun ContentBookingScreen(
         item {
             AppDivider(thickness = 2.dp)
 
-            GKKDeliveryInfo(viewModel)
+            GKKPickupInfo(viewModel)
 
-            AppButton(text = "Book Now") {
-                viewModel.onEvent(GharKaKhanaEvent.BookNow)
-            }
+            if (state.bookButtonLoader)
+                ShowLoading()
+            else
+                AppButton(text = "Book Now") {
+                    viewModel.onEvent(GharKaKhanaEvent.BookNow)
+                }
         }
     }
 }
@@ -206,7 +215,7 @@ fun PdLocation(
     VerticalSpace(space = SpaceBetweenViewsAndSubViews)
 
     SinglePdLocation(
-        backgroundColor = MaterialTheme.colorScheme.onPrimaryContainer,
+        backgroundColor = forestGreen.invoke(),
         title = "Destination Location",
         iconId = R.drawable.destination_icon,
         address = state.destinationLocation,
@@ -338,6 +347,9 @@ fun FoodInfo(viewModel: GharKaKhanaViewModel) {
                     modifier = Modifier
                         .fillMaxWidth()
                         .weight(1f),
+                    buttonColors = ButtonDefaults.buttonColors(
+                        containerColor = forestGreen.invoke()
+                    ),
                     text = "Add"
                 ) {
                     viewModel.onEvent(GharKaKhanaEvent.AddToCart)
@@ -406,8 +418,8 @@ fun SingleFoodItem(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun GKKDeliveryInfo(viewModel: GharKaKhanaViewModel) {
-    var state = viewModel.state
+fun GKKPickupInfo(viewModel: GharKaKhanaViewModel) {
+    val state = viewModel.state
     var showDatePickerDialog by rememberSaveable { mutableStateOf(false) }
     var timePickerExpanded by rememberSaveable { mutableStateOf(false) }
     val datePickerState = rememberDatePickerState()
@@ -479,7 +491,7 @@ fun GKKDeliveryInfo(viewModel: GharKaKhanaViewModel) {
             hint = "Total Weight (kg)",
             readOnly = true
         )
-
+/*
         AppTextField(
             value = viewModel.remarks,
             onValueChanged = {
@@ -487,7 +499,7 @@ fun GKKDeliveryInfo(viewModel: GharKaKhanaViewModel) {
             },
             hint = "Remarks",
             readOnly = false
-        )
+        )*/
 
 
         val items = listOf<@Composable RowScope.() -> Unit> {
@@ -515,8 +527,44 @@ fun GKKDeliveryInfo(viewModel: GharKaKhanaViewModel) {
                     }, fontSize = fontSize
             )
         }
+        VerticalSpace(space = SpaceBetweenViewsAndSubViews)
 
         SpaceBetweenRow(items = items)
+
+        VerticalSpace(space = SpaceBetweenViewsAndSubViews)
+
+        AppDivider(thickness = 2.dp)
+
+        val radioOptions = listOf(
+            RadioButtonInfo(
+                id = 1,
+                text = "Express Delivery",
+            ),
+            RadioButtonInfo(
+                id = 2,
+                text = "Standard Delivery"
+            )
+        )
+
+        AppRadioButton(
+            radioOptions,
+            when (viewModel.deliveryType) {
+                DeliveryType.Express -> radioOptions[0].text
+                DeliveryType.Standard -> radioOptions[1].text
+            },
+            onOptionSelected = {
+                when (it.id) {
+                    1 -> {
+                        viewModel.deliveryType = DeliveryType.Express
+                    }
+
+                    2 -> {
+                        viewModel.deliveryType = DeliveryType.Standard
+                    }
+                }
+            },
+            fontSize = fontSize1,
+        )
 
         VerticalSpace(space = SpaceBetweenViewsAndSubViews)
 

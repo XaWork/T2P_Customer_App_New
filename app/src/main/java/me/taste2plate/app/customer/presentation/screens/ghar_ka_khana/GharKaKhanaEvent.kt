@@ -10,11 +10,10 @@ sealed class GharKaKhanaEvent {
     ) : GharKaKhanaEvent()
 
     object GetAddress: GharKaKhanaEvent()
-
-    object CheckCutOffTime: GharKaKhanaEvent()
     object UpdateState: GharKaKhanaEvent()
     object AddToCart: GharKaKhanaEvent()
     object BookNow: GharKaKhanaEvent()
+    object ConfirmCheckout: GharKaKhanaEvent()
     data class DeleteCart(
         val id: String
     ): GharKaKhanaEvent()

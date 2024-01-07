@@ -1,7 +1,5 @@
 package me.taste2plate.app.customer.presentation.screens.profile
 
-import android.content.res.Configuration
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.CardDefaults
@@ -14,24 +12,22 @@ import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.withStyle
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import me.taste2plate.app.customer.domain.model.auth.User
 import me.taste2plate.app.customer.domain.model.custom.LogRequest
 import me.taste2plate.app.customer.domain.model.custom.LogType
-import me.taste2plate.app.customer.presentation.screens.home.HomeEvent
 import me.taste2plate.app.customer.presentation.theme.HighSpacing
 import me.taste2plate.app.customer.presentation.theme.LowElevation
 import me.taste2plate.app.customer.presentation.theme.ScreenPadding
 import me.taste2plate.app.customer.presentation.theme.SpaceBetweenViews
-import me.taste2plate.app.customer.presentation.theme.T2PCustomerAppTheme
 import me.taste2plate.app.customer.presentation.theme.onSecondaryColor
 import me.taste2plate.app.customer.presentation.theme.primaryColor
 import me.taste2plate.app.customer.presentation.utils.noRippleClickable
 import me.taste2plate.app.customer.presentation.widgets.AppScaffold
 import me.taste2plate.app.customer.presentation.widgets.AppTopBar
 import me.taste2plate.app.customer.presentation.widgets.RoundedCornerCard
+import me.taste2plate.app.customer.presentation.widgets.ShowLoading
 import me.taste2plate.app.customer.presentation.widgets.TextAlignCenter
 import me.taste2plate.app.customer.presentation.widgets.TextAlignEnd
 import me.taste2plate.app.customer.presentation.widgets.VerticalSpace
@@ -41,12 +37,13 @@ fun ProfileScreen(
     viewModel: ProfileViewModel = hiltViewModel(),
     onNavigateToEditProfileScreen: () -> Unit,
     onNavigateToAddressListScreen: () -> Unit,
+    onNavigateLogoutScreen: () -> Unit,
     navigateBack: () -> Unit,
 
     ) {
 
 
-    LaunchedEffect(true){
+    LaunchedEffect(true) {
         viewModel.onEvent(
             ProfileEvents.AddLog(
                 LogRequest(
@@ -54,7 +51,14 @@ fun ProfileScreen(
                     event = "enter in profile screen",
                     page_name = "/profile"
                 )
-            ))
+            )
+        )
+    }
+
+    LaunchedEffect(key1 = viewModel.state) {
+        if(viewModel.state.userDeleted){
+            onNavigateLogoutScreen()
+        }
     }
 
 
@@ -62,13 +66,17 @@ fun ProfileScreen(
         topBar = {
             AppTopBar(
                 title = "Profile"
-            ) {navigateBack()}
+            ) { navigateBack() }
         }
     ) {
         ContentProfileScreen(
+            state = viewModel.state,
             user = if (viewModel.state.user == null) null else viewModel.state.user,
             onNavigateToEditProfileScreen = {
                 onNavigateToEditProfileScreen()
+            },
+            deleteUser = {
+                viewModel.onEvent(ProfileEvents.DeleteUser)
             }
         ) {
             onNavigateToAddressListScreen()
@@ -78,8 +86,10 @@ fun ProfileScreen(
 
 @Composable
 fun ContentProfileScreen(
+    state: ProfileState,
     user: User?,
     onNavigateToEditProfileScreen: () -> Unit,
+    deleteUser: () -> Unit,
     onNavigateToAddressListScreen: () -> Unit,
 ) {
     Column(
@@ -129,7 +139,7 @@ fun ContentProfileScreen(
             }
         }
 
-        VerticalSpace(space = HighSpacing)
+        VerticalSpace(space = SpaceBetweenViews)
 
         RoundedCornerCard(
             cardColor = CardDefaults.cardColors(
@@ -145,14 +155,26 @@ fun ContentProfileScreen(
                 modifier = Modifier.padding(ScreenPadding)
             )
         }
-    }
-}
 
-@Preview
-@Preview(name = "Dark Preview", uiMode = Configuration.UI_MODE_NIGHT_YES)
-@Composable
-fun ProfileScreenPreview() {
-    T2PCustomerAppTheme {
-        //ProfileScreen({}) {}
+        VerticalSpace(space = HighSpacing)
+
+        if (state.isLoading)
+            ShowLoading()
+        else
+        RoundedCornerCard(
+            cardColor = CardDefaults.cardColors(
+                containerColor = primaryColor.invoke()
+            ),
+            elevation = LowElevation,
+            modifier = Modifier.noRippleClickable {
+                deleteUser()
+            }
+        ) {
+
+                TextAlignCenter(
+                    text = "Delete Account",
+                    modifier = Modifier.padding(ScreenPadding)
+                )
+        }
     }
 }

@@ -11,6 +11,7 @@ import me.taste2plate.app.customer.domain.model.user.CommonResponse
 import me.taste2plate.app.customer.domain.model.user.DeleteFromWishlistModel
 import me.taste2plate.app.customer.domain.model.user.GetProfileModel
 import me.taste2plate.app.customer.domain.model.user.GharKaKhanaAddToCartModel
+import me.taste2plate.app.customer.domain.model.user.GharKaKhanaCheckoutModel
 import me.taste2plate.app.customer.domain.model.user.GharKaKhanaFetchCartModel
 import me.taste2plate.app.customer.domain.model.user.MyPlanModel
 import me.taste2plate.app.customer.domain.model.user.OrderConfirmModel
@@ -50,6 +51,10 @@ class UserRepoImpl @Inject constructor(
         return api.getProfile(id)
     }
 
+    override suspend fun deleteUser(id: String): CommonResponse {
+        return api.deleteUser(id)
+    }
+
     override suspend fun getMyPlan(id: String): MyPlanModel {
         return api.getMyPlan(id)
     }
@@ -81,7 +86,7 @@ class UserRepoImpl @Inject constructor(
         productId: String
     ) = api.deleteFromWishlist(userId, productId)
 
-    override suspend fun getCart(userId: String, city: String, zip: String) =
+    override suspend fun getCart(userId: String, city: String?, zip: String?) =
         api.getCart(userId, city, zip)
 
     override suspend fun updateCart(
@@ -271,5 +276,27 @@ class UserRepoImpl @Inject constructor(
 
     override suspend fun gharKaKhanaDeleteCart(itemId: String): CommonResponse {
         return api.gharKaKhanaDeleteCart(itemId)
+    }
+
+    override suspend fun gharKaKhanaCheckout(
+        userId: String,
+        sourceLocation: String,
+        destinationLocation: String,
+        pickupDate: String,
+        pickupTime: String,
+        deliveryType: String
+    ): GharKaKhanaCheckoutModel {
+        return api.gharKaKhanaCheckout(
+            userId,
+            sourceLocation,
+            destinationLocation,
+            pickupDate,
+            pickupTime,
+            deliveryType
+        )
+    }
+
+    override suspend fun gharKaKhanaConfirmCheckout(orderId: String): CommonResponse {
+        return api.gharKaKhanaConfirmCheckout(orderId)
     }
 }

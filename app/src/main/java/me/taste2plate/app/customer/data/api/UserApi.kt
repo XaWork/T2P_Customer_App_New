@@ -10,6 +10,7 @@ import me.taste2plate.app.customer.domain.model.user.CommonResponse
 import me.taste2plate.app.customer.domain.model.user.DeleteFromWishlistModel
 import me.taste2plate.app.customer.domain.model.user.GetProfileModel
 import me.taste2plate.app.customer.domain.model.user.GharKaKhanaAddToCartModel
+import me.taste2plate.app.customer.domain.model.user.GharKaKhanaCheckoutModel
 import me.taste2plate.app.customer.domain.model.user.GharKaKhanaFetchCartModel
 import me.taste2plate.app.customer.domain.model.user.MyPlanModel
 import me.taste2plate.app.customer.domain.model.user.OrderConfirmModel
@@ -71,6 +72,11 @@ interface UserApi {
     suspend fun getWalletTransactions(@Query("id") userId: String): WalletTransactionModel
 
 
+    @FormUrlEncoded
+    @POST("delete-user")
+    suspend fun deleteUser(@Field("id") userId: String): CommonResponse
+
+
     // ------------------------- Wishlist -------------------------
     @GET("get-wish")
     suspend fun getWishlist(
@@ -106,8 +112,8 @@ interface UserApi {
     @GET("get-cart")
     suspend fun getCart(
         @Query("id") id: String,
-        @Query("customer_city") cityId: String,
-        @Query("customer_zip") zipCode: String
+        @Query("customer_city") cityId: String?,
+        @Query("customer_zip") zipCode: String?
     ): CartModel
 
 
@@ -263,9 +269,27 @@ interface UserApi {
     suspend fun gharKaKhanaFetchCart(
         @Field("user") userId: String,
     ): GharKaKhanaFetchCartModel
+
     @FormUrlEncoded
     @POST("gharkakhana-delete-cart")
     suspend fun gharKaKhanaDeleteCart(
         @Field("id") itemId: String,
     ): CommonResponse
+
+    @FormUrlEncoded
+    @POST("gharkakhana-confirm-checkout")
+    suspend fun gharKaKhanaConfirmCheckout(
+        @Field("id") orderId: String,
+    ): CommonResponse
+
+    @FormUrlEncoded
+    @POST("gharkakhana-checkout")
+    suspend fun gharKaKhanaCheckout(
+        @Field("userId") userId: String,
+        @Field("source_location") sourceLocation: String,
+        @Field("destination_location") destinationLocation: String,
+        @Field("pickup_date") pickupDate: String,
+        @Field("pickup_time") pickupTime: String,
+        @Field("delivery_type") deliveryType: String,
+    ): GharKaKhanaCheckoutModel
 }

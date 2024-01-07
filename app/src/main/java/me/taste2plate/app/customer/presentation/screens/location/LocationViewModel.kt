@@ -27,20 +27,26 @@ import com.google.android.libraries.places.api.net.FindAutocompletePredictionsRe
 import com.google.android.libraries.places.api.net.PlacesClient
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import me.taste2plate.app.customer.data.Resource
 import me.taste2plate.app.customer.data.UserPref
+import me.taste2plate.app.customer.domain.model.user.LocalAddress
+import me.taste2plate.app.customer.domain.use_case.user.FetchCityUsingUseCase
 import java.io.IOException
 import javax.inject.Inject
 
 @HiltViewModel
 class LocationViewModel @Inject constructor(
-    private val userPref: UserPref
+    private val userPref: UserPref,
+    private val fetchCityUsingZipUseCase: FetchCityUsingUseCase
 ) : ViewModel() {
 
     var state by mutableStateOf(LocationState())
+    var lat by mutableStateOf("")
+    private var lng by mutableStateOf("")
+    var zip by mutableStateOf("")
     private var job: Job? = null
     val locationAutofill = mutableStateListOf<AutocompleteResult>()
     lateinit var placesClient: PlacesClient
@@ -52,6 +58,8 @@ class LocationViewModel @Inject constructor(
             is LocationEvent.GetCurrentLocation -> {
                 currentLocation(event.context)
             }
+
+            is LocationEvent.GetCityFromZip -> fetchCityUsingZip()
         }
     }
 
@@ -143,23 +151,53 @@ class LocationViewModel @Inject constructor(
     }
 
     var text by mutableStateOf("")
+    var cityName by mutableStateOf("")
 
     fun getAddress(latLng: LatLng) {
+        lat = latLng.latitude.toString()
+        lng = latLng.longitude.toString()
         try {
             currentLatLong = latLng
             viewModelScope.launch {
                 withContext(Dispatchers.IO) {
                     try {
-                       if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU){
-                           geoCoder.getFromLocation(latLng.latitude, latLng.longitude, 1){
-                               text = it[0].getAddressLine(0)
-                           }
-                       }else{
-                           val address = geoCoder.getFromLocation(latLng.latitude, latLng.longitude, 1)
-                           if (address?.isNotEmpty() == true) {
-                               text = address[0]?.getAddressLine(0).toString()
-                           }
-                       }
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                            geoCoder.getFromLocation(latLng.latitude, latLng.longitude, 1) {
+                                text = it[0].getAddressLine(0)
+                                zip = it[0].postalCode
+                                cityName = "${it[0].locality}, ${it[0].adminArea}"
+
+                                Log.e(
+                                    "Address",
+                                    "Full Address : $text\nZip : $zip\nLocality : ${it[0].locality}\n" +
+                                            "Admin Area : ${it[0].adminArea}\n" +
+                                            "Locale : ${it[0].locale}\n" +
+                                            "Sub Admin Area : ${it[0].subAdminArea}\n" +
+                                            "Sub Locality : ${it[0].subLocality}\n" +
+                                            "Feature Name : ${it[0].featureName}\n" +
+                                            "Premises : ${it[0].premises}\n"
+                                )
+                            }
+                        } else {
+                            val address =
+                                geoCoder.getFromLocation(latLng.latitude, latLng.longitude, 1)
+                            if (address?.isNotEmpty() == true) {
+                                text = address[0]?.getAddressLine(0).toString()
+                                zip = address[0].postalCode
+                                cityName = "${address[0].locality}, ${address[0].adminArea}"
+
+                                Log.e(
+                                    "Address",
+                                    "Full Address : $text\nZip : $zip\nLocality : ${address[0].locality}\n" +
+                                            "Admin Area : ${address[0].adminArea}\n" +
+                                            "Locale : ${address[0].locale}\n" +
+                                            "Sub Admin Area : ${address[0].subAdminArea}\n" +
+                                            "Sub Locality : ${address[0].subLocality}\n" +
+                                            "Feature Name : ${address[0].featureName}\n" +
+                                            "Premises : ${address[0].premises}\n"
+                                )
+                            }
+                        }
                     } catch (e: IOException) {
                         // Handle IOException appropriately
                         Log.e("Error", e.toString())
@@ -168,6 +206,48 @@ class LocationViewModel @Inject constructor(
             }
         } catch (e: Exception) {
             Log.e("Error", e.printStackTrace().toString())
+        }
+    }
+
+    private fun fetchCityUsingZip() {
+        viewModelScope.launch {
+            fetchCityUsingZipUseCase.execute(
+                zip
+            ).collect { result ->
+                when (result) {
+                    is Resource.Loading -> {
+                        state = state.copy(isLoading = true)
+                    }
+
+                    is Resource.Success -> {
+                        //val isError = result.data?.status == Status.error.name
+                        val city = result.data?.result
+
+                        userPref.saveAddress(
+                            LocalAddress(
+                                pinCode = zip,
+                                lat = lat,
+                                lng = lng,
+                                cityId = city?.id,
+                                cityName = city?.name ?: cityName,
+                            )
+                        )
+
+                        state =
+                            state.copy(
+                                isLoading = false,
+                                addressSavedLocally = true
+                            )
+                    }
+
+                    is Resource.Error -> {
+                        state = state.copy(
+                            isLoading = false
+                        )
+                    }
+                }
+
+            }
         }
     }
 }

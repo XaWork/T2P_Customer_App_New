@@ -10,6 +10,7 @@ import me.taste2plate.app.customer.domain.model.user.CommonResponse
 import me.taste2plate.app.customer.domain.model.user.DeleteFromWishlistModel
 import me.taste2plate.app.customer.domain.model.user.GetProfileModel
 import me.taste2plate.app.customer.domain.model.user.GharKaKhanaAddToCartModel
+import me.taste2plate.app.customer.domain.model.user.GharKaKhanaCheckoutModel
 import me.taste2plate.app.customer.domain.model.user.GharKaKhanaFetchCartModel
 import me.taste2plate.app.customer.domain.model.user.MyPlanModel
 import me.taste2plate.app.customer.domain.model.user.OrderConfirmModel
@@ -39,6 +40,10 @@ interface UserRepo {
     suspend fun getMyPlan(
         id: String,
     ): MyPlanModel
+
+    suspend fun deleteUser(
+        id: String,
+    ): CommonResponse
 
     suspend fun getWalletTransaction(
         id: String,
@@ -74,8 +79,8 @@ interface UserRepo {
 
     suspend fun getCart(
         userId: String,
-        city: String,
-        zip: String
+        city: String?,
+        zip: String?
     ): CartModel
 
     suspend fun updateCart(
@@ -198,4 +203,17 @@ interface UserRepo {
     suspend fun gharKaKhanaDeleteCart(
         itemId: String,
     ): CommonResponse
+
+    suspend fun gharKaKhanaConfirmCheckout(
+        orderId: String,
+    ): CommonResponse
+
+    suspend fun gharKaKhanaCheckout(
+        userId: String,
+        sourceLocation: String,
+        destinationLocation: String,
+        pickupDate: String,
+        pickupTime: String,
+        deliveryType: String,
+    ): GharKaKhanaCheckoutModel
 }

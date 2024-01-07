@@ -142,8 +142,8 @@ fun Navigation() {
             val screen = entry.arguments?.getString("screen")
             LocationScreen(
                 screen = screen,
-                onNavigateToAddEditAddressScreen = {
-                    navController.navigate(Screens.AddEditAddressScreen.route)
+                onNavigateToHomeScreen = {
+                    navController.popBackStack()
                 },
                 onNavigateToNotificationScreen = {
                     navController.navigate(Screens.NotificationScreen.route) {
@@ -223,9 +223,7 @@ fun Navigation() {
                     navController.navigate(Screens.AddressListScreen.route)
                 },
                 onNavigateToAddAddressScreen = {
-                    navController.navigate(Screens.AddEditAddressScreen.route) {
-                        popUpTo(0)
-                    }
+                    navController.navigate(Screens.LocationScreen.route + "?screen=${Screens.HomeScreen.route}")
                 },
                 onNavigateAboutScreen = {
                     navController.navigate(Screens.AboutScreen.route + "?screen=$it")
@@ -290,7 +288,11 @@ fun Navigation() {
                         navController.navigate(Screens.AddressListScreen.route)
                     },
                     onNavigateToCheckoutScreen = {
-                        navController.navigate(Screens.GharKaKhanaCheckoutScreen.route)
+                        navController.navigate(Screens.GharKaKhanaCheckoutScreen.route) {
+                            popUpTo(Screens.GharKaKhanaCheckoutScreen.route) {
+                                inclusive = true
+                            }
+                        }
                     },
                     navigateBack = {
                         navController.popBackStack()
@@ -305,6 +307,11 @@ fun Navigation() {
                     viewModel = viewModel,
                     navigateBack = {
                         navController.popBackStack()
+                    },
+                    moveToHomeScreen = {
+                        navController.navigate(Screens.HomeScreen.route) {
+                            popUpTo(0)
+                        }
                     }
                 )
             }
@@ -530,7 +537,10 @@ fun Navigation() {
                     viewModel = viewModel,
                     onNavigateToCheckoutScreen = {
                         navController.navigate(Screens.CheckoutScreen.route)
-                    }, onBackPress = {
+                    },
+                    onNavigateToAddressListScreen = {
+                        navController.navigate(Screens.AddressListScreen.route)
+                    },onBackPress = {
                         navController.popBackStack()
                     })
             }
@@ -591,6 +601,11 @@ fun Navigation() {
                     },
                     navigateBack = {
                         navController.popBackStack()
+                    },
+                    onNavigateLogoutScreen = {
+                        navController.navigate(Screens.OnBoardingScreen.route) {
+                            popUpTo(0)
+                        }
                     }
                 )
             }

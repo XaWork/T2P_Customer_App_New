@@ -6,6 +6,7 @@ import me.taste2plate.app.customer.domain.model.auth.User
 import me.taste2plate.app.customer.domain.model.user.CartModel
 import me.taste2plate.app.customer.domain.model.user.CommonResponse
 import me.taste2plate.app.customer.domain.model.user.DeleteFromWishlistModel
+import me.taste2plate.app.customer.domain.model.user.LocalAddress
 import me.taste2plate.app.customer.domain.model.user.WishListModel
 import me.taste2plate.app.customer.domain.model.user.address.AddressListModel
 
@@ -13,6 +14,7 @@ data class HomeState(
     val isLoading: Boolean = false,
     val cartError: Boolean = false,
     val addressLoader: Boolean = false,
+    val showErrorMessage: Boolean = false,
     val noAddressFound: Boolean = false,
     val checked: Boolean = false,
     val user: User? = null,
@@ -29,6 +31,7 @@ data class HomeState(
     val addToCartResponse: CommonResponse? = null,
     val foodItemUpdateInfo: FoodItemUpdateInfo? = null,
     val defaultAddress: AddressListModel.Result? = null,
+    val localAddress: LocalAddress? = null,
 )
 
 data class FoodItemUpdateInfo(

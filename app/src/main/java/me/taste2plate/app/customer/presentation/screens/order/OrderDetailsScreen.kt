@@ -403,7 +403,7 @@ fun StraightLine(modifier: Modifier = Modifier) {
         val lineLength = size.width / 2 // Adjust the length as needed
 
         drawLine(
-            color = Color.Red,
+            color = Color.Green,
             start = Offset(size.width / 2, startY),
             end = Offset(size.width / 2, endY),
             strokeWidth = 3.dp.toPx()

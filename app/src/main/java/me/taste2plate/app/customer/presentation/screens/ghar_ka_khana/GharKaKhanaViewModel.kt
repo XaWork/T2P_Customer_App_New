@@ -15,9 +15,12 @@ import me.taste2plate.app.customer.domain.use_case.custom.GharKaKhanaCategoryUse
 import me.taste2plate.app.customer.domain.use_case.custom.GharKaKhanaSubCategoryUseCase
 import me.taste2plate.app.customer.domain.use_case.product.CutOffTimeCheckUseCase
 import me.taste2plate.app.customer.domain.use_case.user.GharKaKhanaAddToCartUseCase
+import me.taste2plate.app.customer.domain.use_case.user.GharKaKhanaCheckoutUseCase
+import me.taste2plate.app.customer.domain.use_case.user.GharKaKhanaConfirmCheckoutUseCase
 import me.taste2plate.app.customer.domain.use_case.user.GharKaKhanaDeleteCartUseCase
 import me.taste2plate.app.customer.domain.use_case.user.GharKaKhanaFetchCartUseCase
 import me.taste2plate.app.customer.domain.use_case.user.address.AllAddressUseCase
+import me.taste2plate.app.customer.presentation.screens.checkout.DeliveryType
 import javax.inject.Inject
 
 @HiltViewModel
@@ -26,16 +29,18 @@ class GharKaKhanaViewModel @Inject constructor(
     private var gharKaKhanaCategoryUseCase: GharKaKhanaCategoryUseCase,
     private var gharKaKhanaSubCategoryUseCase: GharKaKhanaSubCategoryUseCase,
     private val allAddressUseCase: AllAddressUseCase,
-    private val cutOffTimeCheckUseCase: CutOffTimeCheckUseCase,
     private val gkkAddToCartUseCase: GharKaKhanaAddToCartUseCase,
     private val gkkFetchCartUseCase: GharKaKhanaFetchCartUseCase,
-    private val gkkDeleteCartUseCase: GharKaKhanaDeleteCartUseCase
+    private val gharKaKhanaCheckoutUseCase: GharKaKhanaCheckoutUseCase,
+    private val gkkDeleteCartUseCase: GharKaKhanaDeleteCartUseCase,
+    private val gharKaKhanaConfirmCheckoutUseCase: GharKaKhanaConfirmCheckoutUseCase
 ) : ViewModel() {
 
     var state by mutableStateOf(GharKaKhanaState())
     var category by mutableStateOf("")
     var subCategory by mutableStateOf("")
     var checked by mutableStateOf(true)
+    var deliveryType by mutableStateOf(DeliveryType.Standard)
     var remarks by mutableStateOf("")
     var selectedDate by mutableStateOf("")
     var selectedTimeSlot by mutableStateOf("")
@@ -44,7 +49,7 @@ class GharKaKhanaViewModel @Inject constructor(
     val pickupTimeSlots = listOf(
         "08:00 AM - 12:00 PM",
         "12:00 PM - 04:00 PM",
-        "04:00 PM - -8:00 PM"
+        "04:00 PM - 08:00 PM"
     )
 
     init {
@@ -107,14 +112,11 @@ class GharKaKhanaViewModel @Inject constructor(
                 else if (selectedDate.isEmpty() || selectedTimeSlot.isEmpty())
                     state = state.copy(isError = true, message = "Select pickup date and time.")
                 else
-                    state = state.copy(moveToCheckout = true)
+                    checkout()
             }
 
-            GharKaKhanaEvent.CheckCutOffTime -> {
-                checkCutOffTime(
-                    startCity = state.pickupLocation!!.city.id,
-                    endCity = state.destinationLocation!!.city.id
-                )
+            GharKaKhanaEvent.ConfirmCheckout -> {
+                if (state.checkout != null) confirmCheckout()
             }
         }
     }
@@ -156,45 +158,6 @@ class GharKaKhanaViewModel @Inject constructor(
                             message = result.message
                         )
                     }
-                }
-
-            }
-        }
-    }
-
-
-    private fun checkCutOffTime(
-        startCity: String,
-        endCity: String
-    ) {
-        Log.e("cities", "Start city : $startCity\nEnd city : $endCity")
-        viewModelScope.launch {
-            cutOffTimeCheckUseCase.execute(
-                startCity, endCity
-            ).collect { result ->
-                when (result) {
-                    is Resource.Loading -> state = state.copy(isLoading = false)
-                    is Resource.Success -> {
-                        val data = result.data
-                        val isError = data?.status == Status.error.name
-
-                        Log.e("cities", "Data is : $data")
-
-                        state = state.copy(
-                            isLoading = false,
-                            isError = isError,
-                            cutOffTimeCheckModel = data,
-                            finish = !isError
-                        )
-                    }
-
-                    is Resource.Error ->
-                        state = state.copy(
-                            isLoading = false,
-                            isError = true,
-                            message = result.message,
-                            finish = false
-                        )
                 }
 
             }
@@ -361,8 +324,13 @@ class GharKaKhanaViewModel @Inject constructor(
                                 message = if (isError) result.data?.message else "",
                             )
 
-                        if (!isError)
+                        if (!isError) {
+                            category = ""
+                            subCategory = ""
+                            productName = ""
+                            weight  = ""
                             fetchCart()
+                        }
                     }
 
                     is Resource.Error -> {
@@ -377,5 +345,79 @@ class GharKaKhanaViewModel @Inject constructor(
             }
         }
     }
+
+
+    private fun checkout() {
+        viewModelScope.launch {
+            gharKaKhanaCheckoutUseCase.execute(
+                state.pickupLocation!!.id,
+                state.destinationLocation!!.id,
+                selectedDate + "T18:04:29.820+00:00",
+                selectedTimeSlot,
+                deliveryType.name.lowercase()
+            ).collect { result ->
+                when (result) {
+                    is Resource.Loading -> {
+                        state = state.copy(bookButtonLoader = true)
+                    }
+
+                    is Resource.Success -> {
+                        val isError = result.data?.status == Status.error.name
+                        state =
+                            state.copy(
+                                bookButtonLoader = false,
+                                isError = isError,
+                                message = if (isError) result.data?.message else null,
+                                checkout = result.data,
+                                moveToCheckout = !isError
+                            )
+                    }
+
+                    is Resource.Error -> {
+                        state = state.copy(
+                            bookButtonLoader = false,
+                            isError = true,
+                            message = result.message
+                        )
+                    }
+                }
+            }
+        }
+    }
+
+    private fun confirmCheckout() {
+        viewModelScope.launch {
+            gharKaKhanaConfirmCheckoutUseCase.execute(
+                state.checkout!!.data.id,
+            ).collect { result ->
+                when (result) {
+                    is Resource.Loading -> {
+                        state = state.copy(bookButtonLoader = true)
+                    }
+
+                    is Resource.Success -> {
+                        val isError = result.data?.status == Status.error.name
+                        state =
+                            state.copy(
+                                bookButtonLoader = false,
+                                isError = isError,
+                                message = if (isError) result.data?.message else null,
+                                confirmCheckout = result.data,
+                            )
+                    }
+
+                    is Resource.Error -> {
+                        state = state.copy(
+                            bookButtonLoader = false,
+                            isError = true,
+                            message = result.message
+                        )
+                    }
+                }
+
+            }
+        }
+    }
+
 
 }
