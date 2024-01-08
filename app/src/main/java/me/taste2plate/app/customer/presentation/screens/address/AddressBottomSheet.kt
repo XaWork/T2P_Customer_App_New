@@ -3,6 +3,7 @@ package me.taste2plate.app.customer.presentation.screens.address
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -14,6 +15,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import me.taste2plate.app.customer.domain.model.user.address.AddressListModel
+import me.taste2plate.app.customer.presentation.screens.home.CenterColumn
 import me.taste2plate.app.customer.presentation.theme.ExtraHighPadding
 import me.taste2plate.app.customer.presentation.theme.LowElevation
 import me.taste2plate.app.customer.presentation.theme.ScreenPadding
@@ -32,10 +34,11 @@ fun AddressBottomSheet(
     setDefaultAddress: (address: AddressListModel.Result) -> Unit
 ) {
     Box(
-        modifier = Modifier.fillMaxWidth()
+        modifier = Modifier
+            .fillMaxWidth()
             .padding(bottom = 50.dp)
     ) {
-        if (isLoading || addressList.isEmpty())
+        if (isLoading)
             ShowLoading(isButton = false)
         else {
             LazyColumn(
@@ -47,15 +50,23 @@ fun AddressBottomSheet(
                 ),
                 verticalArrangement = Arrangement.spacedBy(SpaceBetweenViewsAndSubViews)
             ) {
-                items(addressList) { address ->
-                    SingleAddressItem(
-                        modifier = Modifier.noRippleClickable {
-                            setDefaultAddress(address)
-                        },
-                        address
-                    )
-                }
+                if (addressList.isNotEmpty())
+                    items(addressList) { address ->
+                        SingleAddressItem(
+                            modifier = Modifier.noRippleClickable {
+                                setDefaultAddress(address)
+                            },
+                            address
+                        )
+                    }
+                else
+                    item {
+                        CenterColumn {
+                            Text("No Address Found. Please add one.")
+                        }
+                    }
             }
+
 
             AppButton(
                 text = "Add New Address",

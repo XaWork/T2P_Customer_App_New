@@ -22,20 +22,17 @@ class ProductDetailsUseCase @Inject constructor(
             emit(Resource.Loading(true))
             try {
                 val defaultAddress = userPref.getDefaultAddress()
-                val localAddress = userPref.getAddress()
-                val lat: String
-                val lng: String
-                val city: String
+                //val localAddress = userPref.getAddress()
 
-                if(defaultAddress != null){
-                    lat = defaultAddress.position.coordinates[0].toString()
-                    lng = defaultAddress.position.coordinates[0].toString()
-                    city = defaultAddress.city.id
-                }else{
+                //if(defaultAddress != null){
+                val lat: String = defaultAddress?.position?.coordinates?.get(0).toString()
+                val lng: String = defaultAddress?.position?.coordinates?.get(0).toString()
+                val city: String? = defaultAddress?.city?.id
+                /*}else{
                     lat = localAddress?.lat.toString()
                     lng = localAddress?.lng.toString()
                     city = localAddress?.cityId.toString()
-                }
+                }*/
                 val response = repo.productDetails(id, lat, lng, city)
                 emit(Resource.Success(response))
             } catch (io: IOException) {

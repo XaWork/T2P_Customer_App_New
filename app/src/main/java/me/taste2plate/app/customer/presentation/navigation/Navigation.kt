@@ -220,7 +220,7 @@ fun Navigation() {
                     navController.navigate(Screens.WishlistScreen.route)
                 },
                 onNavigateToAddressListScreen = {
-                    navController.navigate(Screens.AddressListScreen.route)
+                    navController.navigate(Screens.AddEditAddressScreen.route)
                 },
                 onNavigateToAddAddressScreen = {
                     navController.navigate(Screens.LocationScreen.route + "?screen=${Screens.HomeScreen.route}")

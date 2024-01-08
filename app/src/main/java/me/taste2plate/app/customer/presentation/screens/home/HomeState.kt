@@ -27,6 +27,7 @@ data class HomeState(
     val deleteFromWishlistModel: DeleteFromWishlistModel? = null,
     val cartData: CartModel? = null,
     val addressListModel: AddressListModel? = null,
+    val addressList: List<AddressListModel.Result> = emptyList(),
     val addToWishlistResponse: CommonResponse? = null,
     val addToCartResponse: CommonResponse? = null,
     val foodItemUpdateInfo: FoodItemUpdateInfo? = null,

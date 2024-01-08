@@ -139,7 +139,8 @@ class HomeViewModel @Inject constructor(
                             addToCartResponse = null,
                             errorMessage = null,
                             isError = false,
-                            showErrorMessage = false
+                            showErrorMessage = false,
+                            noAddressFound = false
                         )
                     }
 
@@ -273,15 +274,11 @@ class HomeViewModel @Inject constructor(
         viewModelScope.launch {
             val localAddress = userPref.getAddress()
             val defaultAddress = userPref.getDefaultAddress()
-            if (localAddress != null || defaultAddress != null) {
+            if (defaultAddress != null || localAddress != null) {
                 state = state.copy(
                     defaultAddress = defaultAddress,
                     localAddress = localAddress,
                     noAddressFound = false
-                )
-                Log.e(
-                    "Address",
-                    "default address is not null && Address not found is ${state.noAddressFound}"
                 )
                 hasDefaultAddress = true
             }
@@ -312,21 +309,18 @@ class HomeViewModel @Inject constructor(
                         //if (!isError)
                         T2PApp.wishlistCount = data?.result?.size ?: 0
 
+
                         if (hasDefaultAddress()) {
-                            Log.e(
-                                "Address",
-                                "Address not found is ${state.noAddressFound}"
-                            )
-                            state = state.copy(noAddressFound = false)
                             getCart()
                         } else {
-                            state = state.copy(noAddressFound = true)
+                            getAddress()
+                            /*state = state.copy(noAddressFound = true)
                             Log.e(
                                 "Address",
                                 "Address not found is in else case${state.noAddressFound}"
-                            )
+                            )*/
                         }
-                            //getLocalAddress()
+                        //getLocalAddress()
                     }
 
                     is Resource.Error -> {
@@ -569,16 +563,22 @@ class HomeViewModel @Inject constructor(
                                 addressListModel = result.data
                             )
 
-                        /* if (!isError) {
-                             if (state.defaultAddress == null && result.data != null && result.data.result.isNotEmpty()) {
-                             } else {
-                                 if (result.data != null && result.data.result.isEmpty()) {
-                                     state = state.copy(noAddressFound = true)
-                                 } else if (state.cartData == null)
-                                     getCart()
-                             }
+                        //if (!isError) {
+                        if (state.defaultAddress == null && result.data != null && result.data.result.isNotEmpty()) {
+                            if (state.localAddress == null && state.defaultAddress == null)
+                                userPref.saveDefaultAddress(result.data.result[0])
 
-                         }*/
+                            state = state.copy(
+                                defaultAddress = result.data.result[0],
+                                noAddressFound = false,
+                                addressList = result.data.result
+                            )
+                            //}
+                            getCart()
+                        }else  {
+                            state =
+                                state.copy(isLoading = false, noAddressFound = (state.localAddress == null && state.defaultAddress == null))
+                        }
                     }
 
                     is Resource.Error -> {

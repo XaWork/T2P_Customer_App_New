@@ -45,6 +45,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import me.taste2plate.app.customer.R
 import me.taste2plate.app.customer.T2PApp
@@ -153,6 +154,16 @@ fun HomeScreen(
 
     //observe state
     LaunchedEffect(state) {
+        if (state.noAddressFound) {
+            Log.e("Address", "No address found ${state.noAddressFound}")
+            //getting white screen issue that's why I use delay
+            scope.launch {
+                viewModel.onEvent(HomeEvent.UpdateState(changeAddToWishlistResponse = true))
+                delay(1000)
+                onNavigateToAddAddressScreen()
+            }
+            //onNavigateToAddAddressScreen()
+        }
         if (!state.cartError && state.message != null &&
             state.addToWishlistResponse != null ||
             !state.cartError && state.message != null &&
@@ -167,10 +178,6 @@ fun HomeScreen(
         }
         if (state.cartError) {
             showSettingDialog = true
-        }
-        if (state.noAddressFound) {
-            Log.e("Address", "No address found ${state.noAddressFound}")
-            showLocationDialog = true
         }
         //check app version
         if (state.setting != null) {
@@ -196,17 +203,6 @@ fun HomeScreen(
         }
     })
 
-
-    if (showLocationDialog && !showCustomDialog) {
-        CustomDialog(
-            title = "Select Location",
-            text = "Please select a delivery location.",
-            confirmButtonText = "Select",
-            dismissAllowed = !state.noAddressFound
-        ) {
-            onNavigateToAddAddressScreen()
-        }
-    }
 
     if (showCustomDialog) {
         CustomDialog(
@@ -240,21 +236,21 @@ fun HomeScreen(
             },
             sheetState = sheetState
         ) {
-            if (state.addressListModel != null && state.addressListModel.result.isNotEmpty())
-                AddressBottomSheet(
-                    isLoading = state.addressLoader,
-                    state.addressListModel.result,
-                    setDefaultAddress = { address ->
-                        showBottomSheet = false
-                        viewModel.onEvent(
-                            HomeEvent.SetDefaultAddress(address)
-                        )
-                    },
-                    onNavigateToAddressListScreen = {
-                        showBottomSheet = false
-                        onNavigateToAddressListScreen()
-                    }
-                )
+            // if (state.addressListModel != null && state.addressListModel.result.isNotEmpty())
+            AddressBottomSheet(
+                isLoading = state.addressLoader,
+                state.addressList,
+                setDefaultAddress = { address ->
+                    showBottomSheet = false
+                    viewModel.onEvent(
+                        HomeEvent.SetDefaultAddress(address)
+                    )
+                },
+                onNavigateToAddressListScreen = {
+                    showBottomSheet = false
+                    onNavigateToAddressListScreen()
+                }
+            )
         }
     }
 
@@ -385,7 +381,8 @@ fun HomeScreen(
             else
                 Column {
                     AddressBar(
-                        address = if (state.defaultAddress == null) state.localAddress!!.cityName!! else state.defaultAddress.address,
+                        address = state.defaultAddress?.address ?: state.localAddress?.cityName
+                        ?: "Your delivery address here...",
                         checked = state.checked,
                         onCheckChange = { viewModel.onEvent(HomeEvent.ChangeTaste) }) {
                         //onNavigateToAddAddressScreen()

@@ -20,9 +20,9 @@ class AllPlanUseCase @Inject constructor(
             emit(Resource.Loading(true))
             try {
                 val defaultAddress = userPref.getDefaultAddress()
-                val localAddress = userPref.getAddress()
+               // val localAddress = userPref.getAddress()
 
-                val city = defaultAddress?.city?.id ?: localAddress?.cityId
+                val city = defaultAddress?.city?.id /*?: localAddress?.cityId*/
                 val response = repo.getPlans(city)
                 emit(Resource.Success(response))
             } catch (io: IOException) {

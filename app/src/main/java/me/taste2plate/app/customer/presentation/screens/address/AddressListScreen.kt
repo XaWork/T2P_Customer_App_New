@@ -83,7 +83,7 @@ fun AddressListScreen(
             }
 
             state.deleteAddressResponse != null && state.addressList.isEmpty() -> {
-                onPopUpToAddEditScreen()
+               // onPopUpToAddEditScreen()
             }
         }
     }

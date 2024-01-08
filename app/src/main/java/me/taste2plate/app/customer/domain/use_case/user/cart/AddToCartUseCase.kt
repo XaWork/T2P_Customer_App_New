@@ -36,7 +36,7 @@ class AddToCartUseCase @Inject constructor(
                     )
                     emit(Resource.Success(response))
                 }else{
-                    emit(Resource.Error(message = "Sorry!! We didn't delivered in your city."))
+                    emit(Resource.Error(message = "Please add/select your delivery address."))
                 }
             } catch (io: IOException) {
                 io.printStackTrace()
