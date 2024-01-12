@@ -1,6 +1,10 @@
 package me.taste2plate.app.customer.presentation.navigation
 
 import android.util.Log
+import androidx.compose.animation.EnterTransition
+import androidx.compose.animation.ExitTransition
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -60,7 +64,12 @@ import me.taste2plate.app.customer.presentation.screens.wishlist.WishlistScreen
 fun Navigation() {
     val navController = rememberNavController()
 
-    NavHost(navController = navController, startDestination = Screens.SplashScreen.route) {
+    NavHost(navController = navController, startDestination = Screens.SplashScreen.route,
+        enterTransition = { EnterTransition.None },
+        exitTransition = { ExitTransition.None },
+        popEnterTransition = {EnterTransition.None},
+        popExitTransition = {ExitTransition.None}
+    ) {
 
         // --------------------------> Splash Screen <------------------------------------
         composable(route = Screens.SplashScreen.route) {
@@ -540,7 +549,7 @@ fun Navigation() {
                     },
                     onNavigateToAddressListScreen = {
                         navController.navigate(Screens.AddressListScreen.route)
-                    },onBackPress = {
+                    }, onBackPress = {
                         navController.popBackStack()
                     })
             }

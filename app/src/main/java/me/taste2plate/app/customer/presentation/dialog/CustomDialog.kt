@@ -32,7 +32,7 @@ fun CustomDialog(
         },
         onDismissRequest = {
             if (dismissAllowed)
-                onConfirmation()
+                onDismiss()
         },
         confirmButton = {
             TextButton(

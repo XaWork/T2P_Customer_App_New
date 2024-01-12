@@ -184,6 +184,7 @@ fun PdLocation(
             AddressBottomSheet(
                 isLoading = state.addressLoader,
                 state.addressListModel,
+                defaultAddress = null,
                 setDefaultAddress = {
                     showBottomSheet = false
                     viewModel.onEvent(

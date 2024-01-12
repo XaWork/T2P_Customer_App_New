@@ -274,14 +274,14 @@ class HomeViewModel @Inject constructor(
         viewModelScope.launch {
             val localAddress = userPref.getAddress()
             val defaultAddress = userPref.getDefaultAddress()
-            if (defaultAddress != null || localAddress != null) {
-                state = state.copy(
-                    defaultAddress = defaultAddress,
-                    localAddress = localAddress,
-                    noAddressFound = false
-                )
-                hasDefaultAddress = true
-            }
+            // if (defaultAddress != null || localAddress != null) {
+            state = state.copy(
+                defaultAddress = defaultAddress,
+                localAddress = localAddress,
+                // noAddressFound = (defaultAddress == null && localAddress == null)
+            )
+            hasDefaultAddress = (defaultAddress != null || localAddress != null)
+            // }
         }
 
         return hasDefaultAddress
@@ -501,8 +501,8 @@ class HomeViewModel @Inject constructor(
 
                     is Resource.Success -> {
                         val isError = result.data?.status == Status.error.name
-                        if (!isError)
-                            T2PApp.cartCount = result.data!!.result.size
+                        //if (!isError)
+                        T2PApp.cartCount = result.data?.result?.size ?: 0
                         state =
                             state.copy(
                                 isLoading = false,
@@ -563,21 +563,27 @@ class HomeViewModel @Inject constructor(
                                 addressListModel = result.data
                             )
 
+                        state = state.copy(addressList = emptyList())
                         //if (!isError) {
-                        if (state.defaultAddress == null && result.data != null && result.data.result.isNotEmpty()) {
-                            if (state.localAddress == null && state.defaultAddress == null)
+                        if (result.data != null && result.data.result.isNotEmpty()) {
+                            Log.e("Address", "Home defautl address is ${state.defaultAddress}")
+                            if (/*userPref.getDefaultAddress() == null || */state.localAddress == null && state.defaultAddress == null)
                                 userPref.saveDefaultAddress(result.data.result[0])
 
                             state = state.copy(
-                                defaultAddress = result.data.result[0],
+                                defaultAddress = if (state.localAddress == null && state.defaultAddress == null) result.data.result[0] else state.defaultAddress,
                                 noAddressFound = false,
                                 addressList = result.data.result
                             )
                             //}
                             getCart()
-                        }else  {
+                        } else {
+                            Log.e("Address", "Address model is empty")
                             state =
-                                state.copy(isLoading = false, noAddressFound = (state.localAddress == null && state.defaultAddress == null))
+                                state.copy(
+                                    isLoading = false,
+                                    noAddressFound = (state.localAddress == null && state.defaultAddress == null)
+                                )
                         }
                     }
 

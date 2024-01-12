@@ -84,6 +84,7 @@ fun CartScreen(
             AddressBottomSheet(
                 isLoading = false,
                 addressList = state.addressList,
+                defaultAddress = state.defaultAddress,
                 onNavigateToAddressListScreen = {
                     showAddressBottomSheet = false
                     onNavigateToAddressListScreen()
@@ -142,7 +143,7 @@ fun CartScreen(
                 onNavigateToCheckoutScreen = {
                     if (state.defaultAddress != null) {
                         onNavigateToCheckoutScreen()
-                    }else{
+                    } else {
                         showToast("Please select/add delivery address.")
                         showAddressBottomSheet = true
                         viewModel.onEvent(CheckoutEvents.GetAddressList)

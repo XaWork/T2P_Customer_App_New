@@ -188,6 +188,7 @@ fun CheckoutScreen(
             AddressBottomSheet(
                 isLoading = false,
                 addressList = state.addressList,
+                defaultAddress = state.defaultAddress,
                 onNavigateToAddressListScreen = {
                     showAddressBottomSheet = false
                     onNavigateToAddressListScreen()

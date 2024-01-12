@@ -7,6 +7,10 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
@@ -17,6 +21,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import me.taste2plate.app.customer.domain.model.auth.User
 import me.taste2plate.app.customer.domain.model.custom.LogRequest
 import me.taste2plate.app.customer.domain.model.custom.LogType
+import me.taste2plate.app.customer.presentation.dialog.CustomDialog
 import me.taste2plate.app.customer.presentation.theme.HighSpacing
 import me.taste2plate.app.customer.presentation.theme.LowElevation
 import me.taste2plate.app.customer.presentation.theme.ScreenPadding
@@ -42,6 +47,25 @@ fun ProfileScreen(
 
     ) {
 
+    var showDeleteAccountDialog by remember {
+        mutableStateOf(false)
+    }
+
+    if (showDeleteAccountDialog) {
+        CustomDialog(
+            title = "Delete Account?",
+            text = "Do you really want to delete your account.",
+            confirmButtonText = "Delete",
+            dismissButtonText = "Cancel",
+            onDismiss = {
+                showDeleteAccountDialog = false
+            },
+            onConfirmation =  {
+                showDeleteAccountDialog = false
+                viewModel.onEvent(ProfileEvents.DeleteUser)
+            }
+        )
+    }
 
     LaunchedEffect(true) {
         viewModel.onEvent(
@@ -56,7 +80,7 @@ fun ProfileScreen(
     }
 
     LaunchedEffect(key1 = viewModel.state) {
-        if(viewModel.state.userDeleted){
+        if (viewModel.state.userDeleted) {
             onNavigateLogoutScreen()
         }
     }
@@ -76,7 +100,7 @@ fun ProfileScreen(
                 onNavigateToEditProfileScreen()
             },
             deleteUser = {
-                viewModel.onEvent(ProfileEvents.DeleteUser)
+                showDeleteAccountDialog = true
             }
         ) {
             onNavigateToAddressListScreen()
@@ -161,20 +185,19 @@ fun ContentProfileScreen(
         if (state.isLoading)
             ShowLoading()
         else
-        RoundedCornerCard(
-            cardColor = CardDefaults.cardColors(
-                containerColor = primaryColor.invoke()
-            ),
-            elevation = LowElevation,
-            modifier = Modifier.noRippleClickable {
-                deleteUser()
-            }
-        ) {
-
+            RoundedCornerCard(
+                cardColor = CardDefaults.cardColors(
+                    containerColor = primaryColor.invoke()
+                ),
+                elevation = LowElevation,
+                modifier = Modifier.noRippleClickable {
+                    deleteUser()
+                }
+            ) {
                 TextAlignCenter(
                     text = "Delete Account",
                     modifier = Modifier.padding(ScreenPadding)
                 )
-        }
+            }
     }
 }

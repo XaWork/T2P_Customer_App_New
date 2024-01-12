@@ -187,12 +187,12 @@ class UserPref @Inject constructor(
         else {
             val address: LocalAddress =
                 Gson().fromJson(addressFlow.first(), LocalAddress::class.java)
-            Log.e("address","address is ${addressFlow.first()}")
+            Log.e("address", "address is ${addressFlow.first()}")
             address
         }
     }
 
-    suspend fun saveDefaultAddress(address: AddressListModel.Result) {
+    suspend fun saveDefaultAddress(address: AddressListModel.Result?) {
         val stringAddress = Gson().toJson(address)
         dataStore.edit { preferences ->
             preferences[KEY_ADDRESS] = stringAddress
@@ -205,9 +205,13 @@ class UserPref @Inject constructor(
             preferences[KEY_ADDRESS]
         }
 
-        return if (addressFlow.first() == null)
+        val defaultAddress = addressFlow.first()
+
+        return if (defaultAddress == "null" || defaultAddress == null) {
+            Log.e("Address", "Your Default address is if case${addressFlow.first()}")
             null
-        else {
+        } else {
+            Log.e("Address", "Your Default address is else case ${addressFlow.first()}")
             val address: AddressListModel.Result =
                 Gson().fromJson(addressFlow.first(), AddressListModel.Result::class.java)
             //Log.e("address","address is ${addressFlow.first()}")

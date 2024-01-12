@@ -1,6 +1,7 @@
 package me.taste2plate.app.customer.presentation.screens.address
 
 import android.content.res.Configuration
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -10,6 +11,9 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AddBusiness
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -20,6 +24,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import me.taste2plate.app.customer.domain.model.custom.LogRequest
@@ -28,16 +33,20 @@ import me.taste2plate.app.customer.domain.model.user.address.AddressListModel
 import me.taste2plate.app.customer.presentation.dialog.DeleteAddressDialog
 import me.taste2plate.app.customer.presentation.screens.auth.AuthEvents
 import me.taste2plate.app.customer.presentation.theme.LowElevation
+import me.taste2plate.app.customer.presentation.theme.MediumPadding
 import me.taste2plate.app.customer.presentation.theme.ScreenPadding
 import me.taste2plate.app.customer.presentation.theme.SpaceBetweenViews
 import me.taste2plate.app.customer.presentation.theme.T2PCustomerAppTheme
 import me.taste2plate.app.customer.presentation.theme.VeryLowSpacing
 import me.taste2plate.app.customer.presentation.theme.cardContainerOnSecondaryColor
+import me.taste2plate.app.customer.presentation.theme.primaryColor
+import me.taste2plate.app.customer.presentation.theme.screenBackgroundColor
 import me.taste2plate.app.customer.presentation.theme.whatsappColor
 import me.taste2plate.app.customer.presentation.widgets.AppButton
 import me.taste2plate.app.customer.presentation.widgets.AppEmptyView
 import me.taste2plate.app.customer.presentation.widgets.AppScaffold
 import me.taste2plate.app.customer.presentation.widgets.AppTopBar
+import me.taste2plate.app.customer.presentation.widgets.MaterialIconButton
 import me.taste2plate.app.customer.presentation.widgets.RoundedCornerCard
 import me.taste2plate.app.customer.presentation.widgets.ShowLoading
 import me.taste2plate.app.customer.presentation.widgets.SpaceBetweenRow
@@ -56,15 +65,16 @@ fun AddressListScreen(
         mutableStateOf(false)
     }
 
-    LaunchedEffect(true){
+    LaunchedEffect(true) {
         viewModel.onEvent(
             AddressEvents.AddLog(
-            LogRequest(
-                type = LogType.pageVisit,
-                event = "enter in address list screen",
-                page_name = "/address"
+                LogRequest(
+                    type = LogType.pageVisit,
+                    event = "enter in address list screen",
+                    page_name = "/address"
+                )
             )
-        ))
+        )
     }
 
     if (showDeleteDialog)
@@ -83,7 +93,7 @@ fun AddressListScreen(
             }
 
             state.deleteAddressResponse != null && state.addressList.isEmpty() -> {
-               // onPopUpToAddEditScreen()
+                // onPopUpToAddEditScreen()
             }
         }
     }
@@ -96,6 +106,19 @@ fun AddressListScreen(
             AppTopBar(
                 title = "My Addresses"
             ) { navigateBack() }
+        },
+        floatingActionButton = {
+            MaterialIconButton(
+                imageVector = Icons.Default.AddBusiness,
+                tint = screenBackgroundColor.invoke(),
+                modifier = Modifier
+                    .background(primaryColor.invoke())
+                    .clip(CircleShape)
+                    .padding(MediumPadding)
+            ) {
+                viewModel.onEvent(AddressEvents.StoreAddressId(-1))
+                onNavigateToEditAddEditScreen()
+            }
         }
     ) {
         ContentAddressListScreen(state,
@@ -126,38 +149,48 @@ fun ContentAddressListScreen(
 
     if (state.isLoading)
         ShowLoading(isButton = false)
-    else if (addressList.isEmpty())
-        AppEmptyView()
     else
         Box(
             modifier = Modifier.fillMaxSize()
         ) {
-            LazyColumn(
-                verticalArrangement = Arrangement.spacedBy(ScreenPadding),
-                contentPadding = PaddingValues(
-                    top = ScreenPadding,
-                    start = ScreenPadding,
-                    bottom = 70.dp,
-                    end = ScreenPadding
-                )
-            ) {
-                itemsIndexed(addressList) { index, address ->
-                    SingleAddressItem(
-                        address,
-                        onEdit = { onEdit(index) }) {
-                        onDelete(index)
+            if (addressList.isNotEmpty())
+                LazyColumn(
+                    verticalArrangement = Arrangement.spacedBy(ScreenPadding),
+                    contentPadding = PaddingValues(
+                        top = ScreenPadding,
+                        start = ScreenPadding,
+                        bottom = 70.dp,
+                        end = ScreenPadding
+                    )
+                ) {
+                    itemsIndexed(addressList) { index, address ->
+
+                        SingleAddressItem(address = address, defaultAddress = null,
+                            showEditDelete = true,
+                            onEdit = { onEdit(index) },
+                            onDelete =
+                            { onDelete(index) }
+                        )
+                        /*SingleAddressItem(
+                            address,
+                            onEdit = { onEdit(index) }) {
+                            onDelete(index)
+                        }*/
                     }
                 }
-            }
+            else
+                Column {
+                    AppEmptyView()
+                }
 
-            AppButton(
+           /* AppButton(
                 text = "Add New Address",
                 modifier = Modifier.align(
                     Alignment.BottomCenter
                 )
             ) {
                 onNavigateToAddAddressScreen()
-            }
+            }*/
         }
 }
 

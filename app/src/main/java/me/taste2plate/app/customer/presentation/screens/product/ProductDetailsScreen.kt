@@ -363,6 +363,7 @@ fun ProductDetails(
                         if (it.product.id == details.id)
                             cartItemLength = it.quantity
                     }
+                }
                     if (state.addToCartEnable)
                         CartAddRemove(
                             modifier = Modifier
@@ -374,7 +375,7 @@ fun ProductDetails(
                         }
                     else
                         Text("")
-                }
+                //}
             }
 
             /*val items = listOf<@Composable RowScope.() -> Unit> {

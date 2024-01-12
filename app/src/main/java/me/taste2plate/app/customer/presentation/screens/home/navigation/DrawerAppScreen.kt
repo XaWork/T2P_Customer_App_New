@@ -15,6 +15,7 @@ import me.taste2plate.app.customer.presentation.utils.walletString
 
 enum class DrawerAppScreen {
     Home,
+    AnyFood2AnyPlace,
     Orders,
     Profile,
     BulkOrders,
@@ -45,6 +46,12 @@ val drawerItems = listOf(
         icon = R.drawable.ic_store_mall_directory_green_24dp,
         title = homeString,
         selected = true
+    ),
+
+    DrawerItem(
+        id = DrawerAppScreen.AnyFood2AnyPlace.name,
+        icon = R.drawable.food_plan,
+        title = "Any Food 2 Any Place",
     ),
 
     DrawerItem(

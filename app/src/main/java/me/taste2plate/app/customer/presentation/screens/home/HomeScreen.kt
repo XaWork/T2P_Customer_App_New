@@ -192,6 +192,7 @@ fun HomeScreen(
     DisposableEffect(key1 = lifecycleOwner, effect = {
         val observer = LifecycleEventObserver { _, event ->
             if (event == Lifecycle.Event.ON_START) {
+                Log.e("HomeScreen", "Home Screen on Start")
                 viewModel.onEvent(HomeEvent.GetWishlist)
             }
         }
@@ -234,12 +235,13 @@ fun HomeScreen(
             onDismissRequest = {
                 showBottomSheet = false
             },
-            sheetState = sheetState
+            sheetState = sheetState, /*contentColor = screenBackgroundColor.invoke(),*/
         ) {
             // if (state.addressListModel != null && state.addressListModel.result.isNotEmpty())
             AddressBottomSheet(
                 isLoading = state.addressLoader,
-                state.addressList,
+                addressList = state.addressList,
+                defaultAddress = state.defaultAddress,
                 setDefaultAddress = { address ->
                     showBottomSheet = false
                     viewModel.onEvent(
@@ -260,6 +262,10 @@ fun HomeScreen(
         drawerState = drawerState, onItemClick = { id ->
             when (id) {
                 DrawerAppScreen.Home.name -> {}
+                DrawerAppScreen.AnyFood2AnyPlace.name -> {
+                   // onNavigateToGharKaKhanaBookingScreen()
+                }
+
                 DrawerAppScreen.Orders.name -> {
                     onNavigateToOrderScreen()
                 }
@@ -385,7 +391,6 @@ fun HomeScreen(
                         ?: "Your delivery address here...",
                         checked = state.checked,
                         onCheckChange = { viewModel.onEvent(HomeEvent.ChangeTaste) }) {
-                        //onNavigateToAddAddressScreen()
                         viewModel.onEvent(HomeEvent.GetAddress)
                         showBottomSheet = true
                     }
@@ -406,7 +411,7 @@ fun HomeScreen(
                                 CenterColumn {
                                     AutoSlidingCarousel(
                                         modifier = Modifier.noRippleClickable {
-                                            onNavigateToGharKaKhanaBookingScreen()
+                                           // onNavigateToGharKaKhanaBookingScreen()
                                         },
                                         pages = home.slider
                                     )

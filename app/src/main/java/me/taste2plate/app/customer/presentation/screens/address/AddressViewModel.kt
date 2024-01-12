@@ -12,6 +12,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import me.taste2plate.app.customer.data.Resource
 import me.taste2plate.app.customer.data.Status
+import me.taste2plate.app.customer.data.UserPref
 import me.taste2plate.app.customer.domain.model.StateListModel
 import me.taste2plate.app.customer.domain.model.custom.City
 import me.taste2plate.app.customer.domain.model.custom.LogRequest
@@ -36,7 +37,8 @@ class AddressViewModel @Inject constructor(
     private val zipListUseCase: ZipListUseCase,
     private val addAddressUseCase: AddAddressUseCase,
     private val addLogUseCase: AddLogUseCase,
-    private val editAddressUseCase: EditAddressUseCase
+    private val editAddressUseCase: EditAddressUseCase,
+    private val userPref:UserPref
 ) : ViewModel() {
 
     var state by mutableStateOf(AddressState())
@@ -322,6 +324,8 @@ class AddressViewModel @Inject constructor(
                     is Resource.Success -> {
                         val data = result.data
                         val isError = data?.status == Status.error.name
+
+                        if(isError || result.data!!.result.isEmpty()) userPref.saveDefaultAddress(null)
                         state.copy(
                             isLoading = false,
                             isError = isError,

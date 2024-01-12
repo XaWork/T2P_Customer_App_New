@@ -326,6 +326,8 @@ fun MapAppBar(
                     .fillMaxWidth()
             )
 
+           // Text("Delete & Change the Pickup/ Delivery Address if it is Different")
+
             AnimatedVisibility(
                 viewModel.locationAutofill.isNotEmpty(),
                 modifier = Modifier
