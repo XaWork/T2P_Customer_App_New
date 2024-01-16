@@ -420,7 +420,7 @@ fun CheckoutScreen(
             changeDeliveryType = {
                 viewModel.onEvent(CheckoutEvents.ChangeDeliveryType(it))
             },
-            navigateBack= {
+            navigateBack = {
                 navigateBack()
             }
         )
@@ -466,6 +466,10 @@ fun CheckoutScreenContent(
         PriceData(
             title = "IGST",
             price = viewModel.igst.toString()
+        ),
+        PriceData(
+            title = "Last Mile Long Distance Extra Charge",
+            price = state.cart?.lastMileLongDistanceExtraCharge ?: ""
         ),
         PriceData(
             title = "Coupon Discount",

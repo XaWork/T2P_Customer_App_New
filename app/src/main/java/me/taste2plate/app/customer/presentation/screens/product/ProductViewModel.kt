@@ -19,8 +19,11 @@ import me.taste2plate.app.customer.data.Taste
 import me.taste2plate.app.customer.data.UserPref
 import me.taste2plate.app.customer.domain.model.custom.LogRequest
 import me.taste2plate.app.customer.domain.model.custom.LogType
+import me.taste2plate.app.customer.domain.model.tracking.EventTraits
+import me.taste2plate.app.customer.domain.model.tracking.TrackEventModel
 import me.taste2plate.app.customer.domain.use_case.analytics.AddLogUseCase
 import me.taste2plate.app.customer.domain.use_case.custom.CheckAvalibilityUseCase
+import me.taste2plate.app.customer.domain.use_case.interakt.TrackEventUseCase
 import me.taste2plate.app.customer.domain.use_case.product.ProductBy
 import me.taste2plate.app.customer.domain.use_case.product.ProductDetailsUseCase
 import me.taste2plate.app.customer.domain.use_case.product.ProductListUseCase
@@ -43,6 +46,7 @@ class ProductViewModel @Inject constructor(
     private val productListUseCase: ProductListUseCase,
     private val productDetailsUseCase: ProductDetailsUseCase,
     private val cartUseCase: CartUseCase,
+    private val trackEventUseCase: TrackEventUseCase,
     private val removeFromWishlistUseCase: RemoveFromWishlistUseCase,
     private val wishlistUseCase: WishlistUseCase,
     private val addToWishlistUseCase: AddToWishlistUseCase,
@@ -176,6 +180,14 @@ class ProductViewModel @Inject constructor(
         }
     }
 
+    private fun addInteraKtLog(trackData: TrackEventModel) {
+        viewModelScope.launch {
+            trackEventUseCase.execute(
+                trackData
+            )
+        }
+    }
+
 
     private fun setTaste() {
         viewModelScope.launch {
@@ -224,7 +236,7 @@ class ProductViewModel @Inject constructor(
                     is Resource.Success -> {
                         val isError = result.data?.status == Status.error.name
                         getWishlist()
-                        if (!isError)
+                        if (!isError) {
                             addLog(
                                 LogRequest(
                                     type = LogType.addToWishlist,
@@ -233,6 +245,16 @@ class ProductViewModel @Inject constructor(
                                     product_id = productId
                                 )
                             )
+                            //interakt
+                            addInteraKtLog(
+                                TrackEventModel(
+                                    event = LogType.addToWishlist,
+                                    traits = EventTraits(
+                                        productId = productId,
+                                    )
+                                )
+                            )
+                        }
                         state =
                             state.copy(
                                 isLoading = false,
@@ -290,6 +312,15 @@ class ProductViewModel @Inject constructor(
                                     event = "remove from wishlist",
                                     page_name = "/productList",
                                     product_id = productId
+                                )
+                            )
+                            //interakt
+                            addInteraKtLog(
+                                TrackEventModel(
+                                    event = LogType.deleteWishlist,
+                                    traits = EventTraits(
+                                        productId = productId,
+                                    )
                                 )
                             )
                         }
@@ -564,7 +595,7 @@ class ProductViewModel @Inject constructor(
                         val isError = data?.status == Status.error.name
                         getCart()
 
-                        if (!isError)
+                        if (!isError) {
                             addLog(
                                 LogRequest(
                                     type = LogType.actionPerform,
@@ -573,6 +604,17 @@ class ProductViewModel @Inject constructor(
                                     product_id = productId
                                 )
                             )
+
+                            //interakt
+                            addInteraKtLog(
+                                TrackEventModel(
+                                    event = LogType.deleteCart,
+                                    traits = EventTraits(
+                                        productId = productId,
+                                    )
+                                )
+                            )
+                        }
 
                         state.copy(
                             // isLoading = false,
@@ -614,6 +656,15 @@ class ProductViewModel @Inject constructor(
                                     event = "Add to cart",
                                     page_name = "/home",
                                     product_id = productId
+                                )
+                            )
+                            //interakt
+                            addInteraKtLog(
+                                TrackEventModel(
+                                    event = LogType.addToCart,
+                                    traits = EventTraits(
+                                        productId = productId,
+                                    )
                                 )
                             )
                         }

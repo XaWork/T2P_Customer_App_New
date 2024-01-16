@@ -2,13 +2,8 @@ package me.taste2plate.app.customer.data.repo
 
 import me.taste2plate.app.customer.data.api.UserApi
 import me.taste2plate.app.customer.domain.model.ApplyCouponModel
-import me.taste2plate.app.customer.domain.model.auth.LoginModel
-import me.taste2plate.app.customer.domain.model.auth.VerifyOTPModel
-import me.taste2plate.app.customer.domain.model.product.CalculateCheckoutDistanceModel
-import me.taste2plate.app.customer.domain.model.user.CartModel
 import me.taste2plate.app.customer.domain.model.user.CheckoutModel
 import me.taste2plate.app.customer.domain.model.user.CommonResponse
-import me.taste2plate.app.customer.domain.model.user.DeleteFromWishlistModel
 import me.taste2plate.app.customer.domain.model.user.GetProfileModel
 import me.taste2plate.app.customer.domain.model.user.GharKaKhanaAddToCartModel
 import me.taste2plate.app.customer.domain.model.user.GharKaKhanaCheckoutModel
@@ -18,7 +13,6 @@ import me.taste2plate.app.customer.domain.model.user.OrderConfirmModel
 import me.taste2plate.app.customer.domain.model.user.OrderListModel
 import me.taste2plate.app.customer.domain.model.user.OrderUpdateModel
 import me.taste2plate.app.customer.domain.model.user.WalletTransactionModel
-import me.taste2plate.app.customer.domain.model.user.WishListModel
 import me.taste2plate.app.customer.domain.model.user.address.AddressListModel
 import me.taste2plate.app.customer.domain.repo.UserRepo
 import javax.inject.Inject
@@ -296,7 +290,19 @@ class UserRepoImpl @Inject constructor(
         )
     }
 
-    override suspend fun gharKaKhanaConfirmCheckout(orderId: String): CommonResponse {
-        return api.gharKaKhanaConfirmCheckout(orderId)
+    override suspend fun gharKaKhanaConfirmCheckout(
+        userId: String,
+        sourceLocation: String,
+        destinationLocation: String,
+        pickupDate: String,
+        pickupTime: String,
+        deliveryType: String): CommonResponse {
+        return api.gharKaKhanaConfirmCheckout(
+            userId,
+            sourceLocation,
+            destinationLocation,
+            pickupDate,
+            pickupTime,
+            deliveryType)
     }
 }

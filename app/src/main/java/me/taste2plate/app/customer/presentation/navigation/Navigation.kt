@@ -294,7 +294,7 @@ fun Navigation() {
                 BookingScreen(
                     viewModel = viewModel,
                     onNavigateToAddressListScreen = {
-                        navController.navigate(Screens.AddressListScreen.route)
+                        navController.navigate(Screens.AddEditAddressScreen.route)
                     },
                     onNavigateToCheckoutScreen = {
                         navController.navigate(Screens.GharKaKhanaCheckoutScreen.route) {
@@ -548,7 +548,7 @@ fun Navigation() {
                         navController.navigate(Screens.CheckoutScreen.route)
                     },
                     onNavigateToAddressListScreen = {
-                        navController.navigate(Screens.AddressListScreen.route)
+                        navController.navigate(Screens.AddEditAddressScreen.route)
                     }, onBackPress = {
                         navController.popBackStack()
                     })
@@ -565,7 +565,7 @@ fun Navigation() {
                         navController.navigate(Screens.OrderConfirmScreen.route)
                     },
                     onNavigateToAddressListScreen = {
-                        navController.navigate(Screens.AddressListScreen.route)
+                        navController.navigate(Screens.AddEditAddressScreen.route)
                     },
                     onNavigateToHomeScreen = {
                         navController.navigate(Screens.HomeScreen.route) {

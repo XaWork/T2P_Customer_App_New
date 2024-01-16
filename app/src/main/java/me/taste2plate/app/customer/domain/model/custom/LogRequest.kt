@@ -19,6 +19,8 @@ class LogType {
         var pageVisit: String = "page visit"
         var login: String = "login"
         var addToCart: String = "add to cart"
+        var deleteCart: String = "delete cart"
+        var deleteWishlist: String = "delete wishlist"
         var addToWishlist: String = "add to wishlist"
         var checkout: String = "checkout"
         var actionPerform: String = "action perform"

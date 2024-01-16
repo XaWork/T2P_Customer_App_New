@@ -1,6 +1,5 @@
 package me.taste2plate.app.customer.presentation.screens.ghar_ka_khana
 
-import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -13,7 +12,6 @@ import me.taste2plate.app.customer.data.Status
 import me.taste2plate.app.customer.data.UserPref
 import me.taste2plate.app.customer.domain.use_case.custom.GharKaKhanaCategoryUseCase
 import me.taste2plate.app.customer.domain.use_case.custom.GharKaKhanaSubCategoryUseCase
-import me.taste2plate.app.customer.domain.use_case.product.CutOffTimeCheckUseCase
 import me.taste2plate.app.customer.domain.use_case.user.GharKaKhanaAddToCartUseCase
 import me.taste2plate.app.customer.domain.use_case.user.GharKaKhanaCheckoutUseCase
 import me.taste2plate.app.customer.domain.use_case.user.GharKaKhanaConfirmCheckoutUseCase
@@ -384,11 +382,14 @@ class GharKaKhanaViewModel @Inject constructor(
             }
         }
     }
-
     private fun confirmCheckout() {
         viewModelScope.launch {
             gharKaKhanaConfirmCheckoutUseCase.execute(
-                state.checkout!!.data.id,
+                state.pickupLocation!!.id,
+                state.destinationLocation!!.id,
+                selectedDate + "T18:04:29.820+00:00",
+                selectedTimeSlot,
+                deliveryType.name.lowercase()
             ).collect { result ->
                 when (result) {
                     is Resource.Loading -> {

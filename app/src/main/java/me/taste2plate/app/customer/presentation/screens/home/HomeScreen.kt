@@ -263,7 +263,7 @@ fun HomeScreen(
             when (id) {
                 DrawerAppScreen.Home.name -> {}
                 DrawerAppScreen.AnyFood2AnyPlace.name -> {
-                   // onNavigateToGharKaKhanaBookingScreen()
+                    onNavigateToGharKaKhanaBookingScreen()
                 }
 
                 DrawerAppScreen.Orders.name -> {

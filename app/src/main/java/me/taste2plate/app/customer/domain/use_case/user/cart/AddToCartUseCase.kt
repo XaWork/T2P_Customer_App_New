@@ -7,6 +7,7 @@ import me.taste2plate.app.customer.data.ApiErrorMessages
 import me.taste2plate.app.customer.data.Resource
 import me.taste2plate.app.customer.data.UserPref
 import me.taste2plate.app.customer.domain.model.user.CommonResponse
+import me.taste2plate.app.customer.domain.repo.InteraktRepo
 import me.taste2plate.app.customer.domain.repo.UserRepo
 import retrofit2.HttpException
 import java.io.IOException
@@ -14,6 +15,7 @@ import javax.inject.Inject
 
 class AddToCartUseCase @Inject constructor(
     private val repo: UserRepo,
+    private val interaktRepo: InteraktRepo,
     private val userPref: UserPref
 ) {
     suspend fun execute(
@@ -28,6 +30,7 @@ class AddToCartUseCase @Inject constructor(
               //  Log.e("Address", "City id is ${localAddress?.cityId}")
 
                 if (defaultAddress != null || localAddress?.cityId != null) {
+                    //api call
                     val response = repo.addToCart(
                         userId = userPref.getUser()!!.id,
                         pId = productId,

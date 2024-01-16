@@ -8,13 +8,11 @@ import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.runBlocking
 import me.taste2plate.app.customer.T2PApp
-import me.taste2plate.app.customer.data.UserPref
 import me.taste2plate.app.customer.data.api.AnalyticsApi
 import me.taste2plate.app.customer.data.api.CustomApi
 import me.taste2plate.app.customer.data.api.GeoIpApi
+import me.taste2plate.app.customer.data.api.InteraktApi
 import me.taste2plate.app.customer.data.api.ProductApi
 import me.taste2plate.app.customer.data.api.UserApi
 import me.taste2plate.app.customer.utils.Constants
@@ -209,6 +207,13 @@ object AppModule {
     @Singleton
     fun provideProductApi(retrofitFactory: RetrofitFactory): ProductApi {
         return retrofitFactory.create(Constants.baseUrl).build()
+    }
+
+
+    @Provides
+    @Singleton
+    fun provideInteraktApi(retrofitFactory: RetrofitFactory): InteraktApi {
+        return retrofitFactory.create(Constants.interaktBaseUrl).build()
     }
 
     /* @Provides

@@ -92,7 +92,6 @@ fun CartScreen(
                 setDefaultAddress = {
                     viewModel.onEvent(CheckoutEvents.SetDefaultAddress(it))
                     showAddressBottomSheet = false
-                    onNavigateToCheckoutScreen()
                 }
             )
         }

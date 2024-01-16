@@ -20,10 +20,13 @@ import me.taste2plate.app.customer.data.UserPref
 import me.taste2plate.app.customer.domain.model.SettingsModel
 import me.taste2plate.app.customer.domain.model.custom.LogRequest
 import me.taste2plate.app.customer.domain.model.custom.LogType
+import me.taste2plate.app.customer.domain.model.tracking.EventTraits
+import me.taste2plate.app.customer.domain.model.tracking.TrackEventModel
 import me.taste2plate.app.customer.domain.model.user.address.AddressListModel
 import me.taste2plate.app.customer.domain.use_case.HomeUseCase
 import me.taste2plate.app.customer.domain.use_case.SettingsUseCase
 import me.taste2plate.app.customer.domain.use_case.analytics.AddLogUseCase
+import me.taste2plate.app.customer.domain.use_case.interakt.TrackEventUseCase
 import me.taste2plate.app.customer.domain.use_case.user.address.AllAddressUseCase
 import me.taste2plate.app.customer.domain.use_case.user.cart.AddToCartUseCase
 import me.taste2plate.app.customer.domain.use_case.user.cart.CartUseCase
@@ -41,6 +44,7 @@ class HomeViewModel @Inject constructor(
     private val wishlistUseCase: WishlistUseCase,
     private val cartUseCase: CartUseCase,
     private val addToWishlistUseCase: AddToWishlistUseCase,
+    private val trackEventUseCase: TrackEventUseCase,
     private val removeFromWishlistUseCase: RemoveFromWishlistUseCase,
     private val allAddressUseCase: AllAddressUseCase,
     private val updateCartUseCase: UpdateCartUseCase,
@@ -159,6 +163,14 @@ class HomeViewModel @Inject constructor(
     private fun addLog(logRequest: LogRequest) {
         viewModelScope.launch {
             addLogUseCase.execute(logRequest)
+        }
+    }
+
+    private fun addInteraKtLog(trackData: TrackEventModel) {
+        viewModelScope.launch {
+            trackEventUseCase.execute(
+                trackData
+            )
         }
     }
 
@@ -306,6 +318,7 @@ class HomeViewModel @Inject constructor(
                             errorMessage = null,
                         )
 
+
                         //if (!isError)
                         T2PApp.wishlistCount = data?.result?.size ?: 0
 
@@ -363,6 +376,15 @@ class HomeViewModel @Inject constructor(
                                     event = "remove from wishlist",
                                     page_name = "/home",
                                     product_id = productId
+                                )
+                            )
+                            //interakt
+                            addInteraKtLog(
+                                TrackEventModel(
+                                    event = LogType.deleteWishlist,
+                                    traits = EventTraits(
+                                        productId = productId,
+                                    )
                                 )
                             )
                         }
@@ -461,7 +483,7 @@ class HomeViewModel @Inject constructor(
                         val data = result.data
                         val isError = data?.status == Status.error.name
 
-                        if (!isError)
+                        if (!isError) {
                             addLog(
                                 LogRequest(
                                     type = LogType.actionPerform,
@@ -470,6 +492,16 @@ class HomeViewModel @Inject constructor(
                                     product_id = productId
                                 )
                             )
+                            //interakt
+                            addInteraKtLog(
+                                TrackEventModel(
+                                    event = LogType.deleteCart,
+                                    traits = EventTraits(
+                                        productId = productId,
+                                    )
+                                )
+                            )
+                        }
 
                         getCart()
 
@@ -618,7 +650,7 @@ class HomeViewModel @Inject constructor(
                     is Resource.Success -> {
                         val isError = result.data?.status == Status.error.name
 
-                        if (!isError)
+                        if (!isError) {
                             addLog(
                                 LogRequest(
                                     type = LogType.addToWishlist,
@@ -627,6 +659,17 @@ class HomeViewModel @Inject constructor(
                                     product_id = productId
                                 )
                             )
+
+                            //interakt
+                            addInteraKtLog(
+                                TrackEventModel(
+                                    event = LogType.addToWishlist,
+                                    traits = EventTraits(
+                                        productId = productId,
+                                    )
+                                )
+                            )
+                        }
 
 
                         getWishlist()
@@ -672,7 +715,7 @@ class HomeViewModel @Inject constructor(
 
                     is Resource.Success -> {
                         val isError = result.data?.status == Status.error.name
-                        if (!isError)
+                        if (!isError) {
                             addLog(
                                 LogRequest(
                                     type = LogType.addToCart,
@@ -681,6 +724,18 @@ class HomeViewModel @Inject constructor(
                                     product_id = productId
                                 )
                             )
+
+                            addInteraKtLog(
+                                TrackEventModel(
+                                    event = LogType.addToCart,
+                                    traits = EventTraits(
+                                        productId = productId,
+                                        quantity = "1",
+                                    )
+                                )
+                            )
+
+                        }
                         state =
                             state.copy(
                                 isLoading = false,

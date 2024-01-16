@@ -1,6 +1,5 @@
 package me.taste2plate.app.customer.presentation.screens.ghar_ka_khana
 
-import me.taste2plate.app.customer.domain.model.SettingsModel
 import me.taste2plate.app.customer.domain.model.auth.User
 import me.taste2plate.app.customer.domain.model.custom.GharKaKhanaCategoryModel
 import me.taste2plate.app.customer.domain.model.custom.GharKaKhanaSubCategoryModel
@@ -9,7 +8,6 @@ import me.taste2plate.app.customer.domain.model.user.CommonResponse
 import me.taste2plate.app.customer.domain.model.user.GharKaKhanaCheckoutModel
 import me.taste2plate.app.customer.domain.model.user.GharKaKhanaFetchCartModel
 import me.taste2plate.app.customer.domain.model.user.address.AddressListModel
-import me.taste2plate.app.customer.presentation.screens.checkout.DeliveryType
 
 data class GharKaKhanaState(
     var addressLoader: Boolean = false,

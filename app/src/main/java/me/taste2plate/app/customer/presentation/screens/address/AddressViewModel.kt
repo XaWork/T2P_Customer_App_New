@@ -428,6 +428,8 @@ class AddressViewModel @Inject constructor(
                                     page_name = "/address"
                                 )
                             )
+
+                            getAddressList(isLoading = false)
                         }
                         state.copy(
                             isLoading = false,
@@ -478,6 +480,8 @@ class AddressViewModel @Inject constructor(
                                 page_name = "/address"
                             )
                         )
+
+                        getAddressList(isLoading = false)
 
                         state.copy(
                             isLoading = false,

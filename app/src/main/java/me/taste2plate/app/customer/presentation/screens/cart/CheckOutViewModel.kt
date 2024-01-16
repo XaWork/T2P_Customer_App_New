@@ -21,11 +21,14 @@ import me.taste2plate.app.customer.data.Status
 import me.taste2plate.app.customer.data.UserPref
 import me.taste2plate.app.customer.domain.model.custom.LogRequest
 import me.taste2plate.app.customer.domain.model.custom.LogType
+import me.taste2plate.app.customer.domain.model.tracking.EventTraits
+import me.taste2plate.app.customer.domain.model.tracking.TrackEventModel
 import me.taste2plate.app.customer.domain.model.user.MyPlanModel
 import me.taste2plate.app.customer.domain.model.user.address.AddressListModel
 import me.taste2plate.app.customer.domain.use_case.ApplyCouponUseCase
 import me.taste2plate.app.customer.domain.use_case.CouponByCityUseCase
 import me.taste2plate.app.customer.domain.use_case.analytics.AddLogUseCase
+import me.taste2plate.app.customer.domain.use_case.interakt.TrackEventUseCase
 import me.taste2plate.app.customer.domain.use_case.product.CalculateCheckoutDistanceUseCase
 import me.taste2plate.app.customer.domain.use_case.product.CutOffTimeCheckUseCase
 import me.taste2plate.app.customer.domain.use_case.user.InitCheckoutUseCase
@@ -55,6 +58,7 @@ class CheckOutViewModel @Inject constructor(
     private val couponByCityUseCase: CouponByCityUseCase,
     private val applyCouponUseCase: ApplyCouponUseCase,
     private val myPlanUseCase: MyPlanUseCase,
+    private val trackEventUseCase: TrackEventUseCase,
     private val initCheckoutUseCase: InitCheckoutUseCase,
     private val orderConfirmUseCase: OrderConfirmUseCase
 ) : ViewModel() {
@@ -213,6 +217,14 @@ class CheckOutViewModel @Inject constructor(
     private fun addLog(logRequest: LogRequest) {
         viewModelScope.launch {
             addLogUseCase.execute(logRequest)
+        }
+    }
+
+    private fun addInteraKtLog(trackData: TrackEventModel) {
+        viewModelScope.launch {
+            trackEventUseCase.execute(
+                trackData
+            )
         }
     }
 
@@ -575,6 +587,16 @@ class CheckOutViewModel @Inject constructor(
                                     event = "order confirmed",
                                     page_name = "/checkout",
                                     order_id = orderId
+                                )
+                            )
+
+                            //interakt
+                            addInteraKtLog(
+                                TrackEventModel(
+                                    event = LogType.addToWishlist,
+                                    traits = EventTraits(
+                                        orderId = orderId
+                                    )
                                 )
                             )
 

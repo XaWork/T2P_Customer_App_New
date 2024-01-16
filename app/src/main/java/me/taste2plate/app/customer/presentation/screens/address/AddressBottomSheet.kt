@@ -67,7 +67,7 @@ fun AddressBottomSheet(
         modifier = Modifier
             .fillMaxWidth()
             .background(screenBackgroundColor.invoke()),
-        floatingActionButton = {
+     /*   floatingActionButton = {
             MaterialIconButton(
                 imageVector = Icons.Default.AddBusiness,
                 tint = screenBackgroundColor.invoke(),
@@ -78,7 +78,7 @@ fun AddressBottomSheet(
             ) {
                 onNavigateToAddressListScreen()
             }
-        }
+        }*/
     ) {
         if (isLoading)
             ShowLoading(isButton = true)
@@ -105,16 +105,14 @@ fun AddressBottomSheet(
                     }
                 else
                     item {
-
                         AppEmptyView(text = "No Address Found. Please add one.")
-                       /* Column(
-                            modifier = Modifier.fillMaxSize(),
-                            verticalArrangement = Arrangement.Center,
-                            horizontalAlignment = Alignment.CenterHorizontally
-                        ) {
-                            Text("No Address Found. Please add one.")
-                        }*/
                     }
+
+                item {
+                    AppButton(text = "Add Address") {
+                        onNavigateToAddressListScreen()
+                    }
+                }
             }
         }
     }

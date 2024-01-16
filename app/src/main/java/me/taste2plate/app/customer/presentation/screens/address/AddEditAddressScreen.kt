@@ -65,11 +65,11 @@ fun AddEditAddressScreen(
             }
 
             state.addAddressResponse != null && state.addAddressResponse.status == Status.success.name -> {
-                onNavigateToHomeScreen()
+                navigateBack()
             }
 
             state.editAddressResponse != null && state.editAddressResponse.status == Status.success.name -> {
-                onNavigateToHomeScreen()
+                navigateBack()
             }
         }
     }

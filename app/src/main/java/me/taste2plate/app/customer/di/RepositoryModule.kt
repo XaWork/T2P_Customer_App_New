@@ -7,11 +7,13 @@ import dagger.hilt.components.SingletonComponent
 import me.taste2plate.app.customer.data.repo.AnalyticsRepoImpl
 import me.taste2plate.app.customer.data.repo.CustomRepoImpl
 import me.taste2plate.app.customer.data.repo.GeoIpRepoImpl
+import me.taste2plate.app.customer.data.repo.InteraktRepoImpl
 import me.taste2plate.app.customer.data.repo.ProductRepoImpl
 import me.taste2plate.app.customer.data.repo.UserRepoImpl
 import me.taste2plate.app.customer.domain.repo.AnalyticsRepo
 import me.taste2plate.app.customer.domain.repo.CustomRepo
 import me.taste2plate.app.customer.domain.repo.GeoIpRepo
+import me.taste2plate.app.customer.domain.repo.InteraktRepo
 import me.taste2plate.app.customer.domain.repo.ProductRepo
 import me.taste2plate.app.customer.domain.repo.UserRepo
 import javax.inject.Singleton
@@ -48,4 +50,10 @@ abstract class RepositoryModule {
     abstract fun bindGeoIpRepo(
         appReposImpl: GeoIpRepoImpl
     ): GeoIpRepo
+
+    @Binds
+    @Singleton
+    abstract fun bindInteraktRepo(
+        repoImpl: InteraktRepoImpl
+    ): InteraktRepo
 }

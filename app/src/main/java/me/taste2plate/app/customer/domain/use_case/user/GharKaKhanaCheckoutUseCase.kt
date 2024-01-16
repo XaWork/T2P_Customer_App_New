@@ -5,13 +5,7 @@ import kotlinx.coroutines.flow.flow
 import me.taste2plate.app.customer.data.ApiErrorMessages
 import me.taste2plate.app.customer.data.Resource
 import me.taste2plate.app.customer.data.UserPref
-import me.taste2plate.app.customer.domain.model.auth.VerifyOTPModel
-import me.taste2plate.app.customer.domain.model.user.CommonResponse
-import me.taste2plate.app.customer.domain.model.user.GetProfileModel
-import me.taste2plate.app.customer.domain.model.user.GharKaKhanaAddToCartModel
 import me.taste2plate.app.customer.domain.model.user.GharKaKhanaCheckoutModel
-import me.taste2plate.app.customer.domain.model.user.GharKaKhanaFetchCartModel
-import me.taste2plate.app.customer.domain.model.user.MyPlanModel
 import me.taste2plate.app.customer.domain.repo.UserRepo
 import retrofit2.HttpException
 import java.io.IOException

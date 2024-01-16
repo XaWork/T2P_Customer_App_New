@@ -1,6 +1,7 @@
 package me.taste2plate.app.customer.domain.use_case.user.cart
 
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flow
 import me.taste2plate.app.customer.data.ApiErrorMessages
 import me.taste2plate.app.customer.data.Resource
@@ -38,6 +39,17 @@ class CartUseCase @Inject constructor(
                 http.printStackTrace()
                 emit(Resource.Error(message = ApiErrorMessages.eException))
             }
+        }.catch { e ->
+            e.printStackTrace()
+            emit(
+                Resource.Error(
+                    message = when (e) {
+                        is IOException -> ApiErrorMessages.errorIOException
+                        is HttpException -> ApiErrorMessages.httpException
+                        else -> ApiErrorMessages.eException
+                    }
+                )
+            )
         }
     }
 }

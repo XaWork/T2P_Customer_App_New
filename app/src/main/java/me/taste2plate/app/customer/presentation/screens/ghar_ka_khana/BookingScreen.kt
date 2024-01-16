@@ -107,7 +107,7 @@ fun BookingScreen(
     AppScaffold(
         topBar = {
             AppTopBar(
-                title = "Ghar ka khana"
+                title = "Any Food 2 Any Place"
             ) { navigateBack() }
         }
     ) {
@@ -115,7 +115,7 @@ fun BookingScreen(
             ShowLoading()
         else
             ContentBookingScreen(
-                viewModel, onNavigateToAddressListScreen
+                viewModel, onNavigateToAddressListScreen, onNavigateToCheckoutScreen
             )
     }
 }
@@ -124,6 +124,7 @@ fun BookingScreen(
 fun ContentBookingScreen(
     viewModel: GharKaKhanaViewModel,
     onNavigateToAddressListScreen: () -> Unit,
+    onNavigateToCheckoutScreen: () -> Unit,
 ) {
     val state = viewModel.state
     LazyColumn(
@@ -157,6 +158,16 @@ fun ContentBookingScreen(
             else
                 AppButton(text = "Book Now") {
                     viewModel.onEvent(GharKaKhanaEvent.BookNow)
+
+                   /* if (state.pickupLocation == null || state.destinationLocation == null) {
+                        showToast("Choose Pickup and Destination Location.")
+                    } else if (state.cartItems.isEmpty()) {
+                        showToast("Add at least one item.")
+                    } else if (viewModel.selectedDate.isEmpty() || viewModel.selectedTimeSlot.isEmpty()) {
+                        showToast("Select pickup date and time.")
+                    } else {
+                        onNavigateToCheckoutScreen()
+                    }*/
                 }
         }
     }
@@ -492,15 +503,15 @@ fun GKKPickupInfo(viewModel: GharKaKhanaViewModel) {
             hint = "Total Weight (kg)",
             readOnly = true
         )
-/*
-        AppTextField(
-            value = viewModel.remarks,
-            onValueChanged = {
-                viewModel.remarks = it
-            },
-            hint = "Remarks",
-            readOnly = false
-        )*/
+        /*
+                AppTextField(
+                    value = viewModel.remarks,
+                    onValueChanged = {
+                        viewModel.remarks = it
+                    },
+                    hint = "Remarks",
+                    readOnly = false
+                )*/
 
 
         val items = listOf<@Composable RowScope.() -> Unit> {
@@ -535,37 +546,6 @@ fun GKKPickupInfo(viewModel: GharKaKhanaViewModel) {
         VerticalSpace(space = SpaceBetweenViewsAndSubViews)
 
         AppDivider(thickness = 2.dp)
-
-        val radioOptions = listOf(
-            RadioButtonInfo(
-                id = 1,
-                text = "Express Delivery",
-            ),
-            RadioButtonInfo(
-                id = 2,
-                text = "Standard Delivery"
-            )
-        )
-
-        AppRadioButton(
-            radioOptions,
-            when (viewModel.deliveryType) {
-                DeliveryType.Express -> radioOptions[0].text
-                DeliveryType.Standard -> radioOptions[1].text
-            },
-            onOptionSelected = {
-                when (it.id) {
-                    1 -> {
-                        viewModel.deliveryType = DeliveryType.Express
-                    }
-
-                    2 -> {
-                        viewModel.deliveryType = DeliveryType.Standard
-                    }
-                }
-            },
-            fontSize = fontSize1,
-        )
 
         VerticalSpace(space = SpaceBetweenViewsAndSubViews)
 

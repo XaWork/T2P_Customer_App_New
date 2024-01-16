@@ -3,7 +3,6 @@ package me.taste2plate.app.customer.domain.repo
 import me.taste2plate.app.customer.domain.model.ApplyCouponModel
 import me.taste2plate.app.customer.domain.model.auth.LoginModel
 import me.taste2plate.app.customer.domain.model.auth.VerifyOTPModel
-import me.taste2plate.app.customer.domain.model.product.CalculateCheckoutDistanceModel
 import me.taste2plate.app.customer.domain.model.user.CartModel
 import me.taste2plate.app.customer.domain.model.user.CheckoutModel
 import me.taste2plate.app.customer.domain.model.user.CommonResponse
@@ -205,7 +204,12 @@ interface UserRepo {
     ): CommonResponse
 
     suspend fun gharKaKhanaConfirmCheckout(
-        orderId: String,
+        userId: String,
+        sourceLocation: String,
+        destinationLocation: String,
+        pickupDate: String,
+        pickupTime: String,
+        deliveryType: String
     ): CommonResponse
 
     suspend fun gharKaKhanaCheckout(

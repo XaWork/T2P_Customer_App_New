@@ -45,7 +45,9 @@ data class CartModel(
     @SerializedName("total_packing_price")
     val totalPackingPrice: String,
     @SerializedName("total_sgst")
-    val totalSgst: String
+    val totalSgst: String,
+    @SerializedName("last_mile_long_distance_extra_charge")
+    val lastMileLongDistanceExtraCharge: String
 ) {
 
     val walletDiscount : Float

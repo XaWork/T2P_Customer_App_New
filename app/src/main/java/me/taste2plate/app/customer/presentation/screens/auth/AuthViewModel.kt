@@ -4,11 +4,8 @@ package me.taste2plate.app.customer.presentation.screens.auth
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import androidx.core.content.ContentProviderCompat.requireContext
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.facebook.appevents.AppEventsConstants
-import com.facebook.appevents.AppEventsLogger
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import me.taste2plate.app.customer.data.Resource
@@ -17,9 +14,15 @@ import me.taste2plate.app.customer.data.UserPref
 import me.taste2plate.app.customer.domain.model.auth.VerifyOTPModel
 import me.taste2plate.app.customer.domain.model.custom.LogRequest
 import me.taste2plate.app.customer.domain.model.custom.LogType
+import me.taste2plate.app.customer.domain.model.tracking.TrackEventModel
+import me.taste2plate.app.customer.domain.model.tracking.EventTraits
+import me.taste2plate.app.customer.domain.model.tracking.TrackUserModel
+import me.taste2plate.app.customer.domain.model.tracking.UserTraits
 import me.taste2plate.app.customer.domain.use_case.analytics.AddLogUseCase
 import me.taste2plate.app.customer.domain.use_case.auth.LoginUseCase
 import me.taste2plate.app.customer.domain.use_case.auth.VerifyOTPUseCase
+import me.taste2plate.app.customer.domain.use_case.interakt.TrackEventUseCase
+import me.taste2plate.app.customer.domain.use_case.interakt.TrackUserUseCase
 import me.taste2plate.app.customer.domain.use_case.user.EditProfileUseCase
 import me.taste2plate.app.customer.domain.use_case.user.GetProfileUseCase
 import me.taste2plate.app.customer.utils.Constants
@@ -32,6 +35,8 @@ class AuthViewModel @Inject constructor(
     private val getProfileUseCase: GetProfileUseCase,
     private val editProfileUseCase: EditProfileUseCase,
     private val addLogUseCase: AddLogUseCase,
+    private val trackUserUseCase: TrackUserUseCase,
+    private val trackEventUseCase: TrackEventUseCase,
     private val userPref: UserPref
 ) : ViewModel() {
 
@@ -176,7 +181,7 @@ class AuthViewModel @Inject constructor(
                             addLog(
                                 LogRequest(
                                     type = LogType.login,
-                                    event = if(state.loginModel!!.newUser) "Sign up successfully" else "login successfully",
+                                    event = if (state.loginModel!!.newUser) "Sign up successfully" else "login successfully",
                                     page_name = "/onboarding"
                                 )
                             )
@@ -274,12 +279,26 @@ class AuthViewModel @Inject constructor(
         viewModelScope.launch {
             userPref.saveUser(verifyOtpModel.data)
             state = state.copy(loginSuccess = true, registerSuccess = registerSuccess)
+            addInteraKtLog(verifyOtpModel)
         }
     }
 
     private fun addLog(logRequest: LogRequest) {
         viewModelScope.launch {
             addLogUseCase.execute(logRequest)
+        }
+    }
+
+    private fun addInteraKtLog(verifyOtpModel: VerifyOTPModel) {
+        viewModelScope.launch {
+            trackUserUseCase.execute(
+                TrackUserModel(
+                    traits = UserTraits(
+                        name = verifyOtpModel.data.fullName ?: "",
+                        email = verifyOtpModel.data.email ?: ""
+                    )
+                )
+            )
         }
     }
 }

@@ -3,7 +3,6 @@ package me.taste2plate.app.customer.data.api
 import me.taste2plate.app.customer.domain.model.ApplyCouponModel
 import me.taste2plate.app.customer.domain.model.auth.LoginModel
 import me.taste2plate.app.customer.domain.model.auth.VerifyOTPModel
-import me.taste2plate.app.customer.domain.model.product.CalculateCheckoutDistanceModel
 import me.taste2plate.app.customer.domain.model.user.CartModel
 import me.taste2plate.app.customer.domain.model.user.CheckoutModel
 import me.taste2plate.app.customer.domain.model.user.CommonResponse
@@ -19,9 +18,7 @@ import me.taste2plate.app.customer.domain.model.user.OrderUpdateModel
 import me.taste2plate.app.customer.domain.model.user.WalletTransactionModel
 import me.taste2plate.app.customer.domain.model.user.WishListModel
 import me.taste2plate.app.customer.domain.model.user.address.AddressListModel
-import retrofit2.Call
 import retrofit2.http.Field
-import retrofit2.http.FieldMap
 import retrofit2.http.FormUrlEncoded
 import retrofit2.http.GET
 import retrofit2.http.POST
@@ -276,14 +273,14 @@ interface UserApi {
         @Field("id") itemId: String,
     ): CommonResponse
 
-    @FormUrlEncoded
+/*    @FormUrlEncoded
     @POST("gharkakhana-confirm-checkout")
     suspend fun gharKaKhanaConfirmCheckout(
         @Field("id") orderId: String,
-    ): CommonResponse
+    ): CommonResponse*/
 
     @FormUrlEncoded
-    @POST("gharkakhana-checkout")
+    @POST("gharkakhana-preview-checkout")
     suspend fun gharKaKhanaCheckout(
         @Field("userId") userId: String,
         @Field("source_location") sourceLocation: String,
@@ -292,4 +289,15 @@ interface UserApi {
         @Field("pickup_time") pickupTime: String,
         @Field("delivery_type") deliveryType: String,
     ): GharKaKhanaCheckoutModel
+
+    @FormUrlEncoded
+    @POST("gharkakhana-checkout")
+    suspend fun gharKaKhanaConfirmCheckout(
+        @Field("userId") userId: String,
+        @Field("source_location") sourceLocation: String,
+        @Field("destination_location") destinationLocation: String,
+        @Field("pickup_date") pickupDate: String,
+        @Field("pickup_time") pickupTime: String,
+        @Field("delivery_type") deliveryType: String,
+    ): CommonResponse
 }

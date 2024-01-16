@@ -15,6 +15,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -28,6 +29,7 @@ import me.taste2plate.app.customer.presentation.widgets.AppButton
 import me.taste2plate.app.customer.presentation.widgets.AppScaffold
 import me.taste2plate.app.customer.presentation.widgets.MaterialIcon
 import me.taste2plate.app.customer.presentation.widgets.VerticalSpace
+import me.taste2plate.app.customer.utils.toDate
 
 @Composable
 fun OrderConfirmScreen(
@@ -37,7 +39,8 @@ fun OrderConfirmScreen(
     AppScaffold {
         OrderConfirmContent(
             state = viewModel.state,
-            onNavigateToHomeScreen = onNavigateToHomeScreen)
+            onNavigateToHomeScreen = onNavigateToHomeScreen
+        )
     }
 }
 
@@ -88,7 +91,8 @@ fun OrderConfirmContent(
             VerticalSpace(space = SpaceBetweenViews)
 
             Text(
-                text = "Your Order Delivery schedule is",
+                text = "Your Order Delivery schedule is \n on ${orderInfo.delivery_date.toDate("dd-MM-yyyy")} \nat",
+                textAlign = TextAlign.Center
             )
 
             Text(
@@ -96,12 +100,12 @@ fun OrderConfirmContent(
                 fontSize = 25.sp,
                 color = primaryColor.invoke()
             )
-/*
-            VerticalSpace(space = SpaceBetweenViewsAndSubViews)
+            /*
+                        VerticalSpace(space = SpaceBetweenViewsAndSubViews)
 
-            Text(
-                text = "For you order".uppercase(),
-            )*/
+                        Text(
+                            text = "For you order".uppercase(),
+                        )*/
         }
 
         AppButton(
