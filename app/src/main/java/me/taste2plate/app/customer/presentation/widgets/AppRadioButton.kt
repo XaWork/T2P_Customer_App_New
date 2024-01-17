@@ -67,7 +67,7 @@ fun AppRadioButton(
                     Text(
                         text = radioButtonInfo.text,
                         style = MaterialTheme.typography.bodyLarge,
-                        modifier = Modifier.padding(start = 16.dp), fontSize = fontSize,
+                        modifier = Modifier.padding(start = 10.dp), fontSize = fontSize,
                         color = if (radioButtonInfo.enable) color else Color.Gray
                     )
             }

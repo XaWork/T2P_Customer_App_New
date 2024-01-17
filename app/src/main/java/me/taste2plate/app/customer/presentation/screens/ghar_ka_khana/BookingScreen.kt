@@ -20,7 +20,6 @@ import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDefaults
 import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -47,9 +46,7 @@ import me.taste2plate.app.customer.domain.model.user.GharKaKhanaFetchCartModel
 import me.taste2plate.app.customer.domain.model.user.address.AddressListModel
 import me.taste2plate.app.customer.presentation.dialog.TimePickerDialog
 import me.taste2plate.app.customer.presentation.screens.address.AddressBottomSheet
-import me.taste2plate.app.customer.presentation.screens.checkout.DeliveryType
 import me.taste2plate.app.customer.presentation.screens.checkout.fontSize
-import me.taste2plate.app.customer.presentation.screens.checkout.fontSize1
 import me.taste2plate.app.customer.presentation.theme.ExtraLowElevation
 import me.taste2plate.app.customer.presentation.theme.LowPadding
 import me.taste2plate.app.customer.presentation.theme.LowSpacing
@@ -67,13 +64,11 @@ import me.taste2plate.app.customer.presentation.widgets.AppButton
 import me.taste2plate.app.customer.presentation.widgets.AppCheckBox
 import me.taste2plate.app.customer.presentation.widgets.AppDivider
 import me.taste2plate.app.customer.presentation.widgets.AppDropDown
-import me.taste2plate.app.customer.presentation.widgets.AppRadioButton
 import me.taste2plate.app.customer.presentation.widgets.AppScaffold
 import me.taste2plate.app.customer.presentation.widgets.AppTextField
 import me.taste2plate.app.customer.presentation.widgets.AppTopBar
 import me.taste2plate.app.customer.presentation.widgets.HorizontalSpace
 import me.taste2plate.app.customer.presentation.widgets.InfoWithIcon
-import me.taste2plate.app.customer.presentation.widgets.RadioButtonInfo
 import me.taste2plate.app.customer.presentation.widgets.RoundedCornerCard
 import me.taste2plate.app.customer.presentation.widgets.ShowLoading
 import me.taste2plate.app.customer.presentation.widgets.SpaceBetweenRow
@@ -133,11 +128,11 @@ fun ContentBookingScreen(
         item {
             PdLocation(viewModel, onNavigateToAddressListScreen = onNavigateToAddressListScreen)
 
-            AppDivider(thickness = 2.dp)
+            AppDivider(thickness = 1.dp)
 
             FoodInfo(viewModel)
 
-            AppDivider(thickness = 2.dp)
+            AppDivider(thickness = 1.dp)
         }
 
         items(state.cartItems) {
@@ -149,7 +144,7 @@ fun ContentBookingScreen(
         }
 
         item {
-            AppDivider(thickness = 2.dp)
+            AppDivider(thickness = 1.dp)
 
             GKKPickupInfo(viewModel)
 
@@ -159,15 +154,15 @@ fun ContentBookingScreen(
                 AppButton(text = "Book Now") {
                     viewModel.onEvent(GharKaKhanaEvent.BookNow)
 
-                   /* if (state.pickupLocation == null || state.destinationLocation == null) {
-                        showToast("Choose Pickup and Destination Location.")
-                    } else if (state.cartItems.isEmpty()) {
-                        showToast("Add at least one item.")
-                    } else if (viewModel.selectedDate.isEmpty() || viewModel.selectedTimeSlot.isEmpty()) {
-                        showToast("Select pickup date and time.")
-                    } else {
-                        onNavigateToCheckoutScreen()
-                    }*/
+                    /* if (state.pickupLocation == null || state.destinationLocation == null) {
+                         showToast("Choose Pickup and Destination Location.")
+                     } else if (state.cartItems.isEmpty()) {
+                         showToast("Add at least one item.")
+                     } else if (viewModel.selectedDate.isEmpty() || viewModel.selectedTimeSlot.isEmpty()) {
+                         showToast("Select pickup date and time.")
+                     } else {
+                         onNavigateToCheckoutScreen()
+                     }*/
                 }
         }
     }
@@ -290,10 +285,20 @@ fun FoodInfo(viewModel: GharKaKhanaViewModel) {
     var categoryExpanded by remember { mutableStateOf(false) }
     var subCategoryExpanded by remember { mutableStateOf(false) }
     val items = listOf<@Composable RowScope.() -> Unit> {
+
+
+        HorizontalSpace(space = SpaceBetweenViewsAndSubViews)
+
+
+    }
+
+    Column {
+        // SpaceBetweenRow(items = items)
+
         AppDropDown(
-            modifier = Modifier
+          /*  modifier = Modifier
                 .fillMaxWidth()
-                .weight(1f),
+                .weight(1f),*/
             expanded = categoryExpanded,
             hint = "Category",
             items = state.category.map { it.name },
@@ -305,11 +310,9 @@ fun FoodInfo(viewModel: GharKaKhanaViewModel) {
                 viewModel.category = it
             })
 
-        HorizontalSpace(space = SpaceBetweenViewsAndSubViews)
-
-        AppDropDown(modifier = Modifier
+        AppDropDown(/*modifier = Modifier
             .fillMaxWidth()
-            .weight(1f),
+            .weight(1f),*/
             hint = "Sub Category",
             expanded = subCategoryExpanded,
             items = state.subCategory.map { it.name },
@@ -320,10 +323,6 @@ fun FoodInfo(viewModel: GharKaKhanaViewModel) {
             onTextChanged = {
                 viewModel.subCategory = it
             })
-    }
-
-    Column {
-        SpaceBetweenRow(items = items)
 
         AppTextField(
             value = viewModel.productName,
@@ -545,7 +544,7 @@ fun GKKPickupInfo(viewModel: GharKaKhanaViewModel) {
 
         VerticalSpace(space = SpaceBetweenViewsAndSubViews)
 
-        AppDivider(thickness = 2.dp)
+        AppDivider(thickness = 1.dp)
 
         VerticalSpace(space = SpaceBetweenViewsAndSubViews)
 

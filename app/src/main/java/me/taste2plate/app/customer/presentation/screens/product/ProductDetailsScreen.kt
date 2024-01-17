@@ -364,17 +364,17 @@ fun ProductDetails(
                             cartItemLength = it.quantity
                     }
                 }
-                    if (state.addToCartEnable)
-                        CartAddRemove(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .weight(1f),
-                            cartItemLength = cartItemLength,
-                        ) {
-                            updateCart(it)
-                        }
-                    else
-                        Text("")
+                if (state.addToCartEnable)
+                    CartAddRemove(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .weight(1f),
+                        cartItemLength = cartItemLength,
+                    ) {
+                        updateCart(it)
+                    }
+                else
+                    Text("")
                 //}
             }
 
@@ -466,19 +466,20 @@ fun ProductDetails(
 
             VerticalSpace(space = VeryLowSpacing)
 
-            if (state.checkAvailabilityModel != null) {
-                if (state.checkAvailabilityModel.express)
-                    InfoWithIcon(
-                        id = R.drawable.delivery_bike,
-                        info = state.checkAvailabilityModel.cutoff_response.express_remarks,
-                        modifier = Modifier.padding(vertical = VeryLowSpacing),
-                        iconOrImageModifier = Modifier.size(20.dp),
-                        colorFilter = ColorFilter.tint(color = forestGreen.invoke()),
-                        maxLines = 10,
-                        textColor = forestGreen.invoke()
-                    )
+            if (state.checkAvailabilityModel != null && state.checkAvailabilityModel.status == Status.success.name) {
+                // if (state.checkAvailabilityModel.express)
+                Column {
+                   // if (state.checkAvailabilityModel.express)
+                        InfoWithIcon(
+                            id = R.drawable.delivery_bike,
+                            info = state.checkAvailabilityModel.cutoff_response.express_remarks,
+                            modifier = Modifier.padding(vertical = VeryLowSpacing),
+                            iconOrImageModifier = Modifier.size(20.dp),
+                            colorFilter = ColorFilter.tint(color = forestGreen.invoke()),
+                            maxLines = 10,
+                            textColor = forestGreen.invoke()
+                        )
 
-                if (state.checkAvailabilityModel.status == Status.success.name) {
                     InfoWithIcon(
                         id = R.drawable.delivery_bike,
                         info = state.checkAvailabilityModel.cutoff_response.remarks,
