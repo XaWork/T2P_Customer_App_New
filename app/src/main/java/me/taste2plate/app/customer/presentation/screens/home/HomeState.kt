@@ -1,5 +1,6 @@
 package me.taste2plate.app.customer.presentation.screens.home
 
+import me.taste2plate.app.customer.domain.model.CouponModel
 import me.taste2plate.app.customer.domain.model.HomeModel
 import me.taste2plate.app.customer.domain.model.SettingsModel
 import me.taste2plate.app.customer.domain.model.auth.User
@@ -12,6 +13,7 @@ import me.taste2plate.app.customer.domain.model.user.address.AddressListModel
 
 data class HomeState(
     val isLoading: Boolean = false,
+    val couponLoading: Boolean = false,
     val cartError: Boolean = false,
     val addressLoader: Boolean = false,
     val showErrorMessage: Boolean = false,
@@ -29,6 +31,7 @@ data class HomeState(
     val addressListModel: AddressListModel? = null,
     val addressList: List<AddressListModel.Result> = emptyList(),
     val addToWishlistResponse: CommonResponse? = null,
+    val couponList: List<CouponModel.Coupon> = emptyList(),
     val addToCartResponse: CommonResponse? = null,
     val foodItemUpdateInfo: FoodItemUpdateInfo? = null,
     val defaultAddress: AddressListModel.Result? = null,

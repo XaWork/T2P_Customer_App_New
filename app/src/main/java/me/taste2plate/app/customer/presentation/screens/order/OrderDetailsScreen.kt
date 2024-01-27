@@ -1,6 +1,5 @@
 package me.taste2plate.app.customer.presentation.screens.order
 
-import android.widget.Toast
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -45,11 +44,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import me.taste2plate.app.customer.domain.model.custom.LogRequest
 import me.taste2plate.app.customer.domain.model.custom.LogType
+import me.taste2plate.app.customer.domain.model.user.GharKaKhanaOrderList
 import me.taste2plate.app.customer.domain.model.user.OrderListModel
 import me.taste2plate.app.customer.presentation.dialog.CustomDialog
 import me.taste2plate.app.customer.presentation.dialog.SettingDialogType
 import me.taste2plate.app.customer.presentation.dialog.SettingInfoDialog
-import me.taste2plate.app.customer.presentation.screens.Product
+import me.taste2plate.app.customer.presentation.theme.ExtraLowElevation
 import me.taste2plate.app.customer.presentation.theme.LowPadding
 import me.taste2plate.app.customer.presentation.theme.MediumRoundedCorners
 import me.taste2plate.app.customer.presentation.theme.MediumSpacing
@@ -57,6 +57,7 @@ import me.taste2plate.app.customer.presentation.theme.ScreenPadding
 import me.taste2plate.app.customer.presentation.theme.SpaceBetweenViews
 import me.taste2plate.app.customer.presentation.theme.SpaceBetweenViewsAndSubViews
 import me.taste2plate.app.customer.presentation.theme.VeryLowSpacing
+import me.taste2plate.app.customer.presentation.theme.cardContainerOnSecondaryColor
 import me.taste2plate.app.customer.presentation.theme.screenBackgroundColor
 import me.taste2plate.app.customer.presentation.utils.noRippleClickable
 import me.taste2plate.app.customer.presentation.utils.rupeeSign
@@ -71,9 +72,9 @@ import me.taste2plate.app.customer.presentation.widgets.RoundedCornerCard
 import me.taste2plate.app.customer.presentation.widgets.ShowLoading
 import me.taste2plate.app.customer.presentation.widgets.SpaceBetweenRow
 import me.taste2plate.app.customer.presentation.widgets.VerticalSpace
-import me.taste2plate.app.customer.presentation.widgets.showToast
 import me.taste2plate.app.customer.utils.toDate
 import me.taste2plate.app.customer.utils.toDateObject
+import me.taste2plate.app.customer.utils.toDecimal
 
 @Composable
 fun OrderDetailsScreen(
@@ -85,7 +86,7 @@ fun OrderDetailsScreen(
     val state = viewModel.state
 
 
-    LaunchedEffect(true){
+    LaunchedEffect(true) {
         viewModel.onEvent(OrderEvent.GetOrderUpdate)
         viewModel.onEvent(
             OrderEvent.AddLog(
@@ -95,7 +96,8 @@ fun OrderDetailsScreen(
                     page_name = "/order",
                     order_id = viewModel.selectedOrder?.id ?: ""
                 )
-            ))
+            )
+        )
     }
 
     var showOrderTrackDialog by remember {
@@ -140,22 +142,29 @@ fun OrderDetailsScreen(
 
     AppScaffold(topBar = {
         AppTopBar(
-            title = viewModel.selectedOrder?.orderid ?: ""
+            title = viewModel.selectedOrder?.orderid ?: viewModel.selectedGharKaKhanOrder?.orderid
+            ?: ""
         ) { navigateBack() }
     }) {
-        if (viewModel.selectedOrder == null) AppEmptyView()
-        else ContentOrderDetailsScreen(
-            state, viewModel.selectedOrder!!,
-            showOrderTrackDialog = {
-                showOrderTrackDialog = true
-            },
-            showCancelOrderDialog = {
-                showCancelOrderDialog = true
-            },
-            onNavigateToTrackOrderScreen = {
-                onNavigateToTrackOrderScreen()
-            }
-        )
+        if (viewModel.selectedOrder == null && state.selectedTab == 0 ||
+            viewModel.selectedGharKaKhanOrder == null && state.selectedTab == 1)
+            AppEmptyView()
+        else if (state.selectedTab == 0)
+            ContentOrderDetailsScreen(
+                state, viewModel.selectedOrder!!,
+                showOrderTrackDialog = {
+                    showOrderTrackDialog = true
+                },
+                showCancelOrderDialog = {
+                    showCancelOrderDialog = true
+                },
+                onNavigateToTrackOrderScreen = {
+                    onNavigateToTrackOrderScreen()
+                }
+            )
+        else
+            ContentGharKaKhanaOrderDetailsScreen(viewModel.selectedGharKaKhanOrder!!)
+
     }
 }
 
@@ -301,6 +310,150 @@ fun ContentOrderDetailsScreen(
                 else AppButton(
                     text = "Cancel Order"
                 ) { showCancelOrderDialog() }
+        }
+    }
+}
+
+@Composable
+fun ContentGharKaKhanaOrderDetailsScreen(
+    order: GharKaKhanaOrderList.Result,
+) {
+    LazyColumn(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(horizontal = ScreenPadding)
+    ) {
+        item{
+            VerticalSpace(space = SpaceBetweenViewsAndSubViews)
+        }
+
+        val orderItems = order.products!!
+        items(orderItems) { item ->
+            SingleGharKaKhanOrderItem(
+                item!!
+            )
+        }
+
+        item {
+            Divider(modifier = Modifier.padding(vertical = SpaceBetweenViews))
+
+            Text(
+                text = "Pickup Date : ${order.pickupDate!!.toDate("dd-MM-yyyy")} \n(${order.pickupTime})",
+                fontWeight = FontWeight.W500
+            )
+
+            VerticalSpace(space = SpaceBetweenViewsAndSubViews)
+
+            Text(
+                text = "Delivery Date : ${order.deliveryDate!!.toDate("dd-MM-yyyy")} (${order.deliveryTimeslot})",
+                fontWeight = FontWeight.W500
+            )
+
+            VerticalSpace(space = SpaceBetweenViewsAndSubViews)
+
+            Text(
+                text = "Delivery Type : ${order.deliveryType?.uppercase()}",
+                fontWeight = FontWeight.W500
+            )
+
+            Divider(modifier = Modifier.padding(vertical = SpaceBetweenViews))
+        }
+
+        //Price list
+        val priceList = listOf(
+            "Total Price" to "$rupeeSign ${order.totalPrice?.toDecimal()}",
+            "Pickup Price" to "$rupeeSign ${order.pickupPrice?.toDecimal()}",
+            "Delivery Price" to "$rupeeSign ${order.deliveryPrice?.toDecimal()}",
+            "SGST" to "$rupeeSign ${if(!order.sgst.isNullOrEmpty()) order.sgst.toDecimal() else ""}",
+            "CGST" to "$rupeeSign ${if(!order.cgst.isNullOrEmpty()) order.cgst.toDecimal() else ""}",
+            "IGST" to "$rupeeSign ${if(!order.igst.isNullOrEmpty()) order.igst.toDecimal() else ""}",
+        )
+
+        items(priceList) {
+            if (it.first.isNotEmpty())
+                SpaceBetweenRow(modifier = Modifier.padding(vertical = LowPadding), item1 = {
+                    Text(it.first, color = MaterialTheme.colorScheme.inverseSurface)
+                }, item2 = {
+                    Text(text = it.second, color = MaterialTheme.colorScheme.inverseSurface)
+                })
+
+        }
+
+        item{
+            Divider(modifier = Modifier.padding(vertical = SpaceBetweenViews))
+        }
+
+        //Distance list
+        val distanceList = listOf(
+            "Pickup Distance" to "${order.pickupDistance?.toDecimal()} KM",
+            "Delivery Distance" to "${order.deliveryDistance?.toDecimal()} KM",
+        )
+
+        items(distanceList) {
+            if (it.first.isNotEmpty())
+                SpaceBetweenRow(modifier = Modifier.padding(vertical = LowPadding), item1 = {
+                    Text(
+                        it.first,
+                        color = MaterialTheme.colorScheme.inverseSurface,
+                        fontWeight = FontWeight.W600
+                    )
+                }, item2 = {
+                    Text(
+                        text = it.second,
+                        color = MaterialTheme.colorScheme.inverseSurface,
+                        fontWeight = FontWeight.W600
+                    )
+                })
+
+        }
+
+        item {
+            Divider(modifier = Modifier.padding(vertical = SpaceBetweenViews))
+
+            SpaceBetweenRow(modifier = Modifier.padding(vertical = SpaceBetweenViewsAndSubViews),
+                item1 = {
+                    Text(
+                        "Total Weight", fontSize = 20.sp, fontWeight = FontWeight.W500
+                    )
+                },
+                item2 = {
+                    Text(
+                        "${order.totalWeight?.toDecimal()} KG",
+                        fontSize = 20.sp,
+                        fontWeight = FontWeight.W500
+                    )
+                })
+
+            Divider(modifier = Modifier.padding(vertical = SpaceBetweenViews))
+        }
+    }
+}
+
+@Composable
+fun SingleGharKaKhanOrderItem(
+    item: GharKaKhanaOrderList.Result.Product,
+) {
+    RoundedCornerCard(
+        modifier = Modifier
+            .padding(bottom = VeryLowSpacing),
+        cardColor = cardContainerOnSecondaryColor.invoke(),
+        elevation = ExtraLowElevation
+    ) {
+        Column(
+            modifier = Modifier
+                .padding(ScreenPadding)
+                .fillMaxWidth(),
+        ) {
+            Text(
+                item.name!!,
+                fontSize = 16.sp,
+                fontWeight = FontWeight.Bold
+            )
+
+            VerticalSpace(space = SpaceBetweenViewsAndSubViews)
+
+            Text("Weight : ${item.weight} kg")
+
         }
     }
 }

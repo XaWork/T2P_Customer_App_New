@@ -48,4 +48,9 @@ data class CheckoutState(
     val timeSlots: List<String> = emptyList(),
     val couponList: List<CouponModel.Coupon> = emptyList(),
     val applyCouponResponse: ApplyCouponModel? = null,
+
+    //show gif and play sound after coupon applied and order confirmed
+    val showCouponGif: Boolean = false,
+    val showOrderConfirmGif: Boolean = false,
+    var showGifTime: Int = 4,
 )

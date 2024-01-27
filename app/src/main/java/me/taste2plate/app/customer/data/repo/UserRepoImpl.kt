@@ -2,12 +2,14 @@ package me.taste2plate.app.customer.data.repo
 
 import me.taste2plate.app.customer.data.api.UserApi
 import me.taste2plate.app.customer.domain.model.ApplyCouponModel
+import me.taste2plate.app.customer.domain.model.user.CartModel
 import me.taste2plate.app.customer.domain.model.user.CheckoutModel
 import me.taste2plate.app.customer.domain.model.user.CommonResponse
 import me.taste2plate.app.customer.domain.model.user.GetProfileModel
 import me.taste2plate.app.customer.domain.model.user.GharKaKhanaAddToCartModel
 import me.taste2plate.app.customer.domain.model.user.GharKaKhanaCheckoutModel
 import me.taste2plate.app.customer.domain.model.user.GharKaKhanaFetchCartModel
+import me.taste2plate.app.customer.domain.model.user.GharKaKhanaOrderList
 import me.taste2plate.app.customer.domain.model.user.MyPlanModel
 import me.taste2plate.app.customer.domain.model.user.OrderConfirmModel
 import me.taste2plate.app.customer.domain.model.user.OrderListModel
@@ -80,8 +82,14 @@ class UserRepoImpl @Inject constructor(
         productId: String
     ) = api.deleteFromWishlist(userId, productId)
 
-    override suspend fun getCart(userId: String, city: String?, zip: String?) =
-        api.getCart(userId, city, zip)
+    override suspend fun getCart(
+        userId: String, address: String?, city: String?, zip: String?
+    ) =
+        api.getCart(userId, address, city, zip)
+
+    override suspend fun getCartByAddress(userId: String, address: String?): CartModel {
+        return api.getCartByAddress(userId, address)
+    }
 
     override suspend fun updateCart(
         userId: String,
@@ -163,6 +171,10 @@ class UserRepoImpl @Inject constructor(
 
     override suspend fun getOrders(userId: String): OrderListModel {
         return api.getOrders(userId)
+    }
+
+    override suspend fun gharKaKhanaOrderList(userId: String): GharKaKhanaOrderList {
+        return api.gharKaKhanaOrderList(userId)
     }
 
     override suspend fun cancelOrder(orderId: String): CommonResponse {
@@ -296,13 +308,15 @@ class UserRepoImpl @Inject constructor(
         destinationLocation: String,
         pickupDate: String,
         pickupTime: String,
-        deliveryType: String): CommonResponse {
+        deliveryType: String
+    ): CommonResponse {
         return api.gharKaKhanaConfirmCheckout(
             userId,
             sourceLocation,
             destinationLocation,
             pickupDate,
             pickupTime,
-            deliveryType)
+            deliveryType
+        )
     }
 }

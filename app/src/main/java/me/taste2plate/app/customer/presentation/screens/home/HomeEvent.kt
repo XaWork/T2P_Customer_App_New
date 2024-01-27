@@ -11,6 +11,7 @@ sealed class HomeEvent {
     object GetWishlist : HomeEvent()
     data class AddLog(val logRequest: LogRequest) : HomeEvent()
     object LogOut : HomeEvent()
+    object GetCoupon : HomeEvent()
     object GetAddress : HomeEvent()
     object ChangeTaste : HomeEvent()
     data class AddToWishlist(

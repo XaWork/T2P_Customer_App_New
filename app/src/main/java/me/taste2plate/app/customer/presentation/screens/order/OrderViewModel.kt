@@ -12,9 +12,11 @@ import me.taste2plate.app.customer.data.Status
 import me.taste2plate.app.customer.data.UserPref
 import me.taste2plate.app.customer.domain.model.custom.LogRequest
 import me.taste2plate.app.customer.domain.model.custom.LogType
+import me.taste2plate.app.customer.domain.model.user.GharKaKhanaOrderList
 import me.taste2plate.app.customer.domain.model.user.OrderListModel
 import me.taste2plate.app.customer.domain.use_case.analytics.AddLogUseCase
 import me.taste2plate.app.customer.domain.use_case.user.order.CancelOrderUseCase
+import me.taste2plate.app.customer.domain.use_case.user.order.GharKaKhanaOrderListUseCase
 import me.taste2plate.app.customer.domain.use_case.user.order.OrderListUseCase
 import me.taste2plate.app.customer.domain.use_case.user.order.OrderUpdateUseCase
 import javax.inject.Inject
@@ -25,11 +27,13 @@ class OrderViewModel @Inject constructor(
     private val addLogUseCase: AddLogUseCase,
     private val orderListUseCase: OrderListUseCase,
     private val orderUpdateUseCase: OrderUpdateUseCase,
-    private val cancelOrderUseCase: CancelOrderUseCase
+    private val cancelOrderUseCase: CancelOrderUseCase,
+    private val gharKaKhanaOrderListUseCase: GharKaKhanaOrderListUseCase,
 ) : ViewModel() {
 
     var state by mutableStateOf(OrderState())
     var selectedOrder: OrderListModel.Result? = null
+    var selectedGharKaKhanOrder: GharKaKhanaOrderList.Result? = null
 
     init {
         getOrders()
@@ -55,6 +59,13 @@ class OrderViewModel @Inject constructor(
 
             is OrderEvent.AddLog -> {
                 addLog(event.logRequest)
+            }
+
+            is OrderEvent.ChangeTab -> {
+                state = state.copy(selectedTab = event.index)
+                if (event.index == 1 && state.gharKaKhanaOrderList.isEmpty()) {
+                    gharKaKhanaOrderList()
+                }
             }
         }
     }
@@ -104,8 +115,40 @@ class OrderViewModel @Inject constructor(
         }
     }
 
+    private fun gharKaKhanaOrderList() {
+        viewModelScope.launch {
+            gharKaKhanaOrderListUseCase.execute().collect { result ->
+                when (result) {
+                    is Resource.Loading -> {
+                        state = state.copy(isLoading = true)
+                    }
+
+                    is Resource.Success -> {
+                        val data = result.data!!
+                        val isError = data.status == Status.error.name
+                        state =
+                            state.copy(
+                                isLoading = false,
+                                isError = isError,
+                                message = if (isError) result.data.message else "",
+                                gharKaKhanaOrderList = if (data.result.isNullOrEmpty()) emptyList() else data.result
+                            )
+                    }
+
+                    is Resource.Error -> {
+                        state = state.copy(
+                            isLoading = false,
+                            isError = true,
+                            message = result.message
+                        )
+                    }
+                }
+            }
+        }
+    }
+
     private fun getOrderUpdates() {
-        if(selectedOrder!=null){
+        if (selectedOrder != null) {
             viewModelScope.launch {
                 orderUpdateUseCase.execute(selectedOrder!!.id).collect { result ->
                     when (result) {

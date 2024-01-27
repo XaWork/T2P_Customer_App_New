@@ -11,6 +11,10 @@ sealed class OrderEvent {
     object GetOrderUpdate : OrderEvent()
     object CancelOrder : OrderEvent()
 
+    data class ChangeTab(
+        val index: Int
+    ): OrderEvent()
+
 
     data class AddLog(
         val logRequest: LogRequest

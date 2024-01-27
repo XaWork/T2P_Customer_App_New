@@ -183,7 +183,7 @@ class LocationViewModel @Inject constructor(
                                 geoCoder.getFromLocation(latLng.latitude, latLng.longitude, 1)
                             if (address?.isNotEmpty() == true) {
                                 text = address[0]?.getAddressLine(0).toString()
-                                zip = address[0].postalCode
+                                zip = address[0].postalCode ?: ""
                                 cityName = "${address[0].locality}, ${address[0].adminArea}"
 
                                 Log.e(

@@ -1,8 +1,11 @@
 package me.taste2plate.app.customer.presentation.screens.checkout
 
 import android.content.res.Configuration
-import android.os.Build
-import androidx.annotation.RequiresApi
+import android.media.MediaPlayer
+import android.os.Build.VERSION.SDK_INT
+import android.util.Log
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -11,6 +14,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -36,6 +40,7 @@ import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -44,6 +49,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
@@ -54,6 +60,11 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import coil.ImageLoader
+import coil.compose.rememberAsyncImagePainter
+import coil.decode.GifDecoder
+import coil.decode.ImageDecoderDecoder
+import kotlinx.coroutines.delay
 import me.taste2plate.app.customer.R
 import me.taste2plate.app.customer.domain.mapper.toCommonForWishAndCartItem
 import me.taste2plate.app.customer.domain.model.auth.User
@@ -68,10 +79,14 @@ import me.taste2plate.app.customer.presentation.dialog.SettingDialogType
 import me.taste2plate.app.customer.presentation.dialog.SettingInfoDialog
 import me.taste2plate.app.customer.presentation.dialog.TimePickerDialog
 import me.taste2plate.app.customer.presentation.screens.address.AddressBottomSheet
+import me.taste2plate.app.customer.presentation.screens.address.SingleAddressItem
 import me.taste2plate.app.customer.presentation.screens.cart.CheckOutViewModel
 import me.taste2plate.app.customer.presentation.screens.cart.CheckoutEvents
 import me.taste2plate.app.customer.presentation.screens.cart.CheckoutState
 import me.taste2plate.app.customer.presentation.screens.cart.SingleCartAndWishlistItem
+import me.taste2plate.app.customer.presentation.screens.home.widgets.HeadingChip
+import me.taste2plate.app.customer.presentation.theme.ExtraHighPadding
+import me.taste2plate.app.customer.presentation.theme.HighPadding
 import me.taste2plate.app.customer.presentation.theme.LowPadding
 import me.taste2plate.app.customer.presentation.theme.LowRoundedCorners
 import me.taste2plate.app.customer.presentation.theme.LowSpacing
@@ -84,6 +99,7 @@ import me.taste2plate.app.customer.presentation.theme.VeryLowSpacing
 import me.taste2plate.app.customer.presentation.theme.forestGreen
 import me.taste2plate.app.customer.presentation.theme.primaryColor
 import me.taste2plate.app.customer.presentation.theme.screenBackgroundColor
+import me.taste2plate.app.customer.presentation.theme.whatsappColor
 import me.taste2plate.app.customer.presentation.utils.noRippleClickable
 import me.taste2plate.app.customer.presentation.utils.rupeeSign
 import me.taste2plate.app.customer.presentation.widgets.AppButton
@@ -115,7 +131,6 @@ import java.util.Locale
 val fontSize = 14.sp
 val fontSize1 = 12.sp
 
-@RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CheckoutScreen(
@@ -172,6 +187,9 @@ fun CheckoutScreen(
                 )
             )
         )
+
+        viewModel.onEvent(CheckoutEvents.GetCoupons)
+        //viewModel.startTimer()
     }
 
     val sheetState = rememberModalBottomSheetState()
@@ -383,47 +401,104 @@ fun CheckoutScreen(
         }
     }
 
-    AppScaffold(
-        topBar = {
-            AppTopBar(
-                title = "Checkout"
-            ) {
-                navigateBack()
+    var audioTime by remember { mutableIntStateOf(4) }
+    if (audioTime > 0) {
+        LaunchedEffect(Unit) {
+            while (audioTime > 0) {
+                delay(1000)
+                audioTime--
             }
-        },
-    ) {
-        CheckoutScreenContent(
-            viewModel = viewModel,
-            openAddressSheet = {
-                viewModel.onEvent(CheckoutEvents.GetAddressList)
-                showAddressBottomSheet = true
+        }
+    }
+
+    if (!state.showCouponGif && !state.showOrderConfirmGif) {
+        AppScaffold(
+            topBar = {
+                AppTopBar(
+                    title = "Checkout"
+                ) {
+                    navigateBack()
+                }
             },
-            onNavigateToOrderConfirmScreen = {
-                viewModel.onEvent(CheckoutEvents.Checkout(context))
-            },
-            updateCart = { id, quantity ->
-                viewModel.onEvent(CheckoutEvents.UpdateCart(id, quantity, context))
-            },
-            showOtherTipDialog = {
-                showOtherTipDialog = true
-            },
-            showCoupons = {
-                showCouponDialog = true
-            },
-            showDatePicker = {
-                showDatePickerDialog = true
-            },
-            showTimeSlots = {
-                if (state.deliveryType == DeliveryType.Standard)
-                    showTimeSlotDialog = true
-            },
-            changeDeliveryType = {
-                viewModel.onEvent(CheckoutEvents.ChangeDeliveryType(it))
-            },
-            navigateBack = {
-                navigateBack()
+        ) {
+            Box {
+                CheckoutScreenContent(
+                    viewModel = viewModel,
+                    openAddressSheet = {
+                        viewModel.onEvent(CheckoutEvents.GetAddressList)
+                        showAddressBottomSheet = true
+                    },
+                    onNavigateToOrderConfirmScreen = {
+                        viewModel.onEvent(CheckoutEvents.Checkout(context))
+                    },
+                    updateCart = { id, quantity ->
+                        viewModel.onEvent(CheckoutEvents.UpdateCart(id, quantity, context))
+                    },
+                    showOtherTipDialog = {
+                        showOtherTipDialog = true
+                    },
+                    showCoupons = {
+                        showCouponDialog = true
+                    },
+                    showDatePicker = {
+                        showDatePickerDialog = true
+                    },
+                    showTimeSlots = {
+                        if (state.deliveryType == DeliveryType.Standard)
+                            showTimeSlotDialog = true
+                    },
+                    changeDeliveryType = {
+                        viewModel.onEvent(CheckoutEvents.ChangeDeliveryType(it))
+                    },
+                    navigateBack = {
+                        navigateBack()
+                    }
+                )
             }
+        }
+    } else {
+        ShowGIF(
+            showCouponGif = state.showCouponGif,
+            couponDiscount = viewModel.couponDiscount.toString()
         )
+    }
+}
+
+@Composable
+fun ShowGIF(showCouponGif: Boolean = true, couponDiscount: String = "") {
+    val context = LocalContext.current
+    val mp3 = MediaPlayer.create(context, R.raw.audio)
+    val imageLoader = ImageLoader.Builder(context)
+        .components {
+            if (SDK_INT >= 28) {
+                add(ImageDecoderDecoder.Factory())
+            } else {
+                add(GifDecoder.Factory())
+            }
+        }
+        .build()
+
+    mp3.start()
+    Box {
+        Image(
+            rememberAsyncImagePainter(
+                model = if (showCouponGif) R.drawable.coupon_applied else R.drawable.order_confirmed,
+                imageLoader
+            ),
+            contentDescription = null,
+            modifier = Modifier.fillMaxSize(),
+        )
+
+        if (showCouponGif)
+            HeadingChip(
+                modifier = Modifier
+                    .align(Alignment.Center)
+                    .padding(top = 150.dp),
+                text = "Coupon Applied\nTotal Discount $rupeeSign$couponDiscount",
+                fontSize = 16.sp,
+                textColor = Color.White,
+                color = whatsappColor
+            )
     }
 }
 
@@ -468,8 +543,14 @@ fun CheckoutScreenContent(
             price = viewModel.igst.toString()
         ),
         PriceData(
-            title = "Last Mile Long Distance Extra Charge",
-            price = state.cart?.lastMileLongDistanceExtraCharge ?: ""
+            title = "Last Mile Long Distance Extra Delivery Charge",
+            price = state.cart?.lastMileLongDistanceExtraCharge ?: "",
+            subTitle = if ((state.cart != null) &&
+                (state.cart.lastMileFreeLongDistance.isNullOrEmpty() && state.cart.lastMileLongDistance.isNullOrEmpty()) &&
+                (state.cart.lastMileFreeLongDistance.toDouble() < state.cart.lastMileLongDistance.toDouble())
+            )
+                "(Last Mile Distance - Free Distance)* Multiplier\n(${state.cart.lastMileLongDistance} - ${state.cart.lastMileFreeLongDistance})Km*${state.cart.lastMileLongDistanceMultiplier}/Km"
+            else null
         ),
         PriceData(
             title = "Coupon Discount",
@@ -481,7 +562,7 @@ fun CheckoutScreenContent(
         ),
         PriceData(
             title = "Wallet Discount",
-            price = viewModel.discountWallet.toString(),
+            price = viewModel.discountWallet.toString().toDecimal().toString(),
             subTitle = viewModel.pointConversionText.ifEmpty { null }
         ),
         PriceData(
@@ -507,6 +588,7 @@ fun CheckoutScreenContent(
             //user info
             item {
                 if (state.defaultAddress != null && state.user != null)
+                //SingleAddressItem(address = state.defaultAddress, defaultAddress = null)
                     AddressBar(
                         address = state.defaultAddress,
                         user = state.user,
@@ -537,7 +619,7 @@ fun CheckoutScreenContent(
                 if (viewModel.youSave != 0.0)
                     InfoWithIcon(
                         id = R.drawable.party,
-                        info = "You Saved $rupeeSign${viewModel.youSave} on this order",
+                        info = "You Saved $rupeeSign${viewModel.youSave.toString().toDecimal()} on this order",
                         modifier = Modifier
                             .fillMaxWidth()
                             .background(Color.Blue.copy(alpha = 0.1f))
@@ -626,9 +708,14 @@ fun CheckoutScreenContent(
                     )
 
                 }, item2 = {
+                    val price =
+                        if (state.cart?.lastMileLongDistanceExtraCharge.isNullOrEmpty()) viewModel.totalPrice
+                        else viewModel.totalPrice + state.cart?.lastMileLongDistanceExtraCharge!!.toDecimal()
+
                     Text(
-                        text = "${rupeeSign}${viewModel.totalPrice}",
-                        color = primaryColor.invoke(), fontSize = fontSize
+                        text = "$rupeeSign${price.toString().toDecimal()}",
+                        color = primaryColor.invoke(),
+                        fontSize = fontSize
                     )
                 })
 
@@ -666,9 +753,13 @@ fun CheckoutScreenContent(
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
+                        val price =
+                            if (state.cart?.lastMileLongDistanceExtraCharge.isNullOrEmpty()) viewModel.totalPrice
+                            else viewModel.totalPrice + state.cart?.lastMileLongDistanceExtraCharge!!.toDecimal()
+
                         Text(
-                            "Total\n$rupeeSign${viewModel.totalPrice}",
-                            textAlign = TextAlign.Center
+                            text = "Total\n$rupeeSign${price.toString().toDecimal()}",
+                            textAlign = TextAlign.Start
                         )
 
                         Text(
@@ -692,7 +783,7 @@ fun AddressBar(
     Column(
         modifier = Modifier.fillMaxWidth()
     ) {
-        Row(
+        /*Row(
             horizontalArrangement = Arrangement.Center,
             verticalAlignment = Alignment.CenterVertically
         ) {
@@ -722,7 +813,8 @@ fun AddressBar(
             text = "${address.address}, ${address.city.name}, ${address.state.name} - ${address.pincode}\n${user.mobile}",
             fontSize = fontSize,
             fontWeight = FontWeight.Light
-        )
+        )*/
+        SingleAddressItem(address = address, defaultAddress = null)
 
         VerticalSpace(space = SpaceBetweenViewsAndSubViews)
 
@@ -751,7 +843,7 @@ fun CouponInfo(
         if (state.applyCouponResponse != null) {
             val items = listOf<@Composable RowScope.() -> Unit> {
                 Text(
-                    text = state.applyCouponResponse.coupon_type,
+                    text = "Coupon Applied",
                     color = primaryColor.invoke()
                 )
 
@@ -1001,7 +1093,6 @@ fun DeliveryInfo(
             when (deliveryType) {
                 DeliveryType.Express -> radioOptions[0].text
                 DeliveryType.Standard -> radioOptions[1].text
-                else -> ""
             },
             onOptionSelected = {
                 when (it.id) {

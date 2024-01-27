@@ -469,16 +469,16 @@ fun ProductDetails(
             if (state.checkAvailabilityModel != null && state.checkAvailabilityModel.status == Status.success.name) {
                 // if (state.checkAvailabilityModel.express)
                 Column {
-                   // if (state.checkAvailabilityModel.express)
-                        InfoWithIcon(
-                            id = R.drawable.delivery_bike,
-                            info = state.checkAvailabilityModel.cutoff_response.express_remarks,
-                            modifier = Modifier.padding(vertical = VeryLowSpacing),
-                            iconOrImageModifier = Modifier.size(20.dp),
-                            colorFilter = ColorFilter.tint(color = forestGreen.invoke()),
-                            maxLines = 10,
-                            textColor = forestGreen.invoke()
-                        )
+                    // if (state.checkAvailabilityModel.express)
+                    InfoWithIcon(
+                        id = R.drawable.delivery_bike,
+                        info = state.checkAvailabilityModel.cutoff_response.express_remarks,
+                        modifier = Modifier.padding(vertical = VeryLowSpacing),
+                        iconOrImageModifier = Modifier.size(20.dp),
+                        colorFilter = ColorFilter.tint(color = forestGreen.invoke()),
+                        maxLines = 10,
+                        textColor = forestGreen.invoke()
+                    )
 
                     InfoWithIcon(
                         id = R.drawable.delivery_bike,
@@ -532,7 +532,7 @@ fun ProductImages(
 
         val alreadyWishListed =
             if (state.wishListData!!.result == null || state.wishListData.result.isEmpty()) false
-            else state.wishListData.result.any { it.product.id == details.id }
+            else state.wishListData.result.any { (it.product.id ?: "") == (details.id ?: "") }
 
         CircleIconButton(
             isDrawableIcon = false,

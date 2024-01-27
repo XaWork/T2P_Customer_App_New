@@ -90,8 +90,6 @@ fun InfoWithIcon(
             else
                 DrawableImage(id = id, colorFilter = colorFilter, modifier = iconOrImageModifier)
         }
-
-
     }
 }
 

@@ -11,6 +11,7 @@ import me.taste2plate.app.customer.domain.model.user.GetProfileModel
 import me.taste2plate.app.customer.domain.model.user.GharKaKhanaAddToCartModel
 import me.taste2plate.app.customer.domain.model.user.GharKaKhanaCheckoutModel
 import me.taste2plate.app.customer.domain.model.user.GharKaKhanaFetchCartModel
+import me.taste2plate.app.customer.domain.model.user.GharKaKhanaOrderList
 import me.taste2plate.app.customer.domain.model.user.MyPlanModel
 import me.taste2plate.app.customer.domain.model.user.OrderConfirmModel
 import me.taste2plate.app.customer.domain.model.user.OrderListModel
@@ -76,8 +77,14 @@ interface UserRepo {
         quantity: Int
     ): CommonResponse
 
+    suspend fun getCartByAddress(
+        userId: String,
+        address: String?,
+    ): CartModel
+
     suspend fun getCart(
         userId: String,
+        address: String?,
         city: String?,
         zip: String?
     ): CartModel
@@ -132,6 +139,7 @@ interface UserRepo {
     ): CommonResponse
 
     suspend fun getOrders(userId: String): OrderListModel
+    suspend fun gharKaKhanaOrderList(userId: String): GharKaKhanaOrderList
     suspend fun cancelOrder(orderId: String): CommonResponse
     suspend fun getOrderUpdates(orderId: String): OrderUpdateModel
     suspend fun createBulkOrder(

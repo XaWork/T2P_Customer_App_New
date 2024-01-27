@@ -26,6 +26,7 @@ fun String.toDateObject(format: String = "dd-MM-yy HH:mm"): Date {
 }
 
 fun String.toDecimal(): Double {
-    val decimalFormat = DecimalFormat("#.##")
-    return decimalFormat.format(this.toDouble()).toDouble()
+    return String.format("%.2f", if(this.isEmpty()) 0.0 else this.toDouble()).toDouble()
+    //val decimalFormat = DecimalFormat("#.##")
+    //return decimalFormat.format(this.toDouble()).toDouble()
 }

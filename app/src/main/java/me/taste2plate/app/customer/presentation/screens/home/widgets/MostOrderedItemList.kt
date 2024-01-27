@@ -3,29 +3,21 @@ package me.taste2plate.app.customer.presentation.screens.home.widgets
 import android.content.res.Configuration
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.background
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.pager.rememberPagerState
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.Star
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -33,7 +25,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.yield
-import me.taste2plate.app.customer.R
 import me.taste2plate.app.customer.domain.model.HomeModel
 import me.taste2plate.app.customer.domain.model.user.CartModel
 import me.taste2plate.app.customer.presentation.screens.home.FoodItemUpdateInfo
@@ -41,10 +32,6 @@ import me.taste2plate.app.customer.presentation.screens.home.HomeEvent
 import me.taste2plate.app.customer.presentation.screens.home.HomeState
 import me.taste2plate.app.customer.presentation.screens.home.HomeViewModel
 import me.taste2plate.app.customer.presentation.screens.product.CartAddRemove
-import me.taste2plate.app.customer.presentation.theme.ForestGreen
-import me.taste2plate.app.customer.presentation.theme.ForestGreenDark
-import me.taste2plate.app.customer.presentation.theme.LowPadding
-import me.taste2plate.app.customer.presentation.theme.LowRoundedCorners
 import me.taste2plate.app.customer.presentation.theme.ScreenPadding
 import me.taste2plate.app.customer.presentation.theme.T2PCustomerAppTheme
 import me.taste2plate.app.customer.presentation.theme.VeryLowSpacing
@@ -52,8 +39,6 @@ import me.taste2plate.app.customer.presentation.theme.primaryColor
 import me.taste2plate.app.customer.presentation.utils.noRippleClickable
 import me.taste2plate.app.customer.presentation.utils.rupeeSign
 import me.taste2plate.app.customer.presentation.widgets.ImageWithWishlistButton
-import me.taste2plate.app.customer.presentation.widgets.InfoWithIcon
-import me.taste2plate.app.customer.presentation.widgets.MaterialIcon
 import me.taste2plate.app.customer.presentation.widgets.RedBorderCard
 import me.taste2plate.app.customer.presentation.widgets.SpaceBetweenRow
 import me.taste2plate.app.customer.presentation.widgets.VerticalSpace
@@ -69,7 +54,7 @@ fun MostOrderedItemList(
     val state = viewModel.state
     val context = LocalContext.current
     val foodItems = state.homeData!!.mostOrderdItem
-    val wishlistItems = state.wishListData!!.result
+    val wishlistItems = state.wishListData?.result
 
     val pagerState = rememberPagerState(pageCount = { foodItems.size })
     LaunchedEffect(Unit) {
@@ -103,13 +88,13 @@ fun MostOrderedItemList(
             state = pagerState,
         ) { page ->
             var wishlistIdList: List<String> = emptyList()
-            if (wishlistItems.isNotEmpty()) {
+            if (wishlistItems?.isNotEmpty() == true) {
                 for (item in wishlistItems) {
                     //by checking null crash are stopped
-                    if (item.product != null && !item.product.id.isNullOrEmpty()) {
-                        wishlistIdList = wishlistItems.map { it.product.id }
+                   // if (item.product != null && !item.product.id.isNullOrEmpty()) {
+                        wishlistIdList = wishlistItems.map { it?.product?.id ?: "" }
                             .toList()
-                    }
+                   // }
                 }
             } else {
                 wishlistIdList = emptyList()

@@ -47,7 +47,13 @@ data class CartModel(
     @SerializedName("total_sgst")
     val totalSgst: String,
     @SerializedName("last_mile_long_distance_extra_charge")
-    val lastMileLongDistanceExtraCharge: String
+    val lastMileLongDistanceExtraCharge: String,
+    @SerializedName("last_mile_long_distance")
+    val lastMileLongDistance: String,
+    @SerializedName("last_mile_long_distance_multiplier")
+    val lastMileLongDistanceMultiplier: String,
+    @SerializedName("last_mile_free_long_distance")
+    val lastMileFreeLongDistance: String
 ) {
 
     val walletDiscount : Float
@@ -533,7 +539,7 @@ data class Shipping(
     @SerializedName("express_shipping")
     val expressShipping: String,
     @SerializedName("normal_shipping")
-    val normalShipping: String
+    val normalShipping: String = ""
 )
 
 

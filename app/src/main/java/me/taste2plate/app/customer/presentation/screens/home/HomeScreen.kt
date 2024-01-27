@@ -18,6 +18,8 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Discount
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
@@ -58,6 +60,7 @@ import me.taste2plate.app.customer.domain.use_case.product.ProductBy
 import me.taste2plate.app.customer.presentation.dialog.CustomDialog
 import me.taste2plate.app.customer.presentation.dialog.SettingDialogType
 import me.taste2plate.app.customer.presentation.dialog.SettingInfoDialog
+import me.taste2plate.app.customer.presentation.dialog.SingleCouponItem
 import me.taste2plate.app.customer.presentation.screens.address.AddressBottomSheet
 import me.taste2plate.app.customer.presentation.screens.home.navigation.DrawerAppScreen
 import me.taste2plate.app.customer.presentation.screens.home.navigation.NavigationDrawer
@@ -71,14 +74,19 @@ import me.taste2plate.app.customer.presentation.screens.home.widgets.SingleFeatu
 import me.taste2plate.app.customer.presentation.screens.home.widgets.TopBrands
 import me.taste2plate.app.customer.presentation.screens.home.widgets.TopList
 import me.taste2plate.app.customer.presentation.screens.home.widgets.TopOrderedFoodCityList
+import me.taste2plate.app.customer.presentation.theme.LowPadding
+import me.taste2plate.app.customer.presentation.theme.ScreenPadding
 import me.taste2plate.app.customer.presentation.theme.T2PCustomerAppTheme
 import me.taste2plate.app.customer.presentation.theme.VeryLowSpacing
+import me.taste2plate.app.customer.presentation.theme.primaryColor
 import me.taste2plate.app.customer.presentation.theme.screenBackgroundColor
 import me.taste2plate.app.customer.presentation.theme.whatsappColor
 import me.taste2plate.app.customer.presentation.utils.noRippleClickable
+import me.taste2plate.app.customer.presentation.widgets.AppEmptyView
 import me.taste2plate.app.customer.presentation.widgets.AppScaffold
 import me.taste2plate.app.customer.presentation.widgets.DrawableImage
 import me.taste2plate.app.customer.presentation.widgets.HorizontalSpace
+import me.taste2plate.app.customer.presentation.widgets.MaterialIcon
 import me.taste2plate.app.customer.presentation.widgets.ShowLoading
 import me.taste2plate.app.customer.presentation.widgets.VerticalSpace
 import me.taste2plate.app.customer.presentation.widgets.showToast
@@ -115,8 +123,10 @@ fun HomeScreen(
 
     //bottom sheet
     val scope = rememberCoroutineScope()
-    var showBottomSheet by remember { mutableStateOf(false) }
-    val sheetState = rememberModalBottomSheetState()
+    var showAddressSheet by remember { mutableStateOf(false) }
+    var showCouponSheet by remember { mutableStateOf(false) }
+    val addressSheetState = rememberModalBottomSheetState()
+    val couponSheetState = rememberModalBottomSheetState()
 
 
     var showCustomDialog by remember {
@@ -229,13 +239,13 @@ fun HomeScreen(
         )
     }
 
-    if (showBottomSheet) {
+    if (showAddressSheet) {
         ModalBottomSheet(
             containerColor = screenBackgroundColor.invoke(),
             onDismissRequest = {
-                showBottomSheet = false
+                showAddressSheet = false
             },
-            sheetState = sheetState, /*contentColor = screenBackgroundColor.invoke(),*/
+            sheetState = addressSheetState, /*contentColor = screenBackgroundColor.invoke(),*/
         ) {
             // if (state.addressListModel != null && state.addressListModel.result.isNotEmpty())
             AddressBottomSheet(
@@ -243,16 +253,38 @@ fun HomeScreen(
                 addressList = state.addressList,
                 defaultAddress = state.defaultAddress,
                 setDefaultAddress = { address ->
-                    showBottomSheet = false
+                    showAddressSheet = false
                     viewModel.onEvent(
                         HomeEvent.SetDefaultAddress(address)
                     )
                 },
                 onNavigateToAddressListScreen = {
-                    showBottomSheet = false
+                    showAddressSheet = false
                     onNavigateToAddressListScreen()
                 }
             )
+        }
+    }
+
+
+    if (showCouponSheet) {
+        ModalBottomSheet(
+            containerColor = screenBackgroundColor.invoke(),
+            onDismissRequest = {
+                showCouponSheet = false
+            },
+            sheetState = couponSheetState,
+        ) {
+            if (state.couponLoading)
+                ShowLoading()
+            else if (state.couponList.isEmpty())
+                AppEmptyView(text = "No coupon found")
+            else
+                LazyColumn(modifier = Modifier.padding(ScreenPadding)) {
+                    items(state.couponList) { coupon ->
+                        SingleCouponItem(coupon = coupon)
+                    }
+                }
         }
     }
 
@@ -355,27 +387,61 @@ fun HomeScreen(
             },
 
             floatingActionButton = {
-                FloatingActionButton(
-                    onClick = { openWhatsApp(context) },
-                    containerColor = Color.Transparent,
-                    elevation = FloatingActionButtonDefaults.elevation(0.dp)
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween
                 ) {
-                    Row(
-                        modifier = Modifier
-                            .clip(RoundedCornerShape(30.dp))
-                            .background(whatsappColor)
-                            .padding(7.dp),
-                        horizontalArrangement = Arrangement.Center,
-                        verticalAlignment = Alignment.CenterVertically
+                    FloatingActionButton(
+                        onClick = {
+                            viewModel.onEvent(HomeEvent.GetCoupon)
+                            showCouponSheet = true
+                        },
+                        containerColor = Color.Transparent,
+                        elevation = FloatingActionButtonDefaults.elevation(0.dp)
                     ) {
-                        DrawableImage(
-                            modifier = Modifier.size(25.dp),
-                            id = R.drawable.whatsapp_sv
-                        )
+                        Row(
+                            modifier = Modifier
+                                .clip(RoundedCornerShape(30.dp))
+                                .background(whatsappColor)
+                                .padding(7.dp),
+                            horizontalArrangement = Arrangement.Center,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            HorizontalSpace(space = ScreenPadding)
 
-                        HorizontalSpace(space = VeryLowSpacing)
+                            MaterialIcon(
+                                imageVector = Icons.Default.Discount,
+                                tint = Color.White
+                            )
 
-                        Text("Chat", color = Color.White)
+                            HorizontalSpace(space = VeryLowSpacing)
+
+                            Text("Coupons", color = Color.White)
+                        }
+                    }
+
+                    FloatingActionButton(
+                        onClick = { openWhatsApp(context) },
+                        containerColor = Color.Transparent,
+                        elevation = FloatingActionButtonDefaults.elevation(0.dp)
+                    ) {
+                        Row(
+                            modifier = Modifier
+                                .clip(RoundedCornerShape(30.dp))
+                                .background(whatsappColor)
+                                .padding(7.dp),
+                            horizontalArrangement = Arrangement.Center,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            DrawableImage(
+                                modifier = Modifier.size(25.dp),
+                                id = R.drawable.whatsapp_sv
+                            )
+
+                            HorizontalSpace(space = VeryLowSpacing)
+
+                            Text("Chat", color = Color.White)
+                        }
                     }
                 }
             }
@@ -392,7 +458,7 @@ fun HomeScreen(
                         checked = state.checked,
                         onCheckChange = { viewModel.onEvent(HomeEvent.ChangeTaste) }) {
                         viewModel.onEvent(HomeEvent.GetAddress)
-                        showBottomSheet = true
+                        showAddressSheet = true
                     }
                     LazyColumn(
                         state = scrollState,
@@ -411,7 +477,7 @@ fun HomeScreen(
                                 CenterColumn {
                                     AutoSlidingCarousel(
                                         modifier = Modifier.noRippleClickable {
-                                           // onNavigateToGharKaKhanaBookingScreen()
+                                            // onNavigateToGharKaKhanaBookingScreen()
                                         },
                                         pages = home.slider
                                     )
@@ -422,7 +488,7 @@ fun HomeScreen(
                             //top order item
                             if (home?.topMostOrderedProducts != null) {
                                 CenterColumn {
-                                    HeadingChip("10 Most Ordered Food/City")
+                                    HeadingChip(text = "10 Most Ordered Food/City")
                                     VerticalSpace(space = VeryLowSpacing)
                                     TopOrderedFoodCityList(
                                         onNavigateToProductListScreen = {
@@ -448,7 +514,7 @@ fun HomeScreen(
                             //top brands
                             if (home?.topBrands != null)
                                 CenterColumn {
-                                    HeadingChip("Top Brands")
+                                    HeadingChip(text = "Top Brands")
                                     VerticalSpace(space = VeryLowSpacing)
                                     TopBrands(
                                         onNavigateToProductListScreen = {
@@ -472,7 +538,7 @@ fun HomeScreen(
                             //Featured
                             if (home?.featured != null)
                                 CenterColumn {
-                                    HeadingChip("Featured")
+                                    HeadingChip(text = "Featured")
                                     VerticalSpace(space = VeryLowSpacing)
                                 }
                         }

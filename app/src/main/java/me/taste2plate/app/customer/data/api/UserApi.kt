@@ -11,6 +11,7 @@ import me.taste2plate.app.customer.domain.model.user.GetProfileModel
 import me.taste2plate.app.customer.domain.model.user.GharKaKhanaAddToCartModel
 import me.taste2plate.app.customer.domain.model.user.GharKaKhanaCheckoutModel
 import me.taste2plate.app.customer.domain.model.user.GharKaKhanaFetchCartModel
+import me.taste2plate.app.customer.domain.model.user.GharKaKhanaOrderList
 import me.taste2plate.app.customer.domain.model.user.MyPlanModel
 import me.taste2plate.app.customer.domain.model.user.OrderConfirmModel
 import me.taste2plate.app.customer.domain.model.user.OrderListModel
@@ -107,8 +108,15 @@ interface UserApi {
     // ------------------------- Cart -------------------------
 
     @GET("get-cart")
+    suspend fun getCartByAddress(
+        @Query("id") id: String,
+        @Query("address") address: String?,
+    ): CartModel
+
+    @GET("get-cart")
     suspend fun getCart(
         @Query("id") id: String,
+        @Query("address") address: String?,
         @Query("customer_city") cityId: String?,
         @Query("customer_zip") zipCode: String?
     ): CartModel
@@ -273,11 +281,11 @@ interface UserApi {
         @Field("id") itemId: String,
     ): CommonResponse
 
-/*    @FormUrlEncoded
-    @POST("gharkakhana-confirm-checkout")
-    suspend fun gharKaKhanaConfirmCheckout(
-        @Field("id") orderId: String,
-    ): CommonResponse*/
+    /*    @FormUrlEncoded
+        @POST("gharkakhana-confirm-checkout")
+        suspend fun gharKaKhanaConfirmCheckout(
+            @Field("id") orderId: String,
+        ): CommonResponse*/
 
     @FormUrlEncoded
     @POST("gharkakhana-preview-checkout")
@@ -300,4 +308,9 @@ interface UserApi {
         @Field("pickup_time") pickupTime: String,
         @Field("delivery_type") deliveryType: String,
     ): CommonResponse
+
+    @POST("gharkakhana-user-order-list")
+    suspend fun gharKaKhanaOrderList(
+        @Query("id") userId: String,
+    ): GharKaKhanaOrderList
 }

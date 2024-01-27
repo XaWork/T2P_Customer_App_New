@@ -16,18 +16,22 @@ class CartUseCase @Inject constructor(
     private val repo: UserRepo,
     private val userPref: UserPref
 ) {
-    suspend fun execute(
-    ): Flow<Resource<CartModel>> {
+    suspend fun execute(): Flow<Resource<CartModel>> {
         val defaultAddress = userPref.getDefaultAddress()
         val localAddress = userPref.getAddress()
-        val city = defaultAddress?.city?.id ?: localAddress?.cityId ?: ""
-        val zip = defaultAddress?.pincode ?: localAddress?.pinCode ?: ""
+        /*  val city = if (defaultAddress != null) null else localAddress?.cityId
+          val zip = if (defaultAddress != null) null else localAddress?.pinCode*/
+        val city = defaultAddress?.city?.id ?: localAddress?.cityId
+        val zip = defaultAddress?.pincode ?: localAddress?.pinCode
         val userId = userPref.getUser()!!.id
 
         return flow {
             emit(Resource.Loading(true))
             try {
-                val response = repo.getCart(userId, city, zip)
+                val response = repo.getCart(userId, defaultAddress?.id ?: "", city, zip)
+                /*val response: CartModel = if (defaultAddress == null)
+                else
+                    repo.getCartByAddress(userId, defaultAddress.id)*/
                 emit(Resource.Success(response))
             } catch (io: IOException) {
                 io.printStackTrace()

@@ -17,8 +17,8 @@ android {
         applicationId = "me.taste2plate.app.customer"
         minSdk = 26
         targetSdk = 34
-        versionCode = 415
-        versionName = "4.15"
+        versionCode = 417
+        versionName = "4.17"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
@@ -81,6 +81,7 @@ dependencies {
 
     //UI
     implementation("io.coil-kt:coil-compose:2.4.0")
+    implementation("io.coil-kt:coil-gif:2.5.0")
 
     //navigation destination
     implementation("androidx.navigation:navigation-compose:$navVersion")
@@ -130,5 +131,10 @@ dependencies {
 
     //facebook
     implementation("com.facebook.android:facebook-android-sdk:13.0.0")
+
+    //exo player
+    implementation("androidx.media3:media3-exoplayer:1.2.1")
+    implementation("androidx.media3:media3-exoplayer-dash:1.2.1")
+    implementation("androidx.media3:media3-ui:1.2.1")
 
 }

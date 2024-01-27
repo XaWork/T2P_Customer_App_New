@@ -59,6 +59,7 @@ import me.taste2plate.app.customer.presentation.theme.cardContainerOnSecondaryCo
 import me.taste2plate.app.customer.presentation.theme.forestGreen
 import me.taste2plate.app.customer.presentation.theme.primaryColor
 import me.taste2plate.app.customer.presentation.theme.screenBackgroundColor
+import me.taste2plate.app.customer.presentation.theme.whatsappColor
 import me.taste2plate.app.customer.presentation.utils.noRippleClickable
 import me.taste2plate.app.customer.presentation.widgets.AppButton
 import me.taste2plate.app.customer.presentation.widgets.AppCheckBox
@@ -222,7 +223,7 @@ fun PdLocation(
     VerticalSpace(space = SpaceBetweenViewsAndSubViews)
 
     SinglePdLocation(
-        backgroundColor = forestGreen.invoke(),
+        backgroundColor = whatsappColor,
         title = "Destination Location",
         iconId = R.drawable.destination_icon,
         address = state.destinationLocation,
@@ -359,7 +360,7 @@ fun FoodInfo(viewModel: GharKaKhanaViewModel) {
                         .fillMaxWidth()
                         .weight(1f),
                     buttonColors = ButtonDefaults.buttonColors(
-                        containerColor = forestGreen.invoke()
+                        containerColor = whatsappColor
                     ),
                     text = "Add"
                 ) {

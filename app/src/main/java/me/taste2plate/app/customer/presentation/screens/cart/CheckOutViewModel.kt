@@ -1,6 +1,7 @@
 package me.taste2plate.app.customer.presentation.screens.cart
 
 import android.content.Context
+import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import androidx.compose.runtime.getValue
@@ -13,6 +14,7 @@ import com.facebook.appevents.AppEventsConstants
 import com.facebook.appevents.AppEventsLogger
 import com.razorpay.Checkout
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import me.taste2plate.app.customer.MainActivity
 import me.taste2plate.app.customer.T2PApp
@@ -60,7 +62,7 @@ class CheckOutViewModel @Inject constructor(
     private val myPlanUseCase: MyPlanUseCase,
     private val trackEventUseCase: TrackEventUseCase,
     private val initCheckoutUseCase: InitCheckoutUseCase,
-    private val orderConfirmUseCase: OrderConfirmUseCase
+    private val orderConfirmUseCase: OrderConfirmUseCase,
 ) : ViewModel() {
 
     var state by mutableStateOf(CheckoutState())
@@ -97,15 +99,23 @@ class CheckOutViewModel @Inject constructor(
     var walletPoint: String = ""
 
     init {
+        // player.prepare()
         getCart()
         getSettings()
         getDefaultAddress(applyCouponAndSetPrice = false)
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        // player.release()
     }
 
     fun onEvent(event: CheckoutEvents) {
         when (event) {
             is CheckoutEvents.GetCart -> {}
             is CheckoutEvents.RemoveCoupon -> {
+                if (state.deliveryType == DeliveryType.Standard)
+                    codEnabled = true
                 state = state.copy(applyCouponResponse = null)
                 getCart()
             }
@@ -214,6 +224,10 @@ class CheckOutViewModel @Inject constructor(
         }
     }
 
+    private fun playVideo(uri: Uri) {
+        //player.setMediaItem(MediaItem.fromUri(uri))
+    }
+
     private fun addLog(logRequest: LogRequest) {
         viewModelScope.launch {
             addLogUseCase.execute(logRequest)
@@ -253,9 +267,11 @@ class CheckOutViewModel @Inject constructor(
         showCodDigitalDialog: Boolean = true,
     ) {
         val priceToCheck = if (state.deliveryType == DeliveryType.Express) {
-            state.cart!!.newFinalPrice.express.toFloat()
+            state.cart!!.cartprice.toFloat()
+            // state.cart!!.newFinalPrice.express.toFloat()
         } else {
-            state.cart!!.newFinalPrice.normal.toFloat()
+            state.cart!!.cartprice.toFloat()
+            //state.cart!!.newFinalPrice.normal.toFloat()
         }
         val minPrice = state.settings!!.minimumOrderValue.toFloat()
         val maxPrice = state.settings!!.maximumOrderValueCod.toFloat()
@@ -373,9 +389,7 @@ class CheckOutViewModel @Inject constructor(
         if (state.deliveryType == DeliveryType.Express) {
             codEnabled = false
             showDialogExpress = true
-        } else {
-            codEnabled = true
-        }
+        } else codEnabled = state.applyCouponResponse == null
     }
 
     private fun setPriceAfterApplyCoupon() {
@@ -386,20 +400,30 @@ class CheckOutViewModel @Inject constructor(
 
             when (state.deliveryType) {
                 DeliveryType.Express -> {
-                    totalPrice = new_final_price.express.toDouble()
-                    igst = gst.express.totalIgst.toDouble()
-                    cgst = gst.express.totalCgst.toDouble()
-                    sgst = gst.express.totalSgst.toDouble()
+                    totalPrice = new_final_price.express.toDecimal()
+                    igst = gst.express.totalIgst.toDecimal()
+                    cgst = gst.express.totalCgst.toDecimal()
+                    sgst = gst.express.totalSgst.toDecimal()
                 }
 
                 DeliveryType.Standard -> {
-                    totalPrice = new_final_price.normal.toDouble()
-                    igst = gst.normal.totalIgst.toDouble()
-                    cgst = gst.normal.totalCgst.toDouble()
-                    sgst = gst.normal.totalSgst.toDouble()
+                    totalPrice = new_final_price.normal.toDecimal()
+                    igst = gst.normal.totalIgst.toDecimal()
+                    cgst = gst.normal.totalCgst.toDecimal()
+                    sgst = gst.normal.totalSgst.toDecimal()
                 }
             }
         }
+
+        val totPrice = totalPrice + state.cart?.lastMileLongDistanceExtraCharge!!.toDouble()
+        Log.e(
+            "pricetocheck",
+            "Total price : ${totalPrice}${state.cart?.lastMileLongDistanceExtraCharge?.toDecimal()}\n" +
+                    "${totalPrice + state.cart?.lastMileLongDistanceExtraCharge!!.toDouble()}\n" +
+                    "${totPrice.toString().toDecimal()}"
+        )
+
+        startTimer()
     }
 
     private fun setPriceAfterWalletStatusChange() {
@@ -603,12 +627,11 @@ class CheckOutViewModel @Inject constructor(
                             state = state.copy(
                                 isError = true,
                                 errorMessage = "Order placed",
-                                orderConfirmed = true
+                                showOrderConfirmGif = true
                             )
+
+                            startTimer(orderConfirmed = true)
                         }
-
-
-                        //Todo: Send user to next Screen
                     }
 
                     is Resource.Error ->
@@ -1066,6 +1089,7 @@ class CheckOutViewModel @Inject constructor(
         viewModelScope.launch {
             userPref.saveDefaultAddress(address)
             state = state.copy(defaultAddress = address)
+            getCart(isLoading = false)
             getUser()
         }
     }
@@ -1124,8 +1148,8 @@ class CheckOutViewModel @Inject constructor(
                         val data = result.data
                         val isError = data?.status == Status.error.name
 
-                        if (data != null && data.coupon.isNotEmpty())
-                            applyCoupon(data.coupon[0].coupon)
+                        /*if (data != null && data.coupon.isNotEmpty())
+                            applyCoupon(data.coupon[0].coupon)*/
 
                         state.copy(
                             isLoading = false,
@@ -1166,10 +1190,14 @@ class CheckOutViewModel @Inject constructor(
                             isError = isError,
                             errorMessage = if (isError) data?.message else null,
                             applyCouponResponse = if (!isError) data else null,
+                            showCouponGif = !isError,
                         )
 
+                        //COD is not applicable after coupon applied
                         if (!isError) {
                             appliedCoupon = couponCode
+                            codEnabled = false
+                            state = state.copy(paymentType = PaymentType.Online)
                             setPriceAfterApplyCoupon()
                             addLog(
                                 LogRequest(
@@ -1179,6 +1207,7 @@ class CheckOutViewModel @Inject constructor(
                                     event_data = couponCode
                                 )
                             )
+
                         }
 
                     }
@@ -1193,5 +1222,26 @@ class CheckOutViewModel @Inject constructor(
 
             }
         }
+    }
+
+    private fun startTimer(orderConfirmed: Boolean = false) {
+        viewModelScope.launch {
+            /*  while (state.showGifTime == 0) {
+                  delay(1000)
+                  state = state.copy(
+                      showGifTime = state.showGifTime--,
+                      orderConfirmed = orderConfirmed && state.showGifTime == 0
+                  )
+              }*/
+
+            delay(3500)
+            state = state.copy(
+                showGifTime = 4,
+                showCouponGif = false,
+                showOrderConfirmGif = false,
+                orderConfirmed = orderConfirmed
+            )
+        }
+
     }
 }

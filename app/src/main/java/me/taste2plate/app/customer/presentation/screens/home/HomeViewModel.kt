@@ -23,6 +23,7 @@ import me.taste2plate.app.customer.domain.model.custom.LogType
 import me.taste2plate.app.customer.domain.model.tracking.EventTraits
 import me.taste2plate.app.customer.domain.model.tracking.TrackEventModel
 import me.taste2plate.app.customer.domain.model.user.address.AddressListModel
+import me.taste2plate.app.customer.domain.use_case.CouponByCityUseCase
 import me.taste2plate.app.customer.domain.use_case.HomeUseCase
 import me.taste2plate.app.customer.domain.use_case.SettingsUseCase
 import me.taste2plate.app.customer.domain.use_case.analytics.AddLogUseCase
@@ -49,6 +50,7 @@ class HomeViewModel @Inject constructor(
     private val allAddressUseCase: AllAddressUseCase,
     private val updateCartUseCase: UpdateCartUseCase,
     private val deleteCartUseCase: DeleteCartUseCase,
+    private val couponByCityUseCase: CouponByCityUseCase,
     private val addToCartUseCase: AddToCartUseCase,
     private val addLogUseCase: AddLogUseCase,
     private val settingUseCase: SettingsUseCase
@@ -157,6 +159,11 @@ class HomeViewModel @Inject constructor(
             }
 
             HomeEvent.CheckDefaultAddress -> hasDefaultAddress()
+            HomeEvent.GetCoupon -> {
+                if(state.defaultAddress != null){
+                    getCoupons()
+                }
+            }
         }
     }
 
@@ -553,6 +560,37 @@ class HomeViewModel @Inject constructor(
                             errorMessage = result.message
                         )
                     }
+                }
+
+            }
+        }
+    }
+
+
+    private fun getCoupons() {
+        viewModelScope.launch {
+            couponByCityUseCase.execute(
+                state.defaultAddress!!.city.id
+            ).collect { result ->
+                state = when (result) {
+                    is Resource.Loading -> state.copy(couponLoading = true)
+                    is Resource.Success -> {
+                        val data = result.data
+                        val isError = data?.status == Status.error.name
+
+                        state.copy(
+                            couponLoading = false,
+                            isError = isError,
+                            couponList = data?.coupon ?: emptyList(),
+                        )
+                    }
+
+                    is Resource.Error ->
+                        state.copy(
+                            couponLoading = false,
+                            isError = true,
+                            errorMessage = result.message
+                        )
                 }
 
             }
