@@ -151,7 +151,7 @@ fun CheckoutScreen(
 
     LaunchedEffect(state) {
         when {
-            (state.cart!!.result.isEmpty()) -> {
+            (state.cart == null || state.cart!!.result.isEmpty()) -> {
                 navigateBack()
             }
 
@@ -545,11 +545,11 @@ fun CheckoutScreenContent(
         PriceData(
             title = "Last Mile Long Distance Extra Delivery Charge",
             price = state.cart?.lastMileLongDistanceExtraCharge ?: "",
-            subTitle = if ((state.cart != null) &&
-                (state.cart.lastMileFreeLongDistance.isNullOrEmpty() && state.cart.lastMileLongDistance.isNullOrEmpty()) &&
-                (state.cart.lastMileFreeLongDistance.toDouble() < state.cart.lastMileLongDistance.toDouble())
-            )
-                "(Last Mile Distance - Free Distance)* Multiplier\n(${state.cart.lastMileLongDistance} - ${state.cart.lastMileFreeLongDistance})Km*${state.cart.lastMileLongDistanceMultiplier}/Km"
+            subTitle =
+            if ((state.cart != null) &&
+                (!state.cart.lastMileFreeLongDistance.isNullOrEmpty() && !state.cart.lastMileLongDistance.isNullOrEmpty()) &&
+                (state.cart.lastMileFreeLongDistance.toDouble() < state.cart.lastMileLongDistance.toDouble()))
+                "(Last Mile Distance - Free Distance)* Multiplier\n(${state.cart.lastMileLongDistance} - ${state.cart.lastMileFreeLongDistance})Km * $rupeeSign${state.cart.lastMileLongDistanceMultiplier}/Km"
             else null
         ),
         PriceData(

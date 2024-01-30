@@ -1,6 +1,7 @@
 package me.taste2plate.app.customer.presentation.screens.ghar_ka_khana
 
 import android.content.res.Configuration
+import android.util.Log
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -142,24 +143,74 @@ fun ContentConfirmBooking(
         }
 
         val data = state.checkout!!
+        val totalDistance =
+            if (data.pickupDistance.isNullOrEmpty() && data.deliveryDistance.isNullOrEmpty()) 0.0
+            else data.pickupDistance!!.toDecimal() + data.deliveryDistance!!.toDecimal()
+
+        val longDistanceExtraPickupCost =
+            if (data.pickUpFreeDistance.isNullOrEmpty() && data.multiplierForPickup.isNullOrEmpty())
+                0.0
+            else
+                (totalDistance - data.pickUpFreeDistance!!.toDecimal()) * data.multiplierForPickup!!.toDecimal()
+
+        val longDistanceExtraDeliveryCost =
+            if (data.deliveryFreeDistance.isNullOrEmpty() && data.multiplierForDelivery.isNullOrEmpty())
+                0.0
+            else
+                (totalDistance - data.deliveryFreeDistance!!.toDecimal()) * data.multiplierForDelivery!!.toDecimal()
+
+        Log.e("Distance", "Delivery Distance : ${data.deliveryDistance}\nPickup Distance : ${data.pickupDistance}" +
+                "Total Distance : $totalDistance" +
+                "Calulate Delivery Cost : ($totalDistance - ${data.deliveryFreeDistance}) * ${data.multiplierForDelivery}")
+
+        Log.e("Distance", "Delivery Distance : ${data.deliveryDistance}\nPickup Distance : ${data.pickupDistance}" +
+                "Total Distance : $totalDistance" +
+                "Calulate Pikckup Cost : ($totalDistance - ${data.pickUpFreeDistance}) * ${data.multiplierForPickup}")
+
         val priceList = listOf(
             PriceData(
                 title = "Billing Summery\n",
-                price ="",
+                price = "",
                 bold = true
+            ),
+            PriceData(
+                title = "Shipping Cost\n",
+                price = rupeeSign + data.shippingPrice?.toDecimal().toString() + "\n"
+            ),
+            PriceData(
+                title = "Long Distance Extra Pickup Cost",
+                price = rupeeSign + "$longDistanceExtraPickupCost",
+                subTitle = "(Total Distance - Free Distance) Km x Rate / Km\n($totalDistance - ${data.pickUpFreeDistance}) Km x $rupeeSign${data.multiplierForPickup} / Km\n"
+            ),
+            PriceData(
+                title = "Long Distance Extra Delivery Cost",
+                price = rupeeSign + "$longDistanceExtraDeliveryCost",
+                subTitle = "(Total Distance - Free Distance) Km x Rate / Km\n($totalDistance - ${data.deliveryFreeDistance}) Km x $rupeeSign${data.multiplierForDelivery} / Km\n"
             ),
             PriceData(
                 title = "CGST",
                 price = rupeeSign + data.cgst?.toDecimal().toString()
             ),
             PriceData(
-                title = "IGST",
-                price = rupeeSign + data.igst?.toDecimal().toString()
-            ),
-            PriceData(
                 title = "SGST",
                 price = rupeeSign + data.sgst?.toDecimal().toString()
             ),
+            PriceData(
+                title = "IGST\n",
+                price = rupeeSign + data.igst?.toDecimal().toString()
+            ),
+            PriceData(
+                title = "Total Estimated Weight\n",
+                bold = true,
+                price = "${data.totalWeight?.toDecimal().toString()} Kg\n"
+            ),
+            PriceData(
+                title = "Total estimated Shipping Cost\n",
+                bold = true,
+                price = "$rupeeSign${data.totalPrice?.toDecimal().toString()}\n"
+            ),
+
+/*
             PriceData(
                 title = "Pickup Price",
                 price = rupeeSign + data.pickupPrice?.toDecimal().toString()
@@ -174,31 +225,34 @@ fun ContentConfirmBooking(
                 bold = true
             ),
             PriceData(
-                title = "Total Weight\n",
-                bold = true,
-                price = "${data.totalWeight?.toDecimal().toString()} Kg\n"
-            ),
-            PriceData(
                 title = "Pickup Distance",
                 price = "${data.pickupDistance?.toDecimal().toString()} Km"
             ),
             PriceData(
                 title = "Delivery Distance",
                 price = "${data.deliveryDistance?.toDecimal().toString()} Km"
-            ),
+            ),*/
         )
 
         items(
             priceList
         ) { price ->
             val itemList = listOf<@Composable RowScope.() -> Unit> {
-                Text(
-                    text = price.title,
-                    fontWeight = if (price.bold) FontWeight.Bold else FontWeight.Light,
-                    fontSize = fontSize,
-                )
+                Column {
+                    Text(
+                        text = price.title,
+                        fontWeight = if (price.bold) FontWeight.Bold else FontWeight.Normal,
+                        fontSize = fontSize,
+                    )
 
-                //if (price.subTitle != null)
+                    if (price.subTitle != null)
+                        Text(
+                            text = price.subTitle,
+                            fontSize = 12.sp,
+                        )
+                }
+
+                //
                 Text(
                     text = price.price,
                     fontSize = 12.sp,

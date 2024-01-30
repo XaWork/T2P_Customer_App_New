@@ -17,8 +17,8 @@ android {
         applicationId = "me.taste2plate.app.customer"
         minSdk = 26
         targetSdk = 34
-        versionCode = 417
-        versionName = "4.17"
+        versionCode = 419
+        versionName = "4.19"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {

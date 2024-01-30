@@ -114,8 +114,8 @@ class CheckOutViewModel @Inject constructor(
         when (event) {
             is CheckoutEvents.GetCart -> {}
             is CheckoutEvents.RemoveCoupon -> {
-                if (state.deliveryType == DeliveryType.Standard)
-                    codEnabled = true
+               /* if (state.deliveryType == DeliveryType.Standard)
+                    codEnabled = true*/
                 state = state.copy(applyCouponResponse = null)
                 getCart()
             }
@@ -389,7 +389,7 @@ class CheckOutViewModel @Inject constructor(
         if (state.deliveryType == DeliveryType.Express) {
             codEnabled = false
             showDialogExpress = true
-        } else codEnabled = state.applyCouponResponse == null
+        } else codEnabled = true
     }
 
     private fun setPriceAfterApplyCoupon() {
@@ -1196,7 +1196,7 @@ class CheckOutViewModel @Inject constructor(
                         //COD is not applicable after coupon applied
                         if (!isError) {
                             appliedCoupon = couponCode
-                            codEnabled = false
+                            //codEnabled = false
                             state = state.copy(paymentType = PaymentType.Online)
                             setPriceAfterApplyCoupon()
                             addLog(

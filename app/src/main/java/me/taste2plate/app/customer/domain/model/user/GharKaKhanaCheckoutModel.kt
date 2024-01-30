@@ -10,6 +10,8 @@ data class GharKaKhanaCheckoutModel(
     val deliveryDate: String?,
     @SerializedName("delivery_distance")
     val deliveryDistance: String?,
+    @SerializedName("delivery_free_distance")
+    val deliveryFreeDistance: String?,
     @SerializedName("delivery_price")
     val deliveryPrice: String?,
     @SerializedName("delivery_timeslot")
@@ -18,6 +20,12 @@ data class GharKaKhanaCheckoutModel(
     val igst: String?,
     @SerializedName("message")
     val message: String?,
+    @SerializedName("multiplier_for_delivery")
+    val multiplierForDelivery: String?,
+    @SerializedName("multiplier_for_pickup")
+    val multiplierForPickup: String?,
+    @SerializedName("pick_up_free_distance")
+    val pickUpFreeDistance: String?,
     @SerializedName("pickup_distance")
     val pickupDistance: String?,
     @SerializedName("pickup_price")
@@ -26,6 +34,8 @@ data class GharKaKhanaCheckoutModel(
     val result: List<Result?>?,
     @SerializedName("sgst")
     val sgst: String?,
+    @SerializedName("shipping_price")
+    val shippingPrice: String?,
     @SerializedName("status")
     val status: String?,
     @SerializedName("total_price")
